@@ -4,6 +4,8 @@ import Foundation
 /// A missing value identifies a legacy row whose `intensityMode` and
 /// `targetValue` remain authoritative.
 public enum PlanLoadMode: String, Codable, CaseIterable, Sendable {
+  case freeWeight = "free_weight"
+  case bodyweight
   case percentage = "pct"
   case rpe
   case rir

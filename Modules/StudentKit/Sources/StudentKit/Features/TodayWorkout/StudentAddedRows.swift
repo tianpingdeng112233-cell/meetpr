@@ -34,6 +34,7 @@ enum StudentAddedRows {
         exercise: exercise, set: PrescribedSet(id: log.id, setIndex: log.setIndex),
         weight: log.weightKg, reps: log.reps)
       draft.actualRPE = log.rpe
+      draft.actualRIR = log.actualRIR
       draft.applyPersistResult(log, completed: log.completed, failed: log.failed)
       return draft
     }

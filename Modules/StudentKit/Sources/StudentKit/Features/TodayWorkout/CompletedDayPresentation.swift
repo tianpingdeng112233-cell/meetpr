@@ -58,7 +58,10 @@ struct CompletedDayPresentation: Equatable, Sendable {
       }
       let weight = draft.actualWeight.map { UnitDisplay.weightText(kg: $0, unit: unit) } ?? "—"
       let reps = draft.actualReps.map(String.init) ?? "—"
-      let rpe = draft.actualRPE.map { " · RPE \(StudentFormatting.decimal($0))" } ?? ""
+      let rpe =
+        draft.actualRIR.map { " · RIR \($0)" } ?? draft.actualRPE.map {
+          " · RPE \(StudentFormatting.decimal($0))"
+        } ?? ""
       result = "\(weight) \(UnitDisplay.weightUnitSuffix(unit)) × \(reps)\(rpe)"
     }
   }

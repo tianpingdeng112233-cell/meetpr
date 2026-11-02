@@ -328,6 +328,30 @@ public final class APIClient: Sendable {
 
 }
 
+extension APIClient {
+  /// Public launch check. Connectivity, malformed responses and missing build metadata fail open.
+  public func requiredAppUpdate(currentBuild: Int?) async -> Int? {
+    guard let currentBuild else { return nil }
+    var request = URLRequest(
+      url: url(path: "/app/min-version", queryItems: [URLQueryItem(name: "platform", value: "ios")])
+    )
+    request.httpMethod = "GET"
+    request.timeoutInterval = 8
+    do {
+      let data = try await perform(request)
+      let response = try MeetPRCodec.decoder.decode(MinimumAppVersion.self, from: data)
+      return response.minBuild > currentBuild ? response.minBuild : nil
+    } catch {
+      return nil
+    }
+  }
+
+}
+
+private struct MinimumAppVersion: Decodable, Sendable {
+  let minBuild: Int
+}
+
 private final class UnauthorizedRecoveryStore: @unchecked Sendable {
   private let lock = NSLock()
   private var handler: APIClient.UnauthorizedRecovery?

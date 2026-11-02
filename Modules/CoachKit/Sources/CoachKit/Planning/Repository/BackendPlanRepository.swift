@@ -3,6 +3,7 @@ import Foundation
 import Networking
 
 public enum BackendPlanRepositoryError: Error, Equatable, Sendable {
+  case unsupportedPrescription(setID: UUID)
   case missingServerDayID(localDayID: UUID)
   case missingServerExerciseID(localExerciseID: UUID)
 }
@@ -189,14 +190,17 @@ public actor BackendPlanRepository: PlanRepository {
         )
       }
 
+      guard let intensityMode = set.intensityMode, let targetValue = set.targetValue,
+        set.loadMode != .freeWeight, set.loadMode != .bodyweight
+      else { throw BackendPlanRepositoryError.unsupportedPrescription(setID: set.id) }
       let createdSet = try await api.createPlanSet(
         planExerciseID: serverExerciseID,
         CreatePlanSetRequestDTO(
           setNumber: set.setNumber,
           targetReps: set.targetReps,
           targetRepsMax: set.targetRepsMax,
-          intensityMode: set.intensityMode,
-          targetValue: set.targetValue,
+          intensityMode: intensityMode,
+          targetValue: targetValue,
           setType: set.setType,
           restSeconds: set.restSeconds,
           coachNote: set.coachNote

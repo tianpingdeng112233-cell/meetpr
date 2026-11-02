@@ -10,6 +10,7 @@ struct QuickLogPlan: Equatable, Sendable {
   struct Row: Equatable, Sendable, Identifiable {
     let id: UUID
     var draft: TodayWorkoutViewModel.SetRowDraft
+    var effortMode: ActualEffortMode
     var included: Bool
     var usesAutomaticWeight: Bool
 
@@ -20,6 +21,11 @@ struct QuickLogPlan: Equatable, Sendable {
     ) {
       self.id = draft.id
       self.draft = draft
+      self.effortMode = AccessoryRow(draft: draft, previous: nil, unit: .kg).input.effortMode
+      if draft.isAccessory && draft.loggedSetID == nil {
+        self.draft.actualRPE = nil
+        self.draft.actualRIR = nil
+      }
       self.included = included
       self.usesAutomaticWeight = usesAutomaticWeight
     }
@@ -104,7 +110,28 @@ struct QuickLogPlan: Equatable, Sendable {
   }
 
   mutating func updateRPE(_ rpe: Decimal?, for rowID: UUID) {
-    update(rowID) { $0.draft.actualRPE = rpe }
+    update(rowID) {
+      if $0.effortMode == .rir {
+        $0.draft.actualRIR = rpe.map { min(9, max(0, NSDecimalNumber(decimal: $0).intValue)) }
+        $0.draft.actualRPE = nil
+      } else {
+        $0.draft.actualRPE = rpe
+        $0.draft.actualRIR = nil
+      }
+    }
+  }
+
+  mutating func switchEffort(for exerciseID: UUID) {
+    let pending = rows.filter {
+      $0.draft.planExerciseID == exerciseID && $0.draft.loggedSetID == nil && $0.draft.isAccessory
+    }
+    guard let first = pending.first else { return }
+    let mode: ActualEffortMode = first.effortMode == .rpe ? .rir : .rpe
+    for index in rows.indices where pending.contains(where: { $0.id == rows[index].id }) {
+      rows[index].effortMode = mode
+      rows[index].draft.actualRPE = nil
+      rows[index].draft.actualRIR = nil
+    }
   }
 
   mutating func setIncluded(_ included: Bool, for rowID: UUID) {

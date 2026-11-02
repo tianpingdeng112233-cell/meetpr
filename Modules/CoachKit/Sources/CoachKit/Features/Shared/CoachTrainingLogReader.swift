@@ -21,7 +21,8 @@ extension CoachSetLogDTO {
     self.init(
       id: log.id, studentID: log.studentID, planExerciseID: log.planExerciseID,
       exerciseID: log.exerciseID, setIndex: log.setIndex, weightKg: log.weightKg,
-      reps: log.reps, rpe: log.rpe, coachRPE: log.coachRPE, completed: log.completed,
+      reps: log.reps, rpe: log.rpe, actualRIR: log.actualRIR, coachRPE: log.coachRPE,
+      completed: log.completed,
       failed: log.failed, assumed: log.assumed, loggedAt: log.loggedAt, loggedDate: log.loggedDate
     )
   }
@@ -32,7 +33,7 @@ extension CoachSetLogDTO {
     return StudentSetLog(
       id: id, studentID: studentID, planExerciseID: planExerciseID, exerciseID: exerciseID,
       setIndex: setIndex, loggedAt: loggedAt, loggedDate: loggedDate,
-      weightKg: weightKg, reps: reps, rpe: rpe, coachRPE: coachRPE,
+      weightKg: weightKg, reps: reps, rpe: rpe, actualRIR: actualRIR, coachRPE: coachRPE,
       completed: completed, failed: failed, assumed: assumed
     )
   }

@@ -4,6 +4,7 @@ import SwiftUI
 struct AccessoryLogRow: View {
   @Binding var row: AccessoryRow
   let number: Int
+  var columnEffortMode: ActualEffortMode = .rpe
   let isSaving: Bool
   let isDisabled: Bool
   let showsValidation: Bool
@@ -16,6 +17,15 @@ struct AccessoryLogRow: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      if row.input.effortMode != columnEffortMode {
+        Text(
+          row.draft.loggedSetID != nil
+            ? StudentStrings.replacing(
+              .accessoryRecordedEffort, values: [String(number), row.input.effortMode.label])
+            : row.input.effortMode.label
+        )
+        .font(.caption2).foregroundStyle(Color.MeetPR.textSecondary)
+      }
       AccessoryColumns {
         Button(action: onEdit) {
           VStack(spacing: MeetPRSpacing.zero) {
@@ -39,7 +49,7 @@ struct AccessoryLogRow: View {
           Text(
             row.previousReps.map {
               [
-                row.isBodyweight ? StudentStrings.localized(.accessoryBw) : row.weightPlaceholder,
+                row.weightPlaceholder,
                 String($0),
               ].joined(separator: " × ")
             } ?? "—"
@@ -52,17 +62,11 @@ struct AccessoryLogRow: View {
         .foregroundStyle(Color.MeetPR.textMuted)
         .disabled(row.previousReps == nil)
         .accessibilityLabel(copy(.accessoryUseLast))
-        if row.isBodyweight {
-          Text(StudentStrings.localized(.accessoryBw))
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-            .lineLimit(1).minimumScaleFactor(0.5)
-            .frame(maxWidth: .infinity)
-        } else {
-          field(
-            .weight, text: $row.input.weight, placeholder: row.weightPlaceholder,
-            invalid: row.weightKg == nil
-              && (!row.input.weight.isEmpty || editedWeight || showsValidation))
-        }
+        field(
+          .weight, text: $row.input.weight,
+          placeholder: row.isBodyweight ? "0" : row.weightPlaceholder,
+          invalid: row.weightKg == nil
+            && (!row.input.weight.isEmpty || editedWeight || showsValidation))
         field(.reps, text: $row.input.reps, placeholder: "", invalid: row.reps == nil)
         field(
           .rpe, text: $row.input.rpe, placeholder: row.isRecorded ? "" : row.rpePlaceholder,
@@ -137,12 +141,17 @@ struct AccessoryLogRow: View {
       .accessibilityLabel(
         copy(
           field == .weight
-            ? .accessoryWeightLabel : field == .reps ? .accessoryRepsLabel : .accessoryRpeLabel)
+            ? .accessoryWeightLabel
+            : field == .reps
+              ? .accessoryRepsLabel
+              : row.input.effortMode == .rir ? .accessoryRirLabel : .accessoryRpeLabel)
       )
       .accessibilityIdentifier("accessory.set.\(number).\(field)")
       .onChange(of: row.input.weight) { _, _ in editedWeight = true }
       #if os(iOS)
-        .keyboardType(field == .reps ? .numberPad : .decimalPad)
+        .keyboardType(
+          (field == .reps || (field == .rpe && row.input.effortMode == .rir))
+            ? .numberPad : .decimalPad)
       #endif
   }
 

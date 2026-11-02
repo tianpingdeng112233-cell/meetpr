@@ -198,7 +198,8 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
 
   func accessoryExercise(isEditable: Bool) -> Exercise? {
     guard let flow = trainingFlow(isEditable: isEditable),
-      let exercise = flow.hero, flow.currentRow?.draft.isAccessory == true
+      let exercise = flow.hero, let draft = flow.currentRow?.draft,
+      draft.isAccessory || draft.prescribed.hasUnspecifiedLoad
     else { return nil }
     return exercise
   }

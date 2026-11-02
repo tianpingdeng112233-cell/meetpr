@@ -12,6 +12,7 @@ extension MeetPRNumberPad.Field {
     case .weight: StudentStrings.localized(.quickLog018)
     case .reps: StudentStrings.localized(.quickLog019)
     case .rpe: StudentStrings.localized(.quickLog010)
+    case .rir: "RIR"
     }
   }
 }
@@ -88,6 +89,7 @@ struct QuickLogSheet: View {
                 activeCell = QuickLogActiveCell(rowID: rowID, field: field)
               },
               onToggle: toggleRow,
+              onSwitchEffort: { plan.switchEffort(for: item.exercise.id) },
               onRestore: {
                 plan.setExerciseIncluded(true, planExerciseID: item.exercise.id)
               }
@@ -175,7 +177,7 @@ struct QuickLogSheet: View {
     }
 
     return MeetPRNumberPad(
-      field: activeCell.field,
+      field: activeCell.field == .rpe && row.effortMode == .rir ? .rir : activeCell.field,
       value: numberPadValue(activeCell.field, row: row),
       minimumWeight: row.draft.isAccessory ? 0 : 20,
       contextText: QuickLogCellLabel.text(for: row, field: activeCell.field),
@@ -199,7 +201,10 @@ struct QuickLogSheet: View {
     switch field {
     case .weight: NSDecimalNumber(decimal: row.draft.actualWeight ?? 0).doubleValue
     case .reps: Double(row.draft.actualReps ?? 1)
-    case .rpe: NSDecimalNumber(decimal: row.draft.actualRPE ?? 8).doubleValue
+    case .rpe, .rir:
+      row.effortMode == .rir
+        ? Double(row.draft.actualRIR ?? 0)
+        : NSDecimalNumber(decimal: row.draft.actualRPE ?? 8).doubleValue
     }
   }
 
@@ -214,7 +219,7 @@ struct QuickLogSheet: View {
     switch cell.field {
     case .weight: plan.updateWeight(Decimal(value), for: cell.rowID)
     case .reps: plan.updateReps(Int(value), for: cell.rowID)
-    case .rpe: plan.updateRPE(Decimal(value), for: cell.rowID)
+    case .rpe, .rir: plan.updateRPE(Decimal(value), for: cell.rowID)
     }
   }
 
@@ -224,7 +229,7 @@ struct QuickLogSheet: View {
       return QuickLogActiveCell(rowID: cell.rowID, field: .reps)
     case .reps:
       return QuickLogActiveCell(rowID: cell.rowID, field: .rpe)
-    case .rpe:
+    case .rpe, .rir:
       let included = plan.rows.filter(\.included)
       guard let index = included.firstIndex(where: { $0.id == cell.rowID }),
         included.indices.contains(index + 1)
@@ -273,7 +278,7 @@ private enum QuickLogCellLabel {
       values: [
         row.draft.displayExerciseName,
         "\(SetDisplayNumber.number(for: row.draft))",
-        field.quickLogTitle,
+        field == .rpe ? row.effortMode.label : field.quickLogTitle,
       ]
     )
   }
@@ -457,6 +462,7 @@ private struct QuickLogExerciseCard: View {
   let activeField: QuickLogField?
   let onSelect: (UUID, QuickLogField) -> Void
   let onToggle: (UUID) -> Void
+  let onSwitchEffort: () -> Void
   let onRestore: () -> Void
 
   private var includedCount: Int { rows.count(where: \.included) }
@@ -484,7 +490,10 @@ private struct QuickLogExerciseCard: View {
           includedCount: includedCount,
           setCount: rows.count
         )
-        QuickLogColumnHeaders()
+        QuickLogColumnHeaders(
+          effortLabel: rows.first(where: { $0.draft.loggedSetID == nil })?.effortMode.label ?? rows
+            .first?.effortMode.label ?? "RPE",
+          onSwitch: rows.allSatisfy { $0.draft.isAccessory } ? onSwitchEffort : nil)
         VStack(spacing: MeetPRSpacing.point6) {
           ForEach(rows) { row in
             if row.draft.isExtra {
@@ -567,17 +576,27 @@ private struct QuickLogExerciseHeader: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct QuickLogColumnHeaders: View {
+  let effortLabel: String
+  let onSwitch: (() -> Void)?
   var body: some View {
     HStack(spacing: MeetPRSpacing.point6) {
       Text("#").frame(width: MeetPRSpacing.space6, alignment: .leading)
       Text(StudentStrings.localized(.quickLog008)).frame(maxWidth: .infinity, alignment: .leading)
       Text(StudentStrings.localized(.quickLog009)).frame(maxWidth: .infinity, alignment: .leading)
-      Text(StudentStrings.localized(.quickLog010)).frame(maxWidth: .infinity, alignment: .leading)
+      Group {
+        if let onSwitch {
+          Button(action: onSwitch) { EffortToggleLabel(text: effortLabel) }.frame(
+            minHeight: MeetPRSpacing.minimumHitTarget
+          ).accessibilityLabel(
+            StudentStrings.localized(.accessoryEffortSwitch))
+        } else {
+          Text(effortLabel)
+        }
+      }.frame(maxWidth: .infinity, alignment: .leading)
       Text(StudentStrings.localized(.quickLog011)).frame(width: MeetPRSpacing.point32)
     }
     .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
     .foregroundStyle(Color.MeetPR.textFaint)
-    .accessibilityHidden(true)
   }
 }
 
@@ -603,7 +622,11 @@ private struct QuickLogSetRow: View {
         showsAutomatic: row.usesAutomaticWeight
       )
       metric(row.draft.actualReps.map(String.init) ?? "—", unit: nil, field: .reps)
-      metric(StudentFormatting.decimal(row.draft.actualRPE), unit: nil, field: .rpe)
+      metric(
+        row.effortMode == .rir
+          ? row.draft.actualRIR.map(String.init) ?? "—"
+          : StudentFormatting.decimal(row.draft.actualRPE),
+        unit: row.effortMode.label, field: .rpe)
       Button(
         action: onToggle,
         label: {

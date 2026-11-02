@@ -17,23 +17,25 @@ struct AccessoryWorkoutHero: View {
       TodayWorkoutRecordingHeader(
         exerciseName: exercise.name, showsAskCoach: showsAskCoach,
         isPreparingAskCoach: isPreparingAskCoach, onAskCoach: onAskCoach)
-      Text(
-        [
-          StudentStrings.localized(.accessoryAccessory),
-          exercise.rows.allSatisfy {
-            AccessoryRow(draft: $0.draft, previous: nil, unit: .kg).isBodyweight
-          } ? StudentStrings.localized(.accessoryBodyweight) : nil,
-          exercise.prescriptionSummary ?? exercise.cardSubtitle,
-          StudentStrings.replacing(
-            .todayWorkoutPresentation003,
-            values: [String(exercise.stableIndex + 1), String(exerciseTotal)]
-          )
-          .trimmingCharacters(in: CharacterSet(charactersIn: " ·")),
-        ].compactMap { $0 }.joined(separator: " · ")
-      )
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-      .foregroundStyle(Color.MeetPR.textMuted)
-      .lineLimit(1)
+      if !exercise.rows.contains(where: { $0.draft.prescribed.hasUnspecifiedLoad }) {
+        Text(
+          [
+            StudentStrings.localized(.accessoryAccessory),
+            exercise.rows.allSatisfy {
+              AccessoryRow(draft: $0.draft, previous: nil, unit: .kg).isBodyweight
+            } ? StudentStrings.localized(.accessoryBodyweight) : nil,
+            exercise.prescriptionSummary ?? exercise.cardSubtitle,
+            StudentStrings.replacing(
+              .todayWorkoutPresentation003,
+              values: [String(exercise.stableIndex + 1), String(exerciseTotal)]
+            )
+            .trimmingCharacters(in: CharacterSet(charactersIn: " ·")),
+          ].compactMap { $0 }.joined(separator: " · ")
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .lineLimit(1)
+      }
       if let note = CoachNoteDisplay.heroExerciseNote(isEditable: true, notes: exercise.note) {
         HeroCoachNote(note: note)
       }

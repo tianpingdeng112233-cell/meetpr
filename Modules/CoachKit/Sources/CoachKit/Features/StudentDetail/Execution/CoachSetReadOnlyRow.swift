@@ -24,8 +24,12 @@ struct CoachSetReadOnlyRow: View {
         LabeledContent(CoachLocalization.localized("coach.videoFeedback.reps")) {
           Text(log.reps.formatted())
         }
-        LabeledContent(CoachLocalization.localized("coach.videoFeedback.rpe")) {
-          Text(log.rpe?.formatted(.number.precision(.fractionLength(0...2))) ?? "–")
+        LabeledContent(
+          log.actualRIR != nil ? "RIR" : CoachLocalization.localized("coach.videoFeedback.rpe")
+        ) {
+          Text(
+            log.actualRIR.map { String($0) } ?? log.rpe?.formatted(
+              .number.precision(.fractionLength(0...2))) ?? "–")
         }
       }
       .font(Font.MeetPR.bodyEmphasis)

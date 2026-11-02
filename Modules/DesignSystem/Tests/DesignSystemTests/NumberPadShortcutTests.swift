@@ -60,3 +60,10 @@ struct NumberPadShortcutTests {
     #expect(title == "Next" ? nextValue == 100.5 : syncValue == 100.5)
   }
 }
+
+@MainActor
+@Test func rirKeypadKeepsZeroAndTwoInsteadOfApplyingRPEFloor() {
+  #expect(MeetPRNumberPad.snapped(0, field: .rir) == 0)
+  #expect(MeetPRNumberPad.snapped(2, field: .rir) == 2)
+  #expect(MeetPRNumberPad.snapped(12, field: .rir) == 9)
+}

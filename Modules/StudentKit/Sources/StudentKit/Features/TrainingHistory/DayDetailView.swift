@@ -67,9 +67,12 @@ public struct DayDetailView: View {
           }
           Spacer()
           if let log {
-            Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .semibold))
-              .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textPrimary)
+            Text(
+              StudentFormatting.result(
+                weightKg: log.weightKg, reps: log.reps, rpe: log.rpe, actualRIR: log.actualRIR)
+            )
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .semibold))
+            .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textPrimary)
           } else {
             Text(StudentFormatting.prescribed(set))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size15))

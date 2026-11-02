@@ -4,6 +4,29 @@ import Networking
 import Testing
 
 @Suite struct SetLogDTOTests {
+  @Test func explicitEmptyActualRIRClearsPreviouslyRecordedEffort() throws {
+    let object = try #require(
+      JSONSerialization.jsonObject(with: MeetPRCodec.encoder.encode(makeRequest(loggedDate: nil)))
+        as? [String: Any])
+    #expect(object["actual_rir"] is NSNull)
+  }
+
+  @Test func actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() throws {
+    let request = CreateSetLogRequestDTO(
+      planExerciseID: UUID(), setIndex: 0, weightKg: 0, reps: 10, actualRIR: 2, completed: true)
+    let object = try #require(
+      JSONSerialization.jsonObject(with: MeetPRCodec.encoder.encode(request)) as? [String: Any])
+    #expect(object["actual_rir"] as? Int == 2)
+    let dto = SetLogDTO(
+      id: UUID(), studentID: UUID(), planExerciseID: request.planExerciseID, setIndex: 0,
+      weightKg: 0, reps: 10, actualRIR: 2, completed: true, loggedAt: Date())
+    let fetched = try MeetPRCodec.decoder.decode(
+      SetLogDTO.self, from: MeetPRCodec.encoder.encode(dto)
+    ).toDomain()
+    #expect(fetched.actualRIR == 2)
+    #expect(fetched.rpe == nil)
+  }
+
   @Test func nilLoggedDateOmitsWireKey() throws {
     let request = makeRequest(loggedDate: nil)
 

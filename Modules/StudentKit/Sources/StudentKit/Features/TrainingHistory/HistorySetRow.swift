@@ -29,7 +29,8 @@ struct HistorySetRow: View {
     label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
     result =
       log.map {
-        StudentFormatting.result(weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe)
+        StudentFormatting.result(
+          weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe, actualRIR: $0.actualRIR)
       } ?? StudentFormatting.prescribed(set)
     completed = log?.completed
   }

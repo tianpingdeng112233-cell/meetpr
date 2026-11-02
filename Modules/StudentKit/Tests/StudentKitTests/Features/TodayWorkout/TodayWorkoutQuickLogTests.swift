@@ -7,7 +7,7 @@ import Testing
 
 @MainActor
 @Suite struct TodayWorkoutQuickLogTests {
-  @Test func unrecordedAccessoryQuickLogPreservesPrescribedAndFallbackRPE() async throws {
+  @Test func unrecordedAccessoryQuickLogDoesNotSubmitPrescribedOrFallbackRPE() async throws {
     let studentID = StudentDemoSeed.studentID
     let exercise = Exercise(
       id: UUID(), name: "Row", exerciseType: .accessory, isCompetitionLift: false,
@@ -28,11 +28,11 @@ import Testing
     let drafts = try #require(model.currentDrafts)
     #expect(drafts.allSatisfy { $0.loggedSetID == nil && !$0.completed })
     let quickLog = makeQuickLogTestPlan(drafts: drafts)
-    #expect(quickLog.rows.map(\.draft.actualRPE) == [7, 8])
+    #expect(quickLog.rows.map(\.draft.actualRPE) == [nil, nil])
     #expect(await model.quickLog(plan: quickLog) == .completed)
     let stored = try await logs.fetchLogsForExercise(
       studentID: studentID, planExerciseID: planExercise.id)
-    #expect(stored.sorted { $0.setIndex < $1.setIndex }.map(\.rpe) == [7, 8])
+    #expect(stored.sorted { $0.setIndex < $1.setIndex }.map(\.rpe) == [nil, nil])
   }
 
   @Test func prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() async throws {
