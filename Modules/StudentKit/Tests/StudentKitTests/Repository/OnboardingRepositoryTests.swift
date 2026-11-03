@@ -42,7 +42,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   #expect(profile.heightCm == 165)
 }
 
-// MARK: - Completion gate mirror (18 + 1 conditional)
+// MARK: - Completion gate mirror (12 + 1 conditional)
 
 @Test func completeWithoutRowReportsAllRequiredFields() async {
   let repo = makeRepo()
@@ -52,7 +52,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   do {
     _ = try await repo.complete()
   } catch OnboardingError.incomplete(let missing) {
-    #expect(missing.count == 18)
+    #expect(missing.count == 12)
     #expect(missing.contains("unit_preference"))
     #expect(missing.contains("is_competing"))
   } catch {
@@ -63,15 +63,15 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
 @Test func completeListsExactMissingFields() async throws {
   let repo = makeRepo()
   var draft = OnboardingFixtures.completeDraft()
-  draft.sleepHours = nil
-  draft.gymTier = nil
+  draft.heightCm = nil
+  draft.gender = nil
   _ = try await repo.upsert(draft.fullPatch())
 
   do {
     _ = try await repo.complete()
     Issue.record("expected incomplete")
   } catch OnboardingError.incomplete(let missing) {
-    #expect(Set(missing) == ["sleep_hours", "gym_tier"])
+    #expect(Set(missing) == ["height_cm", "gender"])
   }
 }
 
@@ -141,4 +141,13 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   let other = UUID(uuidString: "0d000000-0000-0000-0000-000000000003")!
   let profile = try await repo.fetchProfile(studentId: other)
   #expect(profile == nil)
+}
+
+@Test func spec095FourStepProfileCompletesWithoutLegacyFields() async throws {
+  let repo = makeRepo()
+  let profile = try await repo.upsert(OnboardingFixtures.completeDraft().fullPatch())
+  #expect(profile.gymTier == nil)
+  #expect(profile.trainingDays.isEmpty)
+  #expect(profile.sleepHours == nil)
+  #expect(try await repo.complete().isCompleted)
 }

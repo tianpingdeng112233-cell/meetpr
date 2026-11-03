@@ -1,4 +1,5 @@
-// swiftlint:disable type_body_length
+// Dashboard composition retains the existing loading and navigation paths.
+// swiftlint:disable type_body_length file_length
 import Analytics
 import CoreModels
 import DesignSystem
@@ -11,8 +12,14 @@ import SwiftUI
 /// The screen composes existing plan, feedback, e1RM, profile, and notification sources.
 @available(iOS 17.0, macOS 14.0, *)
 public struct DashboardView: View {
+  @Environment(\.bindFirstRun) private var firstRun
+  @Environment(\.refreshBindFirstRun) private var refreshFirstRun
+  private let onOpenProfile: () -> Void
+  private let isVisible: Bool
+  @State private var isStartingFirstPlan = false
   private let studentID: UUID
   private let plans: any StudentPlanRepository
+  private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
   private let onboarding: any OnboardingRepository
   private let feedbackViewModel: FeedbackInboxViewModel
@@ -53,11 +60,16 @@ public struct DashboardView: View {
     planProjectionUpdate: StudentPlanView? = nil,
     onFullReload: @escaping () -> Void = {},
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
-    pushedConversationID: Binding<UUID?> = .constant(nil)
+    pushedConversationID: Binding<UUID?> = .constant(nil),
+    onOpenProfile: @escaping () -> Void = {},
+    isVisible: Bool = true
   ) {
+    self.onOpenProfile = onOpenProfile
+    self.isVisible = isVisible
     self.onboarding = onboarding
     self.studentID = studentID
     self.plans = plans
+    self.logs = logs
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.notifications = notifications
@@ -111,6 +123,11 @@ public struct DashboardView: View {
           },
           onOpenWorkoutDay: openWorkoutDay,
           selectionResetToken: todayReloadToken + todayVolatileReloadToken,
+          onOpenProfile: onOpenProfile,
+          onStartFirstPlan: { Task { await startFirstPlan() } },
+          onDismissFirstPlan: dismissFirstPlan,
+          isStartingFirstPlan: isStartingFirstPlan,
+          isVisible: isVisible,
           onEditProfile: { editingProfile = $0 }
         )
       }
@@ -190,7 +207,7 @@ public struct DashboardView: View {
       isFeedbackLoaded: feedbackViewModel.hasFinishedLoading,
       trendState: e1rmTrendViewModel.state,
       metricsState: profileMetricsViewModel.state,
-      coachName: notifications?.activeCoach?.coachDisplayName
+      coachName: firstRun?.request?.coachDisplayName ?? notifications?.activeCoach?.coachDisplayName
         ?? StudentStrings.localized(.dashboardView003),
       newPRCount: newPRCount,
       showsNotifications: notifications != nil,
@@ -199,7 +216,9 @@ public struct DashboardView: View {
         weekViewModel.state,
         hasAttemptedLoad: hasAttemptedWeekLoad
       ),
-      now: Date()
+      now: Date(),
+      firstRun: firstRun?.isTerminal == true ? nil : firstRun?.request?.firstRun,
+      firstPlan: DashboardTodayPresentation.firstPlan(in: firstRun)
     )
   }
 
@@ -211,11 +230,49 @@ public struct DashboardView: View {
   }
 
   private var stickyStartDay: StudentPlanDay? {
+    guard
+      !DashboardTodayPresentation.hidesBottomStart(
+        firstPlan: DashboardTodayPresentation.firstPlan(in: firstRun))
+    else { return nil }
     let days = weekViewModel.cycleDays
     guard DashboardTodayPresentation.completedToday(in: days, now: Date()) == nil else {
       return nil
     }
     return StudentPlanSequence(days: days).cursorDay
+  }
+
+  private func dismissFirstPlan() {
+    guard let plan = DashboardTodayPresentation.firstPlan(in: firstRun) else { return }
+    Analytics.shared.track(.firstPlanDismiss, props: ["plan_id": .id(plan.id)])
+    firstRun?.dismissPlan()
+  }
+
+  private func startFirstPlan() async {
+    guard !isStartingFirstPlan,
+      let first = DashboardTodayPresentation.firstPlan(in: firstRun)
+    else { return }
+    isStartingFirstPlan = true
+    defer { isStartingFirstPlan = false }
+    let bindingID = firstRun?.request?.id
+    do {
+      guard
+        let handoff = try await DashboardTodayPresentation.firstPlanHandoff(
+          planID: first.id, studentID: studentID, plans: plans, logs: logs)
+      else {
+        completionErrorMessage = StudentStrings.localized(.firstPlanUnavailable)
+        return
+      }
+      guard bindingID == firstRun?.request?.id,
+        DashboardTodayPresentation.firstPlan(in: firstRun)?.id == first.id
+      else { return }
+      Analytics.shared.track(.firstPlanStart, props: ["plan_id": .id(first.id)])
+      firstRun?.dismissPlan()
+      onStartWorkout(handoff)
+    } catch {
+      if !error.isTaskCancellation {
+        completionErrorMessage = StudentStrings.localized(.firstPlanUnavailable)
+      }
+    }
   }
 
   private func openWorkoutDay(_ dayID: UUID) {
@@ -271,11 +328,12 @@ public struct DashboardView: View {
   }
 
   private func loadIfNeeded() async {
+    async let bindingLoad: Void = refreshFirstRun()
     async let weekLoad: Void = loadWeekIfNeeded()
     async let notificationLoad: Void = loadNotificationsIfNeeded()
     async let trendLoad: Void = loadTrendIfNeeded()
     async let metricsLoad: Void = loadMetricsIfNeeded()
-    _ = await (weekLoad, notificationLoad, trendLoad, metricsLoad)
+    _ = await (bindingLoad, weekLoad, notificationLoad, trendLoad, metricsLoad)
     await loadNewPRCount()
   }
 
@@ -295,6 +353,7 @@ public struct DashboardView: View {
 
   private func reload() async {
     hasAttemptedWeekLoad = true
+    async let bindingLoad: Void = refreshFirstRun()
     async let weekLoad: Void = weekViewModel.load(
       studentID: studentID,
       serverAuthoritative: true
@@ -302,15 +361,16 @@ public struct DashboardView: View {
     async let notificationLoad: Void = reloadNotifications()
     async let trendLoad: Void = e1rmTrendViewModel.load(studentID: studentID)
     async let metricsLoad: Void = profileMetricsViewModel.load(studentID: studentID)
-    _ = await (weekLoad, notificationLoad, trendLoad, metricsLoad)
+    _ = await (bindingLoad, weekLoad, notificationLoad, trendLoad, metricsLoad)
     await loadNewPRCount()
     onFullReload()
   }
 
   private func reloadVolatileData() async {
+    async let bindingLoad: Void = refreshFirstRun()
     async let logLoad: Void = weekViewModel.refreshLogs(studentID: studentID)
     async let notificationLoad: Void = reloadVolatileNotifications()
-    _ = await (logLoad, notificationLoad)
+    _ = await (bindingLoad, logLoad, notificationLoad)
     await loadNewPRCount()
   }
 
@@ -383,4 +443,4 @@ public struct DashboardView: View {
   }
 }
 
-// swiftlint:enable type_body_length
+// swiftlint:enable type_body_length file_length

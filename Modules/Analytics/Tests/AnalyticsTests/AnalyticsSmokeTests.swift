@@ -2,7 +2,7 @@ import Testing
 
 @testable import Analytics
 
-@Test func analyticsEventNamesUseBackendRegistryValues() {
+@Test func analyticsEventNamesUseDeclaredContractValues() {
   let expected: [String: Set<String>] = [
     "app_open": ["cold"],
     "screen_view": ["screen"],
@@ -12,6 +12,13 @@ import Testing
     "onboarding_step": ["step_index", "step_name"],
     "onboarding_complete": ["n_steps_filled", "used_draft_resume"],
     "bind_coach_action": ["stage"],
+    // Spec 095 client contract; server allowlist support is tracked in its journal.
+    "notification_permission_action": ["source", "stage", "result"],
+    "bind_welcome_viewed": [],
+    "bind_welcome_continue": [],
+    "first_plan_viewed": ["plan_id"],
+    "first_plan_start": ["plan_id"],
+    "first_plan_dismiss": ["plan_id"],
     "plan_viewed": ["plan_id"],
     "progress_viewed": ["tab"],
     "coach_open_student": ["student_id"],

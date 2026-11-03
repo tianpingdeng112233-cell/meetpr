@@ -6,6 +6,7 @@ public enum PushNotificationKind: String, CaseIterable, Sendable {
   case prCongrats = "pr_congrats"
   case videoPending = "video_pending"
   case bindRequest = "bind_request"
+  case bindAccepted = "bind_accepted"
   case planShift = "plan_shift"
   case planShifted = "plan_shifted"
   case planShiftUndone = "plan_shift_undone"
@@ -19,6 +20,9 @@ public enum PushRouteIntent: Equatable, Sendable {
   case prCongrats(studentID: UUID)
   case videoPending(studentID: UUID, videoID: UUID)
   case bindRequest(requestID: UUID)
+  /// Refresh the authenticated student's binding from the server. Payload
+  /// identifiers never authorize or select a coach locally.
+  case bindAccepted
   case planShift(studentID: UUID, planID: UUID)
   case planShifted(studentID: UUID, planID: UUID)
   case planShiftUndone(studentID: UUID, planID: UUID)
@@ -68,6 +72,8 @@ public enum PushPayloadParser {
       return videoRoute(from: payload)
     case .bindRequest:
       return bindRoute(from: payload)
+    case .bindAccepted:
+      return .bindAccepted
     case .planShift:
       return planRoute(from: payload, kind: kind)
     case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
@@ -89,7 +95,7 @@ public enum PushPayloadParser {
       return .missedTraining(studentID: studentID)
     case .prCongrats:
       return .prCongrats(studentID: studentID)
-    case .chatMessage, .videoPending, .bindRequest, .planShift, .planShifted,
+    case .chatMessage, .videoPending, .bindRequest, .bindAccepted, .planShift, .planShifted,
       .planShiftUndone, .planUpdated, .planPublished:
       return nil
     }
@@ -124,7 +130,7 @@ public enum PushPayloadParser {
       return .planUpdated(studentID: studentID, planID: planID)
     case .planPublished:
       return .planPublished(studentID: studentID, planID: planID)
-    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest:
+    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted:
       return nil
     }
   }

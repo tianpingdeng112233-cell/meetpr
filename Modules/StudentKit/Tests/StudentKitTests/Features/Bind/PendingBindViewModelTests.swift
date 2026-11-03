@@ -1,8 +1,35 @@
+import Analytics
 import Foundation
 import RepositoryContracts
 import Testing
 
 @testable import StudentKit
+
+@Test func spec095PendingSubtitleHandlesEmptyNamedAndCoachNamesInAllLocales() {
+  for (language, empty, named, titled, profileTitle) in [
+    ("zh-Hans", "等待教练接收", "等待教练 王磊 接收", "等待王教练接收", "基础资料"),
+    ("zh-Hant", "等待教練接收", "等待教練 王磊 接收", "等待王教练接收", "基礎資料"),
+    (
+      "en", "Waiting for your coach to accept", "Waiting for coach 王磊 to accept",
+      "Waiting for 王教练 to accept", "Basic profile"
+    ),
+  ] {
+    let locale = Locale(identifier: language)
+    for name: String? in [nil, "", "  \n "] {
+      #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: name, locale: locale) == empty)
+    }
+    #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: "王磊", locale: locale) == named)
+    #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: "王教练", locale: locale) == titled)
+    #expect(StudentStrings.localized(.pendingBindView011, locale: locale) == profileTitle)
+  }
+  #expect(
+    PendingBindViewModel.waitingSubtitle(
+      coachDisplayName: "王教練", locale: Locale(identifier: "zh-Hant")) == "等待王教練接收")
+  #expect(
+    PendingBindViewModel.waitingSubtitle(
+      coachDisplayName: "Coach Wang", locale: Locale(identifier: "en"))
+      == "Waiting for Coach Wang to accept")
+}
 
 // MARK: - Cancel outcomes (spec 031 §7 / risk 4)
 
@@ -67,4 +94,32 @@ import Testing
   #expect(
     PendingBindViewModel.waitingDescription(
       since: start, now: start.addingTimeInterval(-300)) == "0 分钟")
+}
+
+@MainActor
+@Test(arguments: [true, false])
+func welcomePermissionTracksSourceAndStaysOnScreen(allowed: Bool) async {
+  var undecided = true
+  var events: [(AnalyticsEvent, [String: AnalyticsValue])] = []
+  let model = BindWelcomeViewModel(
+    permission: .init(
+      canRequest: { undecided },
+      request: {
+        undecided = false
+        return allowed
+      }),
+    track: { events.append(($0, $1)) })
+  await model.refreshPermission()
+  #expect(model.canRequestPermission)
+  await model.requestPermission()
+  #expect(!model.canRequestPermission)
+  #expect(!model.isRequesting)
+  #expect(events.count == 2)
+  #expect(events[0].0 == .notificationPermissionAction)
+  #expect(events[0].1 == ["source": .enumCase("welcome"), "stage": .enumCase("clicked")])
+  #expect(
+    events[1].1 == [
+      "source": .enumCase("welcome"), "stage": .enumCase("resolved"),
+      "result": .enumCase(allowed ? "allowed" : "denied"),
+    ])
 }

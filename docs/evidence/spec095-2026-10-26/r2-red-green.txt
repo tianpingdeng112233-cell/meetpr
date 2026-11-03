@@ -1,0 +1,86 @@
+DTO missing/null
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-03-34-597Z_pid88366_41435ce2.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/Networking/Tests/NetworkingTests/BindDTOTests.swift:201:15: error: value of type 'BindRequestDTO' has no member 'firstRun'
+    |               `- error: value of type 'BindRequestDTO' has no member 'firstRun'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/Networking/Tests/NetworkingTests/BindDTOTests.swift:202:26: error: value of type 'BindRequest' has no member 'firstRun'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-04-33-622Z_pid88366_3bfc3d31.log
+✔ Test run with 1 test in 0 suites passed after 0.002 seconds.
+
+welcome
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-04-55-189Z_pid88366_4dff6436.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:401:55: error: extra argument 'firstRunDefaults' in call
+    |                                                       `- error: extra argument 'firstRunDefaults' in call
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:403:26: error: cannot infer contextual base in reference to member 'welcome'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-05-53-932Z_pid88366_0cd95be4.log
+✔ Test run with 1 test in 0 suites passed after 0.004 seconds.
+
+settled terminal
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-06-52-757Z_pid88366_51212d63.log
+✘ Test firstRunSettledStudentStaysBoundAndPersistsTerminal() recorded an issue at BindGateViewModelTests.swift:422:3: Expectation failed: (gate.state → .welcome(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(08D2DFAA-67F6-4697-9CB9-B3D380972CD7), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil, firstRun: Optional(CoreModels.BindFirstRun(bindingPlanCount: 1, hasSettledDay: true, firstPlan: nil))))) == (.bound(old) → .bound(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(08D2DFAA-67F6-4697-9CB9-B3D380972CD7), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil, firstRun: Optional(CoreModels.BindFirstRun(bindingPlanCount: 1, hasSettledDay: true, firstPlan: nil)))))
+✘ Test firstRunSettledStudentStaysBoundAndPersistsTerminal() recorded an issue at BindGateViewModelTests.swift:424:3: Expectation failed: (gate.state → .welcome(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(A11BE2A2-69A5-42A5-B1A5-09A0C58145C6), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil, firstRun: Optional(CoreModels.BindFirstRun(bindingPlanCount: 1, hasSettledDay: false, firstPlan: nil))))) == (.bound(unsettled) → .bound(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(A11BE2A2-69A5-42A5-B1A5-09A0C58145C6), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil, firstRun: Optional(CoreModels.BindFirstRun(bindingPlanCount: 1, hasSettledDay: false, firstPlan: nil)))))
+✘ Test run with 1 test in 0 suites failed after 0.009 seconds with 2 issues.
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-07-10-606Z_pid88366_9243d546.log
+✔ Test run with 2 tests in 0 suites passed after 0.008 seconds.
+
+waiting predicate
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-07-15-254Z_pid88366_31efb3dc.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:169:38: error: type 'DashboardTodayPresentation' has no member 'showsNewStudentWaiting'
+    |                                      `- error: type 'DashboardTodayPresentation' has no member 'showsNewStudentWaiting'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:170:39: error: type 'DashboardTodayPresentation' has no member 'showsNewStudentWaiting'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-07-33-051Z_pid88366_51251d5f.log
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+
+first plan and bottom action
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-07-47-891Z_pid88366_c8541010.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:185:38: error: type 'DashboardTodayPresentation' has no member 'firstPlan'
+    |                                      `- error: type 'DashboardTodayPresentation' has no member 'firstPlan'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:186:38: error: type 'DashboardTodayPresentation' has no member 'hidesBottomStart'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-08-07-521Z_pid88366_d3c20dbe.log
+✔ Test run with 1 test in 0 suites passed after 0.005 seconds.
+
+settled first plan
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-08-20-314Z_pid88366_a510f8d1.log
+✘ Test firstRunSettledFirstPlanDoesNotShowEvenWithoutLocalDismissal() recorded an issue at DashboardTodayPresentationTests.swift:204:3: Expectation failed: (DashboardTodayPresentation.firstPlan(in: state) → FirstPlan(id: A9302ECC-831E-46D1-8EAB-5900B63F9282, publishedAt: 2026-10-26 04:08:29 +0000, planWeeks: 2, dayCount: 6, hasSettledDay: true)) == nil
+✘ Test run with 1 test in 0 suites failed after 0.009 seconds with 1 issue.
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-08-29-741Z_pid88366_82c8bc4b.log
+✔ Test run with 1 test in 0 suites passed after 0.004 seconds.
+
+welcome permission source
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-09-12-599Z_pid88366_4da23cae.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/PendingBindViewModelTests.swift:78:15: error: cannot find 'BindWelcomeViewModel' in scope
+   |               `- error: cannot find 'BindWelcomeViewModel' in scope
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/PendingBindViewModelTests.swift:79:18: error: cannot infer contextual base in reference to member 'init'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-09-21-923Z_pid88366_b4d273f1.log
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+
+exact plan first day
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-12-28-390Z_pid88366_2171c2d8.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:212:54: error: type 'DashboardTodayPresentation' has no member 'firstPlanHandoff'
+    |                                                      `- error: type 'DashboardTodayPresentation' has no member 'firstPlanHandoff'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:217:53: error: type 'DashboardTodayPresentation' has no member 'firstPlanHandoff'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-13-04-205Z_pid88366_c19f7286.log
+✔ Test run with 7 tests in 0 suites passed after 0.015 seconds.
+
+name interpolation
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-14-05-503Z_pid88366_a7e4906d.log
+✘ Test firstRunWelcomeTitleUsesSpecifiedNameRule(name:language:expected:) recorded an issue with 3 arguments name → "王教练", language → "zh-Hans", expected → "你现在是王教练的学员了" at BindGateViewModelTests.swift:497:3: Expectation failed: (BindWelcomePresentation.title(name, locale: Locale(identifier: language)) → "你现在是%@的学员了") == (expected → "你现在是王教练的学员了")
+✘ Test firstRunWelcomeTitleUsesSpecifiedNameRule(name:language:expected:) recorded an issue with 3 arguments name → "王磊", language → "zh-Hans", expected → "你现在是王磊教练的学员了" at BindGateViewModelTests.swift:497:3: Expectation failed: (BindWelcomePresentation.title(name, locale: Locale(identifier: language)) → "你现在是%@的学员了") == (expected → "你现在是王磊教练的学员了")
+✘ Test firstRunWelcomeTitleUsesSpecifiedNameRule(name:language:expected:) recorded an issue with 3 arguments name → "", language → "zh-Hans", expected → "你现在是教练的学员了" at BindGateViewModelTests.swift:497:3: Expectation failed: (BindWelcomePresentation.title(name, locale: Locale(identifier: language)) → "你现在是%@的学员了") == (expected → "你现在是教练的学员了")
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-14-37-559Z_pid88366_61cc07f3.log
+✔ Test run with 1051 tests in 49 suites passed after 2.246 seconds.
+
+refresh failure preserves bound
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-19-31-971Z_pid88366_3b310b8d.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelFirstRunTests.swift:125:14: error: value of type 'BindGateViewModel' has no member 'refreshFirstRun'
+    |              `- error: value of type 'BindGateViewModel' has no member 'refreshFirstRun'
+error: fatalError
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-19-48-367Z_pid88366_d0060493.log
+✔ Test run with 1 test in 0 suites passed after 0.003 seconds.
+
+stored competition date
+RED /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-21-45-004Z_pid88366_e3f3fcdf.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:231:39: error: type 'DashboardTodayPresentation' has no member 'showsMeetDateGuidance'
+    |                                       `- error: type 'DashboardTodayPresentation' has no member 'showsMeetDateGuidance'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardTodayPresentationTests.swift:231:71: error: cannot infer contextual base in reference to member 'loaded'
+GREEN /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-21-51-457Z_pid88366_22048937.log
+✔ Test run with 1 test in 0 suites passed after 0.002 seconds.

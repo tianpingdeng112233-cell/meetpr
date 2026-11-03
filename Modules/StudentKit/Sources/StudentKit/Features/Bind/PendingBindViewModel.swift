@@ -1,7 +1,23 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
 import RepositoryContracts
+
+/// AppShell owns OS notification registration; StudentKit only requests it
+/// after an explicit user action. Demo/macOS callers can omit this bridge.
+public struct StudentNotificationPermissionActions: Sendable {
+  let canRequest: @MainActor @Sendable () async -> Bool
+  let request: @MainActor @Sendable () async -> Bool?
+
+  public init(
+    canRequest: @escaping @MainActor @Sendable () async -> Bool = { false },
+    request: @escaping @MainActor @Sendable () async -> Bool? = { nil }
+  ) {
+    self.canRequest = canRequest
+    self.request = request
+  }
+}
 
 @Observable
 @MainActor
@@ -17,11 +33,44 @@ public final class PendingBindViewModel {
 
   public private(set) var isCancelling = false
   public private(set) var cancelError: String?
+  public private(set) var canRequestNotificationPermission = false
+  public private(set) var isRequestingNotificationPermission = false
 
   private let bind: any BindRepository
+  private let notificationPermission: StudentNotificationPermissionActions
 
-  public init(bind: any BindRepository) {
+  public init(
+    bind: any BindRepository,
+    notificationPermission: StudentNotificationPermissionActions = .init()
+  ) {
     self.bind = bind
+    self.notificationPermission = notificationPermission
+  }
+
+  public func refreshNotificationPermission() async {
+    canRequestNotificationPermission = await notificationPermission.canRequest()
+  }
+
+  public func requestNotificationPermission() async -> Bool? {
+    guard canRequestNotificationPermission, !isRequestingNotificationPermission else { return nil }
+    isRequestingNotificationPermission = true
+    defer { isRequestingNotificationPermission = false }
+    Analytics.shared.track(
+      .notificationPermissionAction,
+      props: ["source": .enumCase("pending_bind"), "stage": .enumCase("clicked")]
+    )
+    let result = await notificationPermission.request()
+    if let result {
+      Analytics.shared.track(
+        .notificationPermissionAction,
+        props: [
+          "source": .enumCase("pending_bind"), "stage": .enumCase("resolved"),
+          "result": .enumCase(result ? "allowed" : "denied"),
+        ]
+      )
+    }
+    await refreshNotificationPermission()
+    return result
   }
 
   /// nil = stay (transport failure, inline error shown).
@@ -40,7 +89,24 @@ public final class PendingBindViewModel {
     }
   }
 
-  /// "已等待: 2 小时 14 分" — minute granularity, refreshed by TimelineView.
+  /// Match the welcome screen's name handling without duplicating coach titles.
+  public nonisolated static func waitingSubtitle(
+    coachDisplayName: String?, locale: Locale = .current
+  ) -> String {
+    let name = coachDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    guard !name.isEmpty else {
+      return StudentStrings.localized(.pendingBindWaitingUnnamed, locale: locale)
+    }
+    let includesTitle =
+      name.contains("教练") || name.contains("教練")
+      || (locale.language.languageCode?.identifier == "en"
+        && name.localizedCaseInsensitiveContains("coach"))
+    return StudentStrings.replacing(
+      includesTitle ? .pendingBindWaitingNamed : .pendingBindView002,
+      values: [name], locale: locale)
+  }
+
+  /// Minute granularity, refreshed by TimelineView.
   public nonisolated static func waitingDescription(since submittedAt: Date, now: Date) -> String {
     let seconds = max(0, now.timeIntervalSince(submittedAt))
     let totalMinutes = Int(seconds / 60)

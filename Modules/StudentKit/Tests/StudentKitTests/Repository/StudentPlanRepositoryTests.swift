@@ -404,3 +404,18 @@ private struct CompletionTestSession: SessionStateReader {
   func accessToken() async throws -> String { "token" }
   func currentUser() async throws -> User { throw SessionStateReaderError.missingCurrentUser }
 }
+
+@Test func firstRunExactPlanFetchDoesNotFallBackToLatestPublishedPlan() async {
+  let planID = UUID()
+  let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    #expect(request.url?.path.lowercased() == "/plans/\(planID.uuidString.lowercased())")
+    return APIResponse(data: Data(#"{"error":"PLAN_NOT_FOUND"}"#.utf8), statusCode: 404)
+  }
+  let repo = BackendStudentPlanRepository(api: api, session: CompletionTestSession())
+  do {
+    _ = try await repo.fetchPlan(id: planID, studentID: UUID())
+    Issue.record("An unavailable exact plan must stay unavailable")
+  } catch {
+    #expect(BackendErrorEnvelope.machineCode(from: error) == "PLAN_NOT_FOUND")
+  }
+}

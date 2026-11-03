@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 
 enum DashboardWeekProgressState: Equatable, Sendable {
   case done
@@ -22,6 +23,43 @@ struct DashboardWeekData: Sendable {
 }
 
 enum DashboardTodayPresentation {
+  static func showsMeetDateGuidance(metrics: DashboardProfileMetricsViewModel.State) -> Bool {
+    guard case .loaded(let metrics) = metrics else { return false }
+    return !metrics.hasCompetitionDate
+  }
+
+  static func firstPlanHandoff(
+    planID: UUID, studentID: UUID, plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository
+  ) async throws -> TodayWorkoutPlanHandoff? {
+    guard let plan = try await plans.fetchPlan(id: planID, studentID: studentID),
+      plan.cycleID == planID,
+      let day = StudentPlanSequence(days: plan.days).orderedDays.first
+    else { return nil }
+    let dates = plan.days.map(\.date)
+    let existingLogs = try await logs.fetchLogs(
+      studentID: studentID,
+      in: (dates.min() ?? day.date)...(dates.max() ?? day.date).addingTimeInterval(86_400))
+    return TodayWorkoutPlanHandoff(plan: plan, dayID: day.id, existingLogs: existingLogs)
+  }
+
+  @MainActor
+  static func firstPlan(in experience: BindFirstRunExperience?) -> BindFirstRun.FirstPlan? {
+    guard let experience, !experience.isTerminal, !experience.planDismissed else { return nil }
+    guard let plan = experience.request?.firstRun?.firstPlan, !plan.hasSettledDay else {
+      return nil
+    }
+    return plan
+  }
+
+  static func hidesBottomStart(firstPlan: BindFirstRun.FirstPlan?) -> Bool {
+    firstPlan != nil
+  }
+
+  static func showsNewStudentWaiting(isWaiting: Bool, firstRun: BindFirstRun?) -> Bool {
+    isWaiting && firstRun?.bindingPlanCount == 0
+  }
+
   static func planDay(
     on selectedDate: Date,
     in days: [StudentPlanDay],

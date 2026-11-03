@@ -1,0 +1,454 @@
+{
+  "red-steps": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 29786,
+      "counts": {
+        "passed": 0,
+        "failed": 2,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-54-06-850Z_pid87679_f627953e.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "rawOutput": [
+        "Building for debugging...",
+        "[0/3] Write sources",
+        "[1/3] Write swift-version--58304C5D6DBC2206.txt",
+        "[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift",
+        "[4/5] Emitting module StudentKitTests",
+        "[4/6] Write Objects.LinkFileList",
+        "[5/6] Linking StudentKitPackageTests",
+        "Build complete! (27.50s)",
+        "Building for debugging...\n[0/3] Write sources\n[1/3] Write swift-version--58304C5D6DBC2206.txt\n[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift\n[4/5] Emitting module StudentKitTests\n[4/6] Write Objects.LinkFileList\n[5/6] Linking StudentKitPackageTests\nBuild complete! (27.50s)\n"
+      ],
+      "testFailures": []
+    }
+  },
+  "green-steps": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 52420,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-54-53-090Z_pid87679_d30b5e63.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "red-payload": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 48609,
+      "counts": {
+        "passed": 0,
+        "failed": 6,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-55-58-289Z_pid87679_7a2f9c0d.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "rawOutput": [
+        "Building for debugging...",
+        "[0/3] Write sources",
+        "[1/3] Write swift-version--58304C5D6DBC2206.txt",
+        "[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift",
+        "[4/5] Emitting module StudentKitTests",
+        "[4/6] Write Objects.LinkFileList",
+        "[5/6] Linking StudentKitPackageTests",
+        "Build complete! (46.74s)",
+        "Building for debugging...\n[0/3] Write sources\n[1/3] Write swift-version--58304C5D6DBC2206.txt\n[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift\n[4/5] Emitting module StudentKitTests\n[4/6] Write Objects.LinkFileList\n[5/6] Linking StudentKitPackageTests\nBuild complete! (46.74s)\n"
+      ],
+      "testFailures": []
+    }
+  },
+  "green-payload": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 17493,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-57-07-383Z_pid87679_195e9654.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "red-resume": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 25739,
+      "counts": {
+        "passed": 0,
+        "failed": 6,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-57-38-447Z_pid87679_c32dca49.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "rawOutput": [
+        "Building for debugging...",
+        "[0/3] Write sources",
+        "[1/3] Write swift-version--58304C5D6DBC2206.txt",
+        "[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift",
+        "[4/5] Emitting module StudentKitTests",
+        "[4/6] Write Objects.LinkFileList",
+        "[5/6] Linking StudentKitPackageTests",
+        "Build complete! (23.22s)",
+        "Building for debugging...\n[0/3] Write sources\n[1/3] Write swift-version--58304C5D6DBC2206.txt\n[3/5] Compiling StudentKitTests OnboardingWizardViewModelTests.swift\n[4/5] Emitting module StudentKitTests\n[4/6] Write Objects.LinkFileList\n[5/6] Linking StudentKitPackageTests\nBuild complete! (23.22s)\n"
+      ],
+      "testFailures": []
+    }
+  },
+  "green-resume": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 11934,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-58-11-588Z_pid87679_8d18c4a0.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "red-gate": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 10767,
+      "counts": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-58-38-993Z_pid87679_2ec53e2f.log"
+    },
+    "diagnostics": {
+      "warnings": [
+        {
+          "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:78"
+        },
+        {
+          "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:81"
+        },
+        {
+          "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:89"
+        },
+        {
+          "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:92"
+        },
+        {
+          "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:86"
+        },
+        {
+          "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:89"
+        },
+        {
+          "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:98"
+        },
+        {
+          "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:101"
+        },
+        {
+          "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:110"
+        },
+        {
+          "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:113"
+        }
+      ],
+      "errors": [
+        {
+          "message": "✘ Test spec095FourStepProfileCompletesWithoutLegacyFields() recorded an issue at OnboardingRepositoryTests.swift:146:2: Caught error: .incomplete(missingFields: [\"training_days\", \"gym_tier\", \"daily_life_intensity\", \"life_stress\", \"recovery_speed\", \"sleep_hours\"])"
+        }
+      ],
+      "testFailures": []
+    }
+  },
+  "green-gate": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 24433,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-58-57-202Z_pid87679_381a8f39.log"
+    },
+    "diagnostics": {
+      "warnings": [
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:103"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:115"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "macro expansion #expect:1"
+        }
+      ],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "red-profile": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 13302,
+      "counts": {
+        "passed": 0,
+        "failed": 10,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-59-44-679Z_pid87679_f604e411.log"
+    },
+    "diagnostics": {
+      "warnings": [
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "macro expansion #expect:1"
+        }
+      ],
+      "errors": [],
+      "rawOutput": [
+        "Building for debugging...",
+        "[0/3] Write sources",
+        "[1/3] Write swift-version--58304C5D6DBC2206.txt",
+        "[3/5] Compiling StudentKitTests ProfileDetailPagesTests.swift",
+        "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100:14: warning: no calls to throwing functions occur within 'try' expression",
+        " 98 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}",
+        " 99 |   ).inspect()",
+        "100 |   let rows = try inspected.findAll(MyProfileValueRow.self)",
+        "    |              `- warning: no calls to throwing functions occur within 'try' expression",
+        "101 |   #expect(",
+        "102 |     try rows.map { try $0.actualView().label } == [",
+        "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112:17: warning: no calls to throwing functions occur within 'try' expression",
+        "110 |     ])",
+        "111 |   let account = try inspected.find(AccountSecuritySection.self)",
+        "112 |   let buttons = try account.findAll(ViewType.Button.self)",
+        "    |                 `- warning: no calls to throwing functions occur within 'try' expression",
+        "113 |   #expect(",
+        "114 |     try buttons.map { try $0.accessibilityIdentifier() } == [",
+        "macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression",
+        "`- /Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:74: note: expanded code originates here",
+        "115 |       \"account.changePassword\", \"account.export\", \"account.delete\",",
+        "116 |     ])",
+        "117 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)",
+        "    |   `- note: in expansion of macro 'expect' here",
+        "    +--- macro expansion #expect ---------------------------------------",
+        "    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode(\"try inspected.findAll(AppearancePreferenceRow.self).count == 1\"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()",
+        "    |  |                      `- warning: no calls to throwing functions occur within 'try' expression",
+        "    +-------------------------------------------------------------------",
+        "118 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)",
+        "119 | }",
+        "macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression",
+        "`- /Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:118:71: note: expanded code originates here",
+        "116 |     ])",
+        "117 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)",
+        "118 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)",
+        "    |   `- note: in expansion of macro 'expect' here",
+        "    +--- macro expansion #expect ---------------------------------------",
+        "    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode(\"try inspected.findAll(ProfileSignOutButton.self).count == 1\"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()",
+        "    |  |                      `- warning: no calls to throwing functions occur within 'try' expression",
+        "    +-------------------------------------------------------------------",
+        "119 | }",
+        "120 | ",
+        "[4/5] Emitting module StudentKitTests",
+        "[4/6] Write Objects.LinkFileList",
+        "[5/6] Linking StudentKitPackageTests",
+        "Build complete! (11.30s)",
+        "Building for debugging...\n[0/3] Write sources\n[1/3] Write swift-version--58304C5D6DBC2206.txt\n[3/5] Compiling StudentKitTests ProfileDetailPagesTests.swift\n/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100:14: warning: no calls to throwing functions occur within 'try' expression\n 98 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}\n 99 |   ).inspect()\n100 |   let rows = try inspected.findAll(MyProfileValueRow.self)\n    |              `- warning: no calls to throwing functions occur within 'try' expression\n101 |   #expect(\n102 |     try rows.map { try $0.actualView().label } == [\n\n/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112:17: warning: no calls to throwing functions occur within 'try' expression\n110 |     ])\n111 |   let account = try inspected.find(AccountSecuritySection.self)\n112 |   let buttons = try account.findAll(ViewType.Button.self)\n    |                 `- warning: no calls to throwing functions occur within 'try' expression\n113 |   #expect(\n114 |     try buttons.map { try $0.accessibilityIdentifier() } == [\n\nmacro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression\n`- /Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:74: note: expanded code originates here\n115 |       \"account.changePassword\", \"account.export\", \"account.delete\",\n116 |     ])\n117 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)\n    |   `- note: in expansion of macro 'expect' here\n    +--- macro expansion #expect ---------------------------------------\n    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode(\"try inspected.findAll(AppearancePreferenceRow.self).count == 1\"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()\n    |  |                      `- warning: no calls to throwing functions occur within 'try' expression\n    +-------------------------------------------------------------------\n118 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)\n119 | }\n\nmacro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression\n`- /Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:118:71: note: expanded code originates here\n116 |     ])\n117 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)\n118 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)\n    |   `- note: in expansion of macro 'expect' here\n    +--- macro expansion #expect ---------------------------------------\n    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode(\"try inspected.findAll(ProfileSignOutButton.self).count == 1\"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()\n    |  |                      `- warning: no calls to throwing functions occur within 'try' expression\n    +-------------------------------------------------------------------\n119 | }\n120 | \n[4/5] Emitting module StudentKitTests\n[4/6] Write Objects.LinkFileList\n[5/6] Linking StudentKitPackageTests\nBuild complete! (11.30s)\n"
+      ],
+      "testFailures": []
+    }
+  },
+  "green-profile": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 81751,
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T03-00-26-145Z_pid87679_65c0d675.log"
+    },
+    "diagnostics": {
+      "warnings": [
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "macro expansion #expect:1"
+        }
+      ],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "red-pending": {
+    "summary": {
+      "status": "FAILED",
+      "durationMs": 19110,
+      "counts": {
+        "passed": 0,
+        "failed": 17,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T03-02-14-610Z_pid87679_a52a1654.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "rawOutput": [
+        "Building for debugging...",
+        "[0/4] Write sources",
+        "[2/4] Write swift-version--58304C5D6DBC2206.txt",
+        "[4/6] Compiling StudentKit PendingBindViewModel.swift",
+        "[5/8] Compiling StudentKit PendingBindView.swift",
+        "[6/8] Compiling StudentKit BindGateView.swift",
+        "[7/8] Emitting module StudentKit",
+        "[8/11] Compiling StudentKitTests PendingBindViewModelTests.swift",
+        "[9/11] Emitting module StudentKitTests",
+        "[9/11] Write Objects.LinkFileList",
+        "[10/11] Linking StudentKitPackageTests",
+        "Build complete! (17.37s)",
+        "Building for debugging...\n[0/4] Write sources\n[2/4] Write swift-version--58304C5D6DBC2206.txt\n[4/6] Compiling StudentKit PendingBindViewModel.swift\n[5/8] Compiling StudentKit PendingBindView.swift\n[6/8] Compiling StudentKit BindGateView.swift\n[7/8] Emitting module StudentKit\n[8/11] Compiling StudentKitTests PendingBindViewModelTests.swift\n[9/11] Emitting module StudentKitTests\n[9/11] Write Objects.LinkFileList\n[10/11] Linking StudentKitPackageTests\nBuild complete! (17.37s)\n"
+      ],
+      "testFailures": []
+    }
+  },
+  "green-pending": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 45565,
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T03-03-32-456Z_pid87679_e86559c2.log"
+    },
+    "diagnostics": {
+      "warnings": [
+        {
+          "message": "expression of type 'Bool?' is unused [#no-usage]",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112"
+        },
+        {
+          "message": "no calls to throwing functions occur within 'try' expression",
+          "location": "macro expansion #expect:1"
+        }
+      ],
+      "errors": [],
+      "testFailures": []
+    }
+  },
+  "final-build": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 139736,
+      "target": "simulator"
+    },
+    "artifacts": {
+      "buildLogPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/build_sim_2026-11-02T03-08-54-518Z_pid87679_6b189c8e.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": []
+    }
+  }
+}

@@ -1,0 +1,90 @@
+--- a/MeetPR/Sources/MeetPRApp.swift
++++ b/MeetPR/Sources/MeetPRApp.swift
+@@ -31,6 +31,29 @@
+     self.restTimerActivityController = restTimerActivityController
+     restTimerActivityController.cleanUpAllActivities()
+
++    #if DEMO_MODE
++      let evidenceArgs = ProcessInfo.processInfo.arguments
++      if evidenceArgs.contains("-spec095-new") || evidenceArgs.contains("-spec095-old-draft") {
++        UserDefaultsPendingBindCodeStore(suiteName: "spec095-i2-evidence").stash(
++          PendingBindCode(code: "ABCDEFGH23", displayName: "I2 Demo", stashedAt: Date()),
++          studentId: StudentDemoSeed.studentID)
++        let directory = URL.documentsDirectory.appending(path: "spec095-i2-evidence")
++        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
++        let file = directory.appending(path: "draft-\(StudentDemoSeed.studentID.uuidString).json")
++        if evidenceArgs.contains("-spec095-old-draft") {
++          var legacy = OnboardingDraft.from(
++            StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID))
++          legacy.furthestStep = 5
++          legacy.savedAt = Date()
++          legacy.noteToCoach = "Legacy draft · old step 5"
++          let encoder = JSONEncoder()
++          encoder.dateEncodingStrategy = .iso8601
++          if let data = try? encoder.encode(legacy) { try? data.write(to: file, options: .atomic) }
++        } else {
++          try? FileManager.default.removeItem(at: file)
++        }
++      }
++    #endif
+     let dependencies = Self.makeRootDependencies(draftStore: draftStore)
+     rootView = dependencies.rootView
+     _session = State(initialValue: dependencies.session)
+--- a/Modules/AppShell/Sources/AppShell/RootView.swift
++++ b/Modules/AppShell/Sources/AppShell/RootView.swift
+@@ -38,7 +38,9 @@
+   private let studentAccount: any AccountRepository
+   private let summaryReadStore: any EvaluationSummaryReadStoring
+   private let pendingBindStore: any PendingBindCodeStoring
+-  private let onboardingDraftStore = LocalOnboardingDraftStore()
++  private let onboardingDraftStore = LocalOnboardingDraftStore(
++    directory: ProcessInfo.processInfo.arguments.contains("-spec095-evidence")
++      ? URL.documentsDirectory.appending(path: "spec095-i2-evidence") : nil)
+   private let coachStudentVideos: any CoachStudentVideoRepository
+   private let coachVideoQueue: (any CoachVideoQueueRepository)?
+   private let coachExerciseStats: any CoachExerciseStatsProviding
+@@ -68,7 +70,9 @@
+     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+     studentAccount: (any AccountRepository)? = nil,
+     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
+-    pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
++    pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(
++    suiteName: ProcessInfo.processInfo.arguments.contains("-spec095-evidence")
++      ? "spec095-i2-evidence" : nil),
+     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
+     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
+     exerciseStats: (any CoachExerciseStatsProviding)? = nil,
+--- a/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift
+@@ -519,6 +519,13 @@
+       arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil
+     }
+     let onboarding = arguments.contains("-spec085-onboarding")
++    if arguments.contains("-spec095-new") {
++      return OnboardingProfile(
++        userId: studentID, unitPreference: .kg, gender: .male, birthDate: "2001-03-15",
++        heightCm: 178, trainingYears: 3, squatStance: .lowBar, deadliftStyle: .conventional,
++        benchGrip: .standard, squat1RMKg: 180, bench1RMKg: 120, deadlift1RMKg: 220,
++        createdAt: referenceDate, updatedAt: referenceDate)
++    }
+     let competing: Bool? =
+       onboarding || scenario == "unanswered" ? nil : isCompeting
+     return OnboardingProfile(
+@@ -574,7 +581,16 @@
+     studentID: UUID,
+     coachID: UUID = StudentDemoSeed.coachID
+   ) -> BindRequest {
+-    BindRequest(
++    let arguments = ProcessInfo.processInfo.arguments
++    if let index = arguments.firstIndex(of: "-spec095-pending-name"),
++      arguments.indices.contains(index + 1) {
++      let name = arguments[index + 1]
++      return BindRequest(
++        id: uuid(8_000), studentId: studentID, coachId: coachID,
++        coachDisplayName: name == "-" ? nil : name, inviteCodeId: uuid(8_001),
++        status: .pending, submittedAt: Date(), expiredAt: Date().addingTimeInterval(604_800))
++    }
++    return BindRequest(
+       id: uuid(8_000),
+       studentId: studentID,
+       coachId: coachID,

@@ -1,7 +1,7 @@
 import CoreModels
 import Foundation
 
-/// Mutable working copy the 7-step wizard binds to (spec 032 §5). Distinct
+/// Mutable working copy the 4-step wizard binds to (spec 095 amendment). Distinct
 /// from `OnboardingProfile` (immutable server snapshot): all fields optional
 /// or empty, plus resume metadata. Persisted as plain JSON by
 /// `LocalOnboardingDraftStore`.
@@ -21,18 +21,18 @@ public struct OnboardingDraft: Codable, Equatable, Sendable {
   public var squat1RMKg: Decimal?
   public var bench1RMKg: Decimal?
   public var deadlift1RMKg: Decimal?
-  // Step 4
+  // Retained only to decode legacy drafts; never sent by the four-step wizard.
   public var trainingDays: [TrainingDay] = []
   public var gymTier: GymTier?
   public var equipmentOverrides: [String] = []
-  // Step 5
+  // Legacy recovery fields
   public var dailyLifeIntensity: Int?
   public var lifeStress: Int?
   public var recoverySpeed: Int?
   public var sleepHours: Int?
-  // Step 6 (uploads stay out of the draft — degraded Step 6, spec 032 §8)
+  // Legacy materials fields (uploads stay out of the draft)
   public var muscleGroupsToStrengthen: [MuscleGroup] = []
-  // Step 7 — text fields stay non-optional for SwiftUI bindings; empty
+  // Step 4 (formerly 7) — text fields stay non-optional for SwiftUI bindings; empty
   // means "not provided" and patches as JSON null.
   public var injuryNotes: String = ""
   public var injuryAreas: [InjuryArea] = []
@@ -138,7 +138,7 @@ extension OnboardingDraft {
 // MARK: - Step gating + resume (D11)
 
 extension OnboardingDraft {
-  public static let stepCount = 7
+  public static let stepCount = 4
 
   /// UI required-field gate per step (wiki v2.4 required columns). PUT
   /// itself never requires completeness — this only gates "下一步".
@@ -152,13 +152,6 @@ extension OnboardingDraft {
     case 3:
       return squat1RMKg != nil && bench1RMKg != nil && deadlift1RMKg != nil
     case 4:
-      return (2...6).contains(trainingDays.count) && gymTier != nil
-    case 5:
-      return dailyLifeIntensity != nil && lifeStress != nil
-        && recoverySpeed != nil && sleepHours != nil
-    case 6:
-      return true  // uploads degraded + muscle groups optional
-    case 7:
       return isCompeting != true
         || (competitionDate != nil && MeetClass.parse(targetWeightClass) != nil)
     default:
@@ -198,22 +191,6 @@ extension OnboardingDraft {
       patch.bench1RMKg = Self.ifSet(bench1RMKg)
       patch.deadlift1RMKg = Self.ifSet(deadlift1RMKg)
     case 4:
-      // zod min(2): an undersized selection stays absent — never ship an
-      // invalid array that would 400 the whole PUT (risk 3).
-      patch.trainingDays =
-        (2...6).contains(trainingDays.count) ? .value(trainingDays) : .absent
-      patch.gymTier = Self.ifSet(gymTier)
-      patch.equipmentOverrides =
-        equipmentOverrides.isEmpty ? .null : .value(equipmentOverrides)
-    case 5:
-      patch.dailyLifeIntensity = Self.ifSet(dailyLifeIntensity)
-      patch.lifeStress = Self.ifSet(lifeStress)
-      patch.recoverySpeed = Self.ifSet(recoverySpeed)
-      patch.sleepHours = Self.ifSet(sleepHours)
-    case 6:
-      patch.muscleGroupsToStrengthen =
-        muscleGroupsToStrengthen.isEmpty ? .null : .value(muscleGroupsToStrengthen)
-    case 7:
       patch.injuryNotes = Self.nullableText(injuryNotes)
       patch.injuryAreas = injuryAreas.isEmpty ? .null : .value(injuryAreas)
       patch.isCompeting = .value(isCompeting == true)
@@ -297,7 +274,7 @@ extension OnboardingPatch {
 // MARK: - 422 missing_fields → step mapping (D12)
 
 extension OnboardingDraft {
-  /// Backend completion gate fields (18 + conditional competition_date)
+  /// Backend completion gate fields (12 + conditional competition_date)
   /// mapped onto wizard steps; unknown fields return nil.
   public static func step(forMissingField field: String) -> Int? {
     switch field {
@@ -307,12 +284,8 @@ extension OnboardingDraft {
       2
     case "squat_1rm_kg", "bench_1rm_kg", "deadlift_1rm_kg":
       3
-    case "training_days", "gym_tier":
-      4
-    case "daily_life_intensity", "life_stress", "recovery_speed", "sleep_hours":
-      5
     case "is_competing", "competition_date":
-      7
+      4
     default:
       nil
     }

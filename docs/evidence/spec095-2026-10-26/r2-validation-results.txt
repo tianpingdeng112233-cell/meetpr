@@ -1,0 +1,266 @@
+finalStudent
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 15736,
+    "counts": {
+      "passed": 1054,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-30-46-644Z_pid88366_931affe1.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+retry-AppShell
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 29532,
+    "counts": {
+      "passed": 124,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-31-28-598Z_pid88366_f346b638.log"
+  },
+  "diagnostics": {
+    "warnings": [
+      {
+        "message": "static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15"
+      },
+      {
+        "message": "stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26"
+      },
+      {
+        "message": "expression of type 'Bool?' is unused [#no-usage]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122"
+      }
+    ],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+full-CoreModels
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 2531,
+    "counts": {
+      "passed": 161,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-20-06-006Z_pid88366_eeea2021.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+finalAnalytics
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 2157,
+    "counts": {
+      "passed": 30,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-32-26-430Z_pid88366_54263773.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+full-Networking
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 1597,
+    "counts": {
+      "passed": 143,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-25-54-516Z_pid88366_bb2b4d60.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+full-RepositoryContracts
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 1681,
+    "counts": {
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-20-08-542Z_pid88366_feacb4f0.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+full-ChatUI
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 5912,
+    "counts": {
+      "passed": 84,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-20-10-227Z_pid88366_ee5e681a.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+retry-DesignSystem
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 19905,
+    "counts": {
+      "passed": 74,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-31-58-143Z_pid88366_35eb2507.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+full-CoachKit
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 41428,
+    "counts": {
+      "passed": 485,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-10-26T04-25-13-082Z_pid88366_8e1ae1e7.log"
+  },
+  "diagnostics": {
+    "warnings": [
+      {
+        "message": "static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15"
+      },
+      {
+        "message": "stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26"
+      },
+      {
+        "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52"
+      },
+      {
+        "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81"
+      }
+    ],
+    "errors": [],
+    "testFailures": []
+  }
+}
+
+finalCNtest
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 45538,
+    "counts": {
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "simulator"
+  },
+  "artifacts": {
+    "buildLogPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/test_sim_2026-10-26T04-31-02-419Z_pid88366_1027ed72.log",
+    "xcresultPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/result-bundles/test_sim_2026-10-26T04-31-02-419Z_pid88366_0b58f577.xcresult",
+    "testProductsPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/test-products/test_sim_2026-10-26T04-31-02-419Z_pid88366_113555ed.xctestproducts"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}
+finalGlobal
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 84847,
+    "target": "simulator"
+  },
+  "artifacts": {
+    "buildLogPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/build_sim_2026-10-26T04-32-33-850Z_pid88366_b8c8ea43.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

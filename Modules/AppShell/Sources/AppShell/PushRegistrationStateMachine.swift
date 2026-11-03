@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 enum PushAuthorizationState: Equatable, Sendable {
@@ -25,9 +26,11 @@ struct PushRegistrationStateMachine: Sendable {
   private var authorizationRequestInFlight = false
   private var requestedRemoteRegistration = false
   private var uploadsInFlight: Set<PushRegistrationKey> = []
+  private var role: UserRole = .coach
 
-  mutating func beginAuthenticatedSession() -> Bool {
+  mutating func beginAuthenticatedSession(role: UserRole = .coach) -> Bool {
     guard activeSessionID == nil else { return false }
+    self.role = role
     nextSessionID &+= 1
     activeSessionID = nextSessionID
     authorizationRequestInFlight = false
@@ -49,6 +52,7 @@ struct PushRegistrationStateMachine: Sendable {
     guard activeSessionID != nil else { return [] }
     switch authorization {
     case .notDetermined:
+      guard role != .coachedStudent else { return [] }
       guard !authorizationRequestInFlight else { return [] }
       authorizationRequestInFlight = true
       return [.requestAuthorization]
@@ -63,6 +67,16 @@ struct PushRegistrationStateMachine: Sendable {
     authorizationRequestInFlight = false
     guard granted else { return [] }
     return allowedActions()
+  }
+
+  mutating func actionsForReminder(
+    authorization: PushAuthorizationState
+  ) -> [PushRegistrationAction] {
+    guard activeSessionID != nil, authorization == .notDetermined,
+      !authorizationRequestInFlight
+    else { return [] }
+    authorizationRequestInFlight = true
+    return [.requestAuthorization]
   }
 
   mutating func authorizationRequestFailed() {

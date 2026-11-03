@@ -3,7 +3,7 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// The nine archive cards (spec 032 §7): scan state = icon + title +
+/// The retained archive cards (spec 095 amendment): icon + title +
 /// summary line; tap pushes the card's edit page. Card 3 (1RM) is read-only
 /// with the lock note; card 9 (教练评估) goes live once a summary exists
 /// (spec 033 §12).
@@ -28,21 +28,6 @@ struct ProfileCardsSection: View {
         OnboardingSummaryFormatter.background(profile)
       }
       oneRMRow
-      editableRow(
-        .environment, icon: "calendar", title: StudentStrings.localized(.profileCardsSection004)
-      ) {
-        OnboardingSummaryFormatter.environment(profile)
-      }
-      editableRow(
-        .recovery, icon: "bed.double", title: StudentStrings.localized(.profileCardsSection005)
-      ) {
-        OnboardingSummaryFormatter.recovery(profile)
-      }
-      editableRow(
-        .materials, icon: "folder", title: StudentStrings.localized(.profileCardsSection006)
-      ) {
-        OnboardingSummaryFormatter.materials(profile)
-      }
       editableRow(
         .competition, icon: "target", title: StudentStrings.localized(.meetTitle)
       ) {
@@ -149,17 +134,14 @@ struct ProfileCardsSection: View {
 /// Which archive card is being edited; maps onto the step patch builders
 /// (1RM card deliberately has no kind — the lock is structural, risk 6).
 enum ProfileCardKind: Hashable {
-  case basics, weight, background, environment, recovery, materials, competition, note, injuries
+  case basics, weight, background, competition, note, injuries
 
   /// The wizard step whose patch builder saves this card. Never 3.
   var patchStep: Int {
     switch self {
     case .basics, .weight: 1
     case .background: 2
-    case .environment: 4
-    case .recovery: 5
-    case .materials: 6
-    case .competition, .note, .injuries: 7
+    case .competition, .note, .injuries: 4
     }
   }
 
@@ -167,9 +149,6 @@ enum ProfileCardKind: Hashable {
     switch self {
     case .basics: StudentStrings.localized(.profileCardsSection002)
     case .background: StudentStrings.localized(.profileCardsSection003)
-    case .environment: StudentStrings.localized(.profileCardsSection004)
-    case .recovery: StudentStrings.localized(.profileCardsSection005)
-    case .materials: StudentStrings.localized(.profileCardsSection006)
     case .competition: StudentStrings.localized(.meetTitle)
     case .weight: StudentStrings.localized(.dashboardProfileMetricsView001)
     case .note: StudentStrings.localized(.profileNote)
@@ -268,12 +247,6 @@ struct ProfileCardEditView: View {
       NoteToCoachFieldsSection(note: $draft.noteToCoach)
     case .background:
       Step2BackgroundSection(draft: $draft)
-    case .environment:
-      Step4EnvironmentSection(draft: $draft)
-    case .recovery:
-      Step5RecoverySection(draft: $draft)
-    case .materials:
-      Step6MaterialsSection(draft: $draft)
     case .competition:
       MeetFieldsSection(draft: $draft, showsErrors: showsValidation)
     case .injuries:
@@ -294,7 +267,7 @@ struct ProfileCardEditView: View {
 
   private func save() async {
     guard !isSaving else { return }
-    if (kind == .competition && !draft.isStepComplete(7))
+    if (kind == .competition && !draft.isStepComplete(4))
       || ((kind == .weight || kind == .basics) && draft.weightKg == nil)
     {
       showsValidation = true

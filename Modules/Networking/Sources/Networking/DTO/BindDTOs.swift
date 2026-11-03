@@ -103,6 +103,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
   public let expiredAt: Date
   public let skipEvaluation: Bool
   public let skipReason: String?
+  public let firstRun: BindFirstRun?
 
   public init(
     id: UUID,
@@ -116,7 +117,8 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
     endedAt: Date? = nil,
     expiredAt: Date,
     skipEvaluation: Bool,
-    skipReason: String?
+    skipReason: String?,
+    firstRun: BindFirstRun? = nil
   ) {
     self.id = id
     self.studentId = studentId
@@ -130,6 +132,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
     self.expiredAt = expiredAt
     self.skipEvaluation = skipEvaluation
     self.skipReason = skipReason
+    self.firstRun = firstRun
   }
 
   public func toDomain() -> BindRequest {
@@ -145,7 +148,8 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
       endedAt: endedAt,
       expiredAt: expiredAt,
       skipEvaluation: skipEvaluation,
-      skipReason: skipReason
+      skipReason: skipReason,
+      firstRun: firstRun
     )
   }
 }

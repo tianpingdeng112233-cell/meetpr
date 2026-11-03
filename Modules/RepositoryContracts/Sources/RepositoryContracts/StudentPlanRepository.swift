@@ -48,6 +48,7 @@ public struct PlanDayCompletion: Equatable, Sendable {
 /// Access to the student's current published plan and sequence completion mutations.
 /// `studentID` is the current user's; the UI layer reads it from Session and passes it in.
 public protocol StudentPlanRepository: Sendable {
+  func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView?
   func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView?
   /// Bypasses stale-while-revalidate cache when completion may have changed.
   func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView?
@@ -60,6 +61,13 @@ public protocol StudentPlanRepository: Sendable {
 }
 
 extension StudentPlanRepository {
+  public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
+    guard let plan = try await refreshCurrentPlan(studentID: studentID), plan.cycleID == id else {
+      return nil
+    }
+    return plan
+  }
+
   public func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
     try await fetchCurrentPlan(studentID: studentID)
   }

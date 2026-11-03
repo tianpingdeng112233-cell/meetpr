@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import StudentKit
@@ -161,4 +162,75 @@ private func sequenceDays() -> [StudentPlanDay] {
       date: start.addingTimeInterval(7 * 86_400), exercises: []
     ),
   ]
+}
+
+@Test func firstRunWaitingCardRequiresNoBindingPlansAndExistingWaitingState() {
+  let new = BindFirstRun(bindingPlanCount: 0, hasSettledDay: false)
+  let returning = BindFirstRun(bindingPlanCount: 2, hasSettledDay: false)
+  #expect(DashboardTodayPresentation.showsNewStudentWaiting(isWaiting: true, firstRun: new))
+  #expect(!DashboardTodayPresentation.showsNewStudentWaiting(isWaiting: false, firstRun: new))
+  #expect(!DashboardTodayPresentation.showsNewStudentWaiting(isWaiting: true, firstRun: returning))
+  #expect(!DashboardTodayPresentation.showsNewStudentWaiting(isWaiting: true, firstRun: nil))
+}
+
+@MainActor
+@Test func firstRunPlanCardDismissalAndSettlementRestoreBottomAction() throws {
+  let first = BindFirstRun.FirstPlan(
+    id: UUID(), publishedAt: Date(), planWeeks: 4, dayCount: 12, hasSettledDay: false)
+  let state = BindFirstRunExperience(
+    studentID: BindFixtures.studentId,
+    defaults: try #require(UserDefaults(suiteName: UUID().uuidString)))
+  state.update(
+    BindFixtures.request(
+      status: .accepted,
+      firstRun: .init(bindingPlanCount: 1, hasSettledDay: false, firstPlan: first)))
+  #expect(DashboardTodayPresentation.firstPlan(in: state) == first)
+  #expect(DashboardTodayPresentation.hidesBottomStart(firstPlan: first))
+  state.dismissPlan()
+  #expect(DashboardTodayPresentation.firstPlan(in: state) == nil)
+  #expect(!DashboardTodayPresentation.hidesBottomStart(firstPlan: nil))
+  #expect(DashboardTodayPresentation.firstPlan(in: nil) == nil)
+}
+
+@MainActor
+@Test func firstRunSettledFirstPlanDoesNotShowEvenWithoutLocalDismissal() throws {
+  let state = BindFirstRunExperience(
+    studentID: BindFixtures.studentId,
+    defaults: try #require(UserDefaults(suiteName: UUID().uuidString)))
+  state.update(
+    BindFixtures.request(
+      status: .accepted,
+      firstRun: .init(
+        bindingPlanCount: 1, hasSettledDay: false,
+        firstPlan: .init(
+          id: UUID(), publishedAt: Date(), planWeeks: 2, dayCount: 6, hasSettledDay: true))))
+  #expect(DashboardTodayPresentation.firstPlan(in: state) == nil)
+}
+
+@Test func firstRunStartUsesRequestedPlanAndFirstDay() async throws {
+  let plan = StudentDemoSeed.makePlanView()
+  let repo = InMemoryStudentPlanRepository(
+    store: TestStudentPlanStore(seed: [StudentDemoSeed.studentID: plan]))
+  let handoff = try await DashboardTodayPresentation.firstPlanHandoff(
+    planID: plan.cycleID, studentID: StudentDemoSeed.studentID, plans: repo,
+    logs: InMemoryStudentTrainingLogRepository())
+  #expect(handoff?.plan.cycleID == plan.cycleID)
+  #expect(handoff?.dayID == plan.days.first?.id)
+  let absent = try await DashboardTodayPresentation.firstPlanHandoff(
+    planID: UUID(), studentID: StudentDemoSeed.studentID, plans: repo,
+    logs: InMemoryStudentTrainingLogRepository())
+  #expect(absent == nil)
+}
+
+@Test func firstRunMeetDateGuidanceUsesStoredDateEvenWhenCountdownIsHidden() {
+  let profile = OnboardingProfile(
+    userId: UUID(), isCompeting: false, competitionDate: "2020-01-01",
+    createdAt: Date(), updatedAt: Date())
+  let metrics = CompetitionCountdownPresenter.metrics(
+    from: profile, now: Date(), calendar: .current)
+  #expect(metrics.competition == nil)
+  #expect(!DashboardTodayPresentation.showsMeetDateGuidance(metrics: .loaded(metrics)))
+  #expect(!DashboardTodayPresentation.showsMeetDateGuidance(metrics: .loading))
+  let empty = CompetitionCountdownPresenter.metrics(from: nil, now: Date(), calendar: .current)
+  #expect(DashboardTodayPresentation.showsMeetDateGuidance(metrics: .loaded(empty)))
 }

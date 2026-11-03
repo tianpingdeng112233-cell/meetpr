@@ -8,15 +8,12 @@ struct MyProfileOneRM: Equatable, Sendable {
 
 struct MyProfileV3Presentation: Equatable, Sendable {
   let oneRepMaxima: [MyProfileOneRM]
-  let recoveryChips: [String]
   let injuryChips: [String]
-  let muscleGroups: String
   let restTimer: String
   let competition: String
   let competitionDate: String?
   let heightAndWeight: String
   let trainingBackground: String
-  let trainingEnvironment: String
 
   var sbdTotalKg: Decimal? {
     let values = oneRepMaxima.compactMap(\.kilograms)
@@ -35,63 +32,13 @@ struct MyProfileV3Presentation: Equatable, Sendable {
         MyProfileOneRM(family: .bench, kilograms: profile.bench1RMKg),
         MyProfileOneRM(family: .deadlift, kilograms: profile.deadlift1RMKg),
       ],
-      recoveryChips: recoveryChips(profile: profile, readiness: readiness),
       injuryChips: injuryChips(profile),
-      muscleGroups: OnboardingSummaryFormatter.muscleGroups(profile),
       restTimer: restTimerText(restTimer),
       competition: OnboardingSummaryFormatter.competition(profile),
       competitionDate: profile.isCompeting == true ? profile.competitionDate : nil,
       heightAndWeight: heightAndWeight(profile),
-      trainingBackground: OnboardingSummaryFormatter.background(profile),
-      trainingEnvironment: OnboardingSummaryFormatter.environment(profile)
+      trainingBackground: OnboardingSummaryFormatter.background(profile)
     )
-  }
-
-  static func recoveryChips(
-    profile: OnboardingProfile,
-    readiness: ReadinessCheckin?,
-    locale: Locale = .current
-  ) -> [String] {
-    if let readiness {
-      return [
-        StudentStrings.replacing(
-          .myProfileV3Presentation001, values: ["\(readiness.sleepQuality)"], locale: locale),
-        StudentStrings.replacing(
-          .myProfileV3Presentation002, values: ["\(readiness.mood)"], locale: locale),
-        StudentStrings.replacing(
-          .myProfileV3Presentation003, values: ["\(readiness.stress)"], locale: locale),
-      ]
-    }
-    return [
-      profile.dailyLifeIntensity.map {
-        StudentStrings.replacing(
-          .myProfileV3Presentation004,
-          values: [
-            OnboardingLabels.scaleLabel(
-              OnboardingLabels.dailyLifeIntensityLabels(locale: locale), notch: $0)
-          ],
-          locale: locale)
-      },
-      profile.lifeStress.map {
-        StudentStrings.replacing(
-          .myProfileV3Presentation005,
-          values: [
-            OnboardingLabels.scaleLabel(
-              OnboardingLabels.lifeStressLabels(locale: locale), notch: $0)
-          ],
-          locale: locale)
-      },
-      profile.recoverySpeed.map {
-        StudentStrings.replacing(
-          .myProfileV3Presentation006,
-          values: [
-            OnboardingLabels.scaleLabel(
-              OnboardingLabels.recoverySpeedLabels(locale: locale), notch: $0)
-          ],
-          locale: locale)
-      },
-    ]
-    .compactMap { $0 }
   }
 
   private static func injuryChips(_ profile: OnboardingProfile) -> [String] {

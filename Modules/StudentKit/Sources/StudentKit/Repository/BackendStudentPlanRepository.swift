@@ -28,6 +28,14 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     _ = now
   }
 
+  public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
+    let token = try await session.accessToken()
+    let tree = try await api.plan(id: id, accessToken: token).toDomain()
+    guard tree.plan.traineeID == studentID else { return nil }
+    let exercises = try await exerciseCatalog(accessToken: token)
+    return StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+  }
+
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
     if let cached = await cache.loadPlan(studentID: studentID) {
       Task { [weak self] in

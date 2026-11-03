@@ -49,11 +49,64 @@ actor OutcomeRecorder {
 // MARK: - Load / resume (D6)
 
 @MainActor
+@Test func spec095WizardReachesExtrasAsItsFourthAndLastStep() async {
+  let harness = WizardHarness()
+  await harness.viewModel.load()
+  harness.viewModel.draft = OnboardingFixtures.completeDraft()
+  for expected in 2...4 {
+    await harness.viewModel.advance()
+    #expect(harness.viewModel.step == expected)
+  }
+  #expect(harness.viewModel.isLastStep)
+  harness.viewModel.draft.isCompeting = true
+  #expect(!harness.viewModel.canAdvance)
+  harness.viewModel.draft.competitionDate = "2026-12-01"
+  harness.viewModel.draft.targetWeightClass = "IPF · 83 kg"
+  #expect(harness.viewModel.canAdvance)
+}
+
+@MainActor
 @Test func loadWithoutAnyDataStartsAtStepOne() async {
   let harness = WizardHarness()
   await harness.viewModel.load()
   #expect(harness.viewModel.phase == .editing)
   #expect(harness.viewModel.step == 1)
+}
+
+@MainActor
+@Test func spec095LegacyDraftSubmissionOmitsRemovedFieldsAndKeepsServerValues() async throws {
+  let harness = WizardHarness()
+  await harness.viewModel.load()
+  var legacy = OnboardingFixtures.completeDraft()
+  legacy.muscleGroupsToStrengthen = [.back]
+  legacy.noteToCoach = "Keep this note"
+  harness.viewModel.draft = legacy
+  await harness.viewModel.complete()
+
+  let patch = try #require(harness.repo.upsertedPatches.last)
+  #expect(patch.trainingDays == .absent)
+  #expect(patch.gymTier == .absent)
+  #expect(patch.equipmentOverrides == .absent)
+  #expect(patch.dailyLifeIntensity == .absent)
+  #expect(patch.lifeStress == .absent)
+  #expect(patch.recoverySpeed == .absent)
+  #expect(patch.sleepHours == .absent)
+  #expect(patch.muscleGroupsToStrengthen == .absent)
+  #expect(patch.uploadAttachmentIds == .absent)
+  #expect(patch.noteToCoach == .value("Keep this note"))
+  #expect(patch.isCompeting == .value(false))
+
+  let server = StudentDemoSeed.makeOnboardingProfile(studentID: OnboardingFixtures.studentId)
+  let saved = InMemoryOnboardingRepository.applied(
+    patch, to: server, updatedAt: OnboardingFixtures.serverUpdatedAt)
+  #expect(saved.trainingDays == server.trainingDays)
+  #expect(saved.gymTier == server.gymTier)
+  #expect(saved.equipmentOverrides == server.equipmentOverrides)
+  #expect(saved.dailyLifeIntensity == server.dailyLifeIntensity)
+  #expect(saved.lifeStress == server.lifeStress)
+  #expect(saved.recoverySpeed == server.recoverySpeed)
+  #expect(saved.sleepHours == server.sleepHours)
+  #expect(saved.muscleGroupsToStrengthen == server.muscleGroupsToStrengthen)
 }
 
 @MainActor
@@ -84,6 +137,27 @@ actor OutcomeRecorder {
 }
 
 // MARK: - Advance (step gating + per-step PUT)
+
+@MainActor
+@Test(arguments: [4, 5, 6, 7])
+func spec095OldDraftResumesAtExtrasAndNormalizesProgress(oldStep: Int) async throws {
+  let harness = WizardHarness()
+  var legacy = OnboardingFixtures.completeDraft()
+  legacy.furthestStep = oldStep
+  legacy.savedAt = OnboardingFixtures.serverUpdatedAt
+  try await harness.draftStore.save(legacy, studentId: OnboardingFixtures.studentId)
+  await harness.viewModel.load()
+  #expect(harness.viewModel.usedDraftResume)
+  #expect(harness.viewModel.step == 4)
+  #expect(harness.viewModel.isLastStep)
+  #expect(harness.viewModel.draft.furthestStep == 4)
+  #expect(harness.viewModel.draft.sleepHours == legacy.sleepHours)
+  await harness.viewModel.saveAndExit()
+  let saved = await harness.draftStore.load(studentId: OnboardingFixtures.studentId)
+  #expect(saved?.furthestStep == 4)
+  #expect(harness.repo.upsertedPatches.last?.sleepHours == .absent)
+  #expect(harness.repo.upsertedPatches.last?.isCompeting == .value(false))
+}
 
 @MainActor
 @Test func advanceIsBlockedUntilStepIsComplete() async {
@@ -153,7 +227,7 @@ actor OutcomeRecorder {
 
   #expect(harness.repo.upsertedPatches.count == 1)
   #expect(harness.repo.upsertedPatches[0].gender == .value(.male))  // full patch
-  #expect(harness.repo.upsertedPatches[0].sleepHours == .value(4))
+  #expect(harness.repo.upsertedPatches[0].sleepHours == .absent)
   #expect(harness.repo.completeCallCount == 1)
   // Draft cleared after success.
   let saved = await harness.draftStore.load(studentId: OnboardingFixtures.studentId)
@@ -262,4 +336,18 @@ actor OutcomeRecorder {
   let outcomes = await harness.outcomes.outcomes
   #expect(outcomes == [.requestSent(sent)])
   #expect(harness.stash.peek(studentId: OnboardingFixtures.studentId) == nil)
+}
+
+@MainActor
+@Test func spec095CompletedProfileSkipsWizardAndClearsStaleDraft() async throws {
+  let harness = WizardHarness()
+  harness.repo.fetchResult = StudentDemoSeed.makeOnboardingProfile(
+    studentID: OnboardingFixtures.studentId)
+  try await harness.draftStore.save(
+    OnboardingFixtures.completeDraft(), studentId: OnboardingFixtures.studentId)
+  await harness.viewModel.load()
+  #expect(harness.viewModel.phase == .completing)
+  #expect(harness.repo.upsertedPatches.isEmpty)
+  #expect(await harness.outcomes.outcomes == [.needsReload])
+  #expect(await harness.draftStore.load(studentId: OnboardingFixtures.studentId) == nil)
 }

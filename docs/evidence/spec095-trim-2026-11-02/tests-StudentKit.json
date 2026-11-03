@@ -1,0 +1,33 @@
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 107770,
+    "counts": {
+      "passed": 1089,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T03-05-23-684Z_pid87679_74173901.log"
+  },
+  "diagnostics": {
+    "warnings": [
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:100"
+      },
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:112"
+      },
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "macro expansion #expect:1"
+      }
+    ],
+    "errors": [],
+    "testFailures": []
+  }
+}

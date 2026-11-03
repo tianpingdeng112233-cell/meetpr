@@ -4,7 +4,7 @@ import Testing
 
 @testable import StudentKit
 
-@Test func profileV3PresentationUsesCurrentReadinessAndOnboardingBaseline() {
+@Test func profileV3PresentationKeepsRetainedProfileValuesWithReadiness() {
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
   let readiness = ReadinessCheckin(
     id: UUID(),
@@ -24,14 +24,12 @@ import Testing
   )
 
   #expect(presentation.sbdTotalKg == 520)
-  #expect(presentation.recoveryChips == ["睡眠 4/5", "状态 3/5", "压力 2/5"])
   #expect(presentation.injuryChips == ["肩部伤病"])
   #expect(presentation.restTimer == "自动 (按 RPE)")
   #expect(presentation.competitionDate == profile.competitionDate)
-  #expect(presentation.trainingEnvironment.contains("4天/周"))
 }
 
-@Test func profileV3PresentationFallsBackToRecoveryProfileAndCustomTimer() {
+@Test func profileV3PresentationKeepsCustomTimerWithoutReadiness() {
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
 
   let presentation = MyProfileV3Presentation.make(
@@ -40,6 +38,5 @@ import Testing
     restTimer: .custom(lowSeconds: 120, midSeconds: 180, highSeconds: 240)
   )
 
-  #expect(presentation.recoveryChips == ["中等强度", "较高压力", "约2天恢复"])
   #expect(presentation.restTimer == "手动设置 2:00/3:00/4:00")
 }

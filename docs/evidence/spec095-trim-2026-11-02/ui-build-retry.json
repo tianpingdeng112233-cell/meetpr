@@ -1,0 +1,33 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🚀 Build & Run\n\nErrors (1):\n\n  ✗ unable to attach DB: error: accessing build database \"/private/tmp/meetpr-095-i2-build/Build/Intermediates.noindex/XCBuildData/build.db\": database is locked Possibly there are two concurrent builds running in the same filesystem location.\n\n❌ Build failed. (⏱️ 122.4s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/build_run_sim_2026-11-02T03-28-39-118Z_pid87679_704be3d9.log — Build Logs\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.build-run-result",
+    "schemaVersion": "2",
+    "didError": true,
+    "error": "Build failed",
+    "data": {
+      "summary": {
+        "status": "FAILED",
+        "durationMs": 122407,
+        "target": "simulator"
+      },
+      "artifacts": {
+        "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/build_run_sim_2026-11-02T03-28-39-118Z_pid87679_704be3d9.log"
+      },
+      "diagnostics": {
+        "warnings": [],
+        "errors": [
+          {
+            "message": "unable to attach DB: error: accessing build database \"/private/tmp/meetpr-095-i2-build/Build/Intermediates.noindex/XCBuildData/build.db\": database is locked Possibly there are two concurrent builds running in the same filesystem location."
+          }
+        ]
+      }
+    }
+  },
+  "isError": true
+}
