@@ -99,6 +99,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
   public let status: BindRequestStatus
   public let submittedAt: Date
   public let respondedAt: Date?
+  public let endedAt: Date?
   public let expiredAt: Date
   public let skipEvaluation: Bool
   public let skipReason: String?
@@ -113,6 +114,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
     status: BindRequestStatus,
     submittedAt: Date,
     respondedAt: Date?,
+    endedAt: Date? = nil,
     expiredAt: Date,
     skipEvaluation: Bool,
     skipReason: String?,
@@ -126,6 +128,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
     self.status = status
     self.submittedAt = submittedAt
     self.respondedAt = respondedAt
+    self.endedAt = endedAt
     self.expiredAt = expiredAt
     self.skipEvaluation = skipEvaluation
     self.skipReason = skipReason
@@ -142,6 +145,7 @@ public struct BindRequestDTO: Codable, Equatable, Sendable {
       status: status,
       submittedAt: submittedAt,
       respondedAt: respondedAt,
+      endedAt: endedAt,
       expiredAt: expiredAt,
       skipEvaluation: skipEvaluation,
       skipReason: skipReason,

@@ -5,11 +5,13 @@ import RepositoryContracts
 
 /// Neutral notices shown atop the enter-code page (spec 031 D8: rejection is
 /// never surfaced as rejection — wiki §3.4 silent semantics).
-public enum BindNotice: Equatable, Sendable {
+public enum BindNotice: Hashable, Sendable {
   /// Latest request was rejected — neutral copy, no "拒绝" wording.
   case coachNotAccepting
   /// Latest request lazily expired after 7 days.
   case requestExpired
+  /// Coach ended the binding; training history remains available (spec 098).
+  case coachUnlinked(coachDisplayName: String?)
   /// Stashed code turned out invalid at submit time.
   case invalidCode
   /// Auto-resubmission failed on transport; stash kept.
@@ -21,6 +23,12 @@ public enum BindNotice: Equatable, Sendable {
       StudentStrings.localized(.bindGateViewModel001)
     case .requestExpired:
       StudentStrings.localized(.bindGateViewModel002)
+    case .coachUnlinked(let coachDisplayName):
+      if let coachDisplayName {
+        StudentStrings.replacing(.bindGateViewModel005, values: [coachDisplayName])
+      } else {
+        StudentStrings.localized(.bindGateViewModel006)
+      }
     case .invalidCode:
       StudentStrings.localized(.bindGateViewModel003)
     case .network:
@@ -270,7 +278,7 @@ public final class BindGateViewModel {
 
   private func resolveUnbound(latest: BindRequest?) async -> BindGateState {
     guard let pending = stash.peek(studentId: studentId) else {
-      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: latest?.status))
+      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: latest))
     }
 
     guard await isOnboardingComplete() else {
@@ -324,7 +332,7 @@ public final class BindGateViewModel {
         return .pendingAcceptance(mine)
       }
     case .none, .rejected, .expired, .cancelled:
-      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: mine?.status))
+      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: mine))
     }
     return .failed
   }
@@ -366,12 +374,19 @@ public final class BindGateViewModel {
   }
 
   /// D8 mapping: rejected → neutral "not accepting"; expired → expired copy;
-  /// cancelled / no history → no notice.
-  private static func notice(for status: BindRequestStatus?) -> BindNotice? {
-    switch status {
-    case .rejected: .coachNotAccepting
-    case .expired: .requestExpired
-    case .pending, .accepted, .cancelled, .none: nil
+  /// Coach-ended bindings → unlink copy; withdrawn requests / no history → no notice.
+  private static func notice(for request: BindRequest?) -> BindNotice? {
+    switch request?.status {
+    case .rejected: return .coachNotAccepting
+    case .expired: return .requestExpired
+    case .cancelled:
+      if let request, request.endedAt != nil {
+        let name = request.coachDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return .coachUnlinked(coachDisplayName: name?.isEmpty == false ? name : nil)
+      } else {
+        return nil
+      }
+    case .pending, .accepted, .none: return nil
     }
   }
 }

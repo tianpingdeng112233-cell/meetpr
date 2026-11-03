@@ -171,25 +171,25 @@ import Testing
 
   @Test func descriptionMapsEveryHalfStepToRIRCopy() {
     let expected = [
-      "还能多做 5 次",
-      "还能多做 4-5 次",
-      "还能多做 4 次",
-      "还能多做 3-4 次",
-      "还能多做 3 次",
-      "还能多做 2-3 次",
-      "还能多做 2 次",
-      "还能多做 1-2 次",
-      "还能多做 1 次",
-      "或许还能多做 1 次",
-      "力竭，无保留",
+      "还剩 4–6 次",
+      "还剩 4–6 次",
+      "还剩 4–6 次",
+      "还剩 3–4 次",
+      "还剩 3 次",
+      "还剩 2–3 次",
+      "还剩 2 次",
+      "还剩 1–2 次",
+      "还剩 1 次",
+      "做不了下一次，但能再加点重",
+      "做不动了",
     ]
     #expect(SetEntryRPE.descriptions == expected)
     for (index, copy) in expected.enumerated() {
       #expect(SetEntryRPE.description(5 + Double(index) * 0.5) == copy)
     }
-    #expect(SetEntryRPE.description(8.2) == "还能多做 2 次")  // snaps before describing
-    #expect(SetEntryRPE.description(4.0) == "还能多做 5 次")  // clamp low
-    #expect(SetEntryRPE.description(11.0) == "力竭，无保留")  // clamp high
+    #expect(SetEntryRPE.description(8.2) == "还剩 2 次")  // snaps before describing
+    #expect(SetEntryRPE.description(4.0) == "还剩 4–6 次")  // clamp low
+    #expect(SetEntryRPE.description(11.0) == "做不动了")  // clamp high
   }
 
   @Test func tickHeightsAndLitRangeMatchV3Contract() {

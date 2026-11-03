@@ -70,14 +70,24 @@ struct AccessoryLogCard: View {
             ], id: \.self
           ) { label in
             Group {
-              if label == effortMode.label && allowsRIR {
-                Button(action: switchEffort) { EffortToggleLabel(text: label) }
-                  .buttonStyle(.plain)
-                  .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-                  .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
-                  .disabled(
-                    viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
-                      || !exercise.rows.contains(where: { $0.draft.loggedSetID == nil }))
+              if label == effortMode.label {
+                HStack(spacing: 0) {
+                  if allowsRIR {
+                    Button(action: switchEffort) { EffortToggleLabel(text: label) }
+                      .buttonStyle(.plain)
+                      .frame(
+                        minWidth: MeetPRSpacing.minimumHitTarget,
+                        minHeight: MeetPRSpacing.minimumHitTarget
+                      )
+                      .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
+                      .disabled(
+                        viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
+                          || !exercise.rows.contains(where: { $0.draft.loggedSetID == nil }))
+                  } else {
+                    Text(label).frame(minWidth: MeetPRSpacing.minimumHitTarget)
+                  }
+                  EffortExplainerButton(kind: effortMode)
+                }
               } else {
                 Text(label)
               }
@@ -253,7 +263,13 @@ struct AccessoryColumns: Layout {
 
   private func widths(_ width: CGFloat) -> [CGFloat] {
     let available = max(0, width - gap * CGFloat(weights.count - 1))
-    return weights.map { available * $0 / weights.reduce(0, +) }
+    // Reserve separate 44pt targets for the effort switch and its help button.
+    let effortWidth = MeetPRSpacing.minimumHitTarget * 2
+    let remaining = max(0, available - effortWidth)
+    let remainingWeight = weights.reduce(0, +) - weights[4]
+    return weights.enumerated().map { index, weight in
+      index == 4 ? effortWidth : remaining * weight / remainingWeight
+    }
   }
 }
 

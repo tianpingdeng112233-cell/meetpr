@@ -19,6 +19,8 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
   public let submittedAt: Date
   /// Coach response time; stays nil for cancelled/expired.
   public let respondedAt: Date?
+  /// Present when the coach ended an accepted binding (spec 098).
+  public let endedAt: Date?
   /// NOT NULL on the wire: pending requests are created with +7d.
   public let expiredAt: Date
   public let skipEvaluation: Bool
@@ -34,6 +36,7 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
     status: BindRequestStatus,
     submittedAt: Date,
     respondedAt: Date? = nil,
+    endedAt: Date? = nil,
     expiredAt: Date,
     skipEvaluation: Bool = false,
     skipReason: String? = nil,
@@ -47,6 +50,7 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
     self.status = status
     self.submittedAt = submittedAt
     self.respondedAt = respondedAt
+    self.endedAt = endedAt
     self.expiredAt = expiredAt
     self.skipEvaluation = skipEvaluation
     self.skipReason = skipReason

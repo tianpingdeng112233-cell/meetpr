@@ -66,6 +66,19 @@ enum StudentStrings {
     static let bindReminderTitle = Key("student.bindReminder.title")
     static let bindReminderBody = Key("student.bindReminder.body")
     static let bindReminderEnable = Key("student.bindReminder.enable")
+
+    static let effortExplainerRirRemaining = Key(
+      "student.effortExplainer.rirRemaining", one: "student.effortExplainer.rirRemainingOne")
+    static let effortExplainerRpeTitle = Key("student.effortExplainer.rpeTitle")
+    static let effortExplainerRpeSubtitle = Key("student.effortExplainer.rpeSubtitle")
+    static let effortExplainerRpeClosing = Key("student.effortExplainer.rpeClosing")
+    static let effortExplainerRpeHelp = Key("student.effortExplainer.rpeHelp")
+    static let effortExplainerRirTitle = Key("student.effortExplainer.rirTitle")
+    static let effortExplainerRirSubtitle = Key("student.effortExplainer.rirSubtitle")
+    static let effortExplainerRirExample = Key("student.effortExplainer.rirExample")
+    static let effortExplainerRirClosing = Key("student.effortExplainer.rirClosing")
+    static let effortExplainerRirHelp = Key("student.effortExplainer.rirHelp")
+    static let effortExplainerClose = Key("student.effortExplainer.close")
     static let loadTypeFreeWeight = Key("student.loadType.freeWeight")
     static let loadTypeBodyweight = Key("student.loadType.bodyweight")
     static let loadTypeFreeWeightHint = Key("student.loadType.freeWeightHint")
@@ -301,6 +314,8 @@ enum StudentStrings {
     static let bindGateViewModel002 = Key("student.bindGateViewModel.copy002")
     static let bindGateViewModel003 = Key("student.bindGateViewModel.copy003")
     static let bindGateViewModel004 = Key("student.bindGateViewModel.copy004")
+    static let bindGateViewModel005 = Key("student.bindGateViewModel.copy005")
+    static let bindGateViewModel006 = Key("student.bindGateViewModel.copy006")
     static let cameraRecorderComponents001 = Key("student.cameraRecorderComponents.copy001")
     static let cameraRecorderComponents002 = Key(
       "student.cameraRecorderComponents.copy002",

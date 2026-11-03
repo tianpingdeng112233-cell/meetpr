@@ -1,0 +1,4 @@
+PASS: 23 changed/new entries match spec 094 generator exactly
+Unchanged baseline drift: Modules/AppShell/Sources/AppShell/Resources/Localizable.xcstrings appShell.update.body
+Unchanged baseline drift: Modules/AppShell/Sources/AppShell/Resources/Localizable.xcstrings appShell.update.current
+Unchanged baseline drift: Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings student.loadType.undo
