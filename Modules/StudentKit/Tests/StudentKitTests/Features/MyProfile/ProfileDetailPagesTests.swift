@@ -41,6 +41,23 @@ import ViewInspector
 }
 
 @MainActor
+@Test func profileInjuryHistoryTitleMatchesMenuAndDetailInAllLanguages() throws {
+  for (language, expected) in [
+    ("zh-Hans", "伤病记录"), ("en", "Injury history"), ("zh-Hant", "傷病記錄"),
+  ] {
+    #expect(
+      StudentStrings.localized(.profileHealth, locale: Locale(identifier: language)) == expected)
+  }
+  #expect(ProfileMenuDestination.health.title == "伤病记录")
+  let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
+  let view = ProfileHomeContent(
+    identity: ProfileIdentity(loginIdentifier: "person@example.com"), state: .loaded(profile),
+    isFailed: false, onOpen: { _ in }, onRetry: {}, onOneRMInfo: {})
+  let rows = try view.inspect().findAll(StudentMenuRow.self)
+  #expect(try rows[1].actualView().title == "伤病记录")
+}
+
+@MainActor
 @Test func profileHealthRowsKeepSummariesAndExistingDestinations() throws {
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
   var readinessOpened = false
