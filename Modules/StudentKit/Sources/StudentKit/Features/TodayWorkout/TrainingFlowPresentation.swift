@@ -12,7 +12,10 @@ struct TrainingFlowPresentation: Equatable, Sendable {
     let partition = TrainingExerciseProgress(exercises: presentation.exercises)
     completed = partition.completed
     hero = partition.active
-    belowHero = ([partition.active].compactMap { $0 } + partition.remaining)
+    let activeBelowHero =
+      TodayWorkoutPresentation.accessoryExercise(for: partition.active) == nil
+      ? partition.active : nil
+    belowHero = ([activeBelowHero].compactMap { $0 } + partition.remaining)
       .sorted { $0.stableIndex < $1.stableIndex }
     completion = presentation.completionAvailability(isEditable: true)
     // Reuse existing position/remaining copy without changing history or summary semantics.

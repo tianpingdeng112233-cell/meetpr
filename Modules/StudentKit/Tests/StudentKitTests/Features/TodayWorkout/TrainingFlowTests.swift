@@ -76,7 +76,7 @@ import Testing
     #expect(partial?.completed.map(\.stableIndex) == [0])
     #expect(partial?.completed.first?.trainingCompletedText == "已完成 · 3 组")
     #expect(partial?.hero?.stableIndex == 1)
-    #expect(partial?.belowHero.map(\.stableIndex) == [1, 2])
+    #expect(partial?.belowHero.map(\.stableIndex) == [2])
     for index in fixture.drafts.indices { fixture.drafts[index].completed = true }
     let done = fixture.presentation().trainingFlow(isEditable: true)
     #expect(done?.hero == nil)
@@ -89,6 +89,34 @@ import Testing
     fixture.day = fixture.day.replacingCompletion(completedAt: Date(), source: "manual")
     #expect(fixture.presentation().trainingFlow(isEditable: true) == nil)
     #expect(makeFixture().presentation(started: false).trainingFlow(isEditable: true) == nil)
+  }
+
+  @Test func accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() throws {
+    var fixture = makeFixture()
+    for index in 0..<3 { fixture.drafts[index].completed = true }
+    let presentation = fixture.presentation(started: false)
+    let flow = try #require(presentation.trainingFlow(isEditable: true))
+    #expect(presentation.accessoryExercise(isEditable: true)?.id == flow.hero?.id)
+    #expect(flow.belowHero.map(\.stableIndex) == [2])
+
+    for index in 3..<5 { fixture.drafts[index].completed = true }
+    let advanced = try #require(fixture.presentation().trainingFlow(isEditable: true))
+    #expect(advanced.completed.map(\.stableIndex) == [0, 1])
+    #expect(advanced.hero?.stableIndex == 2)
+    #expect(advanced.belowHero.isEmpty)
+
+    fixture.drafts[3].completed = false
+    let restored = try #require(fixture.presentation().trainingFlow(isEditable: true))
+    #expect(restored.hero?.stableIndex == 1)
+    #expect(restored.belowHero.map(\.stableIndex) == [2])
+  }
+
+  @Test func mainLiftHeroKeepsItsOwnGroupTableBelow() throws {
+    let presentation = makeFixture().presentation()
+    let flow = try #require(presentation.trainingFlow(isEditable: true))
+    #expect(presentation.accessoryExercise(isEditable: true) == nil)
+    #expect(flow.hero?.stableIndex == 0)
+    #expect(flow.belowHero.map(\.stableIndex) == [0, 1, 2])
   }
 
   private func makeFixture() -> TrainingFlowFixture {

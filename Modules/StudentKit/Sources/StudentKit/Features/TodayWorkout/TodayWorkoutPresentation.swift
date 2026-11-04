@@ -197,8 +197,15 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   }
 
   func accessoryExercise(isEditable: Bool) -> Exercise? {
-    guard let flow = trainingFlow(isEditable: isEditable),
-      let exercise = flow.hero, let draft = flow.currentRow?.draft,
+    Self.accessoryExercise(for: trainingFlow(isEditable: isEditable)?.hero)
+  }
+
+  /// Shared by hero form selection and the list below it, without constructing another flow.
+  static func accessoryExercise(for hero: Exercise?) -> Exercise? {
+    guard let exercise = hero,
+      let draft = exercise.rows.first(where: {
+        $0.draft.needsTrainingResult && !$0.draft.isExtra
+      })?.draft,
       draft.isAccessory || draft.prescribed.hasUnspecifiedLoad
     else { return nil }
     return exercise
