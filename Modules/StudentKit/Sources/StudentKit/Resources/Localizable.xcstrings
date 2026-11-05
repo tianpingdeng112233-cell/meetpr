@@ -29629,6 +29629,75 @@
         }
       }
     },
+    "student.workoutCompletedNotification": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日训练已完成"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout complete."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日訓練已完成"
+          }
+        }
+      }
+    },
+    "student.workoutCompletionWaitingNetwork": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待联网完成今日训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for a connection to finish"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待連線完成今日訓練"
+          }
+        }
+      }
+    },
+    "student.workoutCompletionWaitingNetworkBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "联网后会自动完成，可以先离开，完成后会通知你。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It finishes on its own once you're back online. You can leave — we'll let you know."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線後會自動完成，可以先離開，完成後會通知你。"
+          }
+        }
+      }
+    },
     "student.videoTimeoutNotification": {
       "extractionState": "manual",
       "localizations": {

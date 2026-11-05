@@ -15,17 +15,16 @@ extension VideoAttachmentViewModel {
         sourceURL: sourceURL, draftID: draftID, studentID: studentID,
         trainingDate: trainingDate, slot: slot)
       apply(.updated(record, progress: 0))
-      guard let setLogID = await resolveSetLogID() else {
-        reportVideoProcessingFailure()
-        return
-      }
+      // No set ID yet (offline or the save is still queued) is the normal
+      // pending path: the retained row stays and binds once the set saves.
+      guard let setLogID = await resolveSetLogID() else { return }
       if await bind(record: record, setLogID: setLogID) {
         // Both the durable source/record and canonical association now exist.
         // Failed resolution keeps this caller-owned fallback untouched.
         try? FileManager.default.removeItem(at: sourceURL)
       }
     } catch {
-      reportVideoProcessingFailure()
+      reportVideoProcessingFailure(draftID: draftID)
     }
   }
 
@@ -61,7 +60,7 @@ extension VideoAttachmentViewModel {
     guard record.pendingDraftID != nil,
       let canonicalID = await resolveSetLogID()
     else {
-      reportVideoProcessingFailure()
+      reportVideoProcessingFailure(draftID: record.pendingDraftID)
       return
     }
     await bind(record: record, setLogID: canonicalID)
@@ -78,8 +77,10 @@ extension VideoAttachmentViewModel {
         }
         return true
       }
+    } catch is CancellationError {
+      // A newer selection or removal superseded this bind; nothing failed.
     } catch {
-      reportVideoProcessingFailure()
+      reportVideoProcessingFailure(draftID: record.pendingDraftID)
     }
     return false
   }

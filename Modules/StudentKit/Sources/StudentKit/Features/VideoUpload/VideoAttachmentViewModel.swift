@@ -19,6 +19,8 @@ public final class VideoAttachmentViewModel {
   private(set) var hasLoadedAttachments = false
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
+  /// The set draft a processing failure belongs to; nil means it is not tied to one set.
+  private(set) var lastErrorDraftID: UUID?
   public private(set) var retryErrorMessage: String?
   var missingAttachment: VideoAttachment?
 
@@ -35,11 +37,24 @@ public final class VideoAttachmentViewModel {
   }
 
   public func reportVideoProcessingFailure() {
+    reportVideoProcessingFailure(draftID: nil)
+  }
+
+  func reportVideoProcessingFailure(draftID: UUID?) {
     lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+    lastErrorDraftID = draftID
+  }
+
+  /// A set's entry sheet shows only its own failure, or one not tied to any set.
+  func processingFailureMessage(forDraftID draftID: UUID?) -> String? {
+    guard let lastErrorMessage else { return nil }
+    guard let owner = lastErrorDraftID else { return lastErrorMessage }
+    return owner == draftID ? lastErrorMessage : nil
   }
 
   func clearProcessingFailure() {
     lastErrorMessage = nil
+    lastErrorDraftID = nil
     retryErrorMessage = nil
   }
 
@@ -101,8 +116,9 @@ public final class VideoAttachmentViewModel {
       )
     } catch let error as VideoUploadError {
       lastErrorMessage = Self.message(for: error)
+      lastErrorDraftID = nil
     } catch {
-      lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+      reportVideoProcessingFailure()
     }
   }
 

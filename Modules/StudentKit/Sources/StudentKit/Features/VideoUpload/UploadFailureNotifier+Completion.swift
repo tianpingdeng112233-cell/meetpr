@@ -56,9 +56,12 @@ extension UploadFailureNotifier {
   {
     let content = UNMutableNotificationContent()
     content.title = "MeetPR"
-    content.body = StudentStrings.replacing(
-      completed ? .videoCompletionNotification : .videoTimeoutNotification,
-      values: ["\(count)"])
+    content.body =
+      completed && count == 0
+      ? StudentStrings.localized(.workoutCompletedNotification)
+      : StudentStrings.replacing(
+        completed ? .videoCompletionNotification : .videoTimeoutNotification,
+        values: ["\(count)"])
     content.userInfo = destination.notificationUserInfo
     content.sound = .default
     return content

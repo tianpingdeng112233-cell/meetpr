@@ -103,7 +103,7 @@ struct VideoAttachmentSection: View {
             onCancel: removeAttachment, onRetry: retryAttachment, onDelete: removeAttachment)
         }
       }
-      if let message = videoViewModel.lastErrorMessage {
+      if let message = videoViewModel.processingFailureMessage(forDraftID: draftID) {
         Text(message)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.danger)
@@ -326,7 +326,7 @@ extension VideoAttachmentSection {
       trainingDate: trainingDate, slot: slot, resolveSetLogID: { await ensureSetLogID() })
     // A local persistence failure may produce no row event. Restore the
     // controls explicitly so the error remains actionable.
-    if videoViewModel.lastErrorMessage != nil {
+    if videoViewModel.processingFailureMessage(forDraftID: draftID) != nil {
       isPreparing = false
     }
   }

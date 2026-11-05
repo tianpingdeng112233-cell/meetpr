@@ -51,19 +51,32 @@ struct VideoCompletionControl: View {
 
   private func waitingCard(_ presentation: VideoCompletionPresentation) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
-      Label(
-        StudentStrings.replacing(
-          .videoCompletionProgress,
-          values: [String(presentation.done), String(presentation.total)]),
-        systemImage: "arrow.up.circle"
+      // Zero videos means only the completion request is waiting for a network.
+      if presentation.total == 0 {
+        Label(
+          StudentStrings.localized(.workoutCompletionWaitingNetwork),
+          systemImage: "wifi.exclamationmark"
+        )
+        .font(.callout.bold())
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      } else {
+        Label(
+          StudentStrings.replacing(
+            .videoCompletionProgress,
+            values: [String(presentation.done), String(presentation.total)]),
+          systemImage: "arrow.up.circle"
+        )
+        .font(.callout.bold())
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        ProgressView(value: presentation.progress).tint(Color.MeetPR.goldCTA)
+      }
+      Text(
+        StudentStrings.localized(
+          presentation.total == 0 ? .workoutCompletionWaitingNetworkBody : .videoCompletionBody)
       )
-      .font(.callout.bold())
-      .foregroundStyle(Color.MeetPR.textPrimary)
-      ProgressView(value: presentation.progress).tint(Color.MeetPR.goldCTA)
-      Text(StudentStrings.localized(.videoCompletionBody))
-        .font(.footnote)
-        .foregroundStyle(Color.MeetPR.textSecondary)
-        .fixedSize(horizontal: false, vertical: true)
+      .font(.footnote)
+      .foregroundStyle(Color.MeetPR.textSecondary)
+      .fixedSize(horizontal: false, vertical: true)
     }
     .padding(MeetPRSpacing.space4)
     .frame(maxWidth: .infinity, alignment: .leading)

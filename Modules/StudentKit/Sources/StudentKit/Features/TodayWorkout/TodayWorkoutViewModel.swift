@@ -913,6 +913,11 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
+      if presentsCelebration, Self.isConnectivityFailure(error),
+        deferCompletionUntilOnline(day)
+      {
+        return true
+      }
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
     }
     if presentsCelebration {
@@ -927,6 +932,33 @@ public final class TodayWorkoutViewModel {
       }
     }
     return false
+  }
+
+  /// Offline with every set synced and every video delivered: the reward has
+  /// already been shown, so keep it and let the durable gate send completion
+  /// once the network returns (same wait the video path uses, zero videos).
+  private func deferCompletionUntilOnline(_ day: StudentPlanDay) -> Bool {
+    guard let queue = setSyncQueue, queue.videoCompletion != nil else { return false }
+    do {
+      try queue.completionGate.waitForVideos(
+        dayID: day.id, trainingDate: day.scheduledDate, startedAt: now())
+    } catch {
+      return false
+    }
+    guard queue.completionGate.videoWait(dayID: day.id) != nil else { return false }
+    isCompletionSending = false
+    if let visibleDay = currentDay, visibleDay.id == day.id {
+      replaceCurrentDay(
+        visibleDay.replacingCompletion(completedAt: day.completedAt, source: day.completionSource),
+        updatesPlanDays: false)
+    }
+    Task { await queue.videoCompletion?.refresh() }
+    return true
+  }
+
+  static func isConnectivityFailure(_ error: any Error) -> Bool {
+    if error is URLError { return true }
+    return (error as NSError).domain == NSURLErrorDomain
   }
 
   func receiveVideoCompletion() async {

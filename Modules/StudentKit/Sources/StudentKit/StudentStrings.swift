@@ -36,6 +36,10 @@ enum StudentStrings {
     static let videoCompletionProgress = Key("student.videoCompletionProgress")
     static let videoCompletionBody = Key("student.videoCompletionBody")
     static let videoCompletionNotification = Key("student.videoCompletionNotification")
+    static let workoutCompletedNotification = Key("student.workoutCompletedNotification")
+    static let workoutCompletionWaitingNetwork = Key("student.workoutCompletionWaitingNetwork")
+    static let workoutCompletionWaitingNetworkBody = Key(
+      "student.workoutCompletionWaitingNetworkBody")
     static let videoTimeoutNotification = Key("student.videoTimeoutNotification")
     static let videoCompletionSummary = Key("student.videoCompletionSummary")
     static let videoCompletionUploading = Key("student.videoCompletionUploading")
