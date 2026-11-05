@@ -189,6 +189,7 @@ extension VideoUploadManager {
     // sweep recover an interruption without replaying the remote transition.
     let cleanup = await removeChunkFiles(recordID: record.id)
     try requireLiveWakeContext(recordID: record.id, generation: cleanup.generation)
+    await completionRecovery?(self)
     return cleanup.generation
   }
 

@@ -4,6 +4,7 @@ import Observation
 
 @Observable @MainActor public final class SetSyncQueue {
   let completionGate: WorkoutCompletionGate
+  var videoCompletion: VideoCompletionCoordinator?
   let studentID: UUID
   private(set) var records: [PendingSetRecord]
   private(set) var revision = 0

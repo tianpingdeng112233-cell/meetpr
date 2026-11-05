@@ -29559,6 +29559,167 @@
           }
         }
       }
+    },
+    "student.videoCompletionProgress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频上传中 {0}/{1}"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploading videos {0}/{1}"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片上傳中 {0}/{1}"
+          }
+        }
+      }
+    },
+    "student.videoCompletionBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "传完会自动完成今日训练，可以先离开，完成后会通知你。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We'll finish your workout once they're up. You can leave — we'll let you know."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳完會自動完成今日訓練，可以先離開，完成後會通知你。"
+          }
+        }
+      }
+    },
+    "student.videoCompletionNotification": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日训练已完成，{0} 条视频已送达"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout complete. {0} videos delivered."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日訓練已完成，{0} 條影片已送達"
+          }
+        }
+      }
+    },
+    "student.videoTimeoutNotification": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还有 {0} 条视频没传上，点击重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} videos didn't upload. Tap to retry."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還有 {0} 條影片沒傳上，點選重試"
+          }
+        }
+      }
+    },
+    "student.videoCompletionSummary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频没传上 · {1} 条正在传"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} not uploaded · {1} uploading"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片沒傳上 · {1} 條正在傳"
+          }
+        }
+      }
+    },
+    "student.videoCompletionUploading": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频正在传"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} videos uploading"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片正在傳"
+          }
+        }
+      }
+    },
+    "student.videoCompletionHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频传完后才会真正完成，长按后可以先离开"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your workout finishes once videos are up. You can leave after you hold."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片傳完後才會真正完成，長按後可以先離開"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

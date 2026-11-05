@@ -3,13 +3,17 @@ import Foundation
 
 public protocol UploadFailureNotifying: Sendable {
   func requestAuthorization() async
+  func scheduleCompletionTimeout(count: Int, deadline: Date, destination: UploadFailureDestination)
+    async
+  func notifyWorkoutCompleted(count: Int, destination: UploadFailureDestination) async
+  func cancelCompletionTimeout(destination: UploadFailureDestination) async
   func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async
 }
 
 public struct UploadFailureNotifier: UploadFailureNotifying {
   public static let notificationIdentifier = "video-upload-terminal-failures"
 
-  private let center: UNUserNotificationCenter
+  let center: UNUserNotificationCenter
 
   public init(center: UNUserNotificationCenter = .current()) {
     self.center = center
@@ -26,16 +30,8 @@ public struct UploadFailureNotifier: UploadFailureNotifying {
     destination: UploadFailureDestination
   ) async {
     guard count > 0 else { return }
-    let settings = await center.notificationSettings()
-    guard settings.authorizationStatus != .denied else { return }
-
-    center.removeDeliveredNotifications(withIdentifiers: [Self.notificationIdentifier])
-    center.removePendingNotificationRequests(withIdentifiers: [Self.notificationIdentifier])
-    let request = UNNotificationRequest(
-      identifier: Self.notificationIdentifier,
-      content: Self.content(count: count, destination: destination),
-      trigger: nil)
-    try? await center.add(request)
+    await replaceAggregate(
+      content: Self.content(count: count, destination: destination), trigger: nil)
   }
 
   static let authorizationOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
@@ -59,4 +55,12 @@ public struct UploadFailureNotifier: UploadFailureNotifying {
 struct NoopUploadFailureNotifier: UploadFailureNotifying {
   func requestAuthorization() async {}
   func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async {}
+}
+
+extension UploadFailureNotifying {
+  public func cancelCompletionTimeout(destination: UploadFailureDestination) async {}
+  public func scheduleCompletionTimeout(
+    count: Int, deadline: Date, destination: UploadFailureDestination
+  ) async {}
+  public func notifyWorkoutCompleted(count: Int, destination: UploadFailureDestination) async {}
 }

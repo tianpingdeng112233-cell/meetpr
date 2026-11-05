@@ -860,7 +860,21 @@ public final class TodayWorkoutViewModel {
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
+    let requestedAt = now()
     if presentsCelebration, !(await prepareSetSyncCompletion(dayID: day.id)) { return false }
+    if presentsCelebration, let videos = setSyncQueue?.videoCompletion {
+      do {
+        if try await videos.deferIfNeeded(
+          dayID: day.id, trainingDate: day.scheduledDate, startedAt: requestedAt)
+        {
+          completionPhase = .celebration
+          return true
+        }
+      } catch {
+        actionErrorMessage = Self.recordingErrorMessage(for: error)
+        return false
+      }
+    }
     if presentsCelebration {
       isCompletionSending = true
       completionPhase = .celebration
@@ -870,6 +884,13 @@ public final class TodayWorkoutViewModel {
         updatesPlanDays: false
       )
     }
+    return await performDayCompletion(
+      day, studentID: studentID, presentsCelebration: presentsCelebration)
+  }
+
+  private func performDayCompletion(
+    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool
+  ) async -> Bool {
     do {
       guard
         let completion = try await sendDayCompletion(
@@ -906,6 +927,15 @@ public final class TodayWorkoutViewModel {
       }
     }
     return false
+  }
+
+  func receiveVideoCompletion() async {
+    guard let day = currentDay, let studentID = currentStudentID,
+      let result = setSyncQueue?.videoCompletion?.completed[day.id], day.completedAt == nil
+    else { return }
+    let completed = day.replacingCompletion(completedAt: result.completedAt, source: result.source)
+    replaceCurrentDay(completed)
+    await applyCompletionMutation(fallback: completed, studentID: studentID)
   }
 
   private func prepareSetSyncCompletion(dayID: UUID) async -> Bool {

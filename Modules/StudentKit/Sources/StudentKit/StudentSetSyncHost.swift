@@ -9,6 +9,7 @@ public struct StudentSetSyncHost<Content: View>: View {
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let videos: VideoUploadManager?
+  private let runtime: StudentSetSyncRuntime?
   private let onLogout: @MainActor () async -> Void
   private let content: (@escaping @MainActor () async -> Void) -> Content
   @State private var session: StudentSetSyncSession?
@@ -24,6 +25,7 @@ public struct StudentSetSyncHost<Content: View>: View {
     self.plans = plans
     self.logs = logs
     self.videos = videos?.manager
+    self.runtime = videos?.completionRuntime
     self.onLogout = onLogout
     self.content = content
   }
@@ -46,9 +48,13 @@ public struct StudentSetSyncHost<Content: View>: View {
     .task {
       do {
         if session == nil {
-          session = try StudentSetSyncSession.live(
-            studentID: studentID, plans: plans,
-            logs: logs, videos: videos, onLogout: onLogout)
+          if let runtime, let videos {
+            session = try runtime.session(studentID: studentID, videos: videos, onLogout: onLogout)
+          } else {
+            session = try StudentSetSyncSession.live(
+              studentID: studentID, plans: plans,
+              logs: logs, videos: videos, onLogout: onLogout)
+          }
         }
         session?.start(network: UploadNetworkMonitor())
       } catch { loadError = error.localizedDescription }

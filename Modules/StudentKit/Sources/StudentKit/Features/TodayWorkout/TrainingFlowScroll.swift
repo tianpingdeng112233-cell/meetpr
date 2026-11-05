@@ -9,16 +9,21 @@ struct TrainingFlowSnapshot: Equatable {
 struct TrainingCompletionDock: View {
   let onComplete: () -> Void
   var coordinator: SetSyncCompletionCoordinator?
+  var videoCompletion: VideoCompletionPresentation?
+  var onRetryVideos: () -> Void = {}
 
   var body: some View {
-    SetSyncCompletionControl(coordinator: coordinator, onComplete: onComplete)
-      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
-      .padding(.vertical, MeetPRSpacing.space3)
-      .background(Color.MeetPR.bgBase)
-      .overlay(alignment: .top) {
-        Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: 1)
-      }
-      .accessibilityIdentifier("training.completionDock")
+    VideoCompletionControl(
+      presentation: videoCompletion, coordinator: coordinator,
+      onComplete: onComplete, onRetry: onRetryVideos
+    )
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+    .padding(.vertical, MeetPRSpacing.space3)
+    .background(Color.MeetPR.bgBase)
+    .overlay(alignment: .top) {
+      Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: 1)
+    }
+    .accessibilityIdentifier("training.completionDock")
   }
 }
 
