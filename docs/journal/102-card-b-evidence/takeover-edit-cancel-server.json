@@ -1,0 +1,18 @@
+[
+  {
+    "plan_exercise_id": "42286216-c25d-4455-a466-75c86e3889c6",
+    "weight_kg": "25.00",
+    "reps": 5,
+    "completed": false,
+    "set_index": 0,
+    "logged_date": "2026-11-05"
+  },
+  {
+    "plan_exercise_id": "43ce498f-7292-4518-85cd-d7d981235b1f",
+    "weight_kg": "20.00",
+    "reps": 5,
+    "completed": true,
+    "set_index": 0,
+    "logged_date": "2026-11-05"
+  }
+]
