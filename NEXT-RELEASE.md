@@ -6,16 +6,23 @@
 
 ## 🎯 目标：1.0 (32)
 - 基底：`beta/1.0-31` @ `4ffa409b`；1.0(31) 已于 2026-11-03 上传、11-04 David 确认已发，内容（095 / 098 / 100）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：工程内为 31，切 32 时再 `agvtool new-version 32`；marketing version 保持 1.0。
+- build 号：工程内已 `agvtool new-version 32`（2026-11-05 切包）；marketing version 保持 1.0。
+- 2026-11-05 David 在 iPhone 12 真机验收 iOS 通过并放行下列 6 项全部进 1.0(32)。
 
 ## 本版将包含
 
 - **P0 视频「被吞」修复（meetpr#403，合入 `73ecbfc8`，2026-11-05 David 放行，定「不单独切包、进下班车」）**：
   记组保存未返回时相机回调拿不到组 id 就删录像，保存失败（断网/5xx/超时/换天）同样删。
   现改为排到保存队列后按 draft 身份取 id；拿不到 id 时录像持久挂起，组保存成功或回到原日后自动挂上并上传（冷启动可恢复）。
-  证据：StudentKit 1105 / CoreModels 164 全绿，iPhone 17e 构建过，CI 绿。**真机拍摄路径未亲验**，切包前陪 David 真机走一遍
-  （断网记组→直拍→联网→视频挂上）。排障记录 `docs/diagnose/set-video-lost-2026-11-05.md`。
-  已丢视频服务端无存，只能靠学员相册找回。
+  证据：StudentKit 1105 / CoreModels 164 全绿，iPhone 17e 构建过，CI 绿；11-05 随 101/102 一并在 iPhone 12 真机验收通过。
+  排障记录 `docs/diagnose/set-video-lost-2026-11-05.md`。已丢视频服务端无存，只能靠学员相册找回。
+- **spec 101 A 卡：未送达视频不丢、训练中显示上传失败（PR #408，`eb70d25e`）**：上传失败时保留本机文件，训练页/录入页/已完成训练日显示失败与重试；
+  文件缺失可从相册补选，重试限定在所选训练日。StudentKit 1118 / CoreModels 164 绿，CI 绿。
+- **spec 102 打勾先变绿：离线记组本机先存、长按完成等组同步（PR #411，`38eb103e`）**：训练组先落本机并持久重试；同账号断网冷启动可恢复训练缓存；
+  顺修重开训练日重复 ID 崩溃。StudentKit 1147 / AppShell 125 / DesignSystem 76 绿，CI 绿。
+- **spec 101 B 卡：视频送达后才算完成训练日（PR #412，`1dfaa5b4`，含真机走查两处返修 `b04836de`）**：练完即时奖励不变，
+  有视频在传时显示等待卡、重启可恢复、失败重试，全部送达后才写完成，送达/30 分钟超时走现有通知；断网完成挂起、联网补发。
+  StudentKit 1178 / AppShell 126 绿，CI 绿。
 - **训练页辅助项 hero 不再在下方重复（spec 090，PR #399）**：坐姿划船等辅助项在 hero 卡时，下方列表只显示下一个动作。11-04 已合 release/1.0 并经 iPhone 17e 收货，StudentKit 1096/1096 绿。
 - **学员聊天「+」问教练面板秒关修复（P1，PR #406）**：1.0(30)/(31) 学员在聊天页点「+」，问教练面板约 0.5 秒自动收回；根因=聊天全屏页挂在带资料编辑 navigationDestination 的子树里，修复=挪到 NavigationStack 外层。安卓真机实测无此问题。⚖️2026-11-05 David 定：随下班车，不单独切包。证据见 docs/journal/2026-11-05-chat-plus-autoclose-ios.md。
 
