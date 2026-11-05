@@ -1,0 +1,35 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling StudentKitTests SetSyncDraftTests.swift
+[4/6] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (17.50s)
+Test Suite 'Selected tests' started at 2026-11-05 06:03:46.574.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 06:03:46.575.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 06:03:46.575.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 06:03:46.575.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetSyncDraftTests started.
+◇ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() started.
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:30:5: Expectation failed: created.allSatisfy { !$0.hasSavedRecord }
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:31:5: Expectation failed: (queue.pendingCount → 3) == 0
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:32:5: Expectation failed: (queue.pendingSetCount → 3) == 0
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:34:5: Expectation failed: (sent → [StudentKit.PendingSetRecord(id: B03A4846-9BD1-4C98-89AB-AB9500928690, studentID: 02400000-0000-0000-0000-000000000101, dayID: 02400000-0000-0000-0000-000000001000, trainingDate: 2026-11-02 00:00:00 +0000, draft: StudentKit.TodayWorkoutSetRowDraft(id: 2092E675-8AA5-4A24-AE7D-447125D4C175, planExerciseID: 02400000-0000-0000-0000-000000030000, exerciseID: 02400000-0000-0000-0000-000000002000, exerciseName: "深蹲", exerciseNameEn: Optional("Competition Squat"), isCatalogExercise: true, isAccessory: false, isMainLift: true, liftFamily: nil, planExerciseSortOrder: 0, prescribed: CoreModels.PrescribedSet(id: 2092E675-8AA5-4A24-AE7D-447125D4C175, setIndex: 3, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: nil, reps: nil, repsMax: nil, restSeconds: nil, coachNote: nil), actualWeight: Optional(142.5), actualReps: Optional(5), actualRIR: nil, actualRPE: nil, completed: false, failed: false, assumed: false, loggedSetID: nil, recordedAt: Optional(2026-11-05 06:03:46 +0000), isExtra: true, studentAddedDayID: nil), recordedAt: 2026-11-05 06:03:46 +0000, loggedDate: "2026-11-05", deleting: false, rejected: false, synced: false, confirmed: false, fallbackSetIndex: nil), StudentKit.PendingSetRecord(id: 83433288-223E-41E4-912C-D06AA07B9508, studentID: 02400000-0000-0000-0000-000000000101, dayID: 02400000-0000-0000-0000-000000001000, trainingDate: 2026-11-02 00:00:00 +0000, draft: StudentKit.TodayWorkoutSetRowDraft(id: 51A8F1F6-8E09-4B13-9DF4-D5730E6887FE, planExerciseID: 7E46AA1E-9BE6-4843-AE20-DF21310A7158, exerciseID: 7E46AA1E-9BE6-4843-AE20-DF21310A7158, exerciseName: "Cable pushdown", exerciseNameEn: nil, isCatalogExercise: true, isAccessory: true, isMainLift: false, liftFamily: nil, planExerciseSortOrder: 0, prescribed: CoreModels.PrescribedSet(id: 6DE6BA11-38FC-4E62-95DC-1B6C626607C1, setIndex: 0, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: nil, reps: nil, repsMax: nil, restSeconds: nil, coachNote: nil), actualWeight: nil, actualReps: nil, actualRIR: nil, actualRPE: nil, completed: false, failed: false, assumed: false, loggedSetID: nil, recordedAt: Optional(2026-11-05 06:03:46 +0000), isExtra: false, studentAddedDayID: Optional(02400000-0000-0000-0000-000000001000)), recordedAt: 2026-11-05 06:03:46 +0000, loggedDate: "2026-11-05", deleting: false, rejected: false, synced: false, confirmed: false, fallbackSetIndex: nil), StudentKit.PendingSetRecord(id: 892DFB67-95BC-4D78-AA20-B70CF6CB2F00, studentID: 02400000-0000-0000-0000-000000000101, dayID: 02400000-0000-0000-0000-000000001000, trainingDate: 2026-11-02 00:00:00 +0000, draft: StudentKit.TodayWorkoutSetRowDraft(id: 3922AD0E-25A7-4AD9-8468-5C5D37C90869, planExerciseID: 7E46AA1E-9BE6-4843-AE20-DF21310A7158, exerciseID: 7E46AA1E-9BE6-4843-AE20-DF21310A7158, exerciseName: "Cable pushdown", exerciseNameEn: nil, isCatalogExercise: true, isAccessory: true, isMainLift: false, liftFamily: nil, planExerciseSortOrder: 0, prescribed: CoreModels.PrescribedSet(id: B5C7F289-6AA7-4256-A507-2010260D691E, setIndex: 1, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: nil, reps: nil, repsMax: nil, restSeconds: nil, coachNote: nil), actualWeight: nil, actualReps: nil, actualRIR: nil, actualRPE: nil, completed: false, failed: false, assumed: false, loggedSetID: nil, recordedAt: Optional(2026-11-05 06:03:46 +0000), isExtra: false, studentAddedDayID: Optional(02400000-0000-0000-0000-000000001000)), recordedAt: 2026-11-05 06:03:46 +0000, loggedDate: "2026-11-05", deleting: false, rejected: false, synced: false, confirmed: false, fallbackSetIndex: nil)]).isEmpty → false
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:44:5: Expectation failed: rows.allSatisfy { !$0.hasSavedRecord }
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:48:5: Expectation failed: (input.input.effortMode → .rpe) == .rir
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:52:5: Expectation failed: await reopened.saveAccessoryRow(input)
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:53:5: Expectation failed: (restored.pendingCount → 0) == 1
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:55:5: Expectation failed: (sent.count → 3) == 1
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:56:5: Expectation failed: (sent.first?.draft.actualRIR → nil) == 2
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() recorded an issue at SetSyncDraftTests.swift:57:5: Expectation failed: (sent.first?.draft.actualWeight → 142.5) == (Decimal(string: "12.5") → 12.5)
+✘ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() failed after 0.033 seconds with 11 issues.
+✘ Suite SetSyncDraftTests failed after 0.033 seconds with 11 issues.
+✘ Test run with 1 test in 1 suite failed after 0.034 seconds with 11 issues.

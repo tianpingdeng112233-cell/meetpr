@@ -4,6 +4,7 @@ import CoachKit
 import CoreModels
 import DesignSystem
 import Foundation
+import Networking
 import RepositoryContracts
 import StudentKit
 import SwiftUI
@@ -172,30 +173,30 @@ public struct RootView: View {
     }
     .onAppear { pushRegistrar?.authenticatedRootDidAppear(role: user.role) }
   }
-
   static func authenticatedDestination(for role: UserRole) -> AuthenticatedDestination {
     switch role {
     case .coach: .coach
     case .coachedStudent, .selfTrainStudent: .studentBehindE1RMGate
     }
   }
-
   private func studentEntry(for user: User) -> some View {
-    E1RMCompetitionLiftGate(
-      studentID: user.id,
-      plans: studentPlans,
-      logs: studentLogs,
-      onboarding: studentOnboarding,
-      e1rm: studentE1RM
-    ) {
-      if user.role == .coachedStudent {
-        // EvaluationPeriodView and the bound five-tab root both live below
-        // the same migration gate, so neither can consume stale e1RM history.
-        bindGatedStudentRoot(for: user)
-      } else {
-        studentRoot(for: user, activeCoach: nil, chat: nil, allowsChat: false)
+    StudentSetSyncHost(
+      studentID: user.id, plans: studentPlans, logs: studentLogs,
+      videos: studentVideoUploads, onLogout: { await session.logout() },
+      content: { logout in
+        E1RMCompetitionLiftGate(
+          studentID: user.id, plans: studentPlans, logs: studentLogs,
+          onboarding: studentOnboarding, e1rm: studentE1RM
+        ) {
+          if user.role == .coachedStudent {
+            bindGatedStudentRoot(for: user, onLogout: logout)
+          } else {
+            studentRoot(for: user, activeCoach: nil, chat: nil, allowsChat: false, onLogout: logout)
+          }
+        }
       }
-    }
+    )
+    .id(user.id)
   }
 
   @ViewBuilder
@@ -254,20 +255,22 @@ public struct RootView: View {
 
 extension RootView {
   // swiftlint:disable:next function_body_length
-  private func bindGatedStudentRoot(for user: User) -> some View {
+  private func bindGatedStudentRoot(
+    for user: User, onLogout: @escaping @MainActor () async -> Void
+  ) -> some View {
     let onboarding = studentOnboarding
     let studentId = user.id
     return BindGateView(
-      studentId: studentId,
-      bind: studentBind,
-      stash: pendingBindStore,
+      studentId: studentId, bind: studentBind, stash: pendingBindStore,
       evaluations: studentEvaluations,
       notificationPermission: studentNotificationPermissionActions,
       bindingRefreshRevision: pushRegistrar?.bindingRefreshRevision ?? 0,
+      hasCachedTraining: {
+        await StudentPlanCache().loadPlan(studentID: studentId) != nil
+      },
       isOnboardingComplete: {
-        // Fetch failure reads as "incomplete" (`try?` flattens the error and
-        // the 404 into nil): worst case is one extra trip through the wizard
-        // resume, which is harmless (spec 032 contract).
+        // Failure or 404 reads as incomplete: an extra wizard resume is safe
+        // under the spec 032 contract.
         guard let profile = try? await onboarding.fetchProfile(studentId: studentId) else {
           return false
         }
@@ -276,11 +279,8 @@ extension RootView {
       onboardingProfile: {
         try? await onboarding.fetchProfile(studentId: studentId)
       },
-      // Pre-bind pages live outside the 5 tabs — without this the account
-      // has no way back to the login screen.
-      onLogout: {
-        await session.logout()
-      },
+      // Pre-bind pages outside the tabs still need a way back to login.
+      onLogout: onLogout,
       willApplyBindingChange: { oldCoachID, newCoachID in
         await chatSession.prepareForStudentBindingChange(
           from: oldCoachID,
@@ -302,9 +302,7 @@ extension RootView {
         EvaluationPeriodView(
           studentID: studentId,
           dependencies: evaluationPeriodDependencies,
-          onLogout: {
-            await session.logout()
-          },
+          onLogout: onLogout,
           onCompleted: onCompleted
         )
       },
@@ -312,7 +310,8 @@ extension RootView {
         studentChatRoot(
           for: user,
           activeCoach: activeCoach,
-          refreshBinding: refreshBinding
+          refreshBinding: refreshBinding,
+          onLogout: onLogout
         )
       }
     )
@@ -334,7 +333,8 @@ extension RootView {
   private func studentChatRoot(
     for user: User,
     activeCoach: ActiveCoachContext,
-    refreshBinding: @escaping @MainActor @Sendable () async -> Void
+    refreshBinding: @escaping @MainActor @Sendable () async -> Void,
+    onLogout: @escaping @MainActor () async -> Void
   ) -> some View {
     if let chatRepository {
       // Match the coach too: after a switch, a context built for the previous
@@ -343,7 +343,8 @@ extension RootView {
       if let chat = chatSession.context, chat.currentUserID == user.id,
         chatSession.activeStudentCoachID == activeCoach.coachID
       {
-        studentRoot(for: user, activeCoach: activeCoach, chat: chat, allowsChat: true)
+        studentRoot(
+          for: user, activeCoach: activeCoach, chat: chat, allowsChat: true, onLogout: onLogout)
       } else if chatSession.canActivateStudent(for: activeCoach.coachID) {
         ProgressView()
           .task(id: activeCoach.coachID) {
@@ -358,15 +359,16 @@ extension RootView {
         ProgressView()
       }
     } else {
-      studentRoot(for: user, activeCoach: activeCoach, chat: nil, allowsChat: true)
+      studentRoot(
+        for: user, activeCoach: activeCoach, chat: nil, allowsChat: true, onLogout: onLogout)
     }
   }
-
   private func studentRoot(
     for user: User,
     activeCoach: ActiveCoachContext?,
     chat: ChatSessionContext?,
-    allowsChat: Bool
+    allowsChat: Bool,
+    onLogout: @escaping @MainActor () async -> Void
   ) -> some View {
     StudentRootView(
       studentID: user.id, loginIdentifier: user.phone,
@@ -380,9 +382,7 @@ extension RootView {
       onboarding: studentOnboarding,
       evaluationSummaries: studentEvaluationSummaries,
       summaryReadStore: summaryReadStore,
-      onLogout: {
-        await session.logout()
-      },
+      onLogout: onLogout,
       account: studentAccount,
       restTimerActivityController: restTimerActivityController,
       allowsChat: allowsChat,

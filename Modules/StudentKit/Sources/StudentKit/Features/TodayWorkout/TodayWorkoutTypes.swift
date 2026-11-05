@@ -12,7 +12,7 @@ enum QuickLogOutcome: Equatable, Sendable {
 // onto the VM) — keeps the @Observable class body inside SwiftLint's
 // type_body_length budget.
 
-public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
+public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiable {
   public let id: UUID
   public let planExerciseID: UUID
   /// Catalog exercise identity (variation-level) — spec 028 keys e1RM
@@ -44,6 +44,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public var isExtra = false
   public var studentAddedDayID: UUID?
   public var isStudentAdded: Bool { studentAddedDayID != nil }
+  var hasSavedRecord: Bool { loggedSetID != nil || recordedAt != nil }
 
   public init(
     id: UUID,

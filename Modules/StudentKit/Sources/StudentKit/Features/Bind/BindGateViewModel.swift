@@ -93,6 +93,7 @@ public final class BindGateViewModel {
   /// rather than whichever happens to return last.
   private var fetchGeneration: UInt64 = 0
   private let pollingSleep: @Sendable (Duration) async throws -> Void
+  private let offlineRecovery: BindOfflineRecovery?
 
   public init(
     studentId: UUID,
@@ -101,6 +102,7 @@ public final class BindGateViewModel {
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     evaluations: (any EvaluationRepository)? = nil,
     firstRunDefaults: UserDefaults = .standard,
+    hasCachedTraining: (@MainActor @Sendable () async -> Bool)? = nil,
     pollingSleep: @escaping @Sendable (Duration) async throws -> Void = {
       try await Task.sleep(for: $0)
     },
@@ -116,6 +118,9 @@ public final class BindGateViewModel {
     self.isOnboardingComplete = isOnboardingComplete
     self.evaluations = evaluations
     self.pollingSleep = pollingSleep
+    self.offlineRecovery = hasCachedTraining.map {
+      BindOfflineRecovery(studentID: studentId, defaults: firstRunDefaults, hasCachedTraining: $0)
+    }
     self.willApplyBindingChange = willApplyBindingChange
   }
 
@@ -127,11 +132,18 @@ public final class BindGateViewModel {
   }
 
   private func fetchCandidateState() async -> BindGateState {
+    let generation = fetchGeneration
     let mine: BindRequest?
     do {
       mine = try await bind.myBindRequest()
+      guard generation == fetchGeneration else { return state }
+      offlineRecovery?.remember(mine)
     } catch {
-      if error.isTaskCancellation { return state }
+      if error.isTaskCancellation || generation != fetchGeneration { return state }
+      offlineRecovery?.invalidateIfUnauthorized(error)
+      if let cached = await offlineRecovery?.restore(after: error) {
+        return await boundState(for: cached)
+      }
       return .failed
     }
 
@@ -235,6 +247,7 @@ public final class BindGateViewModel {
     fetchGeneration &+= 1
     switch outcome {
     case .requestSent(let request):
+      offlineRecovery?.remember(nil)
       // A 201 ends any stash lifecycle: a stale code left by an earlier
       // transport failure must never ghost-resubmit later (Codex P1).
       stash.clear(studentId: studentId)
@@ -252,6 +265,7 @@ public final class BindGateViewModel {
     fetchGeneration &+= 1
     switch outcome {
     case .requestSent(let request):
+      offlineRecovery?.remember(nil)
       state = .pendingAcceptance(request)
     case .invalidCode(let displayName):
       state = .needsCode(prefillDisplayName: displayName, notice: .invalidCode)
@@ -270,6 +284,7 @@ public final class BindGateViewModel {
 
   public func handleCancelled() {
     fetchGeneration &+= 1
+    offlineRecovery?.remember(nil)
     stash.clear(studentId: studentId)
     state = .needsCode(prefillDisplayName: nil, notice: nil)
   }
@@ -312,11 +327,18 @@ public final class BindGateViewModel {
   /// the now-authoritative server state directly (avoids load() → resolve →
   /// submit ping-pong).
   private func candidateAfterConflict() async -> BindGateState {
+    let generation = fetchGeneration
     let mine: BindRequest?
     do {
       mine = try await bind.myBindRequest()
+      guard generation == fetchGeneration else { return state }
+      offlineRecovery?.remember(mine)
     } catch {
-      if error.isTaskCancellation { return state }
+      if error.isTaskCancellation || generation != fetchGeneration { return state }
+      offlineRecovery?.invalidateIfUnauthorized(error)
+      if let cached = await offlineRecovery?.restore(after: error) {
+        return await boundState(for: cached)
+      }
       return .failed
     }
 
@@ -373,20 +395,4 @@ public final class BindGateViewModel {
     }
   }
 
-  /// D8 mapping: rejected → neutral "not accepting"; expired → expired copy;
-  /// Coach-ended bindings → unlink copy; withdrawn requests / no history → no notice.
-  private static func notice(for request: BindRequest?) -> BindNotice? {
-    switch request?.status {
-    case .rejected: return .coachNotAccepting
-    case .expired: return .requestExpired
-    case .cancelled:
-      if let request, request.endedAt != nil {
-        let name = request.coachDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return .coachUnlinked(coachDisplayName: name?.isEmpty == false ? name : nil)
-      } else {
-        return nil
-      }
-    case .pending, .accepted, .none: return nil
-    }
-  }
 }

@@ -1,0 +1,26 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling StudentKitTests SetSyncReceiptTests.swift
+[4/6] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (46.50s)
+Test Suite 'Selected tests' started at 2026-11-05 06:09:45.057.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 06:09:45.062.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 06:09:45.062.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 06:09:45.062.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetSyncReceiptTests started.
+◇ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() started.
+✘ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() recorded an issue at SetSyncReceiptTests.swift:28:5: Expectation failed: (queue.records.count → 0) == 1
+✘ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() recorded an issue at SetSyncReceiptTests.swift:29:5: Expectation failed: (queue.overlay(dayID: day, drafts: [oldDifferent]).first?.actualWeight → 110) == 100
+✘ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() failed after 0.013 seconds with 2 issues.
+✘ Suite SetSyncReceiptTests failed after 0.014 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.015 seconds with 2 issues.

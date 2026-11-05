@@ -8,9 +8,10 @@ struct TrainingFlowSnapshot: Equatable {
 
 struct TrainingCompletionDock: View {
   let onComplete: () -> Void
+  var coordinator: SetSyncCompletionCoordinator?
 
   var body: some View {
-    HoldToCompleteButton(action: onComplete)
+    SetSyncCompletionControl(coordinator: coordinator, onComplete: onComplete)
       .padding(.horizontal, MeetPRSpacing.pageHorizontal)
       .padding(.vertical, MeetPRSpacing.space3)
       .background(Color.MeetPR.bgBase)

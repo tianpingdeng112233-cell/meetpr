@@ -19,7 +19,7 @@ struct AccessoryLogRow: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
       if row.input.effortMode != columnEffortMode {
         Text(
-          row.draft.loggedSetID != nil
+          row.draft.hasSavedRecord
             ? StudentStrings.replacing(
               .accessoryRecordedEffort, values: [String(number), row.input.effortMode.label])
             : row.input.effortMode.label

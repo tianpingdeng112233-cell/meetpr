@@ -11,7 +11,7 @@ enum StudentAddedRows {
     let rows = drafts.filter { $0.planExerciseID == exercise.id }
     guard rows.count(where: \.isExtra) < limit else { return nil }
     let previous = rows.filter {
-      $0.loggedSetID != nil && !$0.assumed && ($0.completed || $0.failed)
+      $0.hasSavedRecord && !$0.assumed && ($0.completed || $0.failed)
     }
     .max { ($0.recordedAt ?? .distantPast) < ($1.recordedAt ?? .distantPast) }
     let last = exercise.prescribedSets.last

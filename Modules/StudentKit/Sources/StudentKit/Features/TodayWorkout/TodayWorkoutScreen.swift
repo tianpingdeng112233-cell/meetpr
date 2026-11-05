@@ -277,10 +277,11 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       // Ask-coach moved to the hero card's top-right corner once the action
       // row is gone (David 2026-08-08) — nothing sits above the hold button.
       let progress = presentation.trainingFlow(isEditable: true)?.progress ?? presentation.progress
-      if !progress.allDone {
+      if !progress.allDone, accessoryViewModel?.setSyncCompletion?.phase ?? .idle == .idle {
         TodayWorkoutRemainingPill(text: progress.remainingText)
       }
-      HoldToCompleteButton(action: onComplete)
+      SetSyncCompletionControl(
+        coordinator: accessoryViewModel?.setSyncCompletion, onComplete: onComplete)
     }
   }
 }

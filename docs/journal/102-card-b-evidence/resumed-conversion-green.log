@@ -1,0 +1,38 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[4/8] Compiling StudentKitTests SetSyncRegressionTests.swift
+[5/8] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[6/8] Emitting module StudentKitTests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking StudentKitPackageTests
+Build complete! (23.02s)
+Test Suite 'Selected tests' started at 2026-11-05 06:02:40.795.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 06:02:40.796.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 06:02:40.796.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 06:02:40.796.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetSyncRegressionTests started.
+◇ Suite OfflineSetRecordingTests started.
+◇ Test twoDeletedPlanSlotsDoNotOverwriteSameAddedSlot() started.
+◇ Test conversionRequiresFreshProofOfDeletion(scenario:) started.
+◇ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() started.
+◇ Test missingPlanExerciseUsesOriginalCatalogIdentity() started.
+◇ Test case passing 1 argument scenario → "offline" to conversionRequiresFreshProofOfDeletion(scenario:) started.
+◇ Test case passing 1 argument scenario → "missingDay" to conversionRequiresFreshProofOfDeletion(scenario:) started.
+◇ Test case passing 1 argument scenario → "present" to conversionRequiresFreshProofOfDeletion(scenario:) started.
+◇ Test case passing 1 argument scenario → "unpublished" to conversionRequiresFreshProofOfDeletion(scenario:) started.
+✔ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() passed after 0.027 seconds.
+✔ Test conversionRequiresFreshProofOfDeletion(scenario:) with 4 test cases passed after 0.027 seconds.
+✔ Test missingPlanExerciseUsesOriginalCatalogIdentity() passed after 0.028 seconds.
+✔ Suite OfflineSetRecordingTests passed after 0.028 seconds.
+✔ Test twoDeletedPlanSlotsDoNotOverwriteSameAddedSlot() passed after 0.028 seconds.
+✔ Suite SetSyncRegressionTests passed after 0.028 seconds.
+✔ Test run with 4 tests in 2 suites passed after 0.029 seconds.

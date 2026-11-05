@@ -62,3 +62,49 @@ import Testing
   #expect(delivered.setLogID == canonicalID)
   #expect(delivered.pendingDraftID == nil)
 }
+
+@Test @MainActor func videoRetryWakesPendingSetWithoutWaitingForBackoff() async throws {
+  let harness = VideoUploadHarness()
+  let clock = SetSyncTestClock()
+  let student = StudentDemoSeed.studentID
+  let plan = StudentAddedTestPlan.unsettledDemo()
+  let day = plan.days[0]
+  let logs = InMemoryStudentTrainingLogRepository()
+  let sender = SetSyncSender(logs: logs, videos: harness.manager)
+  var attempts = 0
+  let queue = try SetSyncQueue(
+    studentID: student, storage: MemorySetSyncStorage(),
+    sleep: { _ in await clock.sleep() },
+    send: { record in
+      attempts += 1
+      if attempts == 1 { throw URLError(.timedOut) }
+      return try await sender.send(record)
+    })
+  defer {
+    queue.stop()
+    clock.advance()
+  }
+  let workout = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [student: plan])),
+    logs: logs, setSyncQueue: queue)
+  await workout.load(dayID: day.id, studentID: student)
+  let draft = try #require(workout.currentDrafts?.first)
+  #expect(await workout.commitSet(rowIndex: 0))
+  let pending = try await harness.manager.retainForSet(
+    sourceURL: harness.sourceURL, draftID: draft.id, studentID: student,
+    trainingDate: day.scheduledDate, slot: draft.pendingVideoSlot)
+  let videos = VideoAttachmentViewModel(manager: harness.manager)
+  await videos.start(studentID: student)
+  queue.start()
+  await clock.waitUntilSleeping()
+  #expect(attempts == 1)
+
+  await videos.retryFailures(studentID: student, workout: workout, trainingDate: day.scheduledDate)
+
+  try await waitForSetSync { queue.pendingCount == 0 }
+  let delivered = try await waitForStatus(harness.repository, id: pending.id, oneOf: [.uploaded])
+  #expect(attempts == 2)
+  #expect(delivered.pendingDraftID == nil)
+  #expect(delivered.setLogID == workout.currentDrafts?.first?.loggedSetID)
+  #expect(videos.lastErrorMessage == nil)
+}

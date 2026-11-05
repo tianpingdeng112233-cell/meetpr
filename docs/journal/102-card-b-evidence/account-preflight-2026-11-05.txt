@@ -1,0 +1,4 @@
+LOGIN_OK role=coach
+LOGIN_OK role=coached_student
+BINDING_OK specified_pair_only
+{"result": "READ_ONLY_PREFLIGHT_OK", "plan_count": 1, "published_plan_count": 1, "coach_can_read_target_plans": true, "history_window_from": "2025-11-05", "history_window_to_exclusive": "2026-11-06", "history_set_count": 15, "historical_set_count_before_today": 15, "training_data_mutations": 0}

@@ -53,7 +53,7 @@ struct ExtraSetControls: View {
               Button {
                 if row.record.videoState != .none {
                   viewModel.showAddedVideoError()
-                } else if row.draft.loggedSetID == nil {
+                } else if !row.draft.hasSavedRecord {
                   Task { await viewModel.removeStudentRow(id: row.id) }
                 } else {
                   removal = row.id

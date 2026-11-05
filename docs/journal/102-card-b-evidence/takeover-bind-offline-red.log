@@ -1,0 +1,118 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Emitting module StudentKit
+[5/7] Compiling StudentKit BindGateViewModel.swift
+[6/8] Compiling StudentKit BindGateView.swift
+[7/17] Compiling StudentKitTests BindGateViewModelFirstRunTests.swift
+[8/17] Compiling StudentKitTests StudentRefreshCancellationTests.swift
+[9/17] Compiling StudentKitTests BindGateOfflineRecoveryTests.swift
+[10/17] Emitting module StudentKitTests
+[11/17] Compiling StudentKitTests BindGateViewModelPollingTests.swift
+[12/17] Compiling StudentKitTests BindTestSupport.swift
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:88:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 86 |
+ 87 |   func submitBindRequest(code: String, displayName: String) async throws -> BindRequest {
+ 88 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 89 |     submitCalls.append((code, displayName))
+ 90 |     let result = submitResults.isEmpty ? nil : submitResults.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:91:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 89 |     submitCalls.append((code, displayName))
+ 90 |     let result = submitResults.isEmpty ? nil : submitResults.removeFirst()
+ 91 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 92 |     switch result {
+ 93 |     case .success(let request): return request
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:100:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 98 |
+ 99 |   func myBindRequest() async throws -> BindRequest? {
+100 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+101 |     mineCallCount += 1
+102 |     let result = mineResults.isEmpty ? nil : mineResults.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:103:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+101 |     mineCallCount += 1
+102 |     let result = mineResults.isEmpty ? nil : mineResults.removeFirst()
+103 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+104 |     switch result {
+105 |     case .success(let request): return request
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:112:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+110 |
+111 |   func cancelBindRequest(id: UUID) async throws {
+112 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+113 |     cancelledIds.append(id)
+114 |     let error = cancelErrors.isEmpty ? nil : cancelErrors.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/Users/david/Projects/apps/MeetPR-wt-102/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:115:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+113 |     cancelledIds.append(id)
+114 |     let error = cancelErrors.isEmpty ? nil : cancelErrors.removeFirst()
+115 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+116 |     if let error { throw error }
+117 |   }
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+[13/17] Compiling StudentKitTests BindGateViewModelTests.swift
+[14/17] Compiling StudentKitTests BindGateChatWiringTests.swift
+[15/17] Compiling StudentKitTests SetSyncReceiptTests.swift
+[15/17] Write Objects.LinkFileList
+[16/17] Linking StudentKitPackageTests
+Build complete! (17.67s)
+Test Suite 'Selected tests' started at 2026-11-05 07:42:17.928.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 07:42:17.929.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 07:42:17.929.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 07:42:17.929.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite BindGateOfflineRecoveryTests started.
+◇ Test sameAccountWithTrainingCacheRestoresAcceptedBindingOffline() started.
+✘ Test sameAccountWithTrainingCacheRestoresAcceptedBindingOffline() recorded an issue at BindGateOfflineRecoveryTests.swift:27:5: Expectation failed: (reopened.state → .failed) == (.bound(accepted) → .bound(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(3CC6E4E6-5B67-46F3-AAC8-F21C3D48B1AB), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, endedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil, firstRun: nil)))
+✘ Test sameAccountWithTrainingCacheRestoresAcceptedBindingOffline() failed after 0.007 seconds with 1 issue.
+✘ Suite BindGateOfflineRecoveryTests failed after 0.008 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.008 seconds with 1 issue.

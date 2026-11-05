@@ -9,6 +9,7 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct TodayWorkoutView: View {
+  private let isVisible: Bool
   private let studentID: UUID
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let plans: any StudentPlanRepository
@@ -67,6 +68,8 @@ public struct TodayWorkoutView: View {
 
   public init(
     studentID: UUID,
+    isVisible: Bool = true,
+    setSyncQueue: SetSyncQueue? = nil,
     date: Date? = nil,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
@@ -92,6 +95,7 @@ public struct TodayWorkoutView: View {
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
+    self.isVisible = isVisible
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
@@ -126,15 +130,14 @@ public struct TodayWorkoutView: View {
         plans: plans,
         logs: logs,
         e1rm: e1rm,
+        setSyncQueue: setSyncQueue,
         onboarding: onboarding,
         restTimerSettings: restTimerSettings,
         restTimerActivityController: restTimerActivityController
       )
     )
     self._historyViewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
-    self._readinessViewModel = State(
-      initialValue: ReadinessCheckinViewModel(repo: readiness)
-    )
+    self._readinessViewModel = State(initialValue: ReadinessCheckinViewModel(repo: readiness))
     let services = videoUploads ?? .demo()
     self._replay = State(
       initialValue: CompletedVideoReplayModel(services: services, feedback: feedbackViewModel))
@@ -251,7 +254,8 @@ public struct TodayWorkoutView: View {
         if !showingHistory, case .workout(let presentation) = screenContent,
           presentation.completionAvailability(isEditable: selectedDayState.isEditable).sticky
         {
-          TrainingCompletionDock(onComplete: completeTraining)
+          TrainingCompletionDock(
+            onComplete: completeTraining, coordinator: viewModel.setSyncCompletion)
         }
         if let timer = viewModel.restTimer {
           RestTimerOverlay(
@@ -459,7 +463,11 @@ public struct TodayWorkoutView: View {
     .onChange(of: videoViewModel.hasLoadedAttachments) { _, loaded in
       viewModel.accessoryVideosLoaded = loaded
     }
+    .onChange(of: isVisible) { _, visible in
+      if !visible { viewModel.setSyncCompletion?.reset() }
+    }
     .onChange(of: selectedDayID) { _, newDayID in
+      viewModel.setSyncCompletion?.reset()
       editing = nil
       started = false
       collapsedExercises = [:]
@@ -527,6 +535,7 @@ public struct TodayWorkoutView: View {
       }
     }
     .onDisappear {
+      viewModel.setSyncCompletion?.reset()
       quickLogToastTask?.cancel()
     }
   }

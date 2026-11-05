@@ -1,0 +1,33 @@
+[Analytics] track app_open ["cold": Analytics.AnalyticsValue.bool(true)]
+[Analytics] flush batch=26 status=403
+[Analytics] flush batch=26 status=403
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("dashboard")]
+objc[12570]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x11cf7c398) and /Library/Developer/CoreSimulator/Volumes/iOS_23F77/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.5.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x126560310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+IOSurfaceClientSetSurfaceNotify failed e00002c7
+[Analytics] track plan_viewed ["plan_id": Analytics.AnalyticsValue.id(B2BB5E09-91FC-424D-B3E5-F621AA023129)]
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("today_workout")]
+[Analytics] track workout_log_start ["source": Analytics.AnalyticsValue.enumCase("calendar")]
+[Analytics] flush batch=30 status=403
+[Analytics] flush batch=30 status=403
+[Analytics] flush batch=30 status=403
+[Analytics] track workout_log_save ["n_sets": Analytics.AnalyticsValue.int(5), "duration_ms": Analytics.AnalyticsValue.int(96904)]
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("dashboard")]
+[Analytics] track plan_viewed ["plan_id": Analytics.AnalyticsValue.id(B2BB5E09-91FC-424D-B3E5-F621AA023129)]
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("today_workout")]
+[Analytics] track workout_log_start ["source": Analytics.AnalyticsValue.enumCase("dashboard")]
+[Analytics] flush batch=35 status=403
+[Analytics] track set_logged ["outcome": Analytics.AnalyticsValue.enumCase("completed"), "set_index": Analytics.AnalyticsValue.int(0), "has_video": Analytics.AnalyticsValue.bool(false), "exercise_id": Analytics.AnalyticsValue.id(40C56AF8-69D8-4A4A-A690-526EE38D081B)]
+[Analytics] flush batch=36 status=403
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("account")]
+[Analytics] flush batch=37 status=403
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("today_workout")]
+[Analytics] track workout_log_start ["source": Analytics.AnalyticsValue.enumCase("calendar")]
+[Analytics] flush batch=39 status=403
+[Analytics] track workout_log_save ["n_sets": Analytics.AnalyticsValue.int(2), "duration_ms": Analytics.AnalyticsValue.int(46037)]
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("dashboard")]
+[Analytics] track plan_viewed ["plan_id": Analytics.AnalyticsValue.id(B2BB5E09-91FC-424D-B3E5-F621AA023129)]
+[Analytics] flush batch=42 status=403
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("today_workout")]
+[Analytics] track workout_log_start ["source": Analytics.AnalyticsValue.enumCase("calendar")]
+Swift/NativeDictionary.swift:792: Fatal error: Duplicate values for key: 'E6BA00AD-4F19-4654-981A-CBA7BEA47AA2'
+com.meetpr.app: 12570
