@@ -26,7 +26,9 @@ enum RetainedVideoCleanupPolicy {
     )
 
     let retainedToday = uploadedFiles.filter { !removals.contains($0.attachmentID) }
-    var retainedBytes = retainedToday.reduce(into: Int64.zero) { total, file in
+    var retainedBytes = files.filter { !removals.contains($0.attachmentID) }.reduce(
+      into: Int64.zero
+    ) { total, file in
       total += max(0, file.sizeBytes)
     }
     let limit = max(0, byteLimit)

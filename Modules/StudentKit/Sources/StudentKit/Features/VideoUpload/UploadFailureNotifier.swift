@@ -2,7 +2,7 @@ import Foundation
 @preconcurrency import UserNotifications
 
 public protocol UploadFailureNotifying: Sendable {
-  func requestProvisionalAuthorization() async
+  func requestAuthorization() async
   func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async
 }
 
@@ -15,8 +15,10 @@ public struct UploadFailureNotifier: UploadFailureNotifying {
     self.center = center
   }
 
-  public func requestProvisionalAuthorization() async {
-    _ = try? await center.requestAuthorization(options: [.provisional])
+  public func requestAuthorization() async {
+    let settings = await center.notificationSettings()
+    guard Self.shouldRequestAuthorization(status: settings.authorizationStatus) else { return }
+    _ = try? await center.requestAuthorization(options: Self.authorizationOptions)
   }
 
   public func notifyTerminalFailures(
@@ -27,20 +29,34 @@ public struct UploadFailureNotifier: UploadFailureNotifying {
     let settings = await center.notificationSettings()
     guard settings.authorizationStatus != .denied else { return }
 
+    center.removeDeliveredNotifications(withIdentifiers: [Self.notificationIdentifier])
+    center.removePendingNotificationRequests(withIdentifiers: [Self.notificationIdentifier])
+    let request = UNNotificationRequest(
+      identifier: Self.notificationIdentifier,
+      content: Self.content(count: count, destination: destination),
+      trigger: nil)
+    try? await center.add(request)
+  }
+
+  static let authorizationOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
+
+  static func shouldRequestAuthorization(status: UNAuthorizationStatus) -> Bool {
+    status == .notDetermined || status == .provisional
+  }
+
+  static func content(count: Int, destination: UploadFailureDestination)
+    -> UNMutableNotificationContent
+  {
     let content = UNMutableNotificationContent()
     content.title = StudentStrings.localized(.uploadFailureNotifier001)
     content.body = StudentStrings.replacing(.uploadFailureNotifier002, values: ["\(count)"])
     content.userInfo = destination.notificationUserInfo
-    let request = UNNotificationRequest(
-      identifier: Self.notificationIdentifier,
-      content: content,
-      trigger: nil
-    )
-    try? await center.add(request)
+    content.sound = .default
+    return content
   }
 }
 
 struct NoopUploadFailureNotifier: UploadFailureNotifying {
-  func requestProvisionalAuthorization() async {}
+  func requestAuthorization() async {}
   func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async {}
 }

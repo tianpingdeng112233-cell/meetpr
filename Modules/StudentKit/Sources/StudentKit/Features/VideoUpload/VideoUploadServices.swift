@@ -18,7 +18,8 @@ public struct VideoUploadServices: Sendable {
   /// Demo/preview wiring: real AVFoundation export, loopback "uploads" that
   /// always succeed, nothing persisted across launches.
   public static func demo() -> VideoUploadServices {
-    VideoUploadServices(
+    if let scenario = VideoDeliveryDemoScenario.services() { return scenario }
+    return VideoUploadServices(
       manager: VideoUploadManager(
         service: LoopbackVideoUploadService(),
         exporter: AVFoundationVideoExporter(),

@@ -33,6 +33,8 @@ public struct TodayWorkoutView: View {
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var replay: CompletedVideoReplayModel
   @State private var videoViewModel: VideoAttachmentViewModel
+  @State private var handledUploadFailureToken = 0
+  @State private var pendingUploadRetryDate: Date?
   @State private var selectedDayID: UUID?
   @State private var editing: EditingTarget?
   @State private var quickLogRoute: QuickLogRoute?
@@ -212,7 +214,9 @@ public struct TodayWorkoutView: View {
         accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
         sequencePage: sequencePage,
         gymDayToday: gymDayToday,
-        restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight
+        restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
+        videoFailureCount: videoFailurePresentation.failureCount,
+        onRetryVideos: retryDayVideos
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -230,6 +234,16 @@ public struct TodayWorkoutView: View {
       )
     }
     .environment(replay)
+    .environment(videoViewModel)
+    .modifier(
+      VideoMissingFileHost(
+        model: videoViewModel, enabled: editing == nil,
+        context: missingVideoContext,
+        onRestored: {
+          await videoViewModel.retryFailures(
+            studentID: studentID, workout: viewModel, trainingDate: selectedTrainingDate)
+        })
+    )
     .modifier(CompletedVideoReplayHost(model: replay))
     .task { await replay.load(studentID: studentID) }
     .safeAreaInset(edge: .bottom) {
@@ -454,6 +468,12 @@ public struct TodayWorkoutView: View {
           for: newDayID,
           preloadedPlan: handedOffPlan(for: newDayID)
         )
+        if let retryDate = pendingUploadRetryDate,
+          retryDate == currentWorkout?.day.scheduledDate
+        {
+          pendingUploadRetryDate = nil
+          await videoViewModel.retryFailures(studentID: studentID, workout: viewModel)
+        }
       }
     }
     .onChange(of: planHandoff?.id) { _, _ in
@@ -512,16 +532,22 @@ public struct TodayWorkoutView: View {
   }
 
   private func openUploadFailureDestination() {
-    guard let destination = uploadFailureDestination else { return }
-    selectedDayID =
-      viewModel.planDays.first {
-        PlanCalendarDayIdentity.matches(
-          planDate: $0.scheduledDate,
-          selectedDate: destination.trainingDate,
-          selectedCalendar: .current
-        )
-      }?.id
-    retryTargetSetLogID = destination.setLogID
+    guard let destination = uploadFailureDestination,
+      handledUploadFailureToken != uploadFailureNavigationToken
+    else { return }
+    handledUploadFailureToken = uploadFailureNavigationToken
+    let targetDayID = viewModel.planDays.first {
+      PlanCalendarDayIdentity.matches(
+        planDate: $0.scheduledDate,
+        selectedDate: destination.trainingDate,
+        selectedCalendar: .current
+      )
+    }?.id
+    pendingUploadRetryDate = targetDayID == selectedDayID ? nil : destination.trainingDate
+    selectedDayID = targetDayID
+    Task {
+      await videoViewModel.retryFailures(studentID: studentID, workout: viewModel)
+    }
   }
 
   @ViewBuilder
@@ -765,6 +791,34 @@ public struct TodayWorkoutView: View {
     }
   }
 
+  private var videoFailurePresentation: VideoDeliveryPresentation {
+    VideoDeliveryPresentation(
+      drafts: viewModel.currentDrafts ?? [], trainingDate: selectedTrainingDate,
+      attachments: videoViewModel.rowStates.values.map(\.attachment))
+  }
+
+  private func retryDayVideos() {
+    let date = selectedTrainingDate
+    Task {
+      await videoViewModel.retryFailures(
+        studentID: studentID, workout: viewModel, trainingDate: date)
+    }
+  }
+
+  private func missingVideoContext(_ attachment: VideoAttachment) -> String {
+    guard
+      let draft = viewModel.currentDrafts?.first(where: {
+        VideoDeliveryPresentation.attachment(
+          for: $0, trainingDate: selectedTrainingDate, in: [attachment]) != nil
+      })
+    else { return attachment.trainingDate.formatted(date: .abbreviated, time: .omitted) }
+    let row = CompletedDayPresentation.Row(
+      draft: draft, unit: viewModel.onboardingProfile?.unitPreference ?? .kg,
+      videos: [], local: [], trainingDate: selectedTrainingDate)
+    let setLabel = HistoryEntriesView.setLabel(forZeroBasedIndex: row.number - 1)
+    return "\(draft.displayExerciseName) · \(setLabel) · \(row.result)"
+  }
+
   private func videoStates(
     for drafts: [TodayWorkoutViewModel.SetRowDraft]
   ) -> [UUID: SetRow.VideoState] {
@@ -802,7 +856,8 @@ public struct TodayWorkoutView: View {
     for draft: TodayWorkoutViewModel.SetRowDraft
   ) -> VideoAttachment.Status? {
     if preparingVideoSetID == draft.id { return .pending }
-    return videoRowState(for: draft)?.attachment.status
+    guard let attachment = videoRowState(for: draft)?.attachment else { return nil }
+    return VideoDeliveryPresentation.hasFailure(attachment) ? .failed : attachment.status
   }
 
   private var cameraAvailable: Bool {

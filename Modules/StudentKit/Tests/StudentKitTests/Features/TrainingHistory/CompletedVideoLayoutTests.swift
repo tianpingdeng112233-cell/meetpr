@@ -10,7 +10,7 @@
 
   @MainActor
   struct CompletedVideoLayoutTests {
-    @Test func playbackAndUploadUseEighteenPointsAndKeepTheOriginalTextRowHeight() throws {
+    @Test func playbackKeepsOriginalRowHeightAndFailuresRemainActionable() throws {
       let reference = size(Text("100 kg × 5").font(.MeetPR.mono(size: 13)))
       let playback = CompletedSetVideoButton(video: .remote(UUID()), upload: nil, number: 1) { _ in
       }
@@ -26,9 +26,15 @@
           contentType: "video/mp4", durationSeconds: 8, sizeBytes: 100,
           localFileName: "clip.mp4", recordedAt: .now)
         let indicator = CompletedSetVideoButton(video: nil, upload: upload, number: 1) { _ in }
-        #expect(size(indicator.font(.MeetPR.mono(size: 13))).height == reference.height)
-        #expect(size(indicator).width == 18)
-        #expect(try indicator.inspect().find(ViewType.Image.self).font() == Font.system(size: 18))
+        if status == .failed {
+          #expect(size(indicator).height >= 44)
+          #expect(
+            try indicator.inspect().find(text: StudentStrings.localized(.videoNotDelivered))
+              .string()
+              == StudentStrings.localized(.videoNotDelivered))
+        } else {
+          #expect(size(indicator) == .zero)
+        }
       }
     }
 

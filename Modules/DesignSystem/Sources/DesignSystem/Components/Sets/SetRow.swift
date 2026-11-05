@@ -19,8 +19,6 @@ public struct SetRow: View {
     case failed
   }
 
-  @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
-
   let index: Int
   let weight: Double?
   let reps: Int
@@ -218,26 +216,26 @@ public struct SetRow: View {
     }
   }
 
+  @ViewBuilder
   private var videoIcon: some View {
-    CameraIconShape()
-      .stroke(
-        videoColor,
-        style: StrokeStyle(
-          lineWidth: SetRowContract.cameraStroke,
-          lineCap: .round,
-          lineJoin: .round
+    if videoState == .failed {
+      Image(systemName: "exclamationmark.triangle.fill")
+        .foregroundStyle(Color.MeetPR.danger)
+        .frame(width: SetRowContract.cameraFrame, height: SetRowContract.cameraFrame)
+    } else {
+      CameraIconShape()
+        .stroke(
+          videoColor,
+          style: StrokeStyle(
+            lineWidth: SetRowContract.cameraStroke,
+            lineCap: .round,
+            lineJoin: .round
+          )
         )
-      )
-      .frame(width: SetRowContract.cameraFrame, height: SetRowContract.cameraFrame)
-      .overlay {
-        if differentiateWithoutColor && videoState == .failed {
-          VideoSlashShape()
-            .stroke(
-              Color.MeetPR.danger,
-              style: StrokeStyle(lineWidth: SetRowContract.cameraStroke, lineCap: .round)
-            )
-        }
-      }
+        .frame(width: SetRowContract.cameraFrame, height: SetRowContract.cameraFrame)
+
+    }
+
   }
 
   private var videoColor: Color {
@@ -380,15 +378,6 @@ private struct CameraIconShape: Shape {
     path.addLine(to: rect.svgPoint(x: 21, y: 16.5))
     path.addLine(to: rect.svgPoint(x: 15, y: 13.5))
     path.closeSubpath()
-    return path
-  }
-}
-
-private struct VideoSlashShape: Shape {
-  func path(in rect: CGRect) -> Path {
-    var path = Path()
-    path.move(to: rect.svgPoint(x: 4, y: 20))
-    path.addLine(to: rect.svgPoint(x: 20, y: 4))
     return path
   }
 }

@@ -170,7 +170,7 @@ public actor VideoUploadManager {
     activateBackgroundHandling()
     if !requestedNotificationAuthorization {
       requestedNotificationAuthorization = true
-      await failureNotifier.requestProvisionalAuthorization()
+      await failureNotifier.requestAuthorization()
     }
   }
 

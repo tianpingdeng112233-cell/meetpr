@@ -15,6 +15,7 @@ public struct TrainingHistoryView: View {
   private let onOpenPlanNotification: () -> Void
   private let onOpenToday: () -> Void
   @State private var replay: CompletedVideoReplayModel
+  @State private var uploads: VideoAttachmentViewModel
   @State private var model: ProgressDataModel
   @State private var path: [ProgressMenuDestination] = []
   @State private var showsNotifications = false
@@ -40,9 +41,10 @@ public struct TrainingHistoryView: View {
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onOpenToday = onOpenToday
+    let services = videoUploads ?? .demo()
+    self._uploads = State(initialValue: VideoAttachmentViewModel(manager: services.manager))
     self._replay = State(
-      initialValue: CompletedVideoReplayModel(
-        services: videoUploads ?? .demo(), feedback: feedbackViewModel))
+      initialValue: CompletedVideoReplayModel(services: services, feedback: feedbackViewModel))
     self._model = State(
       initialValue: ProgressDataModel(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
@@ -88,6 +90,13 @@ public struct TrainingHistoryView: View {
       .refreshable { await reload() }
     }
     .environment(replay)
+    .environment(uploads)
+    .modifier(
+      VideoMissingFileHost(
+        model: uploads,
+        context: missingVideoContext)
+    )
+    .task { await uploads.start(studentID: studentID) }
     .modifier(CompletedVideoReplayHost(model: replay))
     .background(Color.MeetPR.bgBase)
     .task {
@@ -99,6 +108,21 @@ public struct TrainingHistoryView: View {
       guard importedHistoryRefreshToken > 0 else { return }
       await model.load()
     }
+  }
+
+  private func missingVideoContext(_ attachment: VideoAttachment) -> String {
+    guard case .loaded(let weeks, let logs) = model.history.state,
+      let log = logs.first(where: { $0.id == attachment.setLogID }),
+      let exercise = weeks.flatMap(\.days).flatMap(\.exercises).first(where: {
+        $0.id == log.planExerciseID
+      })
+    else { return attachment.trainingDate.formatted(date: .abbreviated, time: .omitted) }
+    return [
+      StudentExerciseName.display(exercise.exercise),
+      HistoryEntriesView.setLabel(forZeroBasedIndex: log.setIndex),
+      StudentFormatting.result(
+        weightKg: log.weightKg, reps: log.reps, rpe: log.rpe, actualRIR: log.actualRIR),
+    ].joined(separator: " · ")
   }
 
   private func reload() async {

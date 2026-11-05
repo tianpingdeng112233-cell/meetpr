@@ -138,6 +138,23 @@ struct VideoAttachmentSection: View {
     } message: {
       Text(VideoPrivacyCopy.consentBody)
     }
+    .modifier(
+      VideoMissingFileHost(
+        model: videoViewModel,
+        context: { _ in
+          [
+            badge?.exerciseName,
+            badge?.setOrdinal.map { HistoryEntriesView.setLabel(forZeroBasedIndex: $0 - 1) },
+          ].compactMap { $0 }.joined(
+            separator: " · ")
+        },
+        onRestored: {
+          if let record = rowState?.attachment, record.pendingDraftID != nil {
+            await videoViewModel.retryPending(
+              setLogID: record.setLogID, resolveSetLogID: { await ensureSetLogID() })
+          }
+        })
+    )
     .photosPicker(isPresented: $showingPhotosPicker, selection: $pickedItem, matching: .videos)
     .onChange(of: pickedItem) { _, newItem in
       guard let newItem else { return }
@@ -185,7 +202,9 @@ struct VideoAttachmentSection: View {
 
   private var presentationState: VideoAttachmentV3State {
     VideoAttachmentV3State.resolve(
-      status: rowState?.attachment.status,
+      status: rowState.map {
+        VideoDeliveryPresentation.hasFailure($0.attachment) ? .failed : $0.attachment.status
+      },
       isPreparing: isPreparing,
       cameraAvailable: cameraAvailable
     )

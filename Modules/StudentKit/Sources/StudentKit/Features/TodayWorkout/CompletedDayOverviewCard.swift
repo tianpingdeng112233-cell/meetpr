@@ -140,7 +140,8 @@ private struct CompletedDayExerciseRow: View {
                 .foregroundStyle(row.failed ? Color.MeetPR.danger : Color.MeetPR.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
               CompletedSetVideoButton(
-                video: row.video, upload: replay?.uploadState(setLogID: row.setLogID),
+                video: row.video,
+                upload: row.failedAttachment ?? replay?.uploadState(setLogID: row.setLogID),
                 number: row.number, reservesSpace: exercise.reservesVideoSpace
               ) { video in
                 replay?.open(video, badge: row.badge)
