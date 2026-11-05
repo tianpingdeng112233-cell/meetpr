@@ -240,7 +240,8 @@ public struct TodayWorkoutView: View {
         model: videoViewModel, enabled: editing == nil,
         context: missingVideoContext,
         onRestored: {
-          await videoViewModel.retryFailures(studentID: studentID, workout: viewModel)
+          await videoViewModel.retryFailures(
+            studentID: studentID, workout: viewModel, trainingDate: selectedTrainingDate)
         })
     )
     .modifier(CompletedVideoReplayHost(model: replay))
