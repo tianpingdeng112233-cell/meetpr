@@ -18,7 +18,7 @@ actor RecordingUploadFailureNotifier: UploadFailureNotifying {
   private(set) var notifiedCounts: [Int] = []
   private(set) var destinations: [UploadFailureDestination] = []
 
-  func requestProvisionalAuthorization() async {
+  func requestAuthorization() async {
     authorizationRequestCount += 1
   }
 

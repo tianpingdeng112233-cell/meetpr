@@ -20,6 +20,7 @@ public final class VideoAttachmentViewModel {
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
   public private(set) var retryErrorMessage: String?
+  var missingAttachment: VideoAttachment?
 
   let manager: VideoUploadManager
   private let consentDefaults: UserDefaults
@@ -73,7 +74,7 @@ public final class VideoAttachmentViewModel {
     guard let attachments = try? await manager.repository.fetchAll(studentID: studentID) else {
       return
     }
-    for attachment in attachments.sorted(by: { $0.recordedAt > $1.recordedAt }) {
+    for attachment in attachments.sorted(by: { $0.recordedAt < $1.recordedAt }) {
       rowStates[attachment.setLogID] = RowState(
         attachment: attachment,
         progress: attachment.status == .uploaded ? 1 : 0
@@ -137,6 +138,11 @@ public final class VideoAttachmentViewModel {
   func apply(_ event: VideoUploadEvent) {
     switch event {
     case .updated(let attachment, let progress):
+      if let current = rowStates[attachment.setLogID]?.attachment,
+        current.id != attachment.id, current.recordedAt > attachment.recordedAt
+      {
+        return
+      }
       var state =
         rowStates[attachment.setLogID]
         ?? RowState(attachment: attachment, progress: 0)
@@ -151,16 +157,10 @@ public final class VideoAttachmentViewModel {
       }
     case .retryUnavailable(let setLogID, let attachmentID, let reason):
       guard rowStates[setLogID]?.attachment.id == attachmentID else { return }
-      let message = Self.message(for: reason)
-      lastErrorMessage = message
-      retryErrorMessage = message
-    }
-  }
-
-  private static func message(for reason: VideoRetryUnavailableReason) -> String {
-    switch reason {
-    case .sourceMissing:
-      StudentStrings.localized(.videoAttachmentViewModel002)
+      _ = reason
+      missingAttachment = rowStates[setLogID]?.attachment
+      lastErrorMessage = nil
+      retryErrorMessage = nil
     }
   }
 

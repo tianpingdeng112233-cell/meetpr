@@ -34,12 +34,18 @@ struct CompletedDayPresentation: Equatable, Sendable {
     let failed: Bool
     let result: String
     let video: CompletedSetVideo?
+    let videoFailed: Bool
+    let failedAttachment: VideoAttachment?
     let badge: VideoBadgeInfo
 
     init(
       draft: TodayWorkoutSetRowDraft, unit: UnitPreference, videos: [StudentVideo],
-      local: [VideoAttachment]
+      local: [VideoAttachment], trainingDate: Date
     ) {
+      let attachment = VideoDeliveryPresentation.attachment(
+        for: draft, trainingDate: trainingDate, in: local)
+      failedAttachment = attachment.flatMap { VideoDeliveryPresentation.hasFailure($0) ? $0 : nil }
+      videoFailed = failedAttachment != nil
       video = CompletedSetVideo.resolve(setLogID: draft.loggedSetID, videos: videos, local: local)
       badge = VideoBadgeInfo(
         exerciseName: draft.displayExerciseName,
@@ -75,7 +81,11 @@ struct CompletedDayPresentation: Equatable, Sendable {
     var groups = presentation.exercises.map { exercise in
       let rows = exercise.rows
         .filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
-        .map { Row(draft: $0.draft, unit: unit, videos: videos, local: local) }
+        .map {
+          Row(
+            draft: $0.draft, unit: unit, videos: videos, local: local,
+            trainingDate: presentation.day.scheduledDate)
+        }
       return Exercise(
         id: exercise.id, name: exercise.name, number: exercise.stableIndex + 1,
         isAdded: false, prescribedCount: exercise.prescribedRows.count,
@@ -92,7 +102,11 @@ struct CompletedDayPresentation: Equatable, Sendable {
           id: draft.exerciseID, name: draft.displayExerciseName, number: groups.count + 1,
           isAdded: true, prescribedCount: 0,
           loggedCount: rows.count { $0.completed || $0.failed },
-          rows: rows.map { Row(draft: $0, unit: unit, videos: videos, local: local) },
+          rows: rows.map {
+            Row(
+              draft: $0, unit: unit, videos: videos, local: local,
+              trainingDate: presentation.day.scheduledDate)
+          },
           reservesVideoSpace: TrainingHistoryVideoPresentation.reservesVideoSpace(
             setLogIDs: rows.map(\.loggedSetID), videos: videos, local: local)))
     }

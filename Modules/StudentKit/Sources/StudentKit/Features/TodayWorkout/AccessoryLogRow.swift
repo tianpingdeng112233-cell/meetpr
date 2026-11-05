@@ -32,9 +32,11 @@ struct AccessoryLogRow: View {
             Text(row.draft.isExtra ? StudentStrings.localized(.addedExtra) : String(number)).font(
               .MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
             if row.hasVideo {
-              Image(systemName: "video.fill")
-                .font(.caption2)
-                .foregroundStyle(Color.MeetPR.goldText)
+              Image(
+                systemName: row.hasVideoFailure ? "exclamationmark.triangle.fill" : "video.fill"
+              )
+              .font(.caption2)
+              .foregroundStyle(row.hasVideoFailure ? Color.MeetPR.danger : Color.MeetPR.goldText)
             }
           }
           .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)

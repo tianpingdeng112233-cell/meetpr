@@ -33,6 +33,7 @@ extension VideoUploadManager {
   ) async throws -> VideoAttachment {
     try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
     let destination = fileURL(for: record)
+    let duration = try await exporter.durationSeconds(of: sourceURL)
     do {
       try await exporter.export(from: sourceURL, to: destination)
     } catch {
@@ -46,6 +47,7 @@ extension VideoUploadManager {
       throw CancellationError()
     }
     var exported = record
+    exported.durationSeconds = duration
     exported.sizeBytes = try Self.fileSize(at: destination)
     try await repository.save(exported)
     broadcast(.updated(exported, progress: nil))

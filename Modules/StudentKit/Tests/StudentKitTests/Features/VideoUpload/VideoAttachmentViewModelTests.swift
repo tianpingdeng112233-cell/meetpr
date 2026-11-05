@@ -117,11 +117,33 @@ import Testing
 
   await viewModel.retry(setLogID: setLogID)
   try await waitUntilOnMain {
-    viewModel.retryErrorMessage != nil
+    viewModel.missingAttachment != nil
   }
 
-  #expect(viewModel.retryErrorMessage == "本地视频已不存在,请删除后重新选择")
-  #expect(viewModel.lastErrorMessage == viewModel.retryErrorMessage)
+  #expect(viewModel.missingAttachment?.id == attachment.id)
+  #expect(viewModel.lastErrorMessage == nil)
+}
+
+@MainActor
+@Test func upgradeShowsLatestAttachmentInsteadOfOlderFailure() async throws {
+  let harness = VideoUploadHarness()
+  let studentID = UUID()
+  let setID = UUID()
+  let old = VideoAttachment(
+    id: UUID(), setLogID: setID, studentID: studentID, status: .failed,
+    contentType: "video/mp4", durationSeconds: 5, sizeBytes: 5,
+    recordedAt: Date(timeIntervalSince1970: 1_794_000_000))
+  let latest = VideoAttachment(
+    id: UUID(), setLogID: setID, studentID: studentID, status: .uploaded,
+    contentType: "video/mp4", durationSeconds: 5, sizeBytes: 5,
+    recordedAt: old.recordedAt.addingTimeInterval(60))
+  try await harness.repository.save(old)
+  try await harness.repository.save(latest)
+  let model = VideoAttachmentViewModel(manager: harness.manager, consentDefaults: makeDefaults())
+  await model.start(studentID: studentID)
+  #expect(model.rowStates[setID]?.attachment.id == latest.id)
+  model.apply(.updated(old, progress: nil))
+  #expect(model.rowStates[setID]?.attachment.id == latest.id)
 }
 
 @MainActor

@@ -51,9 +51,7 @@ final class CompletedVideoReplayModel {
   func uploadState(setLogID: UUID?) -> VideoAttachment? {
     guard let setLogID else { return nil }
     let latest = local.filter { $0.setLogID == setLogID }.max { $0.recordedAt < $1.recordedAt }
-    guard let latest, latest.status != .uploaded,
-      CompletedSetVideo.resolve(setLogID: setLogID, videos: videos, local: local) == nil
-    else { return nil }
+    guard let latest, VideoDeliveryPresentation.hasFailure(latest) else { return nil }
     return latest
   }
 

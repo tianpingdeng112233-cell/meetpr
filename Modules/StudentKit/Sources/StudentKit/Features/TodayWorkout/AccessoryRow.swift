@@ -22,6 +22,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   var previousReps: Int? { previous?.reps ?? previousAdded?.reps }
   let unit: UnitPreference
   let hasVideo: Bool
+  let hasVideoFailure: Bool
   let initialInput: AccessoryInput
   var input: AccessoryInput
 
@@ -77,13 +78,14 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
 
   init(
     draft: TodayWorkoutSetRowDraft, previous: StudentSetLog?, unit: UnitPreference,
-    hasVideo: Bool = false, previousAdded: StudentAddedSetLog? = nil
+    hasVideo: Bool = false, hasVideoFailure: Bool = false, previousAdded: StudentAddedSetLog? = nil
   ) {
     self.draft = draft
     self.previous = previous
     self.previousAdded = previousAdded
     self.unit = unit
     self.hasVideo = hasVideo
+    self.hasVideoFailure = hasVideoFailure
     let input = AccessoryInput(
       weight: UnitDisplay.weightText(
         kg: draft.loggedSetID == nil && !draft.isExtra && !draft.isStudentAdded

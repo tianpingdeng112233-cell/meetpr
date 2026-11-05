@@ -67,9 +67,7 @@ struct VideoAttachmentV3Controls: View {
         delivered: delivered, failed: false, canDelete: canDelete,
         replace: onLibrary, delete: onDelete, retry: onRetry)
     case .failed:
-      VideoAttachmentActionsRow(
-        delivered: false, failed: true, canDelete: true,
-        replace: onLibrary, delete: onDelete, retry: onRetry)
+      VideoAttachmentFailureActions(retry: onRetry, replace: onLibrary, delete: onDelete)
     }
   }
 
@@ -168,5 +166,67 @@ private struct VideoAttachmentEditButtons: View {
     .controlSize(.regular)
     .fixedSize(horizontal: true, vertical: false)
     .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+  }
+}
+
+private struct VideoAttachmentFailureActions: View {
+  let retry: @MainActor () -> Void
+  let replace: @MainActor () -> Void
+  let delete: @MainActor () -> Void
+
+  var body: some View {
+    ViewThatFits(in: .horizontal) {
+      VideoFailureActionsLine(iconOnly: false, retry: retry, replace: replace, delete: delete)
+      VideoFailureActionsLine(iconOnly: true, retry: retry, replace: replace, delete: delete)
+    }
+    .accessibilityIdentifier("videoDelivery.failureActions")
+  }
+}
+
+private struct VideoFailureActionsLine: View {
+  let iconOnly: Bool
+  let retry: @MainActor () -> Void
+  let replace: @MainActor () -> Void
+  let delete: @MainActor () -> Void
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.space1) {
+      Text(StudentStrings.localized(.videoAttachmentV3Controls008))
+        .font(.footnote)
+        .foregroundStyle(Color.MeetPR.danger)
+        .fixedSize()
+      Spacer(minLength: MeetPRSpacing.space1)
+      VideoFailureActionButton(
+        title: .videoAttachmentV3Controls009, icon: "arrow.clockwise", iconOnly: iconOnly,
+        action: retry)
+      VideoFailureActionButton(
+        title: .videoAttachmentV3Controls004, icon: "photo", iconOnly: iconOnly, action: replace)
+      VideoFailureActionButton(
+        title: .videoAttachmentV3Controls005, icon: "trash", iconOnly: iconOnly, action: delete)
+    }
+  }
+}
+
+private struct VideoFailureActionButton: View {
+  let title: StudentStrings.Key
+  let icon: String
+  let iconOnly: Bool
+  let action: @MainActor () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Group {
+        if iconOnly { Image(systemName: icon) } else { Text(StudentStrings.localized(title)) }
+      }
+      .font(.footnote)
+      .frame(minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+      }
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel(StudentStrings.localized(title))
   }
 }

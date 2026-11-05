@@ -53,8 +53,12 @@ extension VideoAttachmentViewModel {
   func retryPending(
     setLogID: UUID, resolveSetLogID: @MainActor () async -> UUID?
   ) async {
-    guard let record = rowStates[setLogID]?.attachment,
-      record.pendingDraftID != nil,
+    guard let record = rowStates[setLogID]?.attachment else { return }
+    if await manager.needsReplacement(attachmentID: record.id) {
+      missingAttachment = record
+      return
+    }
+    guard record.pendingDraftID != nil,
       let canonicalID = await resolveSetLogID()
     else {
       reportVideoProcessingFailure()

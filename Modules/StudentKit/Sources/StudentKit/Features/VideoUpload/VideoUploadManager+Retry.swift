@@ -11,10 +11,8 @@ extension VideoUploadManager {
     guard !removingRecordIDs.contains(attachmentID),
       activeUploads[attachmentID] == nil,
       var record = try? await repository.fetch(id: attachmentID),
-      record.status == .failed, record.pendingDraftID == nil
+      VideoDeliveryPresentation.hasFailure(record)
     else { return }
-    guard let retryGeneration = try? requireLiveSnapshotGeneration(from: record) else { return }
-
     let exportedURL = fileURL(for: record)
     let sourceURL: URL?
     if FileManager.default.fileExists(atPath: exportedURL.path) {
@@ -22,17 +20,13 @@ extension VideoUploadManager {
     } else if let retainedSourceURL = retainedSourceURL(recordID: attachmentID) {
       sourceURL = retainedSourceURL
     } else {
-      broadcast(.updated(record, progress: nil))
-      broadcast(
-        .retryUnavailable(
-          setLogID: record.setLogID,
-          attachmentID: record.id,
-          reason: .sourceMissing
-        )
-      )
+      await reportMissingFile(record)
       return
     }
 
+    guard record.pendingDraftID == nil,
+      let retryGeneration = try? requireLiveSnapshotGeneration(from: record)
+    else { return }
     scheduledRetries[attachmentID]?.cancel()
     scheduledRetries[attachmentID] = nil
     scheduledRetryGenerations[attachmentID] = nil
@@ -41,7 +35,7 @@ extension VideoUploadManager {
     guard await abandonRemoteSession(record: &record) else { return }
     guard isLiveRetryContext(recordID: attachmentID, generation: retryGeneration) else { return }
     record.uploadRetryCount = 0
-    record.firstUploadFailureAt = nil
+    record.firstUploadFailureAt = now()
     record.status = .pending
     guard isLiveRetryContext(recordID: attachmentID, generation: retryGeneration) else { return }
     try? await repository.save(record)
@@ -54,10 +48,22 @@ extension VideoUploadManager {
     )
   }
 
+  private func reportMissingFile(_ stored: VideoAttachment) async {
+    var record = stored
+    guard let generation = try? requireLiveSnapshotGeneration(from: record) else { return }
+    record.status = .failed
+    record.uploadGeneration = generation
+    do { try await repository.save(record) } catch { return }
+    guard isLiveRetryContext(recordID: record.id, generation: generation) else { return }
+    broadcast(.updated(record, progress: nil))
+    broadcast(
+      .retryUnavailable(setLogID: record.setLogID, attachmentID: record.id, reason: .sourceMissing))
+  }
+
   public func retry(setLogID: UUID) async {
     guard
       let attachment = try? await repository.fetch(setLogID: setLogID)
-        .last(where: { $0.status == .failed })
+        .last(where: VideoDeliveryPresentation.hasFailure)
     else { return }
     await retry(attachmentID: attachment.id)
   }
@@ -227,7 +233,7 @@ extension VideoUploadManager {
     let records = (try? await repository.fetchAll(studentID: record.studentID)) ?? []
     guard isLiveRetryContext(recordID: record.id, generation: cleanup.generation) else { return }
     await failureNotifier.notifyTerminalFailures(
-      count: records.filter { $0.status == .failed }.count,
+      count: records.filter(VideoDeliveryPresentation.hasFailure).count,
       destination: UploadFailureDestination(
         setLogID: record.setLogID,
         trainingDate: record.trainingDate

@@ -84,6 +84,19 @@ struct RetainedVideoCleanupPolicyTests {
     #expect(removals.isEmpty)
   }
 
+  @Test("undelivered bytes count toward the cap, but only delivered files may be removed")
+  func overLimitPreservesEveryUndeliveredFile() {
+    let pending = makeFile(
+      status: .pending, trainingDate: now.addingTimeInterval(-86_400), sizeBytes: 600)
+    let uploading = makeFile(status: .uploading, trainingDate: now, sizeBytes: 600)
+    let failed = makeFile(status: .failed, trainingDate: now, sizeBytes: 600)
+    let delivered = makeFile(trainingDate: now, sizeBytes: 100)
+    let removals = RetainedVideoCleanupPolicy.attachmentIDsToRemove(
+      from: [pending, uploading, failed, delivered], now: now, calendar: utcCalendar, byteLimit: 500
+    )
+    #expect(removals == [delivered.attachmentID])
+  }
+
   @Test("device-local day handles midnight across a daylight-saving transition")
   func usesDeviceLocalDayAcrossDST() throws {
     var calendar = Calendar(identifier: .gregorian)
