@@ -33,6 +33,17 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let videoCompletionProgress = Key("student.videoCompletionProgress")
+    static let videoCompletionBody = Key("student.videoCompletionBody")
+    static let videoCompletionNotification = Key("student.videoCompletionNotification")
+    static let workoutCompletedNotification = Key("student.workoutCompletedNotification")
+    static let workoutCompletionWaitingNetwork = Key("student.workoutCompletionWaitingNetwork")
+    static let workoutCompletionWaitingNetworkBody = Key(
+      "student.workoutCompletionWaitingNetworkBody")
+    static let videoTimeoutNotification = Key("student.videoTimeoutNotification")
+    static let videoCompletionSummary = Key("student.videoCompletionSummary")
+    static let videoCompletionUploading = Key("student.videoCompletionUploading")
+    static let videoCompletionHint = Key("student.videoCompletionHint")
     static let setSyncUploading = Key("student.setSyncUploading")
     static let setSyncFailedTitle = Key("student.setSyncFailedTitle")
     static let setSyncFailedBody = Key("student.setSyncFailedBody")

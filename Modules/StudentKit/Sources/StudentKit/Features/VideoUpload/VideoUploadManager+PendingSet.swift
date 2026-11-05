@@ -8,7 +8,10 @@ extension VideoUploadManager {
     sourceURL: URL, draftID: UUID, studentID: UUID, trainingDate: Date,
     slot: VideoAttachment.SetSlot? = nil
   ) async throws -> VideoAttachment {
-    try await serializePendingSetMutation {
+    let selection = beginSelection(
+      studentID: studentID, trainingDate: trainingDate, draftID: draftID)
+    defer { finishSelection(selection) }
+    return try await serializePendingSetMutation {
       try await self.performRetainForSet(
         sourceURL: sourceURL, draftID: draftID, studentID: studentID, trainingDate: trainingDate,
         slot: slot)

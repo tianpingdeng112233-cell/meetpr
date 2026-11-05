@@ -219,11 +219,15 @@ public struct TodayWorkoutView: View {
         gymDayToday: gymDayToday,
         restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
         videoFailureCount: videoFailurePresentation.failureCount,
-        onRetryVideos: retryDayVideos
+        onRetryVideos: retryDayVideos,
+        videoCompletion: videoCompletionPresentation
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
       #endif
+      .onChange(of: videoCompletionRevision) { _, _ in
+        Task { await viewModel.receiveVideoCompletion() }
+      }
       .navigationDestination(isPresented: $showingHistory) {
         AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
       }
@@ -253,9 +257,11 @@ public struct TodayWorkoutView: View {
       VStack(spacing: 0) {
         if !showingHistory, case .workout(let presentation) = screenContent,
           presentation.completionAvailability(isEditable: selectedDayState.isEditable).sticky
+            || videoCompletionPresentation?.waiting == true
         {
           TrainingCompletionDock(
-            onComplete: completeTraining, coordinator: viewModel.setSyncCompletion)
+            onComplete: completeTraining, coordinator: viewModel.setSyncCompletion,
+            videoCompletion: videoCompletionPresentation, onRetryVideos: retryDayVideos)
         }
         if let timer = viewModel.restTimer {
           RestTimerOverlay(
@@ -560,7 +566,7 @@ public struct TodayWorkoutView: View {
   }
 
   @ViewBuilder
-  private func completionFlow(phase: WorkoutCompletionFlowPhase) -> some View {
+  func completionFlow(phase: WorkoutCompletionFlowPhase) -> some View {
     if let workout = currentWorkout {
       let presentation = WorkoutCompletionPresentation(
         day: workout.day,
@@ -577,12 +583,19 @@ public struct TodayWorkoutView: View {
         initialPhase: phase,
         onFinish: {
           viewModel.completionPhase = nil
+          let waitingForVideos =
+            viewModel.setSyncQueue?.completionGate.videoWait(dayID: workout.day.id) != nil
+          if waitingForVideos {
+            retryDayVideos()
+          }
           markReviewCompleted(
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
-          returnToCurrentDay()
-          onReturnToToday()
+          if !waitingForVideos {
+            returnToCurrentDay()
+            onReturnToToday()
+          }
         }
       )
     } else {
@@ -798,6 +811,22 @@ public struct TodayWorkoutView: View {
         retryTargetSetLogID = row.draft.loggedSetID
       }
     }
+  }
+
+  private var videoCompletionRevision: Int {
+    viewModel.setSyncQueue?.videoCompletion?.revision ?? 0
+  }
+
+  private var videoCompletionPresentation: VideoCompletionPresentation? {
+    guard case .workout(let presentation) = screenContent,
+      presentation.day.completedAt == nil
+    else { return nil }
+    return VideoCompletionPresentation(
+      attachments: videoViewModel.rowStates.values.map(\.attachment),
+      trainingDate: presentation.day.scheduledDate,
+      allSetsDone: presentation.trainingFlow(isEditable: true)?.progress.allDone
+        ?? presentation.progress.allDone,
+      waiting: viewModel.setSyncQueue?.completionGate.videoWait(dayID: presentation.day.id) != nil)
   }
 
   private var videoFailurePresentation: VideoDeliveryPresentation {

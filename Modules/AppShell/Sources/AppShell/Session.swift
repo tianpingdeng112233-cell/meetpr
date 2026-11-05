@@ -29,6 +29,7 @@ public final class Session {
   @ObservationIgnored let reportsTimezoneOnBootstrap: Bool
   @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
   @ObservationIgnored private var errorTask: Task<Void, Never>?
+  @ObservationIgnored private var bootstrapTask: Task<Void, Never>?
   @ObservationIgnored private var refreshTask: Task<TokenPair, Error>?
   @ObservationIgnored var timezoneReportsInFlight: Set<TimezoneReport> = []
   /// Every login/bootstrap/logout gets a new generation. Completion handlers
@@ -71,7 +72,7 @@ public final class Session {
     )
   }
 
-  public func bootstrap() async {
+  private func performBootstrap() async {
     // The root `.task` calls bootstrap() unconditionally. Once an interactive
     // login/signup has settled the session, never re-run the silent-refresh
     // flow: driving an authenticated session back through `.authenticating`
@@ -329,3 +330,17 @@ extension Session: SessionStateReader {
 
 @available(iOS 17.0, macOS 14.0, *)
 extension Session: @unchecked Sendable {}
+
+extension Session {
+  public func bootstrap() async {
+    if let bootstrapTask {
+      await bootstrapTask.value
+      return
+    }
+    guard case .anonymous = state else { return }
+    let task = Task { await self.performBootstrap() }
+    bootstrapTask = task
+    await task.value
+    bootstrapTask = nil
+  }
+}

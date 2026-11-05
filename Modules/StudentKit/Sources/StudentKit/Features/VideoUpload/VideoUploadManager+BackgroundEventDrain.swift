@@ -50,6 +50,7 @@ extension VideoUploadManager {
       drainingBackgroundRecordIDs.subtract(recordIDs)
     } while !(restoredBackgroundRecords[identifier]?.isEmpty ?? true)
 
+    await completionRecovery?(self)
     let finishTokens = pendingBackgroundFinishTokens.removeValue(forKey: identifier) ?? []
     for token in finishTokens {
       BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(token)
@@ -79,6 +80,7 @@ extension VideoUploadManager {
         await continueDuringBackgroundWake(recordID: recordID)
       }
 
+      await completionRecovery?(self)
       for token in restoredRecord.tokens {
         BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(token)
       }

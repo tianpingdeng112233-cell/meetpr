@@ -240,6 +240,7 @@ extension VideoUploadManager {
       )
     )
     guard isLiveRetryContext(recordID: record.id, generation: cleanup.generation) else { return }
+    await completionRecovery?(self)
   }
 
   private func prepareTerminalFailureRecord(

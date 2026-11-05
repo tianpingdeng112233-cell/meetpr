@@ -56,6 +56,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var restTimerHeight: CGFloat = 0
   var videoFailureCount = 0
   var onRetryVideos: () -> Void = {}
+  var videoCompletion: VideoCompletionPresentation?
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -258,13 +259,6 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     }
   }
 
-  private var flowSnapshot: TrainingFlowSnapshot {
-    guard case .workout(let presentation) = content,
-      let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
-    else { return TrainingFlowSnapshot(dayID: nil, completed: []) }
-    return TrainingFlowSnapshot(dayID: presentation.day.id, completed: flow.completed.map(\.id))
-  }
-
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
     if case .completed = dayState {
@@ -272,7 +266,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onShowReview()
       }
     } else if presentation.completionAvailability(isEditable: dayState.isEditable).button,
-      !presentation.completionAvailability(isEditable: dayState.isEditable).sticky
+      !presentation.completionAvailability(isEditable: dayState.isEditable).sticky,
+      videoCompletion?.waiting != true
     {
       // Ask-coach moved to the hero card's top-right corner once the action
       // row is gone (David 2026-08-08) — nothing sits above the hold button.
@@ -280,8 +275,10 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       if !progress.allDone, accessoryViewModel?.setSyncCompletion?.phase ?? .idle == .idle {
         TodayWorkoutRemainingPill(text: progress.remainingText)
       }
-      SetSyncCompletionControl(
-        coordinator: accessoryViewModel?.setSyncCompletion, onComplete: onComplete)
+      VideoCompletionControl(
+        presentation: videoCompletion,
+        coordinator: accessoryViewModel?.setSyncCompletion, onComplete: onComplete,
+        onRetry: onRetryVideos)
     }
   }
 }
@@ -1370,5 +1367,14 @@ private struct TodayWorkoutQuickLogEntry: View {
     .buttonStyle(PressScaleButtonStyle())
     .padding(.top, MeetPRSpacing.space1)
     .accessibilityIdentifier("todayWorkout.quickLog")
+  }
+}
+
+extension TodayWorkoutScreen {
+  private var flowSnapshot: TrainingFlowSnapshot {
+    guard case .workout(let presentation) = content,
+      let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
+    else { return TrainingFlowSnapshot(dayID: nil, completed: []) }
+    return TrainingFlowSnapshot(dayID: presentation.day.id, completed: flow.completed.map(\.id))
   }
 }

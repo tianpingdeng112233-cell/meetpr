@@ -98,6 +98,9 @@ public actor VideoUploadManager {
     self.networkMonitor = enableNetworkMonitoring ? UploadNetworkMonitor() : nil
   }
 
+  var preparingSelections: [UUID: VideoSelectionScope] = [:]
+  var selectionRevision = 0
+  var completionRecovery: (@Sendable (VideoUploadManager) async -> Void)?
   var pendingSetMutation: Task<Void, Never>?
 
   // MARK: - Public API
@@ -116,6 +119,9 @@ public actor VideoUploadManager {
     trainingDate: Date? = nil,
     recordedAt: Date? = nil
   ) async throws -> VideoAttachment {
+    let selection = beginSelection(
+      studentID: studentID, trainingDate: trainingDate, setLogID: setLogID)
+    defer { finishSelection(selection) }
     await prepareUploadHandling()
     var retainedSourceURL: URL?
     var uploadTaskOwnsSource = false
