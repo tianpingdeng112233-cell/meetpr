@@ -170,7 +170,7 @@ extension VideoUploadManager {
     await cleanTerminalAndOrphanSourceFiles()
 
     let removals = RetainedVideoCleanupPolicy.attachmentIDsToRemove(
-      from: records.filter { $0.pendingDraftID == nil }.map(retainedVideoFile),
+      from: records.map(retainedVideoFile),
       now: now(),
       calendar: .autoupdatingCurrent
     )
@@ -185,12 +185,14 @@ extension VideoUploadManager {
         continue
       }
       guard !retainingSourceRecordIDs.contains(recordID) else { continue }
-      guard let record = try? await repository.fetch(id: recordID) else {
+      let record: VideoAttachment?
+      do { record = try await repository.fetch(id: recordID) } catch { continue }
+      guard let record else {
         guard !retainingSourceRecordIDs.contains(recordID) else { continue }
         _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
         continue
       }
-      if record.status == .uploaded {
+      if record.status == .uploaded, record.pendingDraftID == nil {
         _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
       }
     }
@@ -206,7 +208,7 @@ extension VideoUploadManager {
     }
     return RetainedVideoFile(
       attachmentID: record.id,
-      status: record.status,
+      status: record.pendingDraftID == nil ? record.status : .pending,
       trainingDate: record.trainingDate,
       recordedAt: record.recordedAt,
       sizeBytes: exportedSize + sourceSize

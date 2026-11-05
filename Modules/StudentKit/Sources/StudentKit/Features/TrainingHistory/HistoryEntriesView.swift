@@ -10,6 +10,7 @@ struct HistoryEntriesView: View {
   @Binding var selectedExerciseName: String?
   var addedLogs: [StudentAddedSetLog] = []
   var catalog: [Exercise] = []
+  @Environment(VideoAttachmentViewModel.self) private var uploads: VideoAttachmentViewModel?
   @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
 
   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
@@ -79,6 +80,14 @@ struct HistoryEntriesView: View {
   private func dayCard(_ day: StudentPlanDay, logs: [StudentSetLog]) -> some View {
     let progress = StudentFormatting.completedCount(for: day, logs: logs)
     return VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+      let failures = (replay?.local ?? []).filter {
+        $0.trainingDate == day.scheduledDate && VideoDeliveryPresentation.hasFailure($0)
+      }
+      if !failures.isEmpty {
+        VideoFailureBanner(count: failures.count, historical: true) {
+          Task { for record in failures { await uploads?.retry(setLogID: record.setLogID) } }
+        }
+      }
       HistoryDayHeader(day: day, progress: progress)
 
       if !day.exercises.isEmpty {

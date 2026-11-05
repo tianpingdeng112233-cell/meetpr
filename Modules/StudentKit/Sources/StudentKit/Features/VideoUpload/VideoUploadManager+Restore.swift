@@ -7,6 +7,9 @@ extension VideoUploadManager {
   /// already present.
   public func recoverInterruptedUploads(studentID: UUID) async {
     activateBackgroundHandling()
+    if let records = try? await repository.fetchAll(studentID: studentID), !records.isEmpty {
+      await prepareUploadHandling()
+    }
     recoveringStudentIDs.insert(studentID)
     await flushPendingLocalCleanups()
     await cleanTerminalChunkFiles(studentID: studentID)

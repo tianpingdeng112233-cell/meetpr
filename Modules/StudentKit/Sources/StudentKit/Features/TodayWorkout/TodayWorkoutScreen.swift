@@ -54,6 +54,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var sequencePage: TrainingSequencePage?
   var gymDayToday: Date = WorkoutDatePolicy.gymDayToday()
   var restTimerHeight: CGFloat = 0
+  var videoFailureCount = 0
+  var onRetryVideos: () -> Void = {}
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -166,6 +168,10 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       ProgressView()
         .frame(maxWidth: .infinity, minHeight: 220)
     case .workout(let presentation):
+      if videoFailureCount > 0 {
+        VideoFailureBanner(
+          count: videoFailureCount, historical: !dayState.isEditable, retry: onRetryVideos)
+      }
       if case .upcoming(let cursorDay) = dayState {
         TrainingDayPreview(presentation: presentation, cursorDay: cursorDay, today: gymDayToday)
       } else if case .completed(let canUndo) = dayState {

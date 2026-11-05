@@ -8,9 +8,23 @@ struct CompletedSetVideoButton: View {
   let number: Int
   var reservesSpace = false
   let onPlay: (CompletedSetVideo) -> Void
+  @Environment(VideoAttachmentViewModel.self) private var uploads: VideoAttachmentViewModel?
 
   var body: some View {
-    if reservesSpace || video != nil || upload != nil {
+    if let upload, VideoDeliveryPresentation.hasFailure(upload) {
+      Button {
+        Task { await uploads?.retry(setLogID: upload.setLogID) }
+      } label: {
+        Label(
+          StudentStrings.localized(.videoNotDelivered), systemImage: "exclamationmark.triangle.fill"
+        )
+        .font(.footnote)
+        .foregroundStyle(Color.MeetPR.danger)
+        .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      }
+      .buttonStyle(.plain)
+      .accessibilityIdentifier("completedVideo.failed.\(number)")
+    } else if reservesSpace || video != nil {
       // Inherit the row's text height/baseline; the overlay owns the larger hit area.
       Text(verbatim: " ")
         .hidden()
@@ -19,9 +33,6 @@ struct CompletedSetVideoButton: View {
         .overlay {
           if let video {
             playbackButton(video)
-          } else if let upload {
-            SetVideoUploadIndicator(
-              status: upload.status, progress: 0, size: MeetPRFontMetrics.size18)
           }
         }
     }

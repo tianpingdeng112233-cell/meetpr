@@ -42,6 +42,17 @@ enum StudentStrings {
     static let setSyncLogoutUpload = Key("student.setSyncLogoutUpload")
     static let setSyncLogoutNow = Key("student.setSyncLogoutNow")
     static let setSyncLogoutBody = Key("student.setSyncLogoutBody")
+    static let videoFailureBanner = Key(
+      "student.videoFailureBanner", one: "student.videoFailureBanner.one")
+    static let videoFailureHistory = Key(
+      "student.videoFailureHistory", one: "student.videoFailureHistory.one")
+    static let videoRetryNow = Key("student.videoRetryNow")
+    static let videoNotDelivered = Key("student.videoNotDelivered")
+    static let videoMissingTitle = Key("student.videoMissingTitle")
+    static let videoMissingBody = Key("student.videoMissingBody")
+    static let videoPickAgain = Key("student.videoPickAgain")
+    static let videoLeaveForNow = Key("student.videoLeaveForNow")
+
     static let bindWelcomeSuccess = Key("student.bindWelcomeSuccess")
     static let bindWelcomeTitle = Key("student.bindWelcomeTitle")
     static let bindWelcomeCoach = Key("student.bindWelcomeCoach")

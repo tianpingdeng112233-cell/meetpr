@@ -5,6 +5,30 @@ import Testing
 
 @testable import StudentKit
 
+@Test func pendingSetBytesCountTowardCleanupLimitWithoutDeletingPendingVideo() async throws {
+  let harness = VideoUploadHarness()
+  defer { try? FileManager.default.removeItem(at: harness.filesDirectory) }
+  let studentID = UUID()
+  var pending = sourceRetentionRecord(studentID: studentID, status: .pending)
+  pending.pendingDraftID = UUID()
+  pending.localFileName = "pending.mp4"
+  let uploaded = sourceRetentionRecord(studentID: studentID, status: .uploaded)
+  try await harness.repository.save(pending)
+  try await harness.repository.save(uploaded)
+  let pendingURL = await harness.manager.fileURL(for: pending)
+  let uploadedURL = await harness.manager.fileURL(for: uploaded)
+  try Data().write(to: pendingURL)
+  let handle = try FileHandle(forWritingTo: pendingURL)
+  try handle.truncate(atOffset: UInt64(RetainedVideoCleanupPolicy.defaultByteLimit))
+  try handle.close()
+  try Data([1]).write(to: uploadedURL)
+
+  await harness.manager.cleanRetainedVideos(studentID: studentID)
+
+  #expect(FileManager.default.fileExists(atPath: pendingURL.path))
+  #expect(!FileManager.default.fileExists(atPath: uploadedURL.path))
+}
+
 @Test func uploadManagerDeletesRetainedSourceAfterSuccess() async throws {
   let harness = VideoUploadHarness()
   let sourceURL = try makeTemporaryVideoSource()
@@ -174,7 +198,21 @@ import Testing
 
   #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
   #expect(try sourceFileURLs(in: filesDirectory).isEmpty)
-  #expect(try await repository.fetchAll(studentID: studentID).isEmpty)
+  #expect(await repository.fetchAll(studentID: studentID).isEmpty)
+}
+
+@Test func cleanupPreservesSourceWhenRepositoryReadFails() async throws {
+  let repository = FailingFirstSaveRepository()
+  let directory = FileManager.default.temporaryDirectory.appending(path: "retention-read-\(UUID())")
+  try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  let manager = VideoUploadManager(
+    service: MockVideoUploadService(), exporter: MockVideoExporter(), repository: repository,
+    configuration: VideoUploadHarness.testConfiguration(), filesDirectory: directory)
+  let source = await manager.sourceFileURL(recordID: UUID(), pathExtension: "mov")
+  try Data([1, 2, 3]).write(to: source)
+  await repository.failReads()
+  await manager.cleanRetainedVideos(studentID: UUID())
+  #expect(FileManager.default.fileExists(atPath: source.path))
 }
 
 private func sourceFileURLs(in directory: URL) throws -> [URL] {
@@ -255,6 +293,8 @@ private actor FailingFirstSaveRepository: VideoAttachmentRepository {
   private struct FirstSaveError: Error {}
   private var storage: [UUID: VideoAttachment] = [:]
   private var hasFailedFirstSave = false
+  private var failsReads = false
+  func failReads() { failsReads = true }
 
   func save(_ attachment: VideoAttachment) async throws {
     if !hasFailedFirstSave {
@@ -279,8 +319,9 @@ private actor FailingFirstSaveRepository: VideoAttachmentRepository {
     return attachment
   }
 
-  func fetch(id: UUID) -> VideoAttachment? {
-    storage[id]
+  func fetch(id: UUID) throws -> VideoAttachment? {
+    if failsReads { throw FirstSaveError() }
+    return storage[id]
   }
 
   func fetch(setLogID: UUID) -> [VideoAttachment] {

@@ -1,0 +1,82 @@
+{
+  "records": [
+    {
+      "contentType": "video/mp4",
+      "durationSeconds": 10,
+      "firstUploadFailureAt": "2026-11-05T06:11:50Z",
+      "id": "02400000-0000-0000-0000-000000040000",
+      "localFileName": "02400000-0000-0000-0000-000000040000.mp4",
+      "recordedAt": "2026-11-02T10:00:00Z",
+      "setLogID": "02400000-0000-0000-0000-000000040000",
+      "sizeBytes": 0,
+      "status": "pending",
+      "studentID": "02400000-0000-0000-0000-000000000101",
+      "trainingDate": "2026-11-02T00:00:00Z",
+      "uploadGeneration": 2,
+      "uploadPartCount": 0,
+      "uploadPartTargets": [],
+      "uploadRetryCount": 1,
+      "uploadedParts": []
+    },
+    {
+      "contentType": "video/mp4",
+      "durationSeconds": 10,
+      "firstUploadFailureAt": "2026-11-05T06:11:50Z",
+      "id": "02400000-0000-0000-0000-000000040110",
+      "localFileName": "02400000-0000-0000-0000-000000040110.mp4",
+      "recordedAt": "2026-11-03T10:00:00Z",
+      "setLogID": "02400000-0000-0000-0000-000000040110",
+      "sizeBytes": 0,
+      "status": "pending",
+      "studentID": "02400000-0000-0000-0000-000000000101",
+      "trainingDate": "2026-11-03T00:00:00Z",
+      "uploadGeneration": 4,
+      "uploadPartCount": 0,
+      "uploadPartTargets": [],
+      "uploadRetryCount": 1,
+      "uploadedParts": []
+    },
+    {
+      "contentType": "video/mp4",
+      "durationSeconds": 14,
+      "id": "09000000-0000-0000-0000-000000000100",
+      "localFileName": "09000000-0000-0000-0000-000000000100.mp4",
+      "recordedAt": "2026-11-04T10:00:00Z",
+      "remoteAttachmentID": "4BB64A9E-0776-4E60-BCE1-EA872D3D4F04",
+      "setLogID": "09000000-0000-0000-0000-000000000100",
+      "sizeBytes": 2616227,
+      "status": "uploaded",
+      "studentID": "02400000-0000-0000-0000-000000000101",
+      "trainingDate": "2026-11-04T00:00:00Z",
+      "uploadPartCount": 0,
+      "uploadPartTargets": [],
+      "uploadRetryCount": 0,
+      "uploadedAt": "2026-11-05T06:13:04Z",
+      "uploadedParts": []
+    },
+    {
+      "contentType": "video/mp4",
+      "durationSeconds": 14,
+      "id": "09000000-0000-0000-0000-000000000110",
+      "localFileName": "09000000-0000-0000-0000-000000000110.mp4",
+      "recordedAt": "2026-11-04T10:00:00Z",
+      "remoteAttachmentID": "6758A62D-6973-4F15-8D09-C759E062D5EA",
+      "setLogID": "09000000-0000-0000-0000-000000000110",
+      "sizeBytes": 2616227,
+      "status": "uploaded",
+      "studentID": "02400000-0000-0000-0000-000000000101",
+      "trainingDate": "2026-11-04T00:00:00Z",
+      "uploadPartCount": 0,
+      "uploadPartTargets": [],
+      "uploadRetryCount": 0,
+      "uploadedAt": "2026-11-05T06:13:24Z",
+      "uploadedParts": []
+    }
+  ],
+  "files": {
+    "02400000-0000-0000-0000-000000040000.mp4": null,
+    "02400000-0000-0000-0000-000000040110.mp4": null,
+    "09000000-0000-0000-0000-000000000100.mp4": "c955c364dcc91c56c721124022f500482c404a71d90e3bf1208ab8ef18de3d25",
+    "09000000-0000-0000-0000-000000000110.mp4": "213ece1058b036fa68d0e6dd15b59fdf331d4fdede2648b4a1af83eda50aa12e"
+  }
+}

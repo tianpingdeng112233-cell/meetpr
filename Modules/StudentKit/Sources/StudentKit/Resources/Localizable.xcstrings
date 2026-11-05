@@ -22110,19 +22110,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} training videos failed to upload. Open to review"
+            "value": "{0} training videos didn't upload. Tap to retry."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 {0} 条训练视频没传成功，打开看看"
+            "value": "有 {0} 条训练视频没传上，点击重试"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 {0} 條訓練影片沒傳成功，開啟看看"
+            "value": "有 {0} 條訓練影片沒傳上，點選重試"
           }
         }
       }
@@ -24088,19 +24088,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} training video failed to upload. Open to review"
+            "value": "{0} training video didn't upload. Tap to retry."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 {0} 条训练视频没传成功，打开看看"
+            "value": "有 {0} 条训练视频没传上，点击重试"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 {0} 條訓練影片沒傳成功，開啟看看"
+            "value": "有 {0} 條訓練影片沒傳上，點選重試"
           }
         }
       }
@@ -29326,6 +29326,236 @@
           "stringUnit": {
             "state": "translated",
             "value": "直接退出也會保留，下次登入這個帳號時接著傳。"
+          }
+        }
+      }
+    },
+    "student.videoFailureBanner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频没传上，正在自动重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} videos didn't upload. Retrying…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片沒傳上，正在自動重試"
+          }
+        }
+      }
+    },
+    "student.videoFailureBanner.one": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频没传上，正在自动重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} video didn't upload. Retrying…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片沒傳上，正在自動重試"
+          }
+        }
+      }
+    },
+    "student.videoFailureHistory": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频没传上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} videos didn't upload"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片沒傳上"
+          }
+        }
+      }
+    },
+    "student.videoFailureHistory.one": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 条视频没传上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} video didn't upload"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 條影片沒傳上"
+          }
+        }
+      }
+    },
+    "student.videoRetryNow": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry now"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即重試"
+          }
+        }
+      }
+    },
+    "student.videoNotDelivered": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没传上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not uploaded"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒傳上"
+          }
+        }
+      }
+    },
+    "student.videoMissingTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条视频没传上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This video didn't upload"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這條影片沒傳上"
+          }
+        }
+      }
+    },
+    "student.videoMissingBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机里找不到这条视频的文件了。录像时它也存了一份到相册，选出来就能挂回这一组。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We can't find this video on your phone. A copy was also saved to Photos when it was recorded. Pick it again to attach it to this set."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機裡找不到這條影片的檔案了。錄影時它也存了一份到相簿，選出來就能掛回這一組。"
+          }
+        }
+      }
+    },
+    "student.videoPickAgain": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从相册重新选这条视频"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick this video again from Photos"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從相簿重新選這條影片"
+          }
+        }
+      }
+    },
+    "student.videoLeaveForNow": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先不管"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先不管"
           }
         }
       }

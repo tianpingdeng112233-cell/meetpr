@@ -224,7 +224,7 @@ struct AccessoryLogCard: View {
       draft: row.draft,
       previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex],
       unit: row.draft.prescribed.loadMode == .freeWeight && !allowsRIR ? .kg : unit,
-      hasVideo: row.record.videoState != .none)
+      hasVideo: row.record.videoState != .none, hasVideoFailure: row.record.videoState == .failed)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input
     } else if let effortModeOverride, !source.draft.hasSavedRecord {

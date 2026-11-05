@@ -42,6 +42,11 @@ struct ExtraSetControls: View {
               Image(systemName: row.draft.failed ? "xmark" : "checkmark")
                 .foregroundStyle(row.draft.failed ? Color.MeetPR.danger : Color.MeetPR.success)
             }
+            if row.record.videoState == .failed {
+              Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Color.MeetPR.danger)
+                .accessibilityLabel(StudentStrings.localized(.videoNotDelivered))
+            }
             if editable {
               Button(StudentStrings.localized(.todayWorkoutScreen015)) { onEdit(row) }
                 .font(.caption)

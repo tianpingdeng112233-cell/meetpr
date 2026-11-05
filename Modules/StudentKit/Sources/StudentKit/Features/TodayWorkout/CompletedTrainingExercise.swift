@@ -24,6 +24,11 @@ struct CompletedTrainingExercise: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
             .foregroundStyle(Color.MeetPR.textPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
+          if exercise.rows.contains(where: { $0.record.videoState == .failed }) {
+            Image(systemName: "exclamationmark.triangle.fill")
+              .foregroundStyle(Color.MeetPR.danger)
+              .accessibilityLabel(StudentStrings.localized(.videoNotDelivered))
+          }
           Text(exercise.trainingCompletedText)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
           Image(systemName: collapsed ? "chevron.right" : "chevron.down")
