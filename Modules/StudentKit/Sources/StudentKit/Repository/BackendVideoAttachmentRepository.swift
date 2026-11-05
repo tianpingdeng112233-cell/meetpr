@@ -112,8 +112,8 @@ public actor BackendVideoAttachmentRepository: VideoAttachmentRepository {
   }
 
   private func persist(_ attachments: [VideoAttachment]) throws {
-    cached = attachments
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     try encoder.encode(attachments).write(to: fileURL, options: .atomic)
+    cached = attachments
   }
 }

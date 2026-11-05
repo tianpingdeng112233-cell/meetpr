@@ -12,11 +12,18 @@ extension VideoUploadManager {
   /// deletes all local record, video, and chunk files. A ready attachment is
   /// only unlinked locally because the upload abort endpoint rejects it.
   public func remove(attachmentID: UUID) async {
+    await remove(attachmentID: attachmentID, waitsForPendingBinding: true)
+  }
+
+  func remove(attachmentID: UUID, waitsForPendingBinding: Bool) async {
     // The teardown below clears the active/retry markers before the record
     // row disappears; a cancelParts-triggered session-finished sweep must not
     // treat that intermediate state as dormant and revive the upload.
     guard removingRecordIDs.insert(attachmentID).inserted else { return }
     defer { removingRecordIDs.remove(attachmentID) }
+    // Mark intent before waiting: an in-flight bind must stop publishing or
+    // uploading, then deletion runs after its last repository write settles.
+    if waitsForPendingBinding { await pendingSetMutation?.value }
     await persistNewUploadGeneration(recordID: attachmentID)
     if let task = activeUploads[attachmentID] {
       task.cancel()
@@ -163,7 +170,7 @@ extension VideoUploadManager {
     await cleanTerminalAndOrphanSourceFiles()
 
     let removals = RetainedVideoCleanupPolicy.attachmentIDsToRemove(
-      from: records.map(retainedVideoFile),
+      from: records.filter { $0.pendingDraftID == nil }.map(retainedVideoFile),
       now: now(),
       calendar: .autoupdatingCurrent
     )

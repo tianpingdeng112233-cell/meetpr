@@ -189,6 +189,8 @@ struct SetEntrySheet: View {
 
             if let videoViewModel, let studentID {
               VideoAttachmentSection(
+                draftID: draft.id,
+                slot: draft.pendingVideoSlot,
                 studentID: studentID,
                 trainingDate: trainingDate,
                 videoViewModel: videoViewModel,
@@ -197,7 +199,8 @@ struct SetEntrySheet: View {
                 initialSetLogID: liveDraft.loggedSetID,
                 resolveSetLogID: {
                   syncDraftEdits()
-                  return await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
+                  return await viewModel.resolveVideoSetLogID(
+                    draftID: draft.id, trainingDate: trainingDate)
                 },
                 onWillPick: { syncDraftEdits() }
               )
@@ -636,6 +639,10 @@ extension SetEntrySheet {
   }
 
   fileprivate func syncDraftEdits() {
+    guard let rowIndex = viewModel.videoRowIndex(draftID: draft.id, trainingDate: trainingDate)
+    else {
+      return
+    }
     viewModel.updateWeight(
       rowIndex: rowIndex,
       weight: draft.prescribed.hasUnspecifiedLoad ? enteredLoadTypeWeight : weightValue)

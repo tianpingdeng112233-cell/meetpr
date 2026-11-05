@@ -10,6 +10,8 @@ import UniformTypeIdentifiers
 /// visually neutral; only a terminal failure surfaces upload semantics.
 @available(iOS 17.0, macOS 14.0, *)
 struct VideoAttachmentSection: View {
+  let draftID: UUID
+  let slot: VideoAttachment.SetSlot?
   let studentID: UUID
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel
@@ -47,6 +49,8 @@ struct VideoAttachmentSection: View {
   }
 
   init(
+    draftID: UUID,
+    slot: VideoAttachment.SetSlot? = nil,
     studentID: UUID,
     trainingDate: Date,
     videoViewModel: VideoAttachmentViewModel,
@@ -56,6 +60,8 @@ struct VideoAttachmentSection: View {
     resolveSetLogID: @escaping @MainActor () async -> UUID?,
     onWillPick: (() -> Void)? = nil
   ) {
+    self.draftID = draftID
+    self.slot = slot
     self.studentID = studentID
     self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
@@ -68,7 +74,8 @@ struct VideoAttachmentSection: View {
   }
 
   private var rowState: VideoAttachmentViewModel.RowState? {
-    resolvedSetLogID.flatMap { videoViewModel.rowStates[$0] }
+    videoViewModel.pendingRowState(draftID: draftID, trainingDate: trainingDate, slot: slot)
+      ?? (resolvedSetLogID ?? initialSetLogID).flatMap { videoViewModel.rowStates[$0] }
   }
 
   var body: some View {
@@ -295,23 +302,11 @@ extension VideoAttachmentSection {
   }
 
   private func attach(sourceURL: URL) async {
-    guard let setLogID = await ensureSetLogID() else {
-      // Ownership never transfers to the upload manager on this path: both the
-      // camera copy and the library import live in tmp and would leak here.
-      try? FileManager.default.removeItem(at: sourceURL)
-      videoViewModel.reportVideoProcessingFailure()
-      isPreparing = false
-      return
-    }
     await videoViewModel.attach(
-      sourceURL: sourceURL,
-      setLogID: setLogID,
-      studentID: studentID,
-      trainingDate: trainingDate
-    )
-    // `enqueue` sets `lastErrorMessage` synchronously on failure (e.g. the
-    // clip exceeds the duration limit) and never broadcasts a row, so the
-    // status onChange won't fire — restore the buttons here instead.
+      sourceURL: sourceURL, draftID: draftID, studentID: studentID,
+      trainingDate: trainingDate, slot: slot, resolveSetLogID: { await ensureSetLogID() })
+    // A local persistence failure may produce no row event. Restore the
+    // controls explicitly so the error remains actionable.
     if videoViewModel.lastErrorMessage != nil {
       isPreparing = false
     }
@@ -336,14 +331,22 @@ extension VideoAttachmentSection {
   }
 
   private func retryAttachment() {
-    guard let setLogID = resolvedSetLogID else { return }
-    Task { await videoViewModel.retry(setLogID: setLogID) }
+    guard let record = rowState?.attachment else { return }
+    Task {
+      if record.pendingDraftID != nil {
+        await videoViewModel.retryPending(
+          setLogID: record.setLogID, resolveSetLogID: { await ensureSetLogID() })
+      } else {
+        await videoViewModel.retry(setLogID: record.setLogID)
+      }
+    }
   }
 
   private func removeAttachment() {
-    guard let setLogID = resolvedSetLogID else { return }
-    Task { await videoViewModel.remove(setLogID: setLogID) }
+    guard let record = rowState?.attachment else { return }
+    Task { await videoViewModel.remove(setLogID: record.setLogID) }
   }
+
 }
 
 /// File-URL transferable for PhotosPicker video items; the received file is

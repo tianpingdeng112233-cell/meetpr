@@ -20,7 +20,8 @@ extension VideoUploadManager {
     let records = (try? await repository.fetchAll(studentID: studentID)) ?? []
     await cleanFailedRemoteSessions(in: records)
     var startedTasks: [Task<Void, Never>] = []
-    for record in records where record.status != .uploaded && record.status != .failed {
+    for record in records
+    where record.status != .uploaded && record.status != .failed && record.pendingDraftID == nil {
       if let task = await recoverDormantUpload(record) {
         startedTasks.append(task)
       }

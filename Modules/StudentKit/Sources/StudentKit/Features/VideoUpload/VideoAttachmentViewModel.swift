@@ -21,7 +21,7 @@ public final class VideoAttachmentViewModel {
   public private(set) var lastErrorMessage: String?
   public private(set) var retryErrorMessage: String?
 
-  private let manager: VideoUploadManager
+  let manager: VideoUploadManager
   private let consentDefaults: UserDefaults
   // nonisolated(unsafe) + ObservationIgnored: written only on the main actor;
   // deinit (nonisolated) just cancels it.
@@ -35,6 +35,11 @@ public final class VideoAttachmentViewModel {
 
   public func reportVideoProcessingFailure() {
     lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+  }
+
+  func clearProcessingFailure() {
+    lastErrorMessage = nil
+    retryErrorMessage = nil
   }
 
   deinit {
@@ -129,7 +134,7 @@ public final class VideoAttachmentViewModel {
 
   // MARK: - Internals
 
-  private func apply(_ event: VideoUploadEvent) {
+  func apply(_ event: VideoUploadEvent) {
     switch event {
     case .updated(let attachment, let progress):
       var state =

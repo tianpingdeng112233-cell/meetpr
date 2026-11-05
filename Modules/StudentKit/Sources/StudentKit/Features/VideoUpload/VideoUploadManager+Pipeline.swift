@@ -7,6 +7,9 @@ import RepositoryContracts
 extension VideoUploadManager {
   func run(recordID: UUID, sourceURL: URL?, generation: Int) async {
     do {
+      guard let stored = try await repository.fetch(id: recordID),
+        stored.pendingDraftID == nil
+      else { return }
       var record = try await persistUploadGeneration(generation, recordID: recordID)
       if let sourceURL {
         record = try await export(record, from: sourceURL)

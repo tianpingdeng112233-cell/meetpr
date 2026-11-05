@@ -399,24 +399,21 @@ public struct TodayWorkoutView: View {
         isPresented: $showingDirectCamera,
         onDismiss: { directCameraTarget = nil },
         content: {
-          CameraRecorderView(
-            maxDurationSeconds: videoViewModel.maxDurationSeconds,
-            isPresented: $showingDirectCamera,
-            onPicked: { url in
-              guard let target = directCameraTarget else {
-                try? FileManager.default.removeItem(at: url)
+          if let target = directCameraTarget {
+            CameraRecorderView(
+              maxDurationSeconds: videoViewModel.maxDurationSeconds,
+              isPresented: $showingDirectCamera,
+              onPicked: { url in
+                preparingVideoSetID = target.id
+                Task {
+                  await attachDirectCameraVideo(sourceURL: url, target: target)
+                }
+              },
+              onFailure: {
                 videoViewModel.reportVideoProcessingFailure()
-                return
               }
-              preparingVideoSetID = target.id
-              Task {
-                await attachDirectCameraVideo(sourceURL: url, target: target)
-              }
-            },
-            onFailure: {
-              videoViewModel.reportVideoProcessingFailure()
-            }
-          )
+            )
+          }
         }
       )
     #endif
@@ -434,9 +431,15 @@ public struct TodayWorkoutView: View {
         resolveInitialSelectionIfNeeded()
       }
       await videoViewModel.start(studentID: studentID)
+      await videoViewModel.resumePendingAttachments(workout: viewModel, studentID: studentID)
       viewModel.accessoryVideosLoaded = videoViewModel.hasLoadedAttachments
       if uploadFailureNavigationToken > 0 {
         openUploadFailureDestination()
+      }
+    }
+    .onChange(of: viewModel.state) { _, _ in
+      Task {
+        await videoViewModel.resumePendingAttachments(workout: viewModel, studentID: studentID)
       }
     }
     .onChange(of: videoViewModel.hasLoadedAttachments) { _, loaded in
@@ -752,7 +755,13 @@ public struct TodayWorkoutView: View {
         scrollToVideo: true
       )
     case .retry:
-      retryTargetSetLogID = row.draft.loggedSetID
+      if videoRowState(for: row.draft)?.attachment.pendingDraftID != nil {
+        editing = EditingTarget(
+          id: row.id, rowIndex: row.stableIndex, draft: row.draft,
+          setNumber: row.record.index, scrollToVideo: true)
+      } else {
+        retryTargetSetLogID = row.draft.loggedSetID
+      }
     }
   }
 
@@ -761,8 +770,7 @@ public struct TodayWorkoutView: View {
   ) -> [UUID: SetRow.VideoState] {
     Dictionary(
       uniqueKeysWithValues: drafts.compactMap { draft in
-        guard let setLogID = draft.loggedSetID else { return nil }
-        return (setLogID, setRowVideoState(for: draft))
+        return (draft.loggedSetID ?? draft.id, setRowVideoState(for: draft))
       }
     )
   }
@@ -785,8 +793,9 @@ public struct TodayWorkoutView: View {
   private func videoRowState(
     for draft: TodayWorkoutViewModel.SetRowDraft
   ) -> VideoAttachmentViewModel.RowState? {
-    guard let setLogID = draft.loggedSetID else { return nil }
-    return videoViewModel.rowStates[setLogID]
+    videoViewModel.pendingRowState(
+      draftID: draft.id, trainingDate: selectedTrainingDate, slot: draft.pendingVideoSlot)
+      ?? draft.loggedSetID.flatMap { videoViewModel.rowStates[$0] }
   }
 
   private func videoIndicatorStatus(
@@ -805,7 +814,8 @@ public struct TodayWorkoutView: View {
   }
 
   private func beginDirectCamera(for draft: TodayWorkoutViewModel.SetRowDraft) {
-    directCameraTarget = DirectCameraTarget(id: draft.id)
+    directCameraTarget = DirectCameraTarget(
+      id: draft.id, trainingDate: selectedTrainingDate, slot: draft.pendingVideoSlot)
     if videoViewModel.hasConsented {
       showingDirectCamera = true
     } else {
@@ -817,29 +827,12 @@ public struct TodayWorkoutView: View {
     sourceURL: URL,
     target: DirectCameraTarget
   ) async {
-    let rowIndex = viewModel.currentDrafts?.firstIndex { $0.id == target.id }
-    let liveDraft = rowIndex.flatMap { viewModel.currentDrafts?[$0] }
-    let setLogID: UUID?
-    if let loggedSetID = liveDraft?.loggedSetID {
-      setLogID = loggedSetID
-    } else if let rowIndex {
-      setLogID = await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
-    } else {
-      setLogID = nil
-    }
-
-    guard let setLogID else {
-      try? FileManager.default.removeItem(at: sourceURL)
-      videoViewModel.reportVideoProcessingFailure()
-      preparingVideoSetID = nil
-      return
-    }
     await videoViewModel.attach(
-      sourceURL: sourceURL,
-      setLogID: setLogID,
-      studentID: studentID,
-      trainingDate: selectedTrainingDate
-    )
+      sourceURL: sourceURL, draftID: target.id, studentID: studentID,
+      trainingDate: target.trainingDate, slot: target.slot,
+      resolveSetLogID: {
+        await viewModel.resolveVideoSetLogID(draftID: target.id, trainingDate: target.trainingDate)
+      })
     preparingVideoSetID = nil
   }
 
@@ -1047,6 +1040,8 @@ private struct QuickLogRoute: Identifiable {
 
 private struct DirectCameraTarget {
   let id: UUID
+  let trainingDate: Date
+  let slot: VideoAttachment.SetSlot?
 }
 
 private struct SetRefPickerRoute: Identifiable {
