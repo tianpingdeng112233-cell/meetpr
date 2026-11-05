@@ -16,6 +16,8 @@
   证据：StudentKit 1105 / CoreModels 164 全绿，iPhone 17e 构建过，CI 绿。**真机拍摄路径未亲验**，切包前陪 David 真机走一遍
   （断网记组→直拍→联网→视频挂上）。排障记录 `docs/diagnose/set-video-lost-2026-11-05.md`。
   已丢视频服务端无存，只能靠学员相册找回。
+- **训练页辅助项 hero 不再在下方重复（spec 090，PR #399）**：坐姿划船等辅助项在 hero 卡时，下方列表只显示下一个动作。11-04 已合 release/1.0 并经 iPhone 17e 收货，StudentKit 1096/1096 绿。
+- **学员聊天「+」问教练面板秒关修复（P1，PR #406）**：1.0(30)/(31) 学员在聊天页点「+」，问教练面板约 0.5 秒自动收回；根因=聊天全屏页挂在带资料编辑 navigationDestination 的子树里，修复=挪到 NavigationStack 外层。安卓真机实测无此问题。⚖️2026-11-05 David 定：随下班车，不单独切包。证据见 docs/journal/2026-11-05-chat-plus-autoclose-ios.md。
 
 ## 延期候选（未排期，前置解锁后另行排期）
 
