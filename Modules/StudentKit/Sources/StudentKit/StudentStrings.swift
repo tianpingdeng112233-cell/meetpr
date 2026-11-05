@@ -33,6 +33,37 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let videoCompletionProgress = Key("student.videoCompletionProgress")
+    static let videoCompletionBody = Key("student.videoCompletionBody")
+    static let videoCompletionNotification = Key("student.videoCompletionNotification")
+    static let workoutCompletedNotification = Key("student.workoutCompletedNotification")
+    static let workoutCompletionWaitingNetwork = Key("student.workoutCompletionWaitingNetwork")
+    static let workoutCompletionWaitingNetworkBody = Key(
+      "student.workoutCompletionWaitingNetworkBody")
+    static let videoTimeoutNotification = Key("student.videoTimeoutNotification")
+    static let videoCompletionSummary = Key("student.videoCompletionSummary")
+    static let videoCompletionUploading = Key("student.videoCompletionUploading")
+    static let videoCompletionHint = Key("student.videoCompletionHint")
+    static let setSyncUploading = Key("student.setSyncUploading")
+    static let setSyncFailedTitle = Key("student.setSyncFailedTitle")
+    static let setSyncFailedBody = Key("student.setSyncFailedBody")
+    static let setSyncRetry = Key("student.setSyncRetry")
+    static let setSyncLogoutOne = Key("student.setSyncLogoutOne")
+    static let setSyncLogoutMany = Key("student.setSyncLogoutMany")
+    static let setSyncLogoutUpload = Key("student.setSyncLogoutUpload")
+    static let setSyncLogoutNow = Key("student.setSyncLogoutNow")
+    static let setSyncLogoutBody = Key("student.setSyncLogoutBody")
+    static let videoFailureBanner = Key(
+      "student.videoFailureBanner", one: "student.videoFailureBanner.one")
+    static let videoFailureHistory = Key(
+      "student.videoFailureHistory", one: "student.videoFailureHistory.one")
+    static let videoRetryNow = Key("student.videoRetryNow")
+    static let videoNotDelivered = Key("student.videoNotDelivered")
+    static let videoMissingTitle = Key("student.videoMissingTitle")
+    static let videoMissingBody = Key("student.videoMissingBody")
+    static let videoPickAgain = Key("student.videoPickAgain")
+    static let videoLeaveForNow = Key("student.videoLeaveForNow")
+
     static let bindWelcomeSuccess = Key("student.bindWelcomeSuccess")
     static let bindWelcomeTitle = Key("student.bindWelcomeTitle")
     static let bindWelcomeCoach = Key("student.bindWelcomeCoach")

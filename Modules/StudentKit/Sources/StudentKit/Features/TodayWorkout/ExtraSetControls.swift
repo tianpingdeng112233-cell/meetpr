@@ -42,13 +42,18 @@ struct ExtraSetControls: View {
               Image(systemName: row.draft.failed ? "xmark" : "checkmark")
                 .foregroundStyle(row.draft.failed ? Color.MeetPR.danger : Color.MeetPR.success)
             }
+            if row.record.videoState == .failed {
+              Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Color.MeetPR.danger)
+                .accessibilityLabel(StudentStrings.localized(.videoNotDelivered))
+            }
             if editable {
               Button(StudentStrings.localized(.todayWorkoutScreen015)) { onEdit(row) }
                 .font(.caption)
               Button {
                 if row.record.videoState != .none {
                   viewModel.showAddedVideoError()
-                } else if row.draft.loggedSetID == nil {
+                } else if !row.draft.hasSavedRecord {
                   Task { await viewModel.removeStudentRow(id: row.id) }
                 } else {
                   removal = row.id

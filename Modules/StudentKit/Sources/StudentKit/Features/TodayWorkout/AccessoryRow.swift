@@ -22,6 +22,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   var previousReps: Int? { previous?.reps ?? previousAdded?.reps }
   let unit: UnitPreference
   let hasVideo: Bool
+  let hasVideoFailure: Bool
   let initialInput: AccessoryInput
   var input: AccessoryInput
 
@@ -41,7 +42,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
     }
   }
   mutating func switchEffort(to mode: ActualEffortMode) {
-    guard draft.isAccessory, draft.loggedSetID == nil else { return }
+    guard draft.isAccessory, !draft.hasSavedRecord else { return }
     input.effortMode = mode
     input.rpe = ""
   }
@@ -77,25 +78,26 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
 
   init(
     draft: TodayWorkoutSetRowDraft, previous: StudentSetLog?, unit: UnitPreference,
-    hasVideo: Bool = false, previousAdded: StudentAddedSetLog? = nil
+    hasVideo: Bool = false, hasVideoFailure: Bool = false, previousAdded: StudentAddedSetLog? = nil
   ) {
     self.draft = draft
     self.previous = previous
     self.previousAdded = previousAdded
     self.unit = unit
     self.hasVideo = hasVideo
+    self.hasVideoFailure = hasVideoFailure
     let input = AccessoryInput(
       weight: UnitDisplay.weightText(
-        kg: draft.loggedSetID == nil && !draft.isExtra && !draft.isStudentAdded
+        kg: !draft.hasSavedRecord && !draft.isExtra && !draft.isStudentAdded
           ? (draft.prescribed.isBodyweight ? 0 : draft.prescribed.weightKg) : draft.actualWeight,
         unit: unit),
       reps: (draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax).map(String.init)
         ?? "",
-      rpe: draft.loggedSetID == nil
+      rpe: !draft.hasSavedRecord
         ? "" : draft.actualRIR.map(String.init) ?? draft.actualRPE.map(SetEntryValue.text) ?? "",
       effortMode: draft.actualRIR != nil
         ? .rir
-        : draft.loggedSetID != nil
+        : draft.hasSavedRecord
           ? .rpe : draft.isAccessory && Self.hasRIRTarget(draft) ? .rir : .rpe
     )
     self.initialInput = input

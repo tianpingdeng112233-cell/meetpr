@@ -1,0 +1,30 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/8] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[4/8] Compiling StudentKitTests SetSyncControlTests.swift
+[5/8] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[6/8] Compiling StudentKitTests SetSyncRegressionTests.swift
+[7/8] Emitting module StudentKitTests
+[7/9] Write Objects.LinkFileList
+[8/9] Linking StudentKitPackageTests
+Build complete! (37.78s)
+Test Suite 'Selected tests' started at 2026-11-05 06:00:52.804.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 06:00:52.808.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 06:00:52.808.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 06:00:52.808.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OfflineSetRecordingTests started.
+◇ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() started.
+✘ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() recorded an issue at OfflineSetRecordingTests.swift:94:5: Expectation failed: await logs.added.isEmpty
+✘ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() recorded an issue at OfflineSetRecordingTests.swift:95:5: Expectation failed: (queue.pendingCount → 0) == 1
+✘ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() recorded an issue at OfflineSetRecordingTests.swift:96:5: Expectation failed: (queue → StudentKit.SetSyncQueue).hasRejected(dayID: day → 4565C997-BD52-41EE-9542-08EC8A6FE67E)
+✘ Test sharedUnpublishedErrorWithoutAuthoritativeDeletionStaysRejected() failed after 0.077 seconds with 3 issues.
+✘ Suite OfflineSetRecordingTests failed after 0.078 seconds with 3 issues.
+✘ Test run with 1 test in 1 suite failed after 0.079 seconds with 3 issues.

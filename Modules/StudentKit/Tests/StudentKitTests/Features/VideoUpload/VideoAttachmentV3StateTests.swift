@@ -59,3 +59,19 @@ import ViewInspector
   #expect(!inspected.findAll(ViewType.ProgressView.self).isEmpty)
   #expect(inspected.findAll(ViewType.Button.self).isEmpty)
 }
+
+#if os(macOS)
+  import AppKit
+
+  @MainActor
+  @Test func failureActionsFitMinimumPhoneWidthInOneRow() {
+    let controls = VideoAttachmentV3Controls(
+      state: .failed, onCamera: {}, onLibrary: {}, onCancel: {}, onRetry: {}, onDelete: {}
+    )
+    .frame(width: 288)
+    // 320pt screen minus the existing 16pt page insets on both sides.
+    let size = NSHostingView(rootView: controls).fittingSize
+    #expect(size.width == 288)
+    #expect(size.height == 44)
+  }
+#endif

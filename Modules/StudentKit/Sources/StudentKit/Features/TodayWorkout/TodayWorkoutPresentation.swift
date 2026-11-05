@@ -251,7 +251,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
           record: Self.record(
             from: draft,
             index: SetDisplayNumber.number(for: draft),
-            videoState: draft.loggedSetID.flatMap { videoStates[$0] } ?? .none,
+            videoState: videoStates[draft.loggedSetID ?? draft.id] ?? .none,
             prescriptionDisplay: Self.prescriptionDisplay(
               for: draft,
               suggestionOutcome: suggestionOutcome,

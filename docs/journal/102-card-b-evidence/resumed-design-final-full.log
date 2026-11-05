@@ -1,0 +1,275 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/7] Emitting module DesignSystem
+[4/7] Compiling DesignSystem FailureColors.swift
+[5/7] Compiling DesignSystem Colors.swift
+[6/53] Compiling DesignSystem LegacyColors.swift
+[7/53] Compiling DesignSystem SemanticTone.swift
+[8/53] Compiling DesignSystem VideoColors.swift
+[9/53] Compiling DesignSystem VisualEffects.swift
+[10/53] Compiling DesignSystem Eyebrow.swift
+[11/53] Compiling DesignSystem LargeTitleBar.swift
+[12/53] Compiling DesignSystem MeetPRToastCapsule.swift
+[13/53] Compiling DesignSystem StatBlock.swift
+[14/53] Compiling DesignSystem IconButton.swift
+[15/53] Compiling DesignSystem PrimaryButton.swift
+[16/53] Compiling DesignSystem PrimaryButtonLabel.swift
+[17/53] Compiling DesignSystem SecondaryButton.swift
+[18/53] Compiling DesignSystem Card.swift
+[19/53] Compiling DesignSystem CardSurface.swift
+[20/53] Compiling DesignSystem ElevatedCard.swift
+[21/53] Compiling DesignSystem ExerciseCard.swift
+[22/53] Compiling DesignSystem ExerciseCardHeader.swift
+[23/53] Compiling DesignSystem ExerciseCardPreviews.swift
+[24/53] Compiling DesignSystem StatTile.swift
+[25/53] Compiling DesignSystem MeetPRListRow.swift
+[26/53] Compiling DesignSystem MeetPRTabBar.swift
+[27/53] Compiling DesignSystem SetReadOnlyCell.swift
+[28/53] Compiling DesignSystem InitialAvatar.swift
+[29/53] Compiling DesignSystem PRBadge.swift
+[30/53] Compiling DesignSystem StatusBadge.swift
+[31/53] Compiling DesignSystem MeetPRMark.swift
+[32/53] Compiling DesignSystem PlateVisual+Previews.swift
+[33/53] Compiling DesignSystem CapacityIntensityChart.swift
+[34/53] Compiling DesignSystem E1RMChart.swift
+[35/53] Compiling DesignSystem GoldProgressBar.swift
+[36/53] Compiling DesignSystem ProgressSegments.swift
+[37/53] Compiling DesignSystem Sparkline.swift
+[38/53] Compiling DesignSystem PlateVisual.swift
+[39/53] Compiling DesignSystem BrandPrimaryButton.swift
+[40/53] Compiling DesignSystem DangerButton.swift
+[41/53] Compiling DesignSystem GoldCTA.swift
+[42/53] Compiling DesignSystem HeaderChatButton.swift
+[43/53] Compiling DesignSystem DayChip.swift
+[44/53] Compiling DesignSystem MeetPRNumberPad.swift
+[45/53] Compiling DesignSystem MeetPRTextField.swift
+[46/53] Compiling DesignSystem NumericInput.swift
+[47/53] Compiling DesignSystem RPESlider.swift
+[48/53] Compiling DesignSystem SetRow.swift
+[49/53] Compiling DesignSystem DesignSystemDemo.swift
+[50/53] Compiling DesignSystem CelebrationEffects.swift
+[51/53] Compiling DesignSystem ShimmerOverlay.swift
+[52/69] Compiling DesignSystemTests PlateLoadoutAccessibilityTests.swift
+[53/69] Compiling DesignSystemTests RadiusTests.swift
+[54/70] Compiling DesignSystemTests NumberPadShortcutTests.swift
+[55/70] Compiling DesignSystemTests PlateBreakdownTests.swift
+[56/70] Compiling DesignSystemTests LocalizationCatalogTestSupport.swift
+[57/70] Compiling DesignSystemTests MotionTests.swift
+[58/70] Compiling DesignSystemTests TraditionalChineseCatalogTests.swift
+[59/70] Compiling DesignSystemTests ComponentsSmokeTests.swift
+[60/70] Compiling DesignSystemTests DesignSystemDemoTests.swift
+[61/70] Compiling DesignSystemTests TypographyTests.swift
+[62/70] Compiling DesignSystemTests SetReadOnlyCellTests.swift
+[63/70] Compiling DesignSystemTests SpacingTests.swift
+[64/70] Emitting module DesignSystemTests
+[65/70] Compiling DesignSystemTests AppearanceTests.swift
+[66/70] Compiling DesignSystemTests ColorsTests.swift
+[67/70] Compiling DesignSystemTests VisualEffectsTests.swift
+[68/70] Compiling DesignSystemTests W1ContractTests.swift
+[68/70] Write Objects.LinkFileList
+[69/70] Linking DesignSystemPackageTests
+Build complete! (10.33s)
+Test Suite 'All tests' started at 2026-11-05 06:15:43.892.
+Test Suite 'All tests' passed at 2026-11-05 06:15:43.895.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "NumberPad snapping" started.
+◇ Suite TraditionalChineseCatalogTests started.
+◇ Suite "MeetPR spacing tokens" started.
+◇ Suite "MeetPR typography tokens" started.
+◇ Suite "MeetPR black-gold color tokens" started.
+◇ Suite "MeetPR component smoke tests" started.
+◇ Suite MeetPRAppearanceTests started.
+◇ Suite "MeetPR radius tokens" started.
+◇ Suite "W1 PlateVisual source contracts" started.
+◇ Suite "MeetPR v3 visual-effect tokens" started.
+◇ Suite "MeetPR motion tokens" started.
+◇ Suite "Design system demo" started.
+◇ Suite "Number pad shortcuts" started.
+◇ Suite "Plate breakdown" started.
+◇ Suite "SetReadOnlyCell" started.
+◇ Test "Reps snap to whole values within bounds" started.
+◇ Test rirKeypadKeepsZeroAndTwoInsteadOfApplyingRPEFloor() started.
+◇ Test "sync failure tokens use the approved orange in both themes" started.
+◇ Test "Weight snaps by quarter kilo within bounds" started.
+◇ Test "gold tokens match both v3 themes" started.
+◇ Suite "W1 v3 component contracts" started.
+◇ Suite PlateLoadoutAccessibilityTests started.
+◇ Test "PostScript names match inspected font assets" started.
+◇ Test "text tokens match both v3 themes" started.
+◇ Test "missing custom font resolves to the system fallback branch" started.
+◇ Test "surface tokens match both v3 themes" started.
+◇ Test "BrandPrimaryButton instantiates" started.
+◇ Test "MeetPRTabBar preserves student defaults and supports a coach palette" started.
+◇ Test "IconButton instantiates" started.
+◇ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() started.
+◇ Test "Accessory weight floor of 0 allows sub-20 loads" started.
+◇ Test "MeetPRTextField instantiates" started.
+◇ Test "mockup shell tokens match both v3 themes" started.
+◇ Test "GoldCTA instantiates all variants" started.
+◇ Test "border tokens match both v3 themes" started.
+◇ Test "ElevatedCard instantiates" started.
+◇ Test "Eyebrow instantiates" started.
+◇ Test "MeetPRListRow instantiates" started.
+◇ Test "semantic tokens match both v3 themes" started.
+◇ Test "SecondaryButton instantiates" started.
+◇ Test "StatTile instantiates" started.
+◇ Test "SetRow instantiates" started.
+◇ Test "RPESlider instantiates" started.
+◇ Test "Card instantiates" started.
+◇ Test "tracking values match the black-gold labels" started.
+◇ Test "PrimaryButton instantiates" started.
+◇ Test defaultPreferenceIsLight() started.
+◇ Test labelsAreStable() started.
+◇ Test explicitCasesPinTheirScheme() started.
+◇ Test systemFollowsDeviceAppearance() started.
+◇ Test "font sizes match the complete mockup type scale" started.
+◇ Test "StatusBadge instantiates" started.
+◇ Test "weight unit exposes both supported cases" started.
+◇ Test "InitialAvatar instantiates" started.
+◇ Test "PRBadge instantiates" started.
+◇ Test "NumericInput instantiates" started.
+◇ Test "surviving curves match feedback and reward transitions" started.
+◇ Test "roll-up keyframes match the mockup's WAAPI segments" started.
+◇ Test unknownStoredValueFallsBackToSystem() started.
+◇ Test "radius values match the six-step v3 scale" started.
+◇ Test "roll-up haptics preserve the mockup's vibrate pattern" started.
+◇ Test "Untouched localized weight keeps its original value" started.
+◇ Test "headline emboss preserves both theme recipes" started.
+◇ Test "timing values match the interactive dark mockup" started.
+◇ Test "Untouched accessory weight and RPE keep their decimals" started.
+◇ Test "ExerciseCard instantiates" started.
+◇ Test "demo catalog instantiates" started.
+◇ Test "Next and sync forward the untouched value" started.
+◇ Test "CTA and shadow tokens match both v3 themes" started.
+◇ Test "DangerButton instantiates" started.
+◇ Test "SE_SPEC and SE_DIM tables are complete" started.
+◇ Test "CTA molds preserve every CSS shadow layer" started.
+◇ Test "Collars subtract 2.5kg per side without changing plate rules" started.
+◇ Test "Every 0.25kg input uses valid descending denominations" started.
+◇ Test "20kg and 500kg boundaries are clamped" started.
+◇ Test "175kg greedily loads three 25s and a 2.5 per side" started.
+◇ Test "20kg is an empty bar" started.
+◇ Test "Accessibility text matches empty, collar-only, and loaded branches" started.
+◇ Test "celebration sparks are eighteen particles staggered in six lanes" started.
+◇ Test "Plate and steel gradient locations match source" started.
+◇ Test "Typed keypad decimal replaces the localized placeholder" started.
+◇ Test "spacing values match the 4pt black-gold grid" started.
+◇ Test "zero-based first set renders hash one" started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Untouched localized weight keeps its original value" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Untouched localized weight keeps its original value" started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Untouched accessory weight and RPE keep their decimals" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Untouched accessory weight and RPE keep their decimals" started.
+◇ Test case passing 1 argument title → "Next" to "Next and sync forward the untouched value" started.
+◇ Test case passing 1 argument title → "Sync" to "Next and sync forward the untouched value" started.
+◇ Test "ExerciseCard collapsed source and canonical radius are locked" started.
+◇ Test "SetRow and GoldCTA SVG metrics match dc source" started.
+◇ Test "ExerciseCard partial recorded sets still produce a receipt" started.
+◇ Test "Frozen W0 entries retain legacy parameters" started.
+◇ Test "English count-sensitive copy has singular variants" started.
+◇ Test "Product/presentation defaults are mapped without data defaults" started.
+◇ Test "ExerciseCard summary includes failed-set suffix" started.
+◇ Test "StatTile accepts String, Double, and Int values" started.
+◇ Test collarOnlyLoadStillAnnouncesCollar() started.
+◇ Test labelIncludesCollarOnlyWhenShown() started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Typed keypad decimal replaces the localized placeholder" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Typed keypad decimal replaces the localized placeholder" started.
+✔ Test "missing custom font resolves to the system fallback branch" passed after 0.057 seconds.
+✔ Test "PostScript names match inspected font assets" passed after 0.057 seconds.
+✔ Test "tracking values match the black-gold labels" passed after 0.057 seconds.
+✔ Test defaultPreferenceIsLight() passed after 0.057 seconds.
+✔ Test explicitCasesPinTheirScheme() passed after 0.057 seconds.
+✔ Test systemFollowsDeviceAppearance() passed after 0.057 seconds.
+✔ Test "font sizes match the complete mockup type scale" passed after 0.057 seconds.
+✔ Test "surviving curves match feedback and reward transitions" passed after 0.057 seconds.
+✔ Test "roll-up keyframes match the mockup's WAAPI segments" passed after 0.057 seconds.
+✔ Test "roll-up haptics preserve the mockup's vibrate pattern" passed after 0.057 seconds.
+✔ Test "headline emboss preserves both theme recipes" passed after 0.057 seconds.
+✔ Test unknownStoredValueFallsBackToSystem() passed after 0.057 seconds.
+✔ Test "radius values match the six-step v3 scale" passed after 0.057 seconds.
+✔ Test "timing values match the interactive dark mockup" passed after 0.057 seconds.
+✔ Test labelsAreStable() passed after 0.057 seconds.
+✔ Test "SE_SPEC and SE_DIM tables are complete" passed after 0.057 seconds.
+✔ Test "CTA molds preserve every CSS shadow layer" passed after 0.057 seconds.
+✔ Test "Collars subtract 2.5kg per side without changing plate rules" passed after 0.057 seconds.
+✔ Test "Every 0.25kg input uses valid descending denominations" passed after 0.057 seconds.
+✔ Test "20kg and 500kg boundaries are clamped" passed after 0.057 seconds.
+✔ Test "175kg greedily loads three 25s and a 2.5 per side" passed after 0.057 seconds.
+✔ Test "20kg is an empty bar" passed after 0.057 seconds.
+✔ Test "celebration sparks are eighteen particles staggered in six lanes" passed after 0.057 seconds.
+✔ Test "Plate and steel gradient locations match source" passed after 0.057 seconds.
+✔ Test "spacing values match the 4pt black-gold grid" passed after 0.056 seconds.
+✔ Test "Weight snaps by quarter kilo within bounds" passed after 0.058 seconds.
+✔ Test "Reps snap to whole values within bounds" passed after 0.058 seconds.
+✔ Test rirKeypadKeepsZeroAndTwoInsteadOfApplyingRPEFloor() passed after 0.058 seconds.
+✔ Test "Accessory weight floor of 0 allows sub-20 loads" passed after 0.058 seconds.
+✔ Suite "MeetPR typography tokens" passed after 0.058 seconds.
+✔ Suite MeetPRAppearanceTests passed after 0.058 seconds.
+✔ Suite "MeetPR motion tokens" passed after 0.058 seconds.
+✔ Suite "MeetPR v3 visual-effect tokens" passed after 0.059 seconds.
+✔ Suite "MeetPR radius tokens" passed after 0.059 seconds.
+✔ Suite "W1 PlateVisual source contracts" passed after 0.059 seconds.
+✔ Suite "MeetPR spacing tokens" passed after 0.059 seconds.
+✔ Suite "NumberPad snapping" passed after 0.059 seconds.
+✔ Test "Accessibility text matches empty, collar-only, and loaded branches" passed after 0.060 seconds.
+✔ Suite "Plate breakdown" passed after 0.062 seconds.
+✔ Test "mockup shell tokens match both v3 themes" passed after 0.067 seconds.
+✔ Test "text tokens match both v3 themes" passed after 0.068 seconds.
+✔ Test "sync failure tokens use the approved orange in both themes" passed after 0.068 seconds.
+✔ Test "border tokens match both v3 themes" passed after 0.068 seconds.
+✔ Test "surface tokens match both v3 themes" passed after 0.068 seconds.
+✔ Test "gold tokens match both v3 themes" passed after 0.068 seconds.
+✔ Test "CTA and shadow tokens match both v3 themes" passed after 0.067 seconds.
+✔ Test "semantic tokens match both v3 themes" passed after 0.068 seconds.
+✔ Suite "MeetPR black-gold color tokens" passed after 0.069 seconds.
+✔ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() passed after 0.132 seconds.
+✔ Suite TraditionalChineseCatalogTests passed after 0.133 seconds.
+✔ Test "ElevatedCard instantiates" passed after 0.164 seconds.
+✔ Test "MeetPRTextField instantiates" passed after 0.164 seconds.
+✔ Test "MeetPRListRow instantiates" passed after 0.164 seconds.
+✔ Test "BrandPrimaryButton instantiates" passed after 0.164 seconds.
+✔ Test "Eyebrow instantiates" passed after 0.164 seconds.
+✔ Test "IconButton instantiates" passed after 0.164 seconds.
+✔ Test "Card instantiates" passed after 0.164 seconds.
+✔ Test "MeetPRTabBar preserves student defaults and supports a coach palette" passed after 0.164 seconds.
+✔ Test "SecondaryButton instantiates" passed after 0.164 seconds.
+✔ Test "RPESlider instantiates" passed after 0.164 seconds.
+✔ Test "GoldCTA instantiates all variants" passed after 0.164 seconds.
+✔ Test "StatTile instantiates" passed after 0.164 seconds.
+✔ Test "PrimaryButton instantiates" passed after 0.164 seconds.
+✔ Test "PRBadge instantiates" passed after 0.164 seconds.
+✔ Test "SetRow instantiates" passed after 0.164 seconds.
+✔ Test "InitialAvatar instantiates" passed after 0.164 seconds.
+✔ Test "StatusBadge instantiates" passed after 0.164 seconds.
+✔ Test "NumericInput instantiates" passed after 0.164 seconds.
+✔ Test "weight unit exposes both supported cases" passed after 0.164 seconds.
+✔ Test "ExerciseCard instantiates" passed after 0.164 seconds.
+✔ Test "DangerButton instantiates" passed after 0.164 seconds.
+✔ Test "demo catalog instantiates" passed after 0.164 seconds.
+✔ Test "Next and sync forward the untouched value" with 2 test cases passed after 0.164 seconds.
+✔ Test "Untouched accessory weight and RPE keep their decimals" with 2 test cases passed after 0.164 seconds.
+✔ Test "Untouched localized weight keeps its original value" with 2 test cases passed after 0.164 seconds.
+✔ Suite "Design system demo" passed after 0.165 seconds.
+✔ Suite "MeetPR component smoke tests" passed after 0.165 seconds.
+✔ Test "zero-based first set renders hash one" passed after 0.167 seconds.
+✔ Test "Typed keypad decimal replaces the localized placeholder" with 2 test cases passed after 0.167 seconds.
+✔ Test "ExerciseCard partial recorded sets still produce a receipt" passed after 0.156 seconds.
+✔ Test "ExerciseCard collapsed source and canonical radius are locked" passed after 0.156 seconds.
+✔ Test "English count-sensitive copy has singular variants" passed after 0.155 seconds.
+✔ Test "Product/presentation defaults are mapped without data defaults" passed after 0.155 seconds.
+✔ Test labelIncludesCollarOnlyWhenShown() passed after 0.111 seconds.
+✔ Test "ExerciseCard summary includes failed-set suffix" passed after 0.155 seconds.
+✔ Test "Frozen W0 entries retain legacy parameters" passed after 0.155 seconds.
+✔ Test "StatTile accepts String, Double, and Int values" passed after 0.111 seconds.
+✔ Test collarOnlyLoadStillAnnouncesCollar() passed after 0.111 seconds.
+✔ Test "SetRow and GoldCTA SVG metrics match dc source" passed after 0.156 seconds.
+✔ Suite "Number pad shortcuts" passed after 0.168 seconds.
+✔ Suite "SetReadOnlyCell" passed after 0.168 seconds.
+✔ Suite PlateLoadoutAccessibilityTests passed after 0.169 seconds.
+✔ Suite "W1 v3 component contracts" passed after 0.168 seconds.
+✔ Test run with 76 tests in 17 suites passed after 0.169 seconds.

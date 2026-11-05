@@ -36,6 +36,7 @@ import Testing
     plans: plans, logs: InMemoryStudentTrainingLogRepository(added: [log]))
   await model.load(dayID: plan.days[0].id, studentID: StudentDemoSeed.studentID)
   #expect(model.currentDrafts?.first(where: \.isStudentAdded)?.loggedSetID == log.id)
+  #expect(model.actionErrorMessage == nil)
   await model.load(dayID: plan.days[0].id, studentID: StudentDemoSeed.studentID)
   #expect(model.currentDrafts?.first(where: \.isStudentAdded)?.exerciseName == exercise.name)
 }

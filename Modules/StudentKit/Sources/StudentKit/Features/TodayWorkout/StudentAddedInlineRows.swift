@@ -38,7 +38,7 @@ struct StudentAddedInlineRows: View {
             })
           if editable {
             Button(StudentStrings.localized(.addedRemoveSet), systemImage: "xmark") {
-              if draft.loggedSetID == nil {
+              if !draft.hasSavedRecord {
                 Task { await viewModel.removeStudentRow(id: draft.id) }
               } else {
                 removal = draft.id

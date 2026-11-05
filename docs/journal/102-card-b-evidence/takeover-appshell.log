@@ -1,0 +1,333 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/7] Compiling AppShell RootView.swift
+[4/7] Compiling AppShell resource_bundle_accessor.swift
+[5/7] Emitting module AppShell
+[6/8] Compiling AppShell RootView+Push.swift
+[7/32] Compiling AppShellTests DemoAuthRepositoryTests.swift
+[8/32] Compiling AppShellTests DemoSessionBootstrapTests.swift
+[9/32] Compiling AppShellTests DemoTokenStoreTests.swift
+[10/34] Compiling AppShellTests MinimumVersionGateTests.swift
+[11/34] Compiling AppShellTests PushRegistrarTests.swift
+[12/34] Compiling AppShellTests TokenStoreTests.swift
+[13/34] Compiling AppShellTests ChatSessionControllerTests.swift
+[14/34] Compiling AppShellTests AuthRepositoryTests.swift
+[15/34] Compiling AppShellTests AuthTestSupport.swift
+[16/34] Compiling AppShellTests ChinaEmailRegistrationTests.swift
+[17/34] Compiling AppShellTests GlobalAuthViewModelTests.swift
+[18/34] Compiling AppShellTests GlobalAuthViewTests.swift
+[19/34] Compiling AppShellTests GlobalOAuthTests.swift
+[20/34] Compiling AppShellTests AnalyticsPrivacyNoticeTests.swift
+[21/34] Compiling AppShellTests AuthFlowSnapshotTests.swift
+[22/34] Compiling AppShellTests AuthFormViewModelTests.swift
+[23/34] Compiling AppShellTests ChatSessionRealtimeLifecycleTests.swift
+[24/34] Compiling AppShellTests DemoChatSeedTests.swift
+[25/34] Compiling AppShellTests PlanProjectionIntegrationTests.swift
+[26/34] Compiling AppShellTests LocalizationCatalogTestSupport.swift
+[27/34] Emitting module AppShellTests
+[28/34] Compiling AppShellTests GlobalSessionTests.swift
+[29/34] Compiling AppShellTests SessionRefreshHardFailureTests.swift
+[30/34] Compiling AppShellTests SessionTests.swift
+[31/34] Compiling AppShellTests PushRegistrationStateMachineTests.swift
+[32/34] Compiling AppShellTests StudentE1RMMigrationGateTests.swift
+[32/34] Write Objects.LinkFileList
+[33/34] Linking AppShellPackageTests
+Build complete! (7.18s)
+Test Suite 'All tests' started at 2026-11-05 07:48:04.633.
+Test Suite 'All tests' passed at 2026-11-05 07:48:04.634.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test inMemoryTokenStoreOverwritesTokens() started.
+◇ Test signupPreservesGlobalE164PhoneNumber() started.
+◇ Test demoRefreshReturnsSeededTokenPair() started.
+◇ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() started.
+◇ Test forgotPasswordSuccessInvokesLoginMessageCallback() started.
+◇ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() started.
+◇ Test globalEmailLoginAuthenticatesCoachedStudent() started.
+◇ Test activationWithoutRealtimeFactoryProducesNoClient() started.
+◇ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() started.
+◇ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() started.
+◇ Test signupRequiresRoleButLoginDoesNot() started.
+◇ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() started.
+◇ Test keychainTokenStoreSavesReadsAndClearsTokens() started.
+◇ Test inMemoryTokenStoreSavesAndLoadsTokens() started.
+◇ Test changingSignupEmailClearsCodeReceiptAndCooldown() started.
+◇ Test signupAuthenticatesAndPersistsTokens() started.
+◇ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test demoSignupReturnsSeededCoachAndTokens() started.
+◇ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() started.
+◇ Test inMemoryTokenStoreSavesAndLoadsCachedUser() started.
+◇ Test demoTokenStoreCachesInjectedUser() started.
+◇ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test demoTokenStoreStartsWithAccessToken() started.
+◇ Test deniedAuthorizationDoesNotRequestAgain() started.
+◇ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() started.
+◇ Test demoTokenStoreStartsWithCachedCoach() started.
+◇ Test forgotPasswordStartsAtEmailStep() started.
+◇ Test lateStudentActivationCannotPublishAfterLogout() started.
+◇ Test failedUploadRetriesOnNextActivation() started.
+◇ Test submitSuccessAuthenticatesThroughSession() started.
+◇ Test resetCodeAcceptsOnlySixASCIIDigits() started.
+◇ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() started.
+◇ Test chinaRegistrationPassesCodeThroughSessionAndRepository() started.
+◇ Test demoSessionRefreshDoesNotThrow() started.
+◇ Test mapsAuthErrorsToChineseToastMessages() started.
+◇ Test passwordStartsMaskedWithAReachableRevealButton() started.
+◇ Test loginViewOmitsDeferredAndDeadEndActions() started.
+◇ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() started.
+◇ Test validatesPasswordLengthAndBcryptByteLimit() started.
+◇ Test mapsInvalidCredentialsErrorCode() started.
+◇ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() started.
+◇ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() started.
+◇ Test authFlowRoutesGlobalTrackToGlobalLogin() started.
+◇ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() started.
+◇ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() started.
+◇ Test validatesChineseNationalPhoneNumbers() started.
+◇ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test rejectedAccessTokenRefreshesWithoutLoggingOut() started.
+◇ Test forgotPasswordMovesToCodeThenMapsInvalidCode() started.
+◇ Test chinaBootstrapNeverReportsTimezone() started.
+◇ Test deviceTokenConvertsToLowercaseTwoDigitHex() started.
+◇ Test appleNonceHashUsesLowercaseSHA256Hex() started.
+◇ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() started.
+◇ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() started.
+◇ Test refreshMapsTokenPair() started.
+◇ Test emailTakenOffersSignInAndEditingEmailClearsIt() started.
+◇ Test logoutClearsStoreAndCallsLogoutHookOnce() started.
+◇ Test demoTokenStoreStartsWithRefreshToken() started.
+◇ Test loginAuthenticatesAndPersistsTokens() started.
+◇ Test chinaRegistrationLocksAllInputsDuringSubmission() started.
+◇ Test globalRegistrationHasNoRolePicker() started.
+◇ Test mapsRateLimitedErrorCode() started.
+◇ Test keychainTokenStoreRoundTripsCachedUser() started.
+◇ Test authFlowStartsAtLogin() started.
+◇ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() started.
+◇ Test reminderCannotRequestWithoutAnAuthenticatedSession() started.
+◇ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() started.
+◇ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() started.
+◇ Test loginPrependsChinaCodeAndMapsTokens() started.
+◇ Test coachedStudentCanRequestNotificationsOnceFromAReminderButton() started.
+◇ Test backgroundIntentRecordedBeforeActivationBlocksConnect() started.
+◇ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() started.
+◇ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+◇ Test minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() started.
+◇ Test failedForegroundTimezoneReportRetriesAtNextActivation() started.
+◇ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() started.
+◇ Test forgotPasswordResetStepRendersCodeAndNewPassword() started.
+◇ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() started.
+◇ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() started.
+◇ Test signupCooldownExpiresAndNeverBecomesNegative() started.
+◇ Test signupViewRendersThreeRoleOptions() started.
+◇ Test reloginUploadsAnUnchangedTokenForTheNewSession() started.
+◇ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() started.
+◇ Test changedDeviceTokenUploadsWithinTheSameSession() started.
+◇ Test demoTokenStoreSaveDoesNotOverrideSeededValues() started.
+◇ Test coachBindingInvalidationRouteIsNoOp() started.
+◇ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test globalAuthErrorsHaveHumanReadableMessages() started.
+◇ Test coachedStudentWaitsForAnExplicitNotificationRequest() started.
+◇ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() started.
+◇ Test demoTokenStoreClearKeepsSeededValues() started.
+◇ Test bootstrapReportsTimezoneOnlyWhenItDrifts() started.
+◇ Test loginSubmitIsDisabledForEmptyForm() started.
+◇ Test loginViewRendersPhonePasswordAndSubmitButton() started.
+◇ Test submitFailureStopsLoadingAndStoresToast() started.
+◇ Test demoLoginReturnsInjectedUser() started.
+◇ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() started.
+◇ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() started.
+◇ Test case passing 1 argument role → .selfTrainStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test case passing 1 argument role → .coachedStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test logoutRunsCleanupBeforeClearingAccessToken() started.
+◇ Test validationErrorToastUsesFirstBackendIssue() started.
+◇ Test forgotPasswordInvalidCodeRendersToast() started.
+◇ Test case passing 1 argument error → .network to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test globalRegistrationUsesFixedCoachedStudentRole() started.
+◇ Test demoLoginReturnsSeededCoachAndTokens() started.
+◇ Test demoRefreshIsDeterministic() started.
+◇ Test demoSessionBootstrapAuthenticatesSeededCoach() started.
+◇ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() started.
+◇ Test appleChallengeIsHashedBeforeAuthorizationRequest() started.
+◇ Test mapsPhoneTakenErrorCode() started.
+◇ Test globalGoogleLoginPassesIDTokenThroughSession() started.
+◇ Test inMemoryTokenStoreClearRemovesTokensAndUser() started.
+◇ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() started.
+◇ Test cancellingAppleSignInDoesNotShowErrorToast() started.
+◇ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() started.
+◇ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() started.
+◇ Test bindAcceptedPushRefreshesTheGateEvenBeforeAuthentication() started.
+◇ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() started.
+◇ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() started.
+◇ Test authorizedCoachedStudentStillRegistersAndUploadsDeviceToken() started.
+◇ Test signupPrependsChinaCodeAndMapsUserDefaults() started.
+◇ Test mapsValidationErrorIssues() started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .decoding to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .invalidRefresh to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .refreshExpired to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .validationError to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+✔ Test inMemoryTokenStoreOverwritesTokens() passed after 0.003 seconds.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument code → .invalidRefresh to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument code → .refreshExpired to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .validationError to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument role → .coach to otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+◇ Test case passing 1 argument role → .selfTrainStudent to otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+✔ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() passed after 0.005 seconds.
+◇ Test case passing 1 argument outcome → "timeout" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "belowMinimum" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "current" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "malformed" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "http" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "negative" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+✔ Test inMemoryTokenStoreSavesAndLoadsTokens() passed after 0.005 seconds.
+◇ Test case passing 1 argument track → .global to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test case passing 1 argument track → .china to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+✔ Test inMemoryTokenStoreSavesAndLoadsCachedUser() passed after 0.005 seconds.
+◇ Test case passing 1 argument error → .network to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .decoding to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+✔ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() passed after 0.006 seconds.
+✔ Test deniedAuthorizationDoesNotRequestAgain() passed after 0.005 seconds.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+✔ Test failedUploadRetriesOnNextActivation() passed after 0.005 seconds.
+✔ Test resetCodeAcceptsOnlySixASCIIDigits() passed after 0.006 seconds.
+✔ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() passed after 0.006 seconds.
+✔ Test appleNonceHashUsesLowercaseSHA256Hex() passed after 0.005 seconds.
+✔ Test deviceTokenConvertsToLowercaseTwoDigitHex() passed after 0.006 seconds.
+✔ Test refreshMapsTokenPair() passed after 0.006 seconds.
+✔ Test demoTokenStoreCachesInjectedUser() passed after 0.006 seconds.
+✔ Test demoTokenStoreStartsWithRefreshToken() passed after 0.005 seconds.
+✔ Test demoTokenStoreStartsWithCachedCoach() passed after 0.006 seconds.
+✔ Test demoRefreshReturnsSeededTokenPair() passed after 0.006 seconds.
+✔ Test demoSignupReturnsSeededCoachAndTokens() passed after 0.006 seconds.
+✔ Test coachedStudentCanRequestNotificationsOnceFromAReminderButton() passed after 0.005 seconds.
+✔ Test demoTokenStoreStartsWithAccessToken() passed after 0.006 seconds.
+✔ Test reminderCannotRequestWithoutAnAuthenticatedSession() passed after 0.005 seconds.
+✔ Test otherRolesStillRequestNotificationPermissionOnActivation(role:) with 2 test cases passed after 0.005 seconds.
+✔ Test mapsInvalidCredentialsErrorCode() passed after 0.006 seconds.
+✔ Test reloginUploadsAnUnchangedTokenForTheNewSession() passed after 0.005 seconds.
+✔ Test mapsRateLimitedErrorCode() passed after 0.005 seconds.
+✔ Test demoTokenStoreSaveDoesNotOverrideSeededValues() passed after 0.005 seconds.
+✔ Test coachBindingInvalidationRouteIsNoOp() passed after 0.005 seconds.
+✔ Test coachedStudentWaitsForAnExplicitNotificationRequest() passed after 0.005 seconds.
+✔ Test changedDeviceTokenUploadsWithinTheSameSession() passed after 0.005 seconds.
+✔ Test demoTokenStoreClearKeepsSeededValues() passed after 0.005 seconds.
+✔ Test loginPrependsChinaCodeAndMapsTokens() passed after 0.005 seconds.
+✔ Test signupPreservesGlobalE164PhoneNumber() passed after 0.006 seconds.
+✔ Test demoLoginReturnsInjectedUser() passed after 0.005 seconds.
+✔ Test demoRefreshIsDeterministic() passed after 0.004 seconds.
+✔ Test inMemoryTokenStoreClearRemovesTokensAndUser() passed after 0.004 seconds.
+✔ Test demoLoginReturnsSeededCoachAndTokens() passed after 0.004 seconds.
+✔ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() passed after 0.005 seconds.
+✔ Test mapsPhoneTakenErrorCode() passed after 0.004 seconds.
+✔ Test authorizedCoachedStudentStillRegistersAndUploadsDeviceToken() passed after 0.004 seconds.
+✔ Test signupPrependsChinaCodeAndMapsUserDefaults() passed after 0.004 seconds.
+✔ Test mapsValidationErrorIssues() passed after 0.004 seconds.
+✔ Test globalAuthErrorsHaveHumanReadableMessages() passed after 0.005 seconds.
+✔ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() passed after 0.008 seconds.
+✔ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() passed after 0.022 seconds.
+✔ Test keychainTokenStoreRoundTripsCachedUser() passed after 0.028 seconds.
+✔ Test keychainTokenStoreSavesReadsAndClearsTokens() passed after 0.038 seconds.
+✔ Test signupRequiresRoleButLoginDoesNot() passed after 0.292 seconds.
+✔ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) with 2 test cases passed after 0.292 seconds.
+✔ Test forgotPasswordStartsAtEmailStep() passed after 0.312 seconds.
+✔ Test passwordStartsMaskedWithAReachableRevealButton() passed after 0.333 seconds.
+✔ Test loginViewOmitsDeferredAndDeadEndActions() passed after 0.349 seconds.
+✔ Test validatesPasswordLengthAndBcryptByteLimit() passed after 0.349 seconds.
+✔ Test mapsAuthErrorsToChineseToastMessages() passed after 0.349 seconds.
+✔ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() passed after 0.349 seconds.
+✔ Test authFlowRoutesGlobalTrackToGlobalLogin() passed after 0.428 seconds.
+✔ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() passed after 0.434 seconds.
+✔ Test validatesChineseNationalPhoneNumbers() passed after 0.434 seconds.
+✔ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() passed after 0.480 seconds.
+✔ Test chinaRegistrationLocksAllInputsDuringSubmission() passed after 0.497 seconds.
+✔ Test globalRegistrationHasNoRolePicker() passed after 0.511 seconds.
+✔ Test authFlowStartsAtLogin() passed after 0.558 seconds.
+✔ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() passed after 0.638 seconds.
+✔ Test signupViewRendersThreeRoleOptions() passed after 0.715 seconds.
+✔ Test forgotPasswordResetStepRendersCodeAndNewPassword() passed after 0.732 seconds.
+✔ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) with 2 test cases passed after 0.772 seconds.
+✔ Test loginSubmitIsDisabledForEmptyForm() passed after 0.776 seconds.
+✔ Test loginViewRendersPhonePasswordAndSubmitButton() passed after 0.842 seconds.
+✔ Test validationErrorToastUsesFirstBackendIssue() passed after 0.843 seconds.
+✔ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() passed after 0.843 seconds.
+✔ Test bindAcceptedPushRefreshesTheGateEvenBeforeAuthentication() passed after 0.842 seconds.
+✔ Test activationWithoutRealtimeFactoryProducesNoClient() passed after 0.864 seconds.
+✔ Test changingSignupEmailClearsCodeReceiptAndCooldown() passed after 0.864 seconds.
+✔ Test demoSessionRefreshDoesNotThrow() passed after 0.864 seconds.
+✔ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() passed after 0.863 seconds.
+✔ Test signupCooldownExpiresAndNeverBecomesNegative() passed after 0.863 seconds.
+✔ Test forgotPasswordInvalidCodeRendersToast() passed after 0.866 seconds.
+✔ Test appleChallengeIsHashedBeforeAuthorizationRequest() passed after 0.865 seconds.
+✔ Test forgotPasswordSuccessInvokesLoginMessageCallback() passed after 0.881 seconds.
+✔ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() passed after 0.882 seconds.
+✔ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() passed after 0.884 seconds.
+✔ Test forgotPasswordMovesToCodeThenMapsInvalidCode() passed after 0.889 seconds.
+✔ Test emailTakenOffersSignInAndEditingEmailClearsIt() passed after 0.888 seconds.
+✔ Test submitFailureStopsLoadingAndStoresToast() passed after 0.888 seconds.
+✔ Test demoSessionBootstrapAuthenticatesSeededCoach() passed after 0.887 seconds.
+✔ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() passed after 0.887 seconds.
+✔ Test cancellingAppleSignInDoesNotShowErrorToast() passed after 0.887 seconds.
+✔ Test submitSuccessAuthenticatesThroughSession() passed after 0.891 seconds.
+✔ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() passed after 0.891 seconds.
+✔ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() passed after 0.891 seconds.
+✔ Test minimumVersionGateShowsAppUntilResponse(outcome:) with 6 test cases passed after 0.902 seconds.
+✔ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() passed after 0.909 seconds.
+✔ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() passed after 0.911 seconds.
+✔ Test globalRegistrationUsesFixedCoachedStudentRole() passed after 0.910 seconds.
+✔ Test chinaBootstrapNeverReportsTimezone() passed after 0.914 seconds.
+✔ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) with 4 test cases passed after 0.914 seconds.
+✔ Test chinaRegistrationPassesCodeThroughSessionAndRepository() passed after 0.914 seconds.
+✔ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() passed after 0.914 seconds.
+✔ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() passed after 0.914 seconds.
+✔ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() passed after 0.914 seconds.
+✔ Test signupAuthenticatesAndPersistsTokens() passed after 0.914 seconds.
+✔ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() passed after 0.913 seconds.
+✔ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() passed after 0.912 seconds.
+✔ Test loginAuthenticatesAndPersistsTokens() passed after 0.914 seconds.
+✔ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) with 6 test cases passed after 0.914 seconds.
+✔ Test logoutRunsCleanupBeforeClearingAccessToken() passed after 0.913 seconds.
+✔ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) with 3 test cases passed after 0.914 seconds.
+✔ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() passed after 0.913 seconds.
+✔ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) with 3 test cases passed after 0.913 seconds.
+✔ Test globalEmailLoginAuthenticatesCoachedStudent() passed after 0.914 seconds.
+✔ Test logoutClearsStoreAndCallsLogoutHookOnce() passed after 0.914 seconds.
+✔ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() passed after 0.912 seconds.
+✔ Test bootstrapReportsTimezoneOnlyWhenItDrifts() passed after 0.913 seconds.
+✔ Test failedForegroundTimezoneReportRetriesAtNextActivation() passed after 0.913 seconds.
+✔ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() passed after 0.914 seconds.
+✔ Test rejectedAccessTokenRefreshesWithoutLoggingOut() passed after 0.914 seconds.
+✔ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() passed after 0.914 seconds.
+✔ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() passed after 0.913 seconds.
+✔ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) with 4 test cases passed after 0.913 seconds.
+✔ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() passed after 0.914 seconds.
+✔ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) with 6 test cases passed after 0.914 seconds.
+✔ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() passed after 0.915 seconds.
+✔ Test globalGoogleLoginPassesIDTokenThroughSession() passed after 0.913 seconds.
+✔ Test lateStudentActivationCannotPublishAfterLogout() passed after 0.915 seconds.
+✔ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() passed after 0.915 seconds.
+✔ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() passed after 0.921 seconds.
+✔ Test backgroundIntentRecordedBeforeActivationBlocksConnect() passed after 0.921 seconds.
+✔ Test run with 125 tests in 0 suites passed after 0.922 seconds.

@@ -48,6 +48,7 @@ public struct BindGateView<
     evaluations: (any EvaluationRepository)? = nil,
     notificationPermission: StudentNotificationPermissionActions = .init(),
     bindingRefreshRevision: Int = 0,
+    hasCachedTraining: (@MainActor @Sendable () async -> Bool)? = nil,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     onboardingProfile: @escaping @Sendable () async -> OnboardingProfile? = { nil },
     onLogout: (@MainActor () async -> Void)? = nil,
@@ -77,6 +78,7 @@ public struct BindGateView<
         stash: stash,
         isOnboardingComplete: isOnboardingComplete,
         evaluations: evaluations,
+        hasCachedTraining: hasCachedTraining,
         willApplyBindingChange: willApplyBindingChange
       )
     )

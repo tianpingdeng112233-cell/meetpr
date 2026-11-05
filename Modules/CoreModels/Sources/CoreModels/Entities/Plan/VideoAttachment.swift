@@ -21,15 +21,30 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     case failed
   }
 
+  /// Extra rows receive a new draft ID when reconstructed from server logs.
+  public struct SetSlot: Codable, Hashable, Sendable {
+    public let planExerciseID: UUID
+    public let setIndex: Int
+
+    public init(planExerciseID: UUID, setIndex: Int) {
+      self.planExerciseID = planExerciseID
+      self.setIndex = setIndex
+    }
+  }
+
   public let id: UUID
   /// Local association to `StudentSetLog.id` — see the wiring note above.
-  public let setLogID: UUID
+  public var setLogID: UUID
+  /// While non-nil, setLogID is only a local UI key, never a server ID.
+  /// Together with trainingDate this pins a retained recording to its original set.
+  public var pendingDraftID: UUID?
+  public var pendingSetSlot: SetSlot?
   public let studentID: UUID
   /// Backend `attachments.id`, set once `POST /uploads/initiate` succeeded.
   public var remoteAttachmentID: UUID?
   public var status: Status
   public let contentType: String
-  public let durationSeconds: Double
+  public var durationSeconds: Double
   public var sizeBytes: Int64
   /// File name of the exported H.264 video inside the local upload directory.
   public var localFileName: String?
@@ -72,10 +87,14 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     uploadedParts: [VideoUploadedPart] = [],
     uploadRetryCount: Int = 0,
     firstUploadFailureAt: Date? = nil,
-    uploadGeneration: Int? = nil
+    uploadGeneration: Int? = nil,
+    pendingDraftID: UUID? = nil,
+    pendingSetSlot: SetSlot? = nil
   ) {
     self.id = id
     self.setLogID = setLogID
+    self.pendingDraftID = pendingDraftID
+    self.pendingSetSlot = pendingSetSlot
     self.studentID = studentID
     self.remoteAttachmentID = remoteAttachmentID
     self.status = status
@@ -94,9 +113,16 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     self.uploadGeneration = uploadGeneration
   }
 
+  public func awaitsSet(draftID: UUID, trainingDate: Date, slot: SetSlot? = nil) -> Bool {
+    pendingDraftID != nil && self.trainingDate == trainingDate
+      && (pendingDraftID == draftID || (slot != nil && pendingSetSlot == slot))
+  }
+
   private enum CodingKeys: String, CodingKey {
     case id
     case setLogID
+    case pendingDraftID
+    case pendingSetSlot
     case studentID
     case remoteAttachmentID
     case status
@@ -119,6 +145,8 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     id = try container.decode(UUID.self, forKey: .id)
     setLogID = try container.decode(UUID.self, forKey: .setLogID)
+    pendingDraftID = try container.decodeIfPresent(UUID.self, forKey: .pendingDraftID)
+    pendingSetSlot = try container.decodeIfPresent(SetSlot.self, forKey: .pendingSetSlot)
     studentID = try container.decode(UUID.self, forKey: .studentID)
     remoteAttachmentID = try container.decodeIfPresent(UUID.self, forKey: .remoteAttachmentID)
     status = try container.decode(Status.self, forKey: .status)

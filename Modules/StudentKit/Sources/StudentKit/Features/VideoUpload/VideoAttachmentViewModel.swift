@@ -19,9 +19,12 @@ public final class VideoAttachmentViewModel {
   private(set) var hasLoadedAttachments = false
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
+  /// The set draft a processing failure belongs to; nil means it is not tied to one set.
+  private(set) var lastErrorDraftID: UUID?
   public private(set) var retryErrorMessage: String?
+  var missingAttachment: VideoAttachment?
 
-  private let manager: VideoUploadManager
+  let manager: VideoUploadManager
   private let consentDefaults: UserDefaults
   // nonisolated(unsafe) + ObservationIgnored: written only on the main actor;
   // deinit (nonisolated) just cancels it.
@@ -34,7 +37,25 @@ public final class VideoAttachmentViewModel {
   }
 
   public func reportVideoProcessingFailure() {
+    reportVideoProcessingFailure(draftID: nil)
+  }
+
+  func reportVideoProcessingFailure(draftID: UUID?) {
     lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+    lastErrorDraftID = draftID
+  }
+
+  /// A set's entry sheet shows only its own failure, or one not tied to any set.
+  func processingFailureMessage(forDraftID draftID: UUID?) -> String? {
+    guard let lastErrorMessage else { return nil }
+    guard let owner = lastErrorDraftID else { return lastErrorMessage }
+    return owner == draftID ? lastErrorMessage : nil
+  }
+
+  func clearProcessingFailure() {
+    lastErrorMessage = nil
+    lastErrorDraftID = nil
+    retryErrorMessage = nil
   }
 
   deinit {
@@ -68,7 +89,7 @@ public final class VideoAttachmentViewModel {
     guard let attachments = try? await manager.repository.fetchAll(studentID: studentID) else {
       return
     }
-    for attachment in attachments.sorted(by: { $0.recordedAt > $1.recordedAt }) {
+    for attachment in attachments.sorted(by: { $0.recordedAt < $1.recordedAt }) {
       rowStates[attachment.setLogID] = RowState(
         attachment: attachment,
         progress: attachment.status == .uploaded ? 1 : 0
@@ -95,8 +116,9 @@ public final class VideoAttachmentViewModel {
       )
     } catch let error as VideoUploadError {
       lastErrorMessage = Self.message(for: error)
+      lastErrorDraftID = nil
     } catch {
-      lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+      reportVideoProcessingFailure()
     }
   }
 
@@ -129,9 +151,14 @@ public final class VideoAttachmentViewModel {
 
   // MARK: - Internals
 
-  private func apply(_ event: VideoUploadEvent) {
+  func apply(_ event: VideoUploadEvent) {
     switch event {
     case .updated(let attachment, let progress):
+      if let current = rowStates[attachment.setLogID]?.attachment,
+        current.id != attachment.id, current.recordedAt > attachment.recordedAt
+      {
+        return
+      }
       var state =
         rowStates[attachment.setLogID]
         ?? RowState(attachment: attachment, progress: 0)
@@ -146,16 +173,10 @@ public final class VideoAttachmentViewModel {
       }
     case .retryUnavailable(let setLogID, let attachmentID, let reason):
       guard rowStates[setLogID]?.attachment.id == attachmentID else { return }
-      let message = Self.message(for: reason)
-      lastErrorMessage = message
-      retryErrorMessage = message
-    }
-  }
-
-  private static func message(for reason: VideoRetryUnavailableReason) -> String {
-    switch reason {
-    case .sourceMissing:
-      StudentStrings.localized(.videoAttachmentViewModel002)
+      _ = reason
+      missingAttachment = rowStates[setLogID]?.attachment
+      lastErrorMessage = nil
+      retryErrorMessage = nil
     }
   }
 

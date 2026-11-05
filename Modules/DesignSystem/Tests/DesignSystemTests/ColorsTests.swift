@@ -32,6 +32,14 @@ private enum ColorTestError: Error {
 
 @Suite("MeetPR black-gold color tokens")
 struct ColorsTests {
+  @Test("sync failure tokens use the approved orange in both themes")
+  func failureTokensMatchBothThemes() throws {
+    try assertDynamicColor(.MeetPR.failure, dark: .init(240, 149, 74), light: .init(194, 65, 12))
+    try assertDynamicColor(
+      .MeetPR.failureSoft, dark: .init(240, 149, 74, alpha: 0.14),
+      light: .init(194, 65, 12, alpha: 0.10))
+  }
+
   @Test("surface tokens match both v3 themes")
   func surfaceTokensMatchBothThemes() throws {
     try assertDynamicColor(.MeetPR.bgDeep, dark: .init(5, 5, 6), light: .init(237, 238, 241))

@@ -7,6 +7,9 @@ import RepositoryContracts
 extension VideoUploadManager {
   func run(recordID: UUID, sourceURL: URL?, generation: Int) async {
     do {
+      guard let stored = try await repository.fetch(id: recordID),
+        stored.pendingDraftID == nil
+      else { return }
       var record = try await persistUploadGeneration(generation, recordID: recordID)
       if let sourceURL {
         record = try await export(record, from: sourceURL)
@@ -30,6 +33,7 @@ extension VideoUploadManager {
   ) async throws -> VideoAttachment {
     try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
     let destination = fileURL(for: record)
+    let duration = try await exporter.durationSeconds(of: sourceURL)
     do {
       try await exporter.export(from: sourceURL, to: destination)
     } catch {
@@ -43,6 +47,7 @@ extension VideoUploadManager {
       throw CancellationError()
     }
     var exported = record
+    exported.durationSeconds = duration
     exported.sizeBytes = try Self.fileSize(at: destination)
     try await repository.save(exported)
     broadcast(.updated(exported, progress: nil))
@@ -184,6 +189,7 @@ extension VideoUploadManager {
     // sweep recover an interruption without replaying the remote transition.
     let cleanup = await removeChunkFiles(recordID: record.id)
     try requireLiveWakeContext(recordID: record.id, generation: cleanup.generation)
+    await completionRecovery?(self)
     return cleanup.generation
   }
 

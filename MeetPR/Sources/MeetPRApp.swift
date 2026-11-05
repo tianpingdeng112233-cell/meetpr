@@ -428,7 +428,9 @@ struct MeetPRApp: App {
           studentReadiness: BackendReadinessRepository(api: api, session: chat.session),
           // Set-video uploads (spec 027): backend /uploads/* pipeline; the
           // setLog ↔ attachment mapping persists on-device only in V0.1.
-          studentVideoUploads: .backend(api: api, session: chat.session),
+          studentVideoUploads: .backend(
+            api: api, session: chat.session,
+            prepareSession: { await chat.session.bootstrap() }),
           restTimerActivityController: RestTimerLiveActivityController.shared,
           // Bind + onboarding are cache-free by design (spec 031/032 §9):
           // both must read live server state.

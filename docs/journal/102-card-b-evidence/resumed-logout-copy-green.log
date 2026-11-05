@@ -1,0 +1,24 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/3] Copying Localizable.xcstrings
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (6.92s)
+Test Suite 'Selected tests' started at 2026-11-05 06:37:47.373.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 06:37:47.375.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 06:37:47.376.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 06:37:47.376.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetSyncLogoutTests started.
+◇ Test uploadThenLogoutAndCancel() started.
+◇ Test logoutCountIsInterpolatedInEveryLanguage() started.
+◇ Test directLogoutRetainsAccountQueue() started.
+✔ Test directLogoutRetainsAccountQueue() passed after 0.012 seconds.
+✔ Test uploadThenLogoutAndCancel() passed after 0.050 seconds.
+✔ Test logoutCountIsInterpolatedInEveryLanguage() passed after 0.050 seconds.
+✔ Suite SetSyncLogoutTests passed after 0.051 seconds.
+✔ Test run with 3 tests in 1 suite passed after 0.051 seconds.

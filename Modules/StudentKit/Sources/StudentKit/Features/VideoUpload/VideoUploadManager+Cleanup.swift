@@ -12,11 +12,18 @@ extension VideoUploadManager {
   /// deletes all local record, video, and chunk files. A ready attachment is
   /// only unlinked locally because the upload abort endpoint rejects it.
   public func remove(attachmentID: UUID) async {
+    await remove(attachmentID: attachmentID, waitsForPendingBinding: true)
+  }
+
+  func remove(attachmentID: UUID, waitsForPendingBinding: Bool) async {
     // The teardown below clears the active/retry markers before the record
     // row disappears; a cancelParts-triggered session-finished sweep must not
     // treat that intermediate state as dormant and revive the upload.
     guard removingRecordIDs.insert(attachmentID).inserted else { return }
     defer { removingRecordIDs.remove(attachmentID) }
+    // Mark intent before waiting: an in-flight bind must stop publishing or
+    // uploading, then deletion runs after its last repository write settles.
+    if waitsForPendingBinding { await pendingSetMutation?.value }
     await persistNewUploadGeneration(recordID: attachmentID)
     if let task = activeUploads[attachmentID] {
       task.cancel()
@@ -178,12 +185,14 @@ extension VideoUploadManager {
         continue
       }
       guard !retainingSourceRecordIDs.contains(recordID) else { continue }
-      guard let record = try? await repository.fetch(id: recordID) else {
+      let record: VideoAttachment?
+      do { record = try await repository.fetch(id: recordID) } catch { continue }
+      guard let record else {
         guard !retainingSourceRecordIDs.contains(recordID) else { continue }
         _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
         continue
       }
-      if record.status == .uploaded {
+      if record.status == .uploaded, record.pendingDraftID == nil {
         _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
       }
     }
@@ -199,7 +208,7 @@ extension VideoUploadManager {
     }
     return RetainedVideoFile(
       attachmentID: record.id,
-      status: record.status,
+      status: record.pendingDraftID == nil ? record.status : .pending,
       trainingDate: record.trainingDate,
       recordedAt: record.recordedAt,
       sizeBytes: exportedSize + sourceSize

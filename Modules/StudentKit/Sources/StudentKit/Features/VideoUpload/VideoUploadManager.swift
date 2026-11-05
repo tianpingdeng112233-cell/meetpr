@@ -98,6 +98,11 @@ public actor VideoUploadManager {
     self.networkMonitor = enableNetworkMonitoring ? UploadNetworkMonitor() : nil
   }
 
+  var preparingSelections: [UUID: VideoSelectionScope] = [:]
+  var selectionRevision = 0
+  var completionRecovery: (@Sendable (VideoUploadManager) async -> Void)?
+  var pendingSetMutation: Task<Void, Never>?
+
   // MARK: - Public API
 
   /// Validates duration, persists a `pending` record, and starts the
@@ -114,11 +119,10 @@ public actor VideoUploadManager {
     trainingDate: Date? = nil,
     recordedAt: Date? = nil
   ) async throws -> VideoAttachment {
-    activateBackgroundHandling()
-    if !requestedNotificationAuthorization {
-      requestedNotificationAuthorization = true
-      await failureNotifier.requestProvisionalAuthorization()
-    }
+    let selection = beginSelection(
+      studentID: studentID, trainingDate: trainingDate, setLogID: setLogID)
+    defer { finishSelection(selection) }
+    await prepareUploadHandling()
     var retainedSourceURL: URL?
     var uploadTaskOwnsSource = false
     defer {
@@ -166,6 +170,14 @@ public actor VideoUploadManager {
     startUploadTask(recordID: id, sourceURL: managedSourceURL)
     uploadTaskOwnsSource = true
     return record
+  }
+
+  func prepareUploadHandling() async {
+    activateBackgroundHandling()
+    if !requestedNotificationAuthorization {
+      requestedNotificationAuthorization = true
+      await failureNotifier.requestAuthorization()
+    }
   }
 
   func activateBackgroundHandling() {
