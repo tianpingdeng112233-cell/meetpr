@@ -280,3 +280,10 @@ func lastAndBest(
   let best = points.max { $0.e1RMKg < $1.e1RMKg }
   return (last, best)
 }
+
+extension TodayWorkoutSetRowDraft {
+  var pendingVideoSlot: VideoAttachment.SetSlot? {
+    guard isExtra else { return nil }
+    return VideoAttachment.SetSlot(planExerciseID: planExerciseID, setIndex: prescribed.setIndex)
+  }
+}

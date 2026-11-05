@@ -11,7 +11,7 @@ extension VideoUploadManager {
     guard !removingRecordIDs.contains(attachmentID),
       activeUploads[attachmentID] == nil,
       var record = try? await repository.fetch(id: attachmentID),
-      record.status == .failed
+      record.status == .failed, record.pendingDraftID == nil
     else { return }
     guard let retryGeneration = try? requireLiveSnapshotGeneration(from: record) else { return }
 

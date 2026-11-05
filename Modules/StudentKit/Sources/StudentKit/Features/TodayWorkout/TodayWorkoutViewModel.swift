@@ -759,22 +759,55 @@ public final class TodayWorkoutViewModel {
   }
 
   public func ensureLoggedSetID(rowIndex: Int) async -> UUID? {
-    guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
+    guard let drafts = currentDrafts, drafts.indices.contains(rowIndex) else {
       return nil
     }
     if let loggedSetID = drafts[rowIndex].loggedSetID {
       return loggedSetID
     }
-    let draft = drafts[rowIndex]
-    guard await persist(rowIndex: rowIndex, completed: draft.completed, failed: draft.failed) else {
+    let targetID = drafts[rowIndex].id
+    let generation = loadGeneration
+    let previous = pendingPersist
+    // Reserve a place in the same queue as set saves. Re-read after the prior
+    // save so resolving an ID cannot overwrite its completed/failed flags.
+    let task = Task { [weak self] in
+      _ = await previous?.value
+      guard let self, self.isCurrentLoad(generation),
+        let current = self.currentDrafts,
+        let index = current.firstIndex(where: { $0.id == targetID })
+      else { return false }
+      let draft = current[index]
+      if draft.loggedSetID != nil { return true }
+      return await self.performPersist(
+        rowIndex: index, completed: draft.completed, failed: draft.failed,
+        generation: generation, startsRestTimer: true)
+    }
+    pendingPersist = task
+    guard await task.value, isCurrentLoad(generation) else {
       return nil
     }
-    // currentDrafts, not `case .loaded`: a chained follow-up persist may have
-    // already flipped state to .recording by the time this continuation runs.
-    guard let updated = currentDrafts, updated.indices.contains(rowIndex) else {
+    return currentDrafts?.first(where: { $0.id == targetID })?.loggedSetID
+  }
+
+  func videoRowIndex(draftID: UUID, trainingDate: Date) -> Int? {
+    guard currentDay?.scheduledDate == trainingDate else { return nil }
+    return currentDrafts?.firstIndex { $0.id == draftID }
+  }
+
+  func videoSetLogID(
+    draftID: UUID, trainingDate: Date, slot: VideoAttachment.SetSlot? = nil
+  ) -> UUID? {
+    guard currentDay?.scheduledDate == trainingDate else { return nil }
+    return currentDrafts?.first {
+      $0.id == draftID || (slot != nil && $0.pendingVideoSlot == slot)
+    }?.loggedSetID
+  }
+
+  func resolveVideoSetLogID(draftID: UUID, trainingDate: Date) async -> UUID? {
+    guard let index = videoRowIndex(draftID: draftID, trainingDate: trainingDate) else {
       return nil
     }
-    return updated[rowIndex].loggedSetID
+    return await ensureLoggedSetID(rowIndex: index)
   }
 
   public func clearActionError() {
