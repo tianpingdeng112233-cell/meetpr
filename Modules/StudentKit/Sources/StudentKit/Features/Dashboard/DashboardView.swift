@@ -135,7 +135,6 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
-      .modifier(notificationHost)
       .navigationDestination(item: $editingProfile) { kind in
         DashboardProfileEditor(kind: kind, studentID: studentID, onboarding: onboarding)
       }
@@ -165,6 +164,7 @@ public struct DashboardView: View {
         }
       }
     }
+    .modifier(notificationHost)
     .background(Color.MeetPR.bgBase)
     .task {
       await loadIfNeeded()
