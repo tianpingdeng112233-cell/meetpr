@@ -1,0 +1,26 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKitTests SetSyncReceiptTests.swift
+[4/5] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (10.55s)
+Test Suite 'Selected tests' started at 2026-11-05 07:32:32.759.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-05 07:32:32.761.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-05 07:32:32.761.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 07:32:32.761.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetSyncReceiptTests started.
+◇ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() started.
+✘ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() recorded an issue at SetSyncReceiptTests.swift:28:5: Expectation failed: (Set(loggedIDs).count → 1) == (loggedIDs.count → 2)
+✘ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() recorded an issue at SetSyncReceiptTests.swift:29:5: Expectation failed: (rows.count → 2) == 1
+✘ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() failed after 0.002 seconds with 2 issues.
+✘ Suite SetSyncReceiptTests failed after 0.003 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.003 seconds with 2 issues.

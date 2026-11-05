@@ -81,6 +81,8 @@ public final class TodayWorkoutViewModel {
   private var hasLoadedExerciseCatalog = false
   var inlineCompletionFeedback = 0
 
+  private(set) var setSyncQueue: SetSyncQueue?
+  private(set) var setSyncCompletion: SetSyncCompletionCoordinator?
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rmRepo: any E1RMRepository
@@ -109,6 +111,10 @@ public final class TodayWorkoutViewModel {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    setSyncQueue: SetSyncQueue? = nil,
+    setSyncSleep: @escaping @MainActor () async -> Void = {
+      try? await Task.sleep(for: .seconds(20))
+    },
     onboarding: (any OnboardingProfileReading)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
@@ -120,6 +126,10 @@ public final class TodayWorkoutViewModel {
       try? await Task.sleep(for: .seconds(30))
     }
   ) {
+    self.setSyncQueue = setSyncQueue
+    self.setSyncCompletion = setSyncQueue.map {
+      SetSyncCompletionCoordinator(queue: $0, sleep: setSyncSleep)
+    }
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
@@ -148,6 +158,11 @@ public final class TodayWorkoutViewModel {
       studentDraftCache[day.id] = drafts.filter { $0.isExtra || $0.isStudentAdded }
     }
     currentStudentID = studentID
+    if let setSyncQueue, setSyncQueue.studentID == studentID {
+      setSyncQueue.onAcknowledged = { [weak self] record, receipt in
+        await self?.applySyncedSet(record, receipt: receipt)
+      }
+    }
     editedDraftFields = [:]
     loadGeneration += 1
     let generation = loadGeneration
@@ -478,7 +493,8 @@ public final class TodayWorkoutViewModel {
     exerciseReferences = snapshot.references
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
-    state = .loaded(plan: snapshot.day, drafts: snapshot.drafts)
+    state = .loaded(
+      plan: snapshot.day, drafts: overlaySyncedDrafts(snapshot.drafts, dayID: snapshot.day.id))
   }
 
   private func apply(
@@ -510,7 +526,8 @@ public final class TodayWorkoutViewModel {
     exerciseReferences = snapshot.references
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
-    state = .loaded(plan: snapshot.day, drafts: mergedDrafts)
+    state = .loaded(
+      plan: snapshot.day, drafts: overlaySyncedDrafts(mergedDrafts, dayID: snapshot.day.id))
   }
 
   private func handleLoadError(
@@ -683,6 +700,7 @@ public final class TodayWorkoutViewModel {
 
   @discardableResult
   func saveAccessoryRow(_ row: AccessoryRow) async -> Bool {
+    if setSyncQueue != nil { return await performAccessoryWrite(row, startsRestTimer: true) }
     guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else { return false }
     accessorySavingIDs.insert(row.id)
     defer { accessorySavingIDs.remove(row.id) }
@@ -694,14 +712,14 @@ public final class TodayWorkoutViewModel {
     guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else {
       return AccessoryBatchResult(written: 0, skipped: selection.skipped.count, failed: true)
     }
-    accessoryBatchInFlight = true
+    if setSyncQueue == nil { accessoryBatchInFlight = true }
     defer {
       accessoryBatchInFlight = false
       accessorySavingIDs = []
     }
     var written = 0
     for row in selection.writable {
-      accessorySavingIDs = [row.id]
+      if setSyncQueue == nil { accessorySavingIDs = [row.id] }
       guard await performAccessoryWrite(row, startsRestTimer: false) else {
         return AccessoryBatchResult(
           written: written, skipped: selection.skipped.count, failed: true)
@@ -720,7 +738,10 @@ public final class TodayWorkoutViewModel {
         || drafts[index].prescribed.hasUnspecifiedLoad,
       drafts[index] == row.draft
     else { return false }
-    guard !row.isCancellation || row.draft.isStudentAdded || accessoryVideosLoaded else {
+    guard
+      !row.isCancellation || row.draft.isStudentAdded || accessoryVideosLoaded
+        || (setSyncQueue != nil && row.draft.loggedSetID == nil)
+    else {
       actionErrorMessage = StudentStrings.localized(.dashboardView004)
       return false
     }
@@ -735,7 +756,7 @@ public final class TodayWorkoutViewModel {
         row.input.weight == row.initialInput.weight
         && !row.isBodyweight
       let originalWeight =
-        original.loggedSetID == nil && !original.isExtra && !original.isStudentAdded
+        !original.hasSavedRecord && !original.isExtra && !original.isStudentAdded
         ? original.prescribed.weightKg : original.actualWeight
       updateWeight(rowIndex: index, weight: preservesWeight ? originalWeight : row.weightKg)
       updateReps(rowIndex: index, reps: row.reps)
@@ -764,6 +785,17 @@ public final class TodayWorkoutViewModel {
     }
     if let loggedSetID = drafts[rowIndex].loggedSetID {
       return loggedSetID
+    }
+    if let setSyncQueue {
+      let draft = drafts[rowIndex]
+      guard setSyncQueue.records.contains(where: { $0.draft.id == draft.id && $0.isPending }) else {
+        _ = enqueueSet(
+          rowIndex: rowIndex, completed: draft.completed, failed: draft.failed,
+          startsRestTimer: false)
+        return nil
+      }
+      // #403 retains the video before resolving; no second save or network wait.
+      return nil
     }
     let targetID = drafts[rowIndex].id
     let generation = loadGeneration
@@ -824,12 +856,11 @@ public final class TodayWorkoutViewModel {
   private func completeDay(
     _ day: StudentPlanDay, presentsCelebration: Bool = false
   ) async -> Bool {
-    guard !isCompletionMutationInFlight,
-      let studentID = currentStudentID
-    else { return false }
+    guard !isCompletionMutationInFlight, let studentID = currentStudentID else { return false }
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
+    if presentsCelebration, !(await prepareSetSyncCompletion(dayID: day.id)) { return false }
     if presentsCelebration {
       isCompletionSending = true
       completionPhase = .celebration
@@ -840,13 +871,14 @@ public final class TodayWorkoutViewModel {
       )
     }
     do {
-      let completion: PlanDayCompletion
-      if presentsCelebration {
-        completion = try await WorkoutCompletionRequest().complete(
-          dayID: day.id, studentID: studentID, plans: plans, sleep: completionSleep
-        )
-      } else {
-        completion = try await plans.completeDay(id: day.id, studentID: studentID)
+      guard
+        let completion = try await sendDayCompletion(
+          day, studentID: studentID, presentsCelebration: presentsCelebration)
+      else {
+        isCompletionSending = false
+        completionPhase = nil
+        replaceCurrentDay(day, updatesPlanDays: false)
+        return false
       }
       isCompletionSending = false
       await applyCompletionMutation(
@@ -874,6 +906,36 @@ public final class TodayWorkoutViewModel {
       }
     }
     return false
+  }
+
+  private func prepareSetSyncCompletion(dayID: UUID) async -> Bool {
+    guard let queue = setSyncQueue, let coordinator = setSyncCompletion else { return true }
+    guard await coordinator.prepare(dayID: dayID, retry: coordinator.phase == .failed) else {
+      return false
+    }
+    do { try queue.completionGate.request(dayID: dayID) } catch {
+      actionErrorMessage = Self.recordingErrorMessage(for: error)
+      return false
+    }
+    return true
+  }
+
+  private func sendDayCompletion(
+    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool
+  ) async throws -> PlanDayCompletion? {
+    guard presentsCelebration else {
+      return try await plans.completeDay(id: day.id, studentID: studentID)
+    }
+    let complete = {
+      try await WorkoutCompletionRequest().complete(
+        dayID: day.id, studentID: studentID, plans: self.plans, sleep: self.completionSleep)
+    }
+    if let queue = setSyncQueue {
+      return try await queue.completionGate.completeIfReady(
+        dayID: day.id, setsSynced: queue.pendingCount(dayID: day.id) == 0,
+        videosDelivered: true, complete: complete)
+    }
+    return try await complete()
   }
 
   func quickLog(plan: QuickLogPlan) async -> QuickLogOutcome {
@@ -1010,6 +1072,7 @@ public final class TodayWorkoutViewModel {
     actionErrorMessage = nil
     do {
       try await plans.undoDayCompletion(id: day.id, studentID: studentID)
+      try setSyncQueue?.completionGate.forget(dayID: day.id)
       await applyCompletionMutation(
         fallback: day.replacingCompletion(completedAt: nil, source: nil),
         studentID: studentID
@@ -1323,6 +1386,7 @@ public final class TodayWorkoutViewModel {
       }
       var nextDrafts = drafts
       update(&nextDrafts[rowIndex])
+      guard storeUnfilledDraft(nextDrafts[rowIndex], day: plan) else { return }
       editedDraftFields[draftIdentity(for: nextDrafts[rowIndex]), default: []]
         .insert(editedField)
       state = .loaded(plan: plan, drafts: nextDrafts)
@@ -1554,6 +1618,11 @@ extension TodayWorkoutViewModel {
   fileprivate func persist(
     rowIndex: Int, completed: Bool, failed: Bool = false, startsRestTimer: Bool = true
   ) async -> Bool {
+    if setSyncQueue != nil {
+      return enqueueSet(
+        rowIndex: rowIndex, completed: completed, failed: failed,
+        startsRestTimer: startsRestTimer)
+    }
     let previous = pendingPersist
     // Queued work is only valid for the day it was submitted against: a day
     // switch reloads drafts and rowIndex would address the wrong set.
@@ -1636,6 +1705,7 @@ extension TodayWorkoutViewModel {
       let exercise = day.exercises.first(where: { $0.id == exerciseID }),
       let row = StudentAddedRows.extra(exercise: exercise, drafts: drafts)
     else { return }
+    guard storeUnfilledDraft(row, day: day) else { return }
     drafts.append(row)
     state = .loaded(plan: day, drafts: drafts)
   }
@@ -1650,7 +1720,9 @@ extension TodayWorkoutViewModel {
     if !exerciseCatalog.contains(where: { $0.id == exercise.id }) {
       exerciseCatalog.append(exercise)
     }
-    drafts.append(Self.addedDraft(exercise: exercise, dayID: day.id, index: 0))
+    let row = Self.addedDraft(exercise: exercise, dayID: day.id, index: 0)
+    guard storeUnfilledDraft(row, day: day) else { return }
+    drafts.append(row)
     state = .loaded(plan: day, drafts: drafts)
   }
 
@@ -1665,6 +1737,7 @@ extension TodayWorkoutViewModel {
       exercise: exercise, dayID: day.id, index: (rows.map(\.prescribed.setIndex).max() ?? -1) + 1)
     row.actualWeight = rows.last?.actualWeight
     row.actualReps = rows.last?.actualReps
+    guard storeUnfilledDraft(row, day: day) else { return }
     drafts.append(row)
     state = .loaded(plan: day, drafts: drafts)
   }
@@ -1683,6 +1756,14 @@ extension TodayWorkoutViewModel {
   }
 
   private func persistAdded(rowIndex: Int, completed: Bool) async -> Bool {
+    if setSyncQueue != nil {
+      return enqueueSet(
+        rowIndex: rowIndex, completed: completed, failed: false, startsRestTimer: true)
+    }
+    return await performAddedWrite(rowIndex: rowIndex, completed: completed)
+  }
+
+  private func performAddedWrite(rowIndex: Int, completed: Bool) async -> Bool {
     guard case .loaded(let day, let drafts) = state, drafts.indices.contains(rowIndex),
       let studentID = currentStudentID, let repository = logs as? any StudentAddedLogRepository,
       FlexibleTrainingDay.canWrite(day, in: planDays)
@@ -1736,6 +1817,7 @@ extension TodayWorkoutViewModel {
   }
 
   func removeStudentRow(id: UUID) async -> Bool {
+    if setSyncQueue != nil { return enqueueRemoval(id: id) }
     guard case .loaded(let day, let drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays), accessorySavingIDs.isEmpty,
       !accessoryBatchInFlight, let row = drafts.first(where: { $0.id == id }),
@@ -1798,7 +1880,11 @@ extension TodayWorkoutViewModel {
         }
       }
       hasLoadedExerciseCatalog = true
-    } catch { actionErrorMessage = Self.loadErrorMessage(for: error) }
+    } catch {
+      // Initial training already has its plan's exercises. A background catalog
+      // failure must not masquerade as a failed save; explicit picker loads can retry.
+      if fallbackDays == nil { actionErrorMessage = Self.loadErrorMessage(for: error) }
+    }
   }
 
   private func restoredStudentDrafts(day: StudentPlanDay, planned: [SetRowDraft]) -> [SetRowDraft] {
@@ -1862,5 +1948,145 @@ extension TodayWorkoutViewModel {
     let day = String(parts.day ?? 0)
     return year + "-" + (month.count == 1 ? "0" : "") + month
       + "-" + (day.count == 1 ? "0" : "") + day
+  }
+}
+
+// MARK: - Durable local recording (spec 102)
+extension TodayWorkoutViewModel {
+  func connectSetSync(_ queue: SetSyncQueue) {
+    guard setSyncQueue !== queue else { return }
+    setSyncQueue = queue
+    setSyncCompletion = SetSyncCompletionCoordinator(queue: queue)
+    queue.onAcknowledged = { [weak self] record, receipt in
+      await self?.applySyncedSet(record, receipt: receipt)
+    }
+  }
+
+  private func overlaySyncedDrafts(_ drafts: [SetRowDraft], dayID: UUID) -> [SetRowDraft] {
+    guard let setSyncQueue, setSyncQueue.studentID == currentStudentID else { return drafts }
+    return setSyncQueue.overlay(dayID: dayID, drafts: drafts)
+  }
+
+  private func storeUnfilledDraft(_ draft: SetRowDraft, day: StudentPlanDay) -> Bool {
+    guard let setSyncQueue else { return true }
+    guard !draft.hasSavedRecord, draft.isExtra || draft.isStudentAdded else { return true }
+    guard setSyncQueue.studentID == currentStudentID else { return false }
+    do {
+      try setSyncQueue.storeDraft(dayID: day.id, trainingDate: day.scheduledDate, draft: draft)
+      return true
+    } catch {
+      actionErrorMessage = Self.recordingErrorMessage(for: error)
+      return false
+    }
+  }
+
+  private func enqueueSet(
+    rowIndex: Int, completed: Bool, failed: Bool, startsRestTimer: Bool
+  ) -> Bool {
+    guard let setSyncQueue, setSyncQueue.studentID == currentStudentID,
+      case .loaded(let day, var drafts) = state, drafts.indices.contains(rowIndex),
+      FlexibleTrainingDay.canWrite(day, in: planDays),
+      validateCompletion(drafts[rowIndex], completed: completed)
+    else { return false }
+    let previouslyCompleted = drafts[rowIndex].completed
+    var draft = drafts[rowIndex]
+    draft.completed = completed
+    draft.failed = failed
+    draft.assumed = false
+    draft.recordedAt = now()
+    do {
+      try setSyncQueue.enqueue(
+        dayID: day.id, trainingDate: day.scheduledDate,
+        draft: draft, recordedAt: now(),
+        loggedDate: draft.isStudentAdded
+          ? addedDatePins[day.id]?[draft.exerciseID]
+          : planLogsSnapshot?.logs.first(where: { $0.id == draft.loggedSetID })?.loggedDate)
+    } catch {
+      actionErrorMessage = Self.recordingErrorMessage(for: error)
+      return false
+    }
+    recordingGeneration += 1
+    drafts[rowIndex] = draft
+    state = .loaded(plan: day, drafts: drafts)
+    actionErrorMessage = nil
+    if startsRestTimer, completed, !previouslyCompleted || draft.isAccessory || draft.isStudentAdded
+    {
+      startRestTimer(after: draft, drafts: drafts)
+    }
+    return true
+  }
+
+  private func enqueueRemoval(id: UUID) -> Bool {
+    guard let setSyncQueue, setSyncQueue.studentID == currentStudentID,
+      case .loaded(let day, var drafts) = state,
+      FlexibleTrainingDay.canWrite(day, in: planDays),
+      let draft = drafts.first(where: { $0.id == id }), draft.isExtra || draft.isStudentAdded
+    else { return false }
+    do {
+      try setSyncQueue.enqueue(
+        dayID: day.id, trainingDate: day.scheduledDate,
+        draft: draft, recordedAt: now(), deleting: true)
+    } catch {
+      actionErrorMessage = Self.recordingErrorMessage(for: error)
+      return false
+    }
+    recordingGeneration += 1
+    drafts.removeAll { $0.id == id }
+    studentDraftCache[day.id]?.removeAll { $0.id == id }
+    state = .loaded(plan: day, drafts: drafts)
+    return true
+  }
+
+  private func applySyncedSet(_ record: PendingSetRecord, receipt: SetSyncReceipt) async {
+    guard currentStudentID == record.studentID else { return }
+    let canonicalID: UUID?
+    switch receipt {
+    case .planned(let log):
+      canonicalID = log.id
+      mergePersistedLog(log)
+      await repairPersistedExtra(record.draft, setID: log.id, studentID: record.studentID)
+      let family =
+        planDays.first(where: { $0.id == record.dayID }).flatMap {
+          Self.exerciseFamily(
+            in: $0, planExerciseID: record.draft.planExerciseID,
+            onboarding: onboardingProfile)
+        } ?? record.draft.liftFamily
+      if log.completed {
+        let event = await recordE1RMPoint(
+          for: record.draft, log: log,
+          studentID: record.studentID, family: family,
+          registeredOneRMKg: onboardingProfile?.registeredOneRMKg(for: family))
+        if let event { try? await e1rmRepo.acknowledgePR(eventId: event.id) }
+      }
+    case .added(let log):
+      canonicalID = log.id
+      addedLogs.removeAll { $0.id == log.id }
+      addedLogs.append(log)
+      if record.draft.loggedSetID != nil {
+        await repairStudentDerived(setID: log.id, studentID: record.studentID)
+      }
+      _ = await E1RMRecorder(e1rm: e1rmRepo, now: now).record(
+        E1RMRecorder.Input(
+          studentID: record.studentID, exerciseID: record.draft.exerciseID,
+          family: record.draft.liftFamily, setLogID: log.id,
+          weightKg: log.weightKg, reps: log.reps, rpe: log.rpe, coachRPE: log.coachRPE,
+          completed: log.completed, failed: log.failed,
+          registeredOneRMKg: onboardingProfile?.registeredOneRMKg(for: record.draft.liftFamily)))
+    case .deleted:
+      canonicalID = nil
+      if let id = record.draft.loggedSetID {
+        addedLogs.removeAll { $0.id == id }
+        planLogsSnapshot?.logs.removeAll { $0.id == id }
+        await repairStudentDerived(setID: id, studentID: record.studentID)
+      }
+    }
+    guard currentStudentID == record.studentID,
+      case .loaded(let day, var drafts) = state, day.id == record.dayID,
+      let index = drafts.firstIndex(where: { $0.id == record.draft.id })
+    else { return }
+    // Only merge the canonical identity; later taps and editor input win.
+    drafts[index].loggedSetID = canonicalID
+    if case .added(let log) = receipt { drafts[index].useAddedSlot(log.setIndex, dayID: day.id) }
+    state = .loaded(plan: day, drafts: drafts)
   }
 }

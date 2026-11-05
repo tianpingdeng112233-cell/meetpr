@@ -15,14 +15,14 @@ struct AccessoryLogCard: View {
 
   private var allowsRIR: Bool { exercise.rows.allSatisfy { $0.draft.isAccessory } }
   private var effortMode: ActualEffortMode {
-    effortModeOverride ?? exercise.rows.first(where: { $0.draft.loggedSetID == nil }).map {
+    effortModeOverride ?? exercise.rows.first(where: { !$0.draft.hasSavedRecord }).map {
       row(for: $0).input.effortMode
     } ?? exercise.rows.first.map { row(for: $0).input.effortMode } ?? .rpe
   }
 
   private func switchEffort() {
     let mode: ActualEffortMode = effortMode == .rpe ? .rir : .rpe
-    for presentationRow in exercise.rows where presentationRow.draft.loggedSetID == nil {
+    for presentationRow in exercise.rows where !presentationRow.draft.hasSavedRecord {
       var input = row(for: presentationRow)
       input.switchEffort(to: mode)
       edits[presentationRow.id] = input
@@ -82,7 +82,7 @@ struct AccessoryLogCard: View {
                       .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
                       .disabled(
                         viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
-                          || !exercise.rows.contains(where: { $0.draft.loggedSetID == nil }))
+                          || !exercise.rows.contains(where: { !$0.draft.hasSavedRecord }))
                   } else {
                     Text(label).frame(minWidth: MeetPRSpacing.minimumHitTarget)
                   }
@@ -227,7 +227,7 @@ struct AccessoryLogCard: View {
       hasVideo: row.record.videoState != .none)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input
-    } else if let effortModeOverride, source.draft.loggedSetID == nil {
+    } else if let effortModeOverride, !source.draft.hasSavedRecord {
       source.switchEffort(to: effortModeOverride)
     }
     return source

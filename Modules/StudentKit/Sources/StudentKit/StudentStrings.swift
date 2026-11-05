@@ -33,6 +33,15 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let setSyncUploading = Key("student.setSyncUploading")
+    static let setSyncFailedTitle = Key("student.setSyncFailedTitle")
+    static let setSyncFailedBody = Key("student.setSyncFailedBody")
+    static let setSyncRetry = Key("student.setSyncRetry")
+    static let setSyncLogoutOne = Key("student.setSyncLogoutOne")
+    static let setSyncLogoutMany = Key("student.setSyncLogoutMany")
+    static let setSyncLogoutUpload = Key("student.setSyncLogoutUpload")
+    static let setSyncLogoutNow = Key("student.setSyncLogoutNow")
+    static let setSyncLogoutBody = Key("student.setSyncLogoutBody")
     static let bindWelcomeSuccess = Key("student.bindWelcomeSuccess")
     static let bindWelcomeTitle = Key("student.bindWelcomeTitle")
     static let bindWelcomeCoach = Key("student.bindWelcomeCoach")

@@ -9,6 +9,7 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
+  @Environment(StudentSetSyncSession.self) private var setSyncSession: StudentSetSyncSession?
   private let loginIdentifier: String
   private let profileCoach: ActiveCoachContext?
   @State private var profileNavigationActive = false
@@ -242,7 +243,8 @@ extension StudentRootView {
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
 
       TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        studentID: studentID, isVisible: selectedTab == .training,
+        setSyncQueue: setSyncSession?.queue, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings,
         restTimerActivityController: restTimerActivityController,
