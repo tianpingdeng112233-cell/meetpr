@@ -1,0 +1,19 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.15s)
+Test Suite 'Selected tests' started at 2026-11-06 10:36:30.553.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 10:36:30.554.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 10:36:30.554.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 10:36:30.554.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() started.
+✘ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() recorded an issue at AccessoryRowTests.swift:102:3: Expectation failed: (row.reps == 100 → false) && (row.isWritable → <not evaluated>)
+✘ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() failed after 0.006 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.006 seconds with 1 issue.

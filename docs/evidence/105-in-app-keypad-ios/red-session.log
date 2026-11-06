@@ -1,0 +1,201 @@
+# trimmed to last 200 lines (full log kept locally only)
+196 | }
+197 |
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+macro expansion #expect:1:46: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+`- /Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:200:69: note: expanded code originates here
+196 | }
+197 |
+198 | @Test func sanitizedDropsCharactersOutsideTheLockedAlphabet() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedDropsCharactersOutsideTheLockedAlphabet()' part of global actor 'MainActor'
+199 |   // I / O / 0 / 1 are excluded from the invite-code alphabet on purpose.
+200 |   #expect(EnterCodeView.sanitized("XKI7O0M1PQ2RVT") == "XK7MPQ2RVT")
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkBinaryOperation(EnterCodeView.sanitized("XKI7O0M1PQ2RVT"),{ $0 == $1() },"XK7MPQ2RVT",expression: .__fromBinaryOperation(.__fromSyntaxNode(#"EnterCodeView.sanitized("XKI7O0M1PQ2RVT")"#),"==",.__fromStringLiteral(#""XK7MPQ2RVT""#, "XK7MPQ2RVT")),comments: [.__line("// I / O / 0 / 1 are excluded from the invite-code alphabet on purpose.")],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                                              `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+    +-------------------------------------------------------------------
+201 |   #expect(EnterCodeView.sanitized("!@#$%^") == "")
+202 |   #expect(EnterCodeView.sanitized("中文") == "")
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+macro expansion #expect:1:46: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+`- /Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:201:51: note: expanded code originates here
+196 | }
+197 |
+198 | @Test func sanitizedDropsCharactersOutsideTheLockedAlphabet() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedDropsCharactersOutsideTheLockedAlphabet()' part of global actor 'MainActor'
+199 |   // I / O / 0 / 1 are excluded from the invite-code alphabet on purpose.
+200 |   #expect(EnterCodeView.sanitized("XKI7O0M1PQ2RVT") == "XK7MPQ2RVT")
+201 |   #expect(EnterCodeView.sanitized("!@#$%^") == "")
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkBinaryOperation(EnterCodeView.sanitized("!@#$%^"),{ $0 == $1() },"",expression: .__fromBinaryOperation(.__fromSyntaxNode(#"EnterCodeView.sanitized("!@#$%^")"#),"==",.__fromStringLiteral(#""""#, "")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                                              `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+    +-------------------------------------------------------------------
+202 |   #expect(EnterCodeView.sanitized("中文") == "")
+203 | }
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+macro expansion #expect:1:46: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+`- /Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:202:51: note: expanded code originates here
+196 | }
+197 |
+198 | @Test func sanitizedDropsCharactersOutsideTheLockedAlphabet() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedDropsCharactersOutsideTheLockedAlphabet()' part of global actor 'MainActor'
+199 |   // I / O / 0 / 1 are excluded from the invite-code alphabet on purpose.
+200 |   #expect(EnterCodeView.sanitized("XKI7O0M1PQ2RVT") == "XK7MPQ2RVT")
+201 |   #expect(EnterCodeView.sanitized("!@#$%^") == "")
+202 |   #expect(EnterCodeView.sanitized("中文") == "")
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkBinaryOperation(EnterCodeView.sanitized("中文"),{ $0 == $1() },"",expression: .__fromBinaryOperation(.__fromSyntaxNode(#"EnterCodeView.sanitized("中文")"#),"==",.__fromStringLiteral(#""""#, "")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                                              `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+    +-------------------------------------------------------------------
+203 | }
+204 |
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:206:32: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+203 | }
+204 |
+205 | @Test func sanitizedCapsAtTheCodeLength() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedCapsAtTheCodeLength()' part of global actor 'MainActor'
+206 |   let overlong = EnterCodeView.sanitized("XK7MPQ2RVTZZZZ")
+    |                                `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+207 |
+208 |   #expect(overlong.count == InviteCodeFormat.length)
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+macro expansion #expect:1:46: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+`- /Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:213:51: note: expanded code originates here
+210 | }
+211 |
+212 | @Test func sanitizedKeepsPartialInputIntact() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedKeepsPartialInputIntact()' part of global actor 'MainActor'
+213 |   #expect(EnterCodeView.sanitized("xk7") == "XK7")
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkBinaryOperation(EnterCodeView.sanitized("xk7"),{ $0 == $1() },"XK7",expression: .__fromBinaryOperation(.__fromSyntaxNode(#"EnterCodeView.sanitized("xk7")"#),"==",.__fromStringLiteral(#""XK7""#, "XK7")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                                              `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+    +-------------------------------------------------------------------
+214 |   #expect(EnterCodeView.sanitized("") == "")
+215 | }
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+macro expansion #expect:1:46: warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+`- /Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:214:45: note: expanded code originates here
+210 | }
+211 |
+212 | @Test func sanitizedKeepsPartialInputIntact() {
+    |            `- note: add '@MainActor' to make global function 'sanitizedKeepsPartialInputIntact()' part of global actor 'MainActor'
+213 |   #expect(EnterCodeView.sanitized("xk7") == "XK7")
+214 |   #expect(EnterCodeView.sanitized("") == "")
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkBinaryOperation(EnterCodeView.sanitized(""),{ $0 == $1() },"",expression: .__fromBinaryOperation(.__fromSyntaxNode(#"EnterCodeView.sanitized("")"#),"==",.__fromStringLiteral(#""""#, "")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                                              `- warning: call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]
+    +-------------------------------------------------------------------
+215 | }
+216 |
+
+/Users/david/Projects/apps/MeetPR-wt-105/Modules/StudentKit/Sources/StudentKit/Features/Bind/EnterCodeView.swift:118:15: note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+116 |   /// (so an `O` or `0` never lands in a box that can never validate), then cap
+117 |   /// at the code length.
+118 |   static func sanitized(_ raw: String) -> String {
+    |               `- note: calls to static method 'sanitized' from outside of its actor context are implicitly asynchronous
+119 |     if let extracted = InviteCodeFormat.extract(raw) { return extracted }
+120 |     let normalized = InviteCodeFormat.normalize(raw)
+
+[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>
+[205/229] Emitting module StudentKitTests
+[206/229] Compiling StudentKitTests VideoUploadWakeRemovalRaceTests.swift
+[207/229] Compiling StudentKitTests WeekOverviewViewModelTests.swift
+[208/229] Compiling StudentKitTests ImportedBaselineTestSupport.swift
+[209/229] Compiling StudentKitTests ImportedHistoryBackfillTests.swift
+[210/229] Compiling StudentKitTests ImportedHistoryStatisticsTests.swift
+[211/229] Compiling StudentKitTests ReconciliationSpyE1RMRepository.swift
+[212/229] Compiling StudentKitTests E1RMPREventsContractTests.swift
+[213/229] Compiling StudentKitTests E1RMRepositoryTests.swift
+[214/229] Compiling StudentKitTests ImportedHistoryReviewStoreTests.swift
+[215/229] Compiling StudentKitTests OnboardingRepositoryTests.swift
+[216/229] Compiling StudentKitTests StudentAddedCacheTests.swift
+[217/229] Compiling StudentKitTests StudentFeedbackRepositoryTests.swift
+[218/229] Compiling StudentKitTests StudentPlanIntensityProjectionFixtures.swift
+[219/229] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[220/229] Compiling StudentKitTests StudentPlanProjectionCoachNoteTests.swift
+[221/229] Compiling StudentKitTests StudentPlanRepositoryTests.swift
+[222/229] Compiling StudentKitTests StudentTrainingLogRepositoryTests.swift
+[223/229] Compiling StudentKitTests StudentFormattingLocalizationTests.swift
+[224/229] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[225/229] Compiling StudentKitTests StudentRootViewTests.swift
+[226/229] Compiling StudentKitTests StudentStringsTests.swift
+[227/229] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[227/229] Write Objects.LinkFileList
+[228/229] Linking StudentKitPackageTests
+Build complete! (42.92s)
+Test Suite 'Selected tests' started at 2026-11-06 10:35:55.397.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 10:35:55.397.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 10:35:55.397.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 10:35:55.397.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite WorkoutKeypadSessionTests started.
+◇ Test advancesAcrossRowsAndSkipsUnavailableFields() started.
+◇ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() started.
+◇ Test invalidValueDoesNotAdvanceOrCommit() started.
+✘ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() recorded an issue at WorkoutKeypadSessionTests.swift:50:5: Expectation failed: (values → ["", "", "", ""]) == ["7.5", "8", "", ""]
+± inserted ["", ""], removed ["7.5", "8"]
+✘ Test invalidValueDoesNotAdvanceOrCommit() recorded an issue at WorkoutKeypadSessionTests.swift:60:5: Expectation failed: (session.current?.id → nil) == (cell.id → ID(rowID: 61D6A2CF-7105-4DCB-89C1-03359896EB71, field: DesignSystem.MeetPRNumberPad.Field.rpe))
+✘ Test invalidValueDoesNotAdvanceOrCommit() recorded an issue at WorkoutKeypadSessionTests.swift:61:5: Expectation failed: (value → "10.5") == nil
+✔ Test advancesAcrossRowsAndSkipsUnavailableFields() passed after 0.004 seconds.
+✘ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() failed after 0.004 seconds with 1 issue.
+✘ Test invalidValueDoesNotAdvanceOrCommit() failed after 0.004 seconds with 2 issues.
+✘ Suite WorkoutKeypadSessionTests failed after 0.004 seconds with 3 issues.
+✘ Test run with 3 tests in 1 suite failed after 0.004 seconds with 3 issues.

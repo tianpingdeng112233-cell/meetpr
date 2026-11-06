@@ -61,11 +61,12 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
   @State private var isManualScrolling = false
-  @State private var keyboardVisible = false
+  @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var feedbackExercises: [UUID] = []
 
   var body: some View {
     trainingScrollView
+      .modifier(WorkoutKeypadScrollAvoidance())
       .sensoryFeedback(
         .impact(weight: .light), trigger: accessoryViewModel?.inlineCompletionFeedback ?? 0)
   }
@@ -77,7 +78,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     .scrollIndicators(.hidden)
     .scrollPosition(id: $scrollTarget, anchor: .top)
     .modifier(
-      TrainingScrollInteraction(isScrolling: $isManualScrolling, keyboardVisible: $keyboardVisible)
+      TrainingScrollInteraction(isScrolling: $isManualScrolling)
     )
     .onChange(of: flowSnapshot) { old, new in
       pendingScrollTarget = nil
@@ -90,7 +91,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       let added = new.completed.filter { !old.completed.contains($0) }
       feedbackExercises = added
       for id in added { collapsedExercises[id] = true }
-      guard let target = added.last, !isManualScrolling, !keyboardVisible else { return }
+      guard let target = added.last, !isManualScrolling, keypad?.current == nil else { return }
       pendingScrollTarget = target
     }
     .task(id: pendingScrollTarget) {
@@ -98,7 +99,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       // A set may finish while its editor is dismissing. Let that presentation
       // transaction settle before resolving the newly inserted scroll target.
       do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
-      guard !isManualScrolling, !keyboardVisible, flowSnapshot.completed.contains(target)
+      guard !isManualScrolling, keypad?.current == nil, flowSnapshot.completed.contains(target)
       else {
         if pendingScrollTarget == target { pendingScrollTarget = nil }
         return

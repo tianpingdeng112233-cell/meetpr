@@ -58,7 +58,6 @@ struct TrainingFlowFeedback: ViewModifier {
 /// Tracks user-driven scrolling, including deceleration, without replacing the ScrollView delegate.
 struct TrainingScrollInteraction: ViewModifier {
   @Binding var isScrolling: Bool
-  @Binding var keyboardVisible: Bool
 
   func body(content: Content) -> some View {
     Group {
@@ -73,17 +72,7 @@ struct TrainingScrollInteraction: ViewModifier {
         }
       }
     }
-    #if os(iOS)
-      .onReceive(
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
-      ) { _ in
-        keyboardVisible = true
-      }
-      .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidHideNotification))
-      { _ in
-        keyboardVisible = false
-      }
-    #endif
+
   }
 }
 

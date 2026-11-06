@@ -1,0 +1,6 @@
+Baseline: origin/release/1.0 @ 7b7d906747584af819606f95d9790a5ee4196d8c
+Source: git archive of Modules, extracted under /private/tmp/meetpr105-baseline
+Runner: macOS SwiftPM, same sandbox and flags as feature full-suite run
+Scope: exactly the 14 previously failing test functions (15 cases/issues due to audio channel parameterization)
+No changed source or tests copied into baseline. Third-party dependency checkouts/repositories only reused.
+No source diff in StudentKit Features/VideoUpload source/tests relative to baseline.

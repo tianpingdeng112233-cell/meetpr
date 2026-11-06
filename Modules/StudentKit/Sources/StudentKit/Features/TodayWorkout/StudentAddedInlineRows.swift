@@ -6,6 +6,7 @@ struct StudentAddedInlineRows: View {
   let drafts: [TodayWorkoutSetRowDraft]
   let viewModel: TodayWorkoutViewModel
   let editable: Bool
+  @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var edits: [UUID: AccessoryRow] = [:]
   @State private var removal: UUID?
 
@@ -35,7 +36,11 @@ struct StudentAddedInlineRows: View {
             onSave: {
               let input = row(draft)
               Task { await viewModel.saveAccessoryRow(input) }
-            })
+            },
+            activeField: keypad?.field(for: draft.id),
+            onInput: { openKeypad(rowID: draft.id, field: $0) }
+          )
+          .id(draft.id)
           if editable {
             Button(StudentStrings.localized(.addedRemoveSet), systemImage: "xmark") {
               if !draft.hasSavedRecord {
@@ -58,6 +63,21 @@ struct StudentAddedInlineRows: View {
       Button(StudentStrings.localized(.addedRemove), role: .destructive) {
         if let removal { Task { await viewModel.removeStudentRow(id: removal) } }
       }
+    }
+  }
+
+  private func openKeypad(rowID: UUID, field: MeetPRNumberPad.Field) {
+    let cells = drafts.flatMap { draft in
+      WorkoutKeypadCell.cells(
+        row: row(draft), name: draft.displayExerciseName,
+        number: draft.prescribed.setIndex + 1, includesEffort: true)
+    }
+    let address = WorkoutKeypadCell.Address(rowID: rowID, field: field)
+    keypad?.open(cells: cells, at: address) { cell, value in
+      guard let draft = drafts.first(where: { $0.id == cell.rowID }) else { return }
+      var updated = row(draft)
+      updated.setKeypadValue(value, field: cell.field)
+      edits[cell.rowID] = updated
     }
   }
 

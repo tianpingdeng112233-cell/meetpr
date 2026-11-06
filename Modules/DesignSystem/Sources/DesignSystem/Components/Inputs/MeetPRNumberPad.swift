@@ -3,7 +3,7 @@ import SwiftUI
 /// Bottom-sheet keypad defined by `NumberPad.dc.html`.
 @MainActor
 public struct MeetPRNumberPad: View {
-  public enum Field: Equatable, Sendable {
+  public enum Field: Hashable, Sendable {
     case weight
     case reps
     case rpe
@@ -22,6 +22,9 @@ public struct MeetPRNumberPad: View {
   private let onNext: (@MainActor (Double) -> Void)?
   private let onCancel: @MainActor () -> Void
 
+  private var onTextCommit: (@MainActor (String) -> Void)?
+  private var unitOverride: String?
+  @State private var textInput: NumberPadTextInput?
   @State private var text = ""
   @State private var feedbackTrigger = 0
 
@@ -52,6 +55,21 @@ public struct MeetPRNumberPad: View {
     self.onCancel = onCancel
   }
 
+  /// Inline cells preserve empty text and validate without barbell snapping.
+  public init(
+    field: Field, text: String, contextText: String, unit: String?,
+    commitTitle: String? = nil,
+    onTextCommit: @escaping @MainActor (String) -> Void,
+    onCancel: @escaping @MainActor () -> Void
+  ) {
+    self.init(
+      field: field, value: 0, contextText: contextText,
+      commitTitle: commitTitle, onCommit: { _ in }, onCancel: onCancel)
+    self._textInput = State(initialValue: NumberPadTextInput(value: text, field: field))
+    self.onTextCommit = onTextCommit
+    self.unitOverride = unit
+  }
+
   /// Weight floor is caller-supplied: 20 fits barbell lifts (empty bar), but
   /// accessories (dumbbell/cable/bodyweight) legitimately go below — pass 0.
   public static func snapped(_ raw: Double, field: Field, minimumWeight: Double = 20) -> Double {
@@ -71,7 +89,7 @@ public struct MeetPRNumberPad: View {
   public var body: some View {
     // dc: header owns its 12pt bottom padding; the grid→buttons gap is 8.
     VStack(spacing: MeetPRSpacing.zero) {
-      if contextText != nil || onSync != nil || onNext != nil {
+      if textInput == nil && (contextText != nil || onSync != nil || onNext != nil) {
         MeetPRNumberPadShortcutHeader(
           contextText: contextText,
           syncTitle: syncTitle,
@@ -125,6 +143,8 @@ public struct MeetPRNumberPad: View {
             .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
         }
         .buttonStyle(PressScaleButtonStyle())
+        .disabled(textInput?.isValid == false)
+        .opacity(textInput?.isValid == false ? 0.4 : 1)
         .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: MeetPRSpacing.space2)
       }
       // dc: `margin-top:8px` on the cancel/confirm row.
@@ -150,19 +170,26 @@ public struct MeetPRNumberPad: View {
     .sensoryFeedback(.selection, trigger: feedbackTrigger)
   }
 
+}
+
+extension MeetPRNumberPad {
   private var header: some View {
     // dc: `padding:2px 4px 12px`; the unit hangs off the value at exactly 5pt.
     HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.zero) {
-      Text(fieldTitle)
+      Text(textInput != nil ? (contextText ?? fieldTitle) : fieldTitle)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .tracking(0.72)
         .foregroundStyle(Color.MeetPR.textMuted)
+        .lineLimit(textInput == nil ? nil : 1)
 
       Spacer()
 
-      Text(text.isEmpty ? initialValueText : text)
+      Text(displayText)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
-        .foregroundStyle(text.isEmpty ? Color.MeetPR.textFaint : Color.MeetPR.textPrimary)
+        .foregroundStyle(
+          textInput == nil && text.isEmpty
+            ? Color.MeetPR.textFaint : Color.MeetPR.textPrimary
+        )
         .multilineTextAlignment(.trailing)
         .frame(minWidth: 80)
         .fixedSize(horizontal: true, vertical: false)
@@ -171,7 +198,7 @@ public struct MeetPRNumberPad: View {
             ? DesignSystemStrings.weight
             : field == .reps ? DesignSystemStrings.reps : field == .rir ? "RIR" : "RPE"
         )
-        .accessibilityValue(text.isEmpty ? initialValueText : text)
+        .accessibilityValue(displayText)
 
       if let fieldUnit {
         Text(fieldUnit)
@@ -185,6 +212,11 @@ public struct MeetPRNumberPad: View {
     .padding(.bottom, MeetPRSpacing.space3)
   }
 
+  private var displayText: String {
+    if let textInput { return textInput.text.isEmpty ? "—" : textInput.text }
+    return text.isEmpty ? initialValueText : text
+  }
+
   private var fieldTitle: String {
     switch field {
     case .weight: DesignSystemStrings.enterWeight
@@ -196,7 +228,7 @@ public struct MeetPRNumberPad: View {
 
   private var fieldUnit: String? {
     switch field {
-    case .weight: "KG"
+    case .weight: unitOverride ?? "KG"
     case .reps: DesignSystemStrings.repsUnit
     case .rpe, .rir: nil
     }
@@ -222,6 +254,11 @@ public struct MeetPRNumberPad: View {
 
   private var deleteButton: some View {
     Button {
+      if textInput != nil {
+        textInput?.deleteLast()
+        feedbackTrigger += 1
+        return
+      }
       guard !text.isEmpty else { return }
       text.removeLast()
       feedbackTrigger += 1
@@ -239,6 +276,11 @@ public struct MeetPRNumberPad: View {
   }
 
   private func append(_ character: String) {
+    if textInput != nil {
+      textInput?.append(character)
+      feedbackTrigger += 1
+      return
+    }
     if character == "." {
       guard field != .reps, field != .rir, !text.isEmpty, !text.contains("."), text.count <= 4
       else {
@@ -261,6 +303,11 @@ public struct MeetPRNumberPad: View {
   }
 
   private func commit() {
+    if let textInput, let onTextCommit {
+      guard textInput.isValid else { return }
+      onTextCommit(textInput.committedText)
+      return
+    }
     guard !text.isEmpty else {
       cancel()
       return
@@ -320,50 +367,4 @@ struct MeetPRNumberPadInputValue {
   }
   .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.light)
-}
-
-/// Context line + optional shortcut chips above the keypad (spec 081 quick-log:
-/// "同步到全部 N 组" / "下一格 →"); the caller resolves the value it hands over.
-@MainActor
-private struct MeetPRNumberPadShortcutHeader: View {
-  let contextText: String?
-  let syncTitle: String?
-  let nextTitle: String?
-  let onSync: (@MainActor () -> Void)?
-  let onNext: (@MainActor () -> Void)?
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.space2) {
-      if let contextText {
-        Text(contextText)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textMuted)
-          .lineLimit(1)
-      }
-      Spacer(minLength: MeetPRSpacing.space1)
-      if let syncTitle, let onSync {
-        shortcutButton(syncTitle, action: onSync)
-      }
-      if let nextTitle, let onNext {
-        shortcutButton(nextTitle, action: onNext)
-      }
-    }
-    .padding(.horizontal, MeetPRSpacing.space1)
-    .padding(.bottom, MeetPRSpacing.space2)
-  }
-
-  private func shortcutButton(
-    _ title: String,
-    action: @escaping @MainActor () -> Void
-  ) -> some View {
-    Button(action: action) {
-      Text(title)
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
-        .foregroundStyle(Color.MeetPR.goldText)
-        .padding(.horizontal, MeetPRSpacing.point10)
-        .frame(minHeight: MeetPRSpacing.point30)
-        .background(Color.MeetPR.goldRGB.opacity(0.12), in: .capsule)
-    }
-    .buttonStyle(PressScaleButtonStyle())
-  }
 }

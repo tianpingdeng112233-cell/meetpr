@@ -1,0 +1,29 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module DesignSystemTests
+[4/5] Compiling DesignSystemTests NumberPadTextInputTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking DesignSystemPackageTests
+Build complete! (1.63s)
+Test Suite 'Selected tests' started at 2026-11-06 10:26:50.702.
+Test Suite 'DesignSystemPackageTests.xctest' started at 2026-11-06 10:26:50.703.
+Test Suite 'DesignSystemPackageTests.xctest' passed at 2026-11-06 10:26:50.703.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 10:26:50.703.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite NumberPadTextInputTests started.
+◇ Test rejectsInvalidEffortAndIntegerDecimals() started.
+◇ Test accessoryWeightDoesNotSnapToBarbell() started.
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:17:5: Expectation failed: !((NumberPadTextInput(value: "10.5", field: .rpe) → NumberPadTextInput(text: "10.5", field: DesignSystem.MeetPRNumberPad.Field.rpe, replacesInitialValue: true)).isValid → true → true)
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:18:5: Expectation failed: !((NumberPadTextInput(value: "9.2", field: .rpe) → NumberPadTextInput(text: "9.2", field: DesignSystem.MeetPRNumberPad.Field.rpe, replacesInitialValue: true)).isValid → true → true)
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:20:5: Expectation failed: !((NumberPadTextInput(value: "0", field: .reps) → NumberPadTextInput(text: "0", field: DesignSystem.MeetPRNumberPad.Field.reps, replacesInitialValue: true)).isValid → true → true)
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:22:5: Expectation failed: !((NumberPadTextInput(value: "101", field: .reps) → NumberPadTextInput(text: "101", field: DesignSystem.MeetPRNumberPad.Field.reps, replacesInitialValue: true)).isValid → true → true)
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:26:5: Expectation failed: (input.text → "0.") == "0"
+✔ Test accessoryWeightDoesNotSnapToBarbell() passed after 0.002 seconds.
+✘ Test rejectsInvalidEffortAndIntegerDecimals() failed after 0.002 seconds with 5 issues.
+✘ Suite NumberPadTextInputTests failed after 0.002 seconds with 5 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.002 seconds with 5 issues.

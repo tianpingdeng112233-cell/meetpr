@@ -1,0 +1,43 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[2/4] Write sources
+[4/6] Emitting module DesignSystem
+[5/6] Compiling DesignSystem MeetPRNumberPad.swift
+[6/7] Emitting module StudentKit
+[7/10] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[8/10] Emitting module StudentKitTests
+[9/10] Compiling StudentKitTests AccessoryRowTests.swift
+[9/11] Write Objects.LinkFileList
+[10/11] Linking StudentKitPackageTests
+Build complete! (12.90s)
+Test Suite 'Selected tests' started at 2026-11-06 11:01:12.759.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 11:01:12.761.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 11:01:12.761.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 11:01:12.761.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() started.
+◇ Suite WorkoutKeypadSessionTests started.
+◇ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() started.
+◇ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() started.
+◇ Test invalidValueDoesNotAdvanceOrCommit() started.
+◇ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() started.
+◇ Test advancesAcrossRowsAndSkipsUnavailableFields() started.
+✔ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() passed after 0.005 seconds.
+✔ Test advancesAcrossRowsAndSkipsUnavailableFields() passed after 0.009 seconds.
+✔ Test invalidValueDoesNotAdvanceOrCommit() passed after 0.009 seconds.
+✔ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() passed after 0.009 seconds.
+✘ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() recorded an issue at WorkoutKeypadSessionTests.swift:83:5: Expectation failed: (session.current?.id.field → .rir) == .reps
+✘ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() recorded an issue at WorkoutKeypadSessionTests.swift:85:5: Expectation failed: (row.reps → 100) == 99
+✘ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() failed after 0.011 seconds with 2 issues.
+✘ Suite WorkoutKeypadSessionTests failed after 0.011 seconds with 2 issues.
+✘ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() recorded an issue at AccessoryRowTests.swift:99:5: Expectation failed: !((row → AccessoryRow(draft: StudentKit.TodayWorkoutSetRowDraft(id: 3DD764D4-BC41-4C42-9ABD-5E72ADF4C22B, planExerciseID: 18D7F351-FCEE-45B9-99B2-690EDB2225F9, exerciseID: BF43DCA7-00BA-4F0F-8B2D-B09DDAAC61D7, exerciseName: "Row", exerciseNameEn: nil, isCatalogExercise: true, isAccessory: true, isMainLift: false, liftFamily: nil, planExerciseSortOrder: 0, prescribed: CoreModels.PrescribedSet(id: 3DD764D4-BC41-4C42-9ABD-5E72ADF4C22B, setIndex: 0, weightKg: Optional(60), intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(12), repsMax: nil, restSeconds: nil, coachNote: nil), actualWeight: Optional(60), actualReps: Optional(12), actualRIR: nil, actualRPE: Optional(8), completed: false, failed: false, assumed: false, loggedSetID: nil, recordedAt: nil, isExtra: false, studentAddedDayID: nil), previous: nil, previousAdded: nil, unit: CoreModels.UnitPreference.lb, hasVideo: false, hasVideoFailure: false, initialInput: StudentKit.AccessoryInput(weight: "132.3", reps: "12", rpe: "", effortMode: StudentKit.ActualEffortMode.rpe), input: StudentKit.AccessoryInput(weight: "55.1", reps: "100", rpe: "", effortMode: StudentKit.ActualEffortMode.rpe))).isWritable → true → true)
+✘ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() failed after 0.014 seconds with 1 issue.
+✘ Test run with 6 tests in 1 suite failed after 0.014 seconds with 3 issues.
