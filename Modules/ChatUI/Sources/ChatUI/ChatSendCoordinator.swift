@@ -17,6 +17,8 @@ private enum ChatSendTaskContext {
 public final class ChatSendCoordinator {
   public let currentUserID: UUID
 
+  private var sentDates: [ChatSendOperationKey: Date] = [:]
+  @ObservationIgnored private let now: @Sendable () -> Date
   @ObservationIgnored private let repository: any ChatRepository
   @ObservationIgnored private let onBindingInvalidated: @Sendable () async -> Void
   private var outboxesByConversationID: [UUID: [ChatOutboxItem]] = [:]
@@ -35,11 +37,17 @@ public final class ChatSendCoordinator {
   public init(
     repository: any ChatRepository,
     currentUserID: UUID,
+    now: @escaping @Sendable () -> Date = { Date() },
     onBindingInvalidated: @escaping @Sendable () async -> Void = {}
   ) {
+    self.now = now
     self.repository = repository
     self.currentUserID = currentUserID
     self.onBindingInvalidated = onBindingInvalidated
+  }
+
+  func sentAt(in conversationID: UUID, clientID: String) -> Date? {
+    sentDates[ChatSendOperationKey(conversationID: conversationID, clientID: clientID)]
   }
 
   public func outbox(in conversationID: UUID) -> [ChatOutboxItem] {
@@ -156,6 +164,7 @@ public final class ChatSendCoordinator {
 
     removeItems(olderThan: survivingGeneration)
     settledClientIDs.removeAll()
+    sentDates.removeAll()
   }
 
   func reportBindingInvalidation() {
@@ -197,8 +206,10 @@ public final class ChatSendCoordinator {
       conversationID: conversationID,
       senderID: currentUserID,
       draft: draft,
-      state: .sending
+      state: .sending,
+      createdAt: now()
     )
+    sentDates[key] = item.createdAt
     if let setRefOperation {
       setRefOperations[key] = setRefOperation
     }
@@ -314,7 +325,8 @@ extension ChatSendCoordinator {
       conversationID: item.conversationID,
       senderID: item.senderID,
       draft: item.draft,
-      state: state
+      state: state,
+      createdAt: item.createdAt
     )
   }
 

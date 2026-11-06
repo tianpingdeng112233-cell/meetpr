@@ -133,6 +133,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
   public let setRef: SetRefV1?
   public let videoURL: URL?
   public let videoExpiresIn: Int?
+  public let posterURL: URL?
+  public let durationSeconds: Int?
   public let clientID: String
   public let createdAt: Date
 
@@ -149,6 +151,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     setRef: SetRefV1? = nil,
     videoURL: URL? = nil,
     videoExpiresIn: Int? = nil,
+    posterURL: URL? = nil,
+    durationSeconds: Int? = nil,
     clientID: String,
     createdAt: Date
   ) {
@@ -164,6 +168,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     self.setRef = setRef
     self.videoURL = videoURL
     self.videoExpiresIn = videoExpiresIn
+    self.posterURL = posterURL
+    self.durationSeconds = durationSeconds
     self.clientID = clientID
     self.createdAt = createdAt
   }
@@ -182,6 +188,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     setRef = try? container.decode(SetRefV1ReadValue.self, forKey: .setRef).value
     videoURL = try container.decodeIfPresent(URL.self, forKey: .videoURL)
     videoExpiresIn = try container.decodeIfPresent(Int.self, forKey: .videoExpiresIn)
+    posterURL = try? container.decodeIfPresent(URL.self, forKey: .posterURL)
+    durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds)
     clientID = try container.decode(String.self, forKey: .clientID)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
@@ -200,6 +208,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
       setRef: setRef,
       videoURL: videoURL,
       videoExpiresIn: videoExpiresIn,
+      posterURL: posterURL,
+      durationSeconds: durationSeconds,
       clientID: clientID,
       createdAt: createdAt
     )
@@ -218,6 +228,8 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     case setRef
     case videoURL = "videoUrl"
     case videoExpiresIn
+    case posterURL = "posterUrl"
+    case durationSeconds
     case clientID = "clientId"
     case createdAt
   }

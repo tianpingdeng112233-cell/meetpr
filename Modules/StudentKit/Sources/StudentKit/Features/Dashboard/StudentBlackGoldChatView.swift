@@ -40,6 +40,7 @@ struct StudentBlackGoldChatView: View {
   @State private var viewportHeight: CGFloat = 0
   @State private var feedbackBeingMarkedRead: Set<UUID> = []
   @State private var didChooseInitialScrollPosition = false
+  @Environment(\.locale) private var locale
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -92,10 +93,10 @@ struct StudentBlackGoldChatView: View {
       chooseInitialScrollPositionIfNeeded()
       await viewModel.pollUntilCancelled()
     }
-    .onChange(of: viewModel.renderedMessages.last?.id) { _, messageID in
-      guard didChooseInitialScrollPosition, let messageID else { return }
+    .onChange(of: viewModel.timelineItems.last?.id) { _, itemID in
+      guard didChooseInitialScrollPosition, let itemID else { return }
       scrollAnchor = .bottom
-      scrollPosition = "message-\(messageID.uuidString)"
+      scrollPosition = itemID
     }
     .onChange(of: viewModel.pending.count) { _, _ in
       guard let clientID = viewModel.pending.last?.clientID else { return }
@@ -159,7 +160,16 @@ struct StudentBlackGoldChatView: View {
   /// Mockup lines 637-645: one chronological scroll merging chat, plan, and
   /// feedback items with 18pt insets and a 10pt row gap.
   private var timeline: some View {
-    ScrollView {
+    let items = timelineItems
+    let separators = ChatRelativeTime.separators(
+      timestamps: items.map(\.occurredAt), locale: locale)
+    let rowSeparators = Dictionary(
+      uniqueKeysWithValues: items.enumerated().compactMap { index, item in
+        separators[index].map { _ in
+          (item.id, ChatRelativeTime.separatorText(item.timestamp, locale: locale))
+        }
+      })
+    return ScrollView {
       LazyVStack(spacing: MeetPRSpacing.point10) {
         if isInitialLoadFailed {
           StudentConversationLoadErrorState {
@@ -180,26 +190,12 @@ struct StudentBlackGoldChatView: View {
           StudentChatHistoryLoadingSentinel(load: loadOlderPreservingPosition)
         }
 
-        if !isConversationEmpty, let timestamp = timelineItems.first?.occurredAt {
-          Text(chatTimestamp(timestamp))
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-            .foregroundStyle(Color.MeetPR.textDim)
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, MeetPRSpacing.space1)
-        }
-
-        ForEach(timelineItems) { item in
+        ForEach(items) { item in
+          if let text = rowSeparators[item.id] { ChatTimestampSeparator(text) }
           timelineRow(item)
             .id(item.id)
         }
 
-        ForEach(viewModel.pending, id: \.clientID) { pending in
-          StudentPendingMessageRow(
-            item: pending,
-            retry: { viewModel.retry(clientID: pending.clientID) }
-          )
-          .id("pending-\(pending.clientID)")
-        }
       }
       .padding(MeetPRSpacing.point18)
       .scrollTargetLayout()
@@ -218,7 +214,10 @@ struct StudentBlackGoldChatView: View {
   @ViewBuilder
   private func timelineRow(_ item: StudentChatTimelineItem) -> some View {
     switch item {
-    case .message(let message):
+    case .chat(.pending(let pending)):
+      StudentPendingMessageRow(
+        item: pending, retry: { viewModel.retry(clientID: pending.clientID) })
+    case .chat(.message(let message, _)):
       if let presentation = ChatSetCardPresentation(message: message) {
         ChatSetCardView(
           presentation: presentation,
@@ -358,7 +357,7 @@ struct StudentBlackGoldChatView: View {
 
   private var timelineItems: [StudentChatTimelineItem] {
     StudentChatTimeline.merged(
-      messages: viewModel.renderedMessages,
+      chatItems: viewModel.timelineItems,
       plan: coordinator.planNotice,
       feedback: coordinator.feedbackItems
     )
@@ -491,14 +490,6 @@ struct StudentBlackGoldChatView: View {
     }
   }
 
-  private func chatTimestamp(_ date: Date) -> String {
-    let time = StudentFormatting.time(date)
-    if Calendar.current.isDateInToday(date) {
-      return StudentStrings.replacing(.studentBlackGoldChatView010, values: ["\(time)"])
-    }
-    let day = StudentFormatting.monthDay(date)
-    return "\(day) \(time)"
-  }
 }
 
 private struct StudentSelectedChatVideo: Identifiable {
@@ -798,12 +789,16 @@ private struct StudentFeedbackChatCard: View {
   }
 
   private var videoCover: some View {
-    ZStack {
+    let cover = ChatVideoCoverPresentation(
+      posterURL: feedback.video?.posterURL, durationSeconds: feedback.video?.durationSeconds)
+    return ZStack {
       LinearGradient(
         colors: [Color.MeetPR.borderStrong, Color.MeetPR.surfaceCard],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
       )
+
+      ChatVideoPoster(url: cover.posterURL)
 
       Image(systemName: "play.fill")
         .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .medium))
@@ -816,7 +811,7 @@ private struct StudentFeedbackChatCard: View {
 
       Text(videoLabel)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-        .foregroundStyle(Color.MeetPR.textPrimary)
+        .foregroundStyle(.white)
         .padding(.horizontal, MeetPRSpacing.point7)
         .padding(.vertical, MeetPRSpacing.point2)
         .background(.black.opacity(0.5))
@@ -825,16 +820,18 @@ private struct StudentFeedbackChatCard: View {
         .padding(.top, MeetPRSpacing.space2)
         .padding(.leading, MeetPRSpacing.point9)
 
-      Text(videoDuration)
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-        .foregroundStyle(.white)
-        .padding(.horizontal, MeetPRSpacing.point6)
-        .padding(.vertical, MeetPRSpacing.point2)
-        .background(.black.opacity(0.6))
-        .clipShape(.rect(cornerRadius: 5))
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-        .padding(.bottom, MeetPRSpacing.space2)
-        .padding(.trailing, MeetPRSpacing.point9)
+      if let duration = cover.durationText {
+        Text(duration)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+          .foregroundStyle(.white)
+          .padding(.horizontal, MeetPRSpacing.point6)
+          .padding(.vertical, MeetPRSpacing.point2)
+          .background(.black.opacity(0.6))
+          .clipShape(.rect(cornerRadius: 5))
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+          .padding(.bottom, MeetPRSpacing.space2)
+          .padding(.trailing, MeetPRSpacing.point9)
+      }
     }
     .frame(height: 150)
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
@@ -844,12 +841,6 @@ private struct StudentFeedbackChatCard: View {
     StudentChatTimeline.videoLabel(for: feedback.video)
   }
 
-  private var videoDuration: String {
-    guard let duration = feedback.video?.durationSeconds else { return "—:—" }
-    let minutes = duration / 60
-    let seconds = duration % 60
-    return "\(minutes):\(seconds < 10 ? "0" : "")\(seconds)"
-  }
 }
 
 private struct StudentChatHistoryLoadingSentinel: View {

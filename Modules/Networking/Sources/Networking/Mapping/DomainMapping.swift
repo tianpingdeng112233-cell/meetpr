@@ -167,7 +167,9 @@ extension FeedbackVideoDTO {
       weightKg: weightKg,
       reps: reps,
       rpe: rpe,
-      loggedAt: loggedAt
+      loggedAt: loggedAt,
+      durationSeconds: durationSeconds,
+      posterURL: posterURL
     )
   }
 }

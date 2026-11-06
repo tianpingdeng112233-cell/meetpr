@@ -3,15 +3,15 @@ import CoreModels
 import DesignSystem
 import Foundation
 
-enum StudentChatTimelineItem: Identifiable, Equatable, Sendable {
-  case message(ChatMessage)
+enum StudentChatTimelineItem: Identifiable, Sendable {
+  case chat(ChatTimelineItem)
   case plan(DashboardPlanNotice)
   case feedback(CoachFeedback)
 
   var id: String {
     switch self {
-    case .message(let message):
-      "message-\(message.id.uuidString)"
+    case .chat(let item):
+      item.id
     case .plan(let notice):
       "plan-\(notice.signature.rawValue)"
     case .feedback(let feedback):
@@ -21,14 +21,19 @@ enum StudentChatTimelineItem: Identifiable, Equatable, Sendable {
 
   var occurredAt: Date {
     switch self {
-    case .message(let message):
-      message.createdAt
+    case .chat(let item):
+      item.groupingDate
     case .plan(let notice):
       notice.occurredAt
     case .feedback(let feedback):
       feedback.postedAt
     }
   }
+  var timestamp: Date {
+    if case .chat(let item) = self { return item.timestamp }
+    return occurredAt
+  }
+
 }
 
 enum StudentChatTimeline {
@@ -39,7 +44,13 @@ enum StudentChatTimeline {
     plan: DashboardPlanNotice?,
     feedback: [CoachFeedback]
   ) -> [StudentChatTimelineItem] {
-    var items = messages.map(StudentChatTimelineItem.message)
+    merged(chatItems: messages.map { .message($0) }, plan: plan, feedback: feedback)
+  }
+
+  static func merged(
+    chatItems: [ChatTimelineItem], plan: DashboardPlanNotice?, feedback: [CoachFeedback]
+  ) -> [StudentChatTimelineItem] {
+    var items = chatItems.map(StudentChatTimelineItem.chat)
     if let plan {
       items.append(.plan(plan))
     }
@@ -97,7 +108,7 @@ enum StudentChatTimeline {
     feedback: [CoachFeedback]
   ) async -> String? {
     let anchor = merged(
-      messages: viewModel.renderedMessages,
+      chatItems: viewModel.timelineItems,
       plan: plan,
       feedback: feedback
     ).first?.id

@@ -246,6 +246,7 @@ private struct ConversationTimeline: View {
   let incomingBubbleColor: Color
   let bubbleLayout: ChatBubbleLayout
   @State private var scrollPosition: String?
+  @Environment(\.locale) private var locale
 
   private var presentation: ConversationTimelinePresentation {
     ConversationTimelinePresentation.resolve(
@@ -281,54 +282,66 @@ private struct ConversationTimeline: View {
   }
 
   private var timeline: some View {
-    ScrollView {
+    let items = viewModel.timelineItems
+    let separators = ChatRelativeTime.separators(
+      timestamps: items.map(\.groupingDate), locale: locale)
+    let rowSeparators = Dictionary(
+      uniqueKeysWithValues: items.enumerated().compactMap { index, item in
+        separators[index].map { _ in
+          (item.id, ChatRelativeTime.separatorText(item.timestamp, locale: locale))
+        }
+      })
+    return ScrollView {
       LazyVStack(spacing: MeetPRSpacing.sm) {
         if viewModel.hasMoreHistory {
           HistoryLoadingSentinel(load: loadOlderPreservingPosition)
         }
 
-        ForEach(viewModel.renderedMessages) { message in
-          ChatMessageRow(
-            message: message,
-            isCurrentUser: message.senderID == viewModel.currentUserID,
-            deliveryStatus: viewModel.deliveryStatus(for: message),
-            openImage: {
-              selectedImage = SelectedChatImage(id: message.id)
-              Task {
-                await viewModel.refreshImageIfNeeded(messageID: message.id)
-              }
-            },
-            openVideo: {
-              Task {
-                guard
-                  let url = try? await viewModel.videoPlaybackURL(messageID: message.id)
-                else {
-                  return
-                }
-                selectedVideo = SelectedChatVideo(id: message.id, url: url)
-              }
-            },
-            imageLoaded: {
-              viewModel.imageLoaded(messageID: message.id)
-            },
-            imageFailed: {
-              await viewModel.imageLoadingFailed(messageID: message.id)
-            },
-            outgoingBubbleColor: outgoingBubbleColor,
-            incomingBubbleColor: incomingBubbleColor,
-            bubbleLayout: bubbleLayout
-          )
-          .id(messageScrollID(message.id))
-        }
-
-        ForEach(viewModel.pending, id: \.clientID) { item in
-          PendingChatMessageRow(
-            item: item,
-            retry: { viewModel.retry(clientID: item.clientID) },
-            outgoingBubbleColor: outgoingBubbleColor,
-            bubbleLayout: bubbleLayout
-          )
-          .id(pendingScrollID(item.clientID))
+        ForEach(items) { item in
+          if let text = rowSeparators[item.id] { ChatTimestampSeparator(text) }
+          Group {
+            switch item {
+            case .message(let message, _):
+              ChatMessageRow(
+                message: message,
+                isCurrentUser: message.senderID == viewModel.currentUserID,
+                deliveryStatus: viewModel.deliveryStatus(for: message),
+                openImage: {
+                  selectedImage = SelectedChatImage(id: message.id)
+                  Task {
+                    await viewModel.refreshImageIfNeeded(messageID: message.id)
+                  }
+                },
+                openVideo: {
+                  Task {
+                    guard
+                      let url = try? await viewModel.videoPlaybackURL(messageID: message.id)
+                    else {
+                      return
+                    }
+                    selectedVideo = SelectedChatVideo(id: message.id, url: url)
+                  }
+                },
+                imageLoaded: {
+                  viewModel.imageLoaded(messageID: message.id)
+                },
+                imageFailed: {
+                  await viewModel.imageLoadingFailed(messageID: message.id)
+                },
+                outgoingBubbleColor: outgoingBubbleColor,
+                incomingBubbleColor: incomingBubbleColor,
+                bubbleLayout: bubbleLayout
+              )
+            case .pending(let pending):
+              PendingChatMessageRow(
+                item: pending,
+                retry: { viewModel.retry(clientID: pending.clientID) },
+                outgoingBubbleColor: outgoingBubbleColor,
+                bubbleLayout: bubbleLayout
+              )
+            }
+          }
+          .id(item.id)
         }
       }
       .padding(MeetPRSpacing.base)
@@ -337,10 +350,8 @@ private struct ConversationTimeline: View {
     .scrollIndicators(.hidden)
     .scrollPosition(id: $scrollPosition, anchor: .top)
     .defaultScrollAnchor(.bottom)
-    .onChange(of: viewModel.renderedMessages.last?.id) { _, newID in
-      if let newID {
-        scrollPosition = messageScrollID(newID)
-      }
+    .onChange(of: viewModel.timelineItems.last?.id) { _, newID in
+      if let newID { scrollPosition = newID }
     }
     .onChange(of: viewModel.pending.count) { _, _ in
       if let clientID = viewModel.pending.last?.clientID {
@@ -350,15 +361,11 @@ private struct ConversationTimeline: View {
   }
 
   private func loadOlderPreservingPosition() async {
-    let anchor = viewModel.messages.first.map { messageScrollID($0.id) }
+    let anchor = viewModel.timelineItems.first?.id
     await viewModel.loadOlder()
     if let anchor {
       scrollPosition = anchor
     }
-  }
-
-  private func messageScrollID(_ id: UUID) -> String {
-    "message-\(id.uuidString)"
   }
 
   private func pendingScrollID(_ clientID: String) -> String {
