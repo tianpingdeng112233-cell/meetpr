@@ -1,0 +1,17 @@
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.91s)
+Test Suite 'Selected tests' started at 2026-11-06 03:31:53.156.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 03:31:53.158.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 03:31:53.158.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 03:31:53.158.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test flexibleUndoAllowsLatestCompletionThreeDaysAgo() started.
+✘ Test flexibleUndoAllowsLatestCompletionThreeDaysAgo() recorded an issue at FlexibleTrainingDayTests.swift:13:3: Expectation failed: FlexibleTrainingDay.canUndo((day.id → 02400000-0000-0000-0000-000000001000), days: ([day] → [CoreModels.StudentPlanDay(id: 02400000-0000-0000-0000-000000001000, weekNumber: 1, dayOfWeek: 1, sortOrder: 0, scheduledDate: 2027-01-15 00:00:00 +0000, shiftedToDate: nil, completedAt: Optional(2027-01-12 08:16:40 +0000), completionSource: Optional("manual"), exercises: [CoreModels.StudentPlanExercise(id: 02400000-0000-0000-0000-000000030000, exercise: CoreModels.Exercise(id: 02400000-0000-0000-0000-000000002000, name: "深蹲", nameEn: Optional("Competition Squat"), exerciseType: CoreModels.ExerciseType.mainLift, mainLiftFamily: Optional(CoreModels.LiftFamily.squat), isCompetitionLift: true, competitionStance: nil, muscleGroups: [CoreModels.MuscleGroup.quad, CoreModels.MuscleGroup.glute, CoreModels.MuscleGroup.back], equipment: [CoreModels.Equipment.barbell], movementPattern: [CoreModels.MovementPattern.squat], createdByCoachID: nil, createdAt: 2026-01-13 00:00:00 +0000), sequenceIndex: 0, prescribedSets: [CoreModels.PrescribedSet(id: 02400000-0000-0000-0000-000000040000, setIndex: 0, weightKg: Optional(142.5), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7.5)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: Optional("下放控制 3 秒")), CoreModels.PrescribedSet(id: 02400000-0000-0000-0000-000000040001, setIndex: 1, weightKg: Optional(142.5), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7.5)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 02400000-0000-0000-0000-000000040002, setIndex: 2, weightKg: Optional(142.5), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7.5)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], notes: Optional("节奏310,底部不停顿"))])]), now: (now → 2027-01-15 08:16:40 +0000))
+✘ Test flexibleUndoAllowsLatestCompletionThreeDaysAgo() failed after 0.046 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.046 seconds with 1 issue.

@@ -1,0 +1,6 @@
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/FlexibleTrainingDay.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/FlexibleTrainingDayTests.swift, Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift, Modules/StudentKit/Tests/StudentKitTests/Repository/StudentPlanRepositoryTests.swift
+Linting 'FlexibleTrainingDay.swift' (1/4)
+Linting 'StudentPlanRepositoryTests.swift' (2/4)
+Linting 'InMemoryStudentPlanRepository.swift' (3/4)
+Linting 'FlexibleTrainingDayTests.swift' (4/4)
+Done linting! Found 0 violations, 0 serious in 4 files.

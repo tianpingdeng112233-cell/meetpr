@@ -1,0 +1,324 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module StudentKit
+[4/5] Compiling StudentKit InMemoryStudentPlanRepository.swift
+[5/8] Compiling StudentKit ProfileDemoScene.swift
+[6/8] Compiling StudentKit GrowthProfileV3Previews.swift
+[7/8] Compiling StudentKit StudentRootView.swift
+[8/57] Compiling StudentKitTests SetSyncLogoutTests.swift
+[9/57] Compiling StudentKitTests SetSyncReceiptTests.swift
+[10/57] Compiling StudentKitTests SetSyncRegressionTests.swift
+[11/57] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[12/57] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[13/62] Compiling StudentKitTests HeroCameraUploadTests.swift
+[14/62] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[15/62] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[16/62] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[17/62] Compiling StudentKitTests SetSyncDraftTests.swift
+[18/62] Compiling StudentKitTests ProfileDetailPagesTests.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[19/62] Compiling StudentKitTests SetNumberSurfaceTests.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[20/62] Compiling StudentKitTests StudentSecondaryCancellationTests.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[21/62] Compiling StudentKitTests AccessorySaveTests.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[22/62] Compiling StudentKitTests CameraPersistenceFixture.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[23/62] Compiling StudentKitTests CameraReturnDuringPersistenceTests.swift
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:117:14: warning: no calls to throwing functions occur within 'try' expression
+115 |       center: FakeTrainingReminderNotificationCenter()), onLogout: {}
+116 |   ).inspect()
+117 |   let rows = try inspected.findAll(MyProfileValueRow.self)
+    |              `- warning: no calls to throwing functions occur within 'try' expression
+118 |   #expect(
+119 |     try rows.map { try $0.actualView().label } == [
+
+/Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:129:17: warning: no calls to throwing functions occur within 'try' expression
+127 |     ])
+128 |   let account = try inspected.find(AccountSecuritySection.self)
+129 |   let buttons = try account.findAll(ViewType.Button.self)
+    |                 `- warning: no calls to throwing functions occur within 'try' expression
+130 |   #expect(
+131 |     try buttons.map { try $0.accessibilityIdentifier() } == [
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:134:74: note: expanded code originates here
+132 |       "account.changePassword", "account.export", "account.delete",
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(AppearancePreferenceRow.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(AppearancePreferenceRow.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+136 | }
+
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-104/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:135:71: note: expanded code originates here
+133 |     ])
+134 |   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
+135 |   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try inspected.findAll(ProfileSignOutButton.self).count == 1,expression: .__fromSyntaxNode("try inspected.findAll(ProfileSignOutButton.self).count == 1"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+136 | }
+137 |
+[24/62] Compiling StudentKitTests VideoCompletionIngestionTests.swift
+[25/62] Compiling StudentKitTests VideoCompletionIntegrationTests.swift
+[26/62] Compiling StudentKitTests VideoCompletionReviewRegressionTests.swift
+[27/62] Compiling StudentKitTests VideoCompletionRewardRouteTests.swift
+[28/62] Compiling StudentKitTests VideoCompletionRuntimeTests.swift
+[29/62] Compiling StudentKitTests GrowthE1RMCardPolicyTests.swift
+[30/62] Compiling StudentKitTests GrowthScreenPresentationTests.swift
+[31/62] Compiling StudentKitTests GrowthTotalTests.swift
+[32/62] Compiling StudentKitTests TrainingHistoryViewModelTests.swift
+[33/62] Compiling StudentKitTests VideoDeliveryRetryTests.swift
+[34/62] Compiling StudentKitTests VideoRestoreDayScopeTests.swift
+[35/62] Compiling StudentKitTests WeekOverviewViewModelTests.swift
+[36/62] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[37/62] Compiling StudentKitTests StudentPlanRepositoryTests.swift
+[38/62] Compiling StudentKitTests StudentRootViewTests.swift
+[39/62] Compiling StudentKitTests TodayWorkoutRestTimerTests.swift
+[40/62] Compiling StudentKitTests TodayWorkoutSetRefEntryLayoutTests.swift
+[41/62] Compiling StudentKitTests TodayWorkoutSuggestionBaselineTests.swift
+[42/62] Compiling StudentKitTests TodayWorkoutViewModelTests.swift
+[43/62] Compiling StudentKitTests VideoCompletionBoundaryTests.swift
+[44/62] Compiling StudentKitTests DashboardE1RMFormingStateTests.swift
+[45/62] Compiling StudentKitTests DashboardE1RMTrendViewModelTests.swift
+[46/62] Compiling StudentKitTests DashboardNotificationsViewModelTests.swift
+[47/62] Compiling StudentKitTests DashboardTodayPresentationTests.swift
+[48/62] Compiling StudentKitTests StudentEmptyStateViewTests.swift
+[49/62] Compiling StudentKitTests GrowthCurveViewModelTests.swift
+[50/62] Compiling StudentKitTests TodayWorkoutPersistOrderingTests.swift
+[51/62] Compiling StudentKitTests TodayWorkoutQuickLogDateRangeTests.swift
+[52/62] Compiling StudentKitTests TodayWorkoutQuickLogRetryTests.swift
+[53/62] Compiling StudentKitTests TodayWorkoutQuickLogTestSupport.swift
+[54/62] Compiling StudentKitTests TodayWorkoutQuickLogTests.swift
+[55/62] Compiling StudentKitTests StudentAddedFailureTests.swift
+[56/62] Compiling StudentKitTests StudentAddedWriteTests.swift
+[57/62] Compiling StudentKitTests TodaySetRefSharingSourceTests.swift
+[58/62] Compiling StudentKitTests TodayWorkoutAssumedWriteBackTests.swift
+[59/62] Compiling StudentKitTests TodayWorkoutPRHookTests.swift
+[60/62] Emitting module StudentKitTests
+[60/62] Write Objects.LinkFileList
+[61/62] Linking StudentKitPackageTests
+Build complete! (19.10s)
+Test Suite 'Selected tests' started at 2026-11-06 10:07:12.909.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 10:07:12.910.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 10:07:12.910.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 10:07:12.910.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test undoAllowsLatestCompletionThreeDaysAgo() started.
+◇ Test undoWindowIgnoresDeviceFourAMBoundary() started.
+✔ Test undoWindowIgnoresDeviceFourAMBoundary() passed after 0.016 seconds.
+✔ Test undoAllowsLatestCompletionThreeDaysAgo() passed after 0.016 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.016 seconds.

@@ -91,7 +91,8 @@ import Testing
   }
 }
 
-@Test func undoRejectsCompletionOutsideCurrentGymDay() async throws {
+@Test(arguments: [0.0, 259_200.0, 601_200.0, 604_799.0])
+func undoAllowsLatestCompletionWithinSevenDays(elapsed: TimeInterval) async throws {
   let studentID = UUID()
   let now = Date(timeIntervalSince1970: 2_000_000_000)
   let base = sequencePlan()
@@ -99,7 +100,7 @@ import Testing
     in: base,
     with: [
       base.days[0].replacingCompletion(
-        completedAt: now.addingTimeInterval(-86_400), source: "manual"),
+        completedAt: now.addingTimeInterval(-elapsed), source: "manual"),
       base.days[1],
     ]
   )
@@ -108,9 +109,33 @@ import Testing
     now: { now }
   )
 
+  try await repository.undoDayCompletion(id: plan.days[0].id, studentID: studentID)
+  let restored = try #require(try await repository.fetchCurrentPlan(studentID: studentID))
+  #expect(restored.days[0].completedAt == nil)
+  #expect(StudentPlanSequence.cursorDay(in: restored)?.id == plan.days[0].id)
+}
+
+@Test(arguments: [604_800.0, 604_860.0, 691_200.0])
+func undoRejectsCompletionAtOrBeyondSevenDays(elapsed: TimeInterval) async throws {
+  let studentID = UUID()
+  let now = Date(timeIntervalSince1970: 2_000_000_000)
+  let base = sequencePlan()
+  let plan = replacingDays(
+    in: base,
+    with: [
+      base.days[0].replacingCompletion(
+        completedAt: now.addingTimeInterval(-elapsed), source: "manual"),
+      base.days[1],
+    ]
+  )
+  let repository = InMemoryStudentPlanRepository(
+    store: TestStudentPlanStore(seed: [studentID: plan]), now: { now }
+  )
+
   await #expect(throws: PlanDayCompletionError.undoWindowPassed) {
     try await repository.undoDayCompletion(id: plan.days[0].id, studentID: studentID)
   }
+  #expect(try await repository.fetchCurrentPlan(studentID: studentID) == plan)
 }
 
 @Test func recordingEveryPrescribedSlotDoesNotCompleteDayUntilManualCompletion() async throws {
@@ -170,7 +195,7 @@ import Testing
   )
 }
 
-@Test func undoWindowUsesDeviceFourAMBoundary() async throws {
+@Test func undoWindowIgnoresDeviceFourAMBoundary() async throws {
   let studentID = UUID()
   var calendar = Calendar(identifier: .gregorian)
   calendar.timeZone = try #require(TimeZone(identifier: "Asia/Shanghai"))
@@ -197,9 +222,8 @@ import Testing
   )
 
   try await beforeCutoff.undoDayCompletion(id: completedPlan.days[0].id, studentID: studentID)
-  await #expect(throws: PlanDayCompletionError.undoWindowPassed) {
-    try await atCutoff.undoDayCompletion(id: completedPlan.days[0].id, studentID: studentID)
-  }
+  try await atCutoff.undoDayCompletion(id: completedPlan.days[0].id, studentID: studentID)
+  #expect(try await atCutoff.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt == nil)
 }
 
 @Test func undoThenRefillingSetRequiresManualCompletionAgain() async throws {
