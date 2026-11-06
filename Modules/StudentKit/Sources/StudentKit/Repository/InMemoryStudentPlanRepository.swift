@@ -3,17 +3,16 @@ import Foundation
 import RepositoryContracts
 
 public actor InMemoryStudentPlanRepository: StudentPlanRepository {
+  private static let completionUndoWindow: TimeInterval = 7 * 24 * 3600
   private let store: any StudentPlanStore
-  private let calendar: Calendar
   private let now: @Sendable () -> Date
 
   public init(
     store: any StudentPlanStore,
-    calendar: Calendar? = nil,
+    calendar _: Calendar? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.store = store
-    self.calendar = calendar ?? WorkoutDatePolicy.deviceCalendar
     self.now = now
   }
 
@@ -87,10 +86,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
     guard latest?.0.id == id else {
       throw PlanDayCompletionError.notLatestCompletion
     }
-    guard
-      WorkoutDatePolicy.gymDayRange(containing: now(), calendar: calendar)
-        .contains(completedAt)
-    else {
+    guard now().timeIntervalSince(completedAt) < Self.completionUndoWindow else {
       throw PlanDayCompletionError.undoWindowPassed
     }
 

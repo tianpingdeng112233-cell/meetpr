@@ -76,19 +76,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Completion can only be undone on the same day"
+            "value": "You can only undo workouts completed in the last 7 days"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "只能在当天撤销"
+            "value": "只能撤销 7 天内完成的训练"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "只能在當天復原"
+            "value": "只能復原 7 天內完成的訓練"
           }
         }
       }
