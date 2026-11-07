@@ -98,6 +98,8 @@ import Testing
     row.input.reps = reps
     #expect(!row.isWritable)
   }
+  row.input.reps = "99"
+  #expect(row.reps == 99 && row.isWritable)
   row.input.reps = "12"
   row.input.rpe = "8,5"
   #expect(row.rpe == 8.5 && row.isWritable)

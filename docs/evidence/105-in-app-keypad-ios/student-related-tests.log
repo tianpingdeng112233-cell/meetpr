@@ -1,0 +1,659 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling DesignSystem NumberPadTextInput.swift
+[5/6] Emitting module DesignSystem
+[6/8] Emitting module StudentKit
+[7/8] Compiling StudentKit AccessoryRow.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking StudentKitPackageTests
+Build complete! (5.06s)
+Test Suite 'Selected tests' started at 2026-11-06 11:01:47.405.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 11:01:47.406.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 11:01:47.406.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 11:01:47.406.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetEntryValueTests started.
+◇ Suite TodayWorkoutPresentationTests started.
+◇ Test loadTypeFreeWeightOverridesLegacyMarkerAndRequiresActualWeight() started.
+◇ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() started.
+◇ Suite SetSyncViewInjectionTests started.
+◇ Test completionEdgeStartsTimerWithRPEDuration() started.
+◇ Test workoutKeepsLowRPEInDisplayButRequiresCalibrationForSuggestionBaseline() started.
+◇ Suite "StudentKit localization" started.
+◇ Suite OfflineAccessoryTests started.
+◇ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() started.
+◇ Suite "Set number surfaces" started.
+◇ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() started.
+◇ Test deletedHighestAddedWeightRestoresNonPRBaseline() started.
+◇ Test uncheckingThenRecheckingDoesNotFarmDuplicatePRs() started.
+◇ Suite OfflineSetRecordingTests started.
+◇ Test trainingPlanRefreshAppliesChangedDayAndKeepsUnsubmittedDraft() started.
+◇ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test makeHistoricalLogsSeedsNoFutureLogs() started.
+◇ Test addedCancellationDoesNotRepeatCompletionFeedback() started.
+◇ Suite IntensityWeightSuggestionTests started.
+◇ Test extraFailureKeepsInputAndCanRetry() started.
+◇ Suite SetSyncDraftTests started.
+◇ Test todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() started.
+◇ Suite SetSyncControlTests started.
+◇ Test addedHistoryMarksExtraAndIncludesFamilyRecords() started.
+◇ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() started.
+◇ Suite SetEntryVideoPlaybackStateTests started.
+◇ Suite SetSyncNetworkTests started.
+◇ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() started.
+◇ Test restoredAccessoryExtraKeepsActualRIRWhenWeightChanges() started.
+◇ Test spec085ReceivesExplicitDaysAgainAndOrdinaryRoutesReturnToCursor() started.
+◇ Test accessoryActualRIRSaveAndReloadKeepsOriginalMetric() started.
+◇ Suite SetSyncSuspendedRequestTests started.
+◇ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() started.
+◇ Test emptyRefreshKeepsTheLoadedWorkoutAndItsDraft() started.
+◇ Test loadTypeMainLiftUsesSameExplicitWeightRecording() started.
+◇ Suite TodayWorkoutQuickLogTests started.
+◇ Test todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() started.
+◇ Suite SetSyncLogoutTests started.
+◇ Test loadTypeCompletionCannotPersistMissingFreeWeight() started.
+◇ Suite SetSyncCompletionTests started.
+◇ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() started.
+◇ Suite SetEntryVideoPlayerTests started.
+◇ Suite TodayWorkoutSelectionResolverTests started.
+◇ Test accessoryEffortSwitchClearsOnlyUnrecordedEffortAndPreservesSavedRIR() started.
+◇ Test todayWorkoutViewModelExplainsServerRecordingFailure() started.
+◇ Suite WorkoutKeypadSessionTests started.
+◇ Suite TodayWorkoutExerciseSectionTests started.
+◇ Test addedErrorsHaveSpecificRecovery(code:) started.
+◇ Suite SetEntryPlateMathTests started.
+◇ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() started.
+◇ Test loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test studentSessionSummaryReportsTopSetPerExercise() started.
+◇ Suite TrainingHistoryVideoTests started.
+◇ Suite SetEntryRPEScaleTests started.
+◇ Suite TrainingFlowTests started.
+◇ Suite SetSyncRegressionTests started.
+◇ Suite SetSyncQueueTests started.
+◇ Suite "Today workout set-ref entry layout" started.
+◇ Suite TodayWorkoutQuickLogRetryTests started.
+◇ Suite SetSyncReceiptTests started.
+◇ Suite TrainingCalendarScrollStateTests started.
+◇ Test bodyweightCompactRowsUseTheHeaderUnitAlongsideFixedRows() started.
+◇ Test completionEdgePrefersPrescribedRestSecondsOverStudentPreference() started.
+◇ Suite SBDWeekBadgeTests started.
+◇ Suite TodayWorkoutQuickLogDateRangeTests started.
+◇ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() started.
+◇ Test loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test todayWorkoutDistinguishesMissingPlanFromRestDay() started.
+◇ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() started.
+◇ Test explanationIsAcknowledgedOnceAcrossViewModels() started.
+◇ Test studentSessionSummaryAggregatesCompletedSetsOnly() started.
+◇ Test todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() started.
+◇ Test silentlyAcknowledgesUnacknowledgedPRsOnLaunch() started.
+◇ Test case passing 1 argument localDayCase → Europe/London-BST to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-DST-start to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test lowRPECompletionUsesSegmentedCalculatorAndRecordsE1RM() started.
+◇ Test fullEntryRejectsOtherWeekWrites() started.
+◇ Test case passing 1 argument localDayCase → Europe/London-DST-end to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-DST-start to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-standard to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test studentFormattingResultOmitsMissingWeightAndRPE() started.
+◇ Test lastSetOfTheDayDoesNotStartTimer() started.
+◇ Test case passing 1 argument localDayCase → Asia/Shanghai-all-hours to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-GMT to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test firstCompletionRecordsPointAndDetectsPR() started.
+◇ Test case passing 1 argument localDayCase → America/New_York-DST-end to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test addedRecordsContributeToHistoryStatsAndCSV() started.
+◇ Test completionMutationsFetchAndPropagateOneProjectionEach() started.
+◇ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() started.
+◇ Test bodyweightCardUsesCompactRowsWithOneWeightCaption() started.
+◇ Test todayWorkoutViewModelMapsGenericLoadFailureToRetryMessage() started.
+◇ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() started.
+◇ Test case passing 1 argument localDayCase → America/New_York-daylight to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() started.
+◇ Test loadTypeQuickLogCannotBypassRequiredWeight() started.
+◇ Test "Custom preference uses actual RPE bands" started.
+◇ Test loadTypeBodyweightSaveReloadAndOverwritePreserveWeight() started.
+◇ Test overlappingVideoMintAndCompleteApplyInOrder() started.
+◇ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() started.
+◇ Test consecutiveCompletionsReplaceTheTimer() started.
+◇ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() started.
+◇ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() started.
+◇ Test reconcileCannotConsumeLivePRBeforeE1RMRecordingResumes() started.
+◇ Test fieldReEditCountsCompletedEditSessionsNotKeystrokes() started.
+◇ Test todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() started.
+◇ Test "Badge-facing parsers hide untouched fields instead of clamping them" started.
+◇ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() started.
+◇ Test accessoryClassificationRequiresResolvedCatalogType() started.
+◇ Test loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode:) started.
+◇ Test todayWorkoutViewModelUpdatesActualWeight() started.
+◇ Test loadTypeLegacyBodyweightRetainsOtherCoachCuesAndExtraWeight() started.
+◇ Test selectingAnotherSequenceDayReusesThePlanLogSnapshot() started.
+◇ Test todayWorkoutViewModelPersistsEditsToCompletedSet() started.
+◇ Test completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() started.
+◇ Test ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() started.
+◇ Test todayWorkoutKeepsHandedOffPlanWhenRefreshFails() started.
+◇ Test shiftedPlanPushesIncrementTrainingRefreshRevision() started.
+◇ Test recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration() started.
+◇ Test editingAlreadyCompletedSetDoesNotRestartTimer() started.
+◇ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() started.
+◇ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() started.
+◇ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() started.
+◇ Test todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() started.
+◇ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() started.
+◇ Test failedCompletionDoesNotRecordPointOrDetectPR() started.
+◇ Test realSaveOverAssumedRecordRestoresSharingImmediately() started.
+◇ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() started.
+◇ Test extraRowsNeverReplacePrescriptionProgressAndBatch() started.
+◇ Test loadTypeBodyweightAcceptsEmptyAndPreservesExtraWeight() started.
+◇ Test e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() started.
+◇ Test deletingAddedSetRemovesItsE1RMAndPR() started.
+◇ Test mismatchedSquatStanceDoesNotClaimMainLiftInTitle() started.
+◇ Test completionPresentsCelebrationWhileSendingThenConfirmsReceipt() started.
+◇ Test sameTimestampCompletionsDoNotDoubleFirePRs() started.
+◇ Test case passing 1 argument code → "SET_HAS_ATTACHMENT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_COACH_FEEDBACK" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test todayWorkoutKeepsLogsRecordedBeforeCoachShift() started.
+◇ Test stalePersistDoesNotTouchReloadedState() started.
+◇ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() started.
+◇ Test case passing 1 argument code → "SET_NOT_STUDENT_ADDED" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() started.
+◇ Test extraCancellationRemovesE1RMAndPR() started.
+◇ Test loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test actualRIRSurvivesLogCodableRoundTrip() started.
+◇ Test todayWorkoutViewModelMapsExpiredSessionDuringLoadToLoginMessage() started.
+◇ Test case passing 1 argument code → "SETS_ADHOC_DAY_CONFLICT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() started.
+◇ Test accessoryOverwriteRestMatchesLiveActivity() started.
+◇ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → nil to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() started.
+◇ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() started.
+◇ Test todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() started.
+◇ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() started.
+◇ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() started.
+◇ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() started.
+◇ Test completionDoesNotReopenDismissedReward(failing:) started.
+◇ Test rpePrescriptionWithoutWeightKeepsOptionalTarget() started.
+◇ Test adjustClampsRemainingBetweenZeroAnd900() started.
+◇ Test completionSendingReceiptIsLocalizedInBothLanguages() started.
+◇ Test extraPrefillUsesMostRecentlyRecordedSet() started.
+◇ Test quickLogIsAllowedOnlyForEditableListHero() started.
+◇ Test loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode:) started.
+◇ Test zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() started.
+◇ Test allDoneHasNoRemainingWork() started.
+◇ Test assumedHistoryDoesNotStartColdLaunchWorkout() started.
+◇ Test completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest() started.
+◇ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() started.
+◇ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() started.
+◇ Test failedRealLogResumesColdLaunchWorkout() started.
+◇ Test partialRealLogResumesRecordingHero() started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → 8 to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded() started.
+◇ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() started.
+◇ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() started.
+◇ Test lowBarStudentGetsSquatTitleForLowBarVariationDay() started.
+◇ Test rpeTenIsNotTruncated() started.
+◇ Test trainingPlanRefreshSkipsASecondRequestInsideTheSharedInterval() started.
+◇ Test clampsOutOfRangeOnCommit() started.
+◇ Test parsesMultiDigitAndDecimal() started.
+◇ Test draftMappingKeepsFailureAndVideoSemantics() started.
+◇ Test completedDayKeepsReadOnlyDetailAcrossColdLaunch() started.
+◇ Test loadTypeCardKeepsEveryPerSetIntensityTarget() started.
+◇ Test textRoundTripsWithoutTrailingZeros() started.
+◇ Test zeroSetDayHasNoRemainingWork() started.
+◇ Test todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() started.
+◇ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() started.
+◇ Test invalidSelectedDayFallsBackToSequenceCursor() started.
+◇ Test emptyOrGarbageFallsBackSafely() started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → nil to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → 8 to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → nil to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → 8 to loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) started.
+◇ Test commaDecimalIsNormalized() started.
+◇ Test "English count copy selects singular and plural catalog entries" started.
+◇ Test "Dynamic Chinese templates preserve the original result" started.
+◇ Test "Critical Chinese copy remains byte-identical" started.
+◇ Test workoutViewPassesQueueAcrossItsHostingBoundary() started.
+◇ Test "English count copy uses the designated placeholder" started.
+◇ Test "List punctuation follows locale without changing Chinese output" started.
+◇ Test "Load type catalog values never use printf placeholders" started.
+◇ Test "Catalog exercise names use nameEn only for English display" started.
+◇ Test "Critical English copy is available" started.
+◇ Test "Load type copy substitutes the set number in every language" started.
+◇ Test pendingAccessoryKeepsEditedWeightAndCanCancelBeforeVideoHydration() started.
+◇ Test "set entry sheet renders a source-zero draft as set one" started.
+◇ Test "today workout table offset path renders source index zero as set one" started.
+◇ Test "today workout hero stored-index path renders source index zero as set one" started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → nil to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → 8 to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → nil to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → 8 to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → nil to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → 8 to loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) started.
+◇ Test mainSetAndAccessoryReturnBeforeNetworkAndRefreshKeepsEdits() started.
+◇ Test accessoryPercentageIsUnresolvedAndNeverPrefills() started.
+◇ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test unfilledEditsAndRemovalPersistWithoutEnteringTheSendQueue() started.
+◇ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() started.
+◇ Test syncingUsesWhiteTrainingButtonForeground() started.
+◇ Test attachingVideoPromotesAnUnfilledRowToASendableRecord() started.
+◇ Test oldAcknowledgementCannotTurnAReusedEmptySlotIntoASavedRow() started.
+◇ Test networkRecoveryBypassesBackoff() started.
+◇ Test case passing 2 arguments actualRPE → nil, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 8.5, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test failedControlUsesOrange() started.
+◇ Test case passing 2 arguments actualRPE → 7, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 9, expectedSeconds → 300 to "Custom preference uses actual RPE bands" started.
+◇ Test playbackStartsPausedAndExpansionPreservesTimeAndSpeed() started.
+◇ Test case passing 2 arguments actualRPE → 6.5, expectedSeconds → 105 to "Custom preference uses actual RPE bands" started.
+◇ Test oldCompletionResponseCannotOverwriteNewLoginIntent() started.
+◇ Test oldSetResponseCannotOverwriteNewLoginQueue() started.
+◇ Test case passing 1 argument mode → .bodyweight to loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode:) started.
+◇ Test case passing 1 argument mode → nil to loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode:) started.
+◇ Test case passing 1 argument mode → .freeWeight to loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode:) started.
+◇ Test case passing 2 arguments text → "", allowed → false to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "   ", allowed → false to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "0", allowed → true to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test suspendedRequestDoesNotBlockOtherRowsOrCommit() started.
+◇ Test case passing 2 arguments text → "142.5", allowed → true to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test excludingEverySetRejectsWithoutWritingOrCompleting() started.
+◇ Test completionFailureKeepsWrittenSetsAndReturnsSeparateOutcome() started.
+◇ Test prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() started.
+◇ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() started.
+◇ Test logoutCountIsInterpolatedInEveryLanguage() started.
+◇ Test uploadThenLogoutAndCancel() started.
+◇ Test exclusionsWriteOnlyIncludedPrescriptionSlots() started.
+◇ Test partialFailureWritesSuccessfulSetsBackIntoDrafts() started.
+◇ Test durableGateRequiresBothInputsAndCallsCompletionOnce() started.
+◇ Test rejectionFailsImmediatelyAndLeavingResets() started.
+◇ Test timeoutDoesNotRewardAndRetryStartsNewDeadline() started.
+◇ Test unrecordedAccessoryQuickLogDoesNotSubmitPrescribedOrFallbackRPE() started.
+◇ Test staleUpdateFromOutgoingSurfaceDoesNotStealPlayer() started.
+◇ Test directLogoutRetainsAccountQueue() started.
+◇ Test emptyQueueGoesStraightToReward() started.
+◇ Test jumpReturnsCursorAndIsClockIndependent() started.
+◇ Test setOrdinalIsInterpolatedInBothLanguages() started.
+◇ Test surfaceHandoffExclusivelyBindsPlayerAndIgnoresLateDetach() started.
+◇ Test resizingPlayerSurfacePreservesActualPlaybackTime() started.
+◇ Test expandedHeaderOmitsMissingFields() started.
+◇ Test completedReplayIsReadOnlyAndRoutesReview() started.
+◇ Test readOnlyPlaybackKeepsPlayingIntentAcrossAutomaticURLRefresh() started.
+✔ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() passed after 0.007 seconds.
+◇ Test expandedHeaderIncludesAvailableSetMetrics() started.
+◇ Test centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+◇ Test initialSelectionPrefersExplicitIdentityThenCursor() started.
+◇ Test draftBuilderCarriesExerciseClassificationIntoPlateLoadingGate() started.
+◇ Test sectionsOmitEmptyKinds() started.
+◇ Test exerciseClassificationHelpersUseOnlyExerciseType() started.
+◇ Test sectionsPutMainLiftsAndVariationsBeforeAccessoriesWithoutReordering() started.
+◇ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() started.
+◇ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() started.
+◇ Test invalidValueDoesNotAdvanceOrCommit() started.
+◇ Test setEntryAlwaysStartsWithCollarOff() started.
+◇ Test advancesAcrossRowsAndSkipsUnavailableFields() started.
+◇ Test perSideDropsCollarOnlyWhenOn() started.
+◇ Test bareBarWithoutCollarUsesExactEmptyBarCopy() started.
+◇ Test groupedPlateCopyAndCollarSuffixAreExact() started.
+◇ Test collarOnlyLoadReadsAsCollarOnly() started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → nil to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → nil, targetRPE → 8 to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → nil to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test platesMatchGreedyLoadForPerSide() started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → nil to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .bodyweight, targetRPE → 8 to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test case passing 2 arguments mode → .freeWeight, targetRPE → 8 to loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) started.
+◇ Test case passing 1 argument failing → false to completionDoesNotReopenDismissedReward(failing:) started.
+◇ Test rpeTextBridgeSnapsClampsAndRoundTrips() started.
+◇ Test case passing 1 argument failing → true to completionDoesNotReopenDismissedReward(failing:) started.
+◇ Test scrubIntentSplitsHorizontalFromVertical() started.
+◇ Test historyUsesActualLogIDForExtraAndStudentAddedSets() started.
+◇ Test snapClampsAndRoundsToHalfSteps() started.
+◇ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() started.
+◇ Test scrubIntentStaysUndecidedUntilTheFingerTravels() started.
+◇ Test decimalSnapAlignsNonHalfStepSeed() started.
+◇ Test tickHeightsAndLitRangeMatchV3Contract() started.
+◇ Test valueSnapsToTheNearestTickCentre() started.
+◇ Test valueRoundsAtTheMidpointBetweenTwoTicks() started.
+◇ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() started.
+◇ Test lockedIntentHoldsForTheRestOfTheGesture() started.
+◇ Test onlyAnUncommittedTouchWritesOnRelease() started.
+◇ Test indexRoundTripsEveryStop() started.
+◇ Test case passing 1 argument mode → nil to loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode:) started.
+◇ Test case passing 1 argument mode → .bodyweight to loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode:) started.
+◇ Test case passing 1 argument mode → .freeWeight to loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode:) started.
+◇ Test valueClampsOutsideTheStrip() started.
+◇ Test cellGeometryAccountsForTheGapsBetweenTicks() started.
+◇ Test descriptionMapsEveryHalfStepToRIRCopy() started.
+◇ Test valueRejectsStripsTooNarrowToHoldElevenCells() started.
+◇ Test aScrollThatReturnsToItsStartStillRefusesToWrite() started.
+◇ Test acknowledgedOverlayDoesNotOverwriteNewPrescription() started.
+◇ Test queuedExtraCancellationRepairsDerivedHistory() started.
+◇ Test twoDeletedPlanSlotsDoNotOverwriteSameAddedSlot() started.
+◇ Test immediateDayHasPriorityAndStopPreservesRecords() started.
+◇ Test editingExistingPlannedSetKeepsItsLoggedDate() started.
+◇ Test restoringQueuePrunesOnlyReceiptsOlderThanFourteenDays() started.
+◇ Test durableQueueRestoresLatestEditAndKeepsAccountsSeparate() started.
+◇ Test transientFailureKeepsLocalStateThenRetries() started.
+◇ Test sameAddedSlotKeepsOriginalDateAcrossMidnight() started.
+◇ Test serverSnapshotRemovesAcknowledgedReceiptDurably() started.
+◇ Test sendsInOrderAndLastCancellationWins() started.
+◇ Test rejectedRecordStopsUntilExplicitRetry() started.
+◇ Test "v3 set row stays free of a per-row ask-coach entry" started.
+◇ Test "in-progress hero owns the only ask-coach entry" started.
+◇ Test "all recorded hides the hero and its ask-coach entry (spec 090)" started.
+◇ Test dateLowerBoundUsesThePreviousDaysTrainingDate() started.
+◇ Test freshSheetForgetsThePreviousAttempt() started.
+◇ Test changingTheDateAfterPartialFailureRewritesEverySetOnTheNewDate() started.
+◇ Test quickLogCompletesTheDayItWroteEvenIfTheCursorMovesMidFlight() started.
+◇ Test reopeningConvertedDayWithCachedPlanKeepsOneRowPerRecord() started.
+◇ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() started.
+◇ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() started.
+◇ Test openCalendarClosesOnlyPast56WithMoreThan200Slack() started.
+◇ Test closedCalendarReopensOnlyBelow6() started.
+◇ Test case passing 1 argument language → "zh-Hans" to "Load type copy substitutes the set number in every language" started.
+◇ Test case passing 1 argument language → "en" to "Load type copy substitutes the set number in every language" started.
+◇ Test case passing 1 argument language → "zh-Hant" to "Load type copy substitutes the set number in every language" started.
+◇ Test mixedMainAndAccessoryKeepsOnlyMain() started.
+◇ Test weekOverviewKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() started.
+✔ Test loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(mode:targetRPE:) with 6 test cases passed after 0.015 seconds.
+◇ Test coldLoadKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() started.
+✔ Test studentFormattingResultOmitsMissingWeightAndRPE() passed after 0.015 seconds.
+✔ Test addedRecordsContributeToHistoryStatsAndCSV() passed after 0.015 seconds.
+✔ Test fieldReEditCountsCompletedEditSessionsNotKeystrokes() passed after 0.014 seconds.
+✔ Test accessoryClassificationRequiresResolvedCatalogType() passed after 0.014 seconds.
+✔ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() passed after 0.014 seconds.
+◇ Test case passing 1 argument intensity → .rir(2) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+✔ Test "Badge-facing parsers hide untouched fields instead of clamping them" passed after 0.014 seconds.
+✔ Test completionEligibilityRequiresExplicitWeight(text:allowed:) with 4 test cases passed after 0.014 seconds.
+◇ Test case passing 1 argument intensity → .rpeRange(8, 9) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .weightRange(165, 175) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+✔ Test shiftedPlanPushesIncrementTrainingRefreshRevision() passed after 0.014 seconds.
+◇ Test case passing 1 argument expanded → true to centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+✔ Test mismatchedSquatStanceDoesNotClaimMainLiftInTitle() passed after 0.015 seconds.
+◇ Test case passing 1 argument expanded → false to centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+✔ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() passed after 0.014 seconds.
+✔ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() passed after 0.014 seconds.
+✔ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() passed after 0.014 seconds.
+✔ Test loadTypeFreeWeightOverridesLegacyMarkerAndRequiresActualWeight() passed after 0.017 seconds.
+✔ Test actualRIRSurvivesLogCodableRoundTrip() passed after 0.015 seconds.
+✔ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() passed after 0.017 seconds.
+✔ Test clampsOutOfRangeOnCommit() passed after 0.014 seconds.
+✔ Test rpeTenIsNotTruncated() passed after 0.014 seconds.
+✔ Test textRoundTripsWithoutTrailingZeros() passed after 0.014 seconds.
+✔ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() passed after 0.016 seconds.
+✔ Test "English count copy selects singular and plural catalog entries" passed after 0.014 seconds.
+✔ Test loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode:) with 3 test cases passed after 0.015 seconds.
+✔ Test "Dynamic Chinese templates preserve the original result" passed after 0.014 seconds.
+✔ Test "Critical Chinese copy remains byte-identical" passed after 0.014 seconds.
+✔ Test lowBarStudentGetsSquatTitleForLowBarVariationDay() passed after 0.015 seconds.
+✔ Test "English count copy uses the designated placeholder" passed after 0.014 seconds.
+✔ Test "List punctuation follows locale without changing Chinese output" passed after 0.014 seconds.
+✔ Test "Load type copy substitutes the set number in every language" with 3 test cases passed after 0.014 seconds.
+✔ Test "Critical English copy is available" passed after 0.014 seconds.
+✔ Test "Catalog exercise names use nameEn only for English display" passed after 0.014 seconds.
+✔ Test commaDecimalIsNormalized() passed after 0.014 seconds.
+✔ Test makeHistoricalLogsSeedsNoFutureLogs() passed after 0.018 seconds.
+✔ Test addedHistoryMarksExtraAndIncludesFamilyRecords() passed after 0.018 seconds.
+✔ Test parsesMultiDigitAndDecimal() passed after 0.014 seconds.
+✔ Test initialSelectionPrefersExplicitIdentityThenCursor() passed after 0.011 seconds.
+✔ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) with 3 test cases passed after 0.012 seconds.
+✔ Test accessoryPercentageIsUnresolvedAndNeverPrefills() passed after 0.012 seconds.
+✔ Test sectionsPutMainLiftsAndVariationsBeforeAccessoriesWithoutReordering() passed after 0.010 seconds.
+✔ Test emptyOrGarbageFallsBackSafely() passed after 0.014 seconds.
+✔ Test spec085ReceivesExplicitDaysAgainAndOrdinaryRoutesReturnToCursor() passed after 0.018 seconds.
+✔ Test jumpReturnsCursorAndIsClockIndependent() passed after 0.011 seconds.
+✔ Test sectionsOmitEmptyKinds() passed after 0.010 seconds.
+✔ Test decimalSnapAlignsNonHalfStepSeed() passed after 0.009 seconds.
+✔ Test exerciseClassificationHelpersUseOnlyExerciseType() passed after 0.010 seconds.
+✔ Test rpeTextBridgeSnapsClampsAndRoundTrips() passed after 0.009 seconds.
+✔ Test snapClampsAndRoundsToHalfSteps() passed after 0.009 seconds.
+✔ Test tickHeightsAndLitRangeMatchV3Contract() passed after 0.009 seconds.
+✔ Test lockedIntentHoldsForTheRestOfTheGesture() passed after 0.009 seconds.
+✔ Test scrubIntentStaysUndecidedUntilTheFingerTravels() passed after 0.009 seconds.
+✔ Test valueClampsOutsideTheStrip() passed after 0.008 seconds.
+✔ Test historyUsesActualLogIDForExtraAndStudentAddedSets() passed after 0.009 seconds.
+✔ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() passed after 0.009 seconds.
+✔ Test indexRoundTripsEveryStop() passed after 0.009 seconds.
+✔ Test valueSnapsToTheNearestTickCentre() passed after 0.009 seconds.
+✔ Test valueRejectsStripsTooNarrowToHoldElevenCells() passed after 0.008 seconds.
+✔ Test descriptionMapsEveryHalfStepToRIRCopy() passed after 0.008 seconds.
+✔ Test scrubIntentSplitsHorizontalFromVertical() passed after 0.009 seconds.
+✔ Test valueRoundsAtTheMidpointBetweenTwoTicks() passed after 0.009 seconds.
+✔ Test aScrollThatReturnsToItsStartStillRefusesToWrite() passed after 0.008 seconds.
+✔ Test cellGeometryAccountsForTheGapsBetweenTicks() passed after 0.009 seconds.
+✔ Test onlyAnUncommittedTouchWritesOnRelease() passed after 0.009 seconds.
+✔ Test openCalendarClosesOnlyPast56WithMoreThan200Slack() passed after 0.007 seconds.
+✔ Test closedCalendarReopensOnlyBelow6() passed after 0.007 seconds.
+✔ Test mixedMainAndAccessoryKeepsOnlyMain() passed after 0.002 seconds.
+✔ Suite IntensityWeightSuggestionTests passed after 0.018 seconds.
+✔ Suite TrainingHistoryVideoTests passed after 0.018 seconds.
+✔ Suite TodayWorkoutSelectionResolverTests passed after 0.018 seconds.
+✔ Suite TrainingCalendarScrollStateTests passed after 0.018 seconds.
+✔ Suite SBDWeekBadgeTests passed after 0.018 seconds.
+✔ Suite SetEntryValueTests passed after 0.018 seconds.
+✔ Suite SetEntryRPEScaleTests passed after 0.018 seconds.
+✔ Test "Load type catalog values never use printf placeholders" passed after 0.015 seconds.
+✔ Suite "StudentKit localization" passed after 0.019 seconds.
+✔ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() passed after 0.027 seconds.
+✔ Test restoredAccessoryExtraKeepsActualRIRWhenWeightChanges() passed after 0.027 seconds.
+✔ Test accessoryEffortSwitchClearsOnlyUnrecordedEffortAndPreservesSavedRIR() passed after 0.028 seconds.
+✔ Test addedErrorsHaveSpecificRecovery(code:) with 4 test cases passed after 0.028 seconds.
+✔ Test studentSessionSummaryReportsTopSetPerExercise() passed after 0.029 seconds.
+✔ Test loadTypeLegacyProjectionDoesNotInventIntensity(mode:targetRPE:) with 6 test cases passed after 0.042 seconds.
+✔ Test studentSessionSummaryAggregatesCompletedSetsOnly() passed after 0.043 seconds.
+✔ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() passed after 0.056 seconds.
+✔ Test loadTypeLegacyBodyweightRetainsOtherCoachCuesAndExtraWeight() passed after 0.058 seconds.
+✔ Test loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode:) with 3 test cases passed after 0.060 seconds.
+✔ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() passed after 0.061 seconds.
+✔ Test loadTypeBodyweightAcceptsEmptyAndPreservesExtraWeight() passed after 0.066 seconds.
+✔ Test extraRowsNeverReplacePrescriptionProgressAndBatch() passed after 0.067 seconds.
+✔ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() passed after 0.070 seconds.
+✔ Test completionSendingReceiptIsLocalizedInBothLanguages() passed after 0.075 seconds.
+✔ Test extraPrefillUsesMostRecentlyRecordedSet() passed after 0.075 seconds.
+✔ Test oldAcknowledgementCannotTurnAReusedEmptySlotIntoASavedRow() passed after 0.081 seconds.
+✔ Test failedControlUsesOrange() passed after 0.090 seconds.
+✔ Test durableGateRequiresBothInputsAndCallsCompletionOnce() passed after 0.092 seconds.
+✔ Test rejectionFailsImmediatelyAndLeavingResets() passed after 0.092 seconds.
+✔ Test emptyQueueGoesStraightToReward() passed after 0.093 seconds.
+✔ Test directLogoutRetainsAccountQueue() passed after 0.093 seconds.
+✔ Test draftBuilderCarriesExerciseClassificationIntoPlateLoadingGate() passed after 0.106 seconds.
+✔ Suite TodayWorkoutExerciseSectionTests passed after 0.114 seconds.
+✔ Test acknowledgedOverlayDoesNotOverwriteNewPrescription() passed after 0.180 seconds.
+✔ Test immediateDayHasPriorityAndStopPreservesRecords() passed after 0.180 seconds.
+✔ Test transientFailureKeepsLocalStateThenRetries() passed after 0.180 seconds.
+✔ Test serverSnapshotRemovesAcknowledgedReceiptDurably() passed after 0.180 seconds.
+✔ Test sendsInOrderAndLastCancellationWins() passed after 0.180 seconds.
+✔ Test staleMatchingSnapshotCannotRetireTheLatestReceipt() passed after 0.182 seconds.
+✔ Test restoringQueuePrunesOnlyReceiptsOlderThanFourteenDays() passed after 0.183 seconds.
+✔ Test rejectedRecordStopsUntilExplicitRetry() passed after 0.183 seconds.
+sysctlbyname for kern.hv_vmm_present failed with status -1✔ Test deletedHighestAddedWeightRestoresNonPRBaseline() passed after 0.341 seconds.
+✔ Test quickLogIsAllowedOnlyForEditableListHero() passed after 0.339 seconds.
+✔ Test allDoneHasNoRemainingWork() passed after 0.339 seconds.
+✔ Test assumedHistoryDoesNotStartColdLaunchWorkout() passed after 0.339 seconds.
+✔ Test rpePrescriptionWithoutWeightKeepsOptionalTarget() passed after 0.339 seconds.
+✔ Test zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() passed after 0.339 seconds.
+✔ Test "set entry sheet renders a source-zero draft as set one" passed after 0.338 seconds.
+✔ Test zeroSetDayHasNoRemainingWork() passed after 0.339 seconds.
+✔ Test draftMappingKeepsFailureAndVideoSemantics() passed after 0.339 seconds.
+✔ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() passed after 0.339 seconds.
+✔ Test failedRealLogResumesColdLaunchWorkout() passed after 0.339 seconds.
+✔ Test partialRealLogResumesRecordingHero() passed after 0.339 seconds.
+✔ Test completedDayKeepsReadOnlyDetailAcrossColdLaunch() passed after 0.339 seconds.
+✔ Test playbackStartsPausedAndExpansionPreservesTimeAndSpeed() passed after 0.336 seconds.
+✔ Suite SetEntryVideoPlaybackStateTests passed after 0.342 seconds.
+✔ Suite TodayWorkoutPresentationTests passed after 0.342 seconds.
+✔ Test staleUpdateFromOutgoingSurfaceDoesNotStealPlayer() passed after 0.335 seconds.
+✔ Test surfaceHandoffExclusivelyBindsPlayerAndIgnoresLateDetach() passed after 0.335 seconds.
+✔ Test completedReplayIsReadOnlyAndRoutesReview() passed after 0.335 seconds.
+✔ Test logoutCountIsInterpolatedInEveryLanguage() passed after 0.336 seconds.
+✔ Test expandedHeaderOmitsMissingFields() passed after 0.335 seconds.
+✔ Test expandedHeaderIncludesAvailableSetMetrics() passed after 0.335 seconds.
+✔ Test setOrdinalIsInterpolatedInBothLanguages() passed after 0.335 seconds.
+✔ Test uploadThenLogoutAndCancel() passed after 0.336 seconds.
+✔ Suite SetSyncLogoutTests passed after 0.343 seconds.
+✔ Test centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) with 2 test cases passed after 0.336 seconds.
+✔ Test invalidValueDoesNotAdvanceOrCommit() passed after 0.336 seconds.
+✔ Test perSideDropsCollarOnlyWhenOn() passed after 0.335 seconds.
+✔ Test setEntryAlwaysStartsWithCollarOff() passed after 0.335 seconds.
+✔ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() passed after 0.336 seconds.
+✔ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() passed after 0.334 seconds.
+✔ Test groupedPlateCopyAndCollarSuffixAreExact() passed after 0.335 seconds.
+✔ Test bareBarWithoutCollarUsesExactEmptyBarCopy() passed after 0.335 seconds.
+✔ Test collarOnlyLoadReadsAsCollarOnly() passed after 0.335 seconds.
+✔ Test sameAddedSlotKeepsOriginalDateAcrossMidnight() passed after 0.333 seconds.
+✔ Test durableQueueRestoresLatestEditAndKeepsAccountsSeparate() passed after 0.333 seconds.
+✔ Test advancesAcrossRowsAndSkipsUnavailableFields() passed after 0.336 seconds.
+✔ Suite TrainingFlowTests passed after 0.343 seconds.
+✔ Test "v3 set row stays free of a per-row ask-coach entry" passed after 0.333 seconds.
+✔ Test platesMatchGreedyLoadForPerSide() passed after 0.335 seconds.
+✔ Suite SetSyncQueueTests passed after 0.343 seconds.
+✔ Suite SetEntryPlateMathTests passed after 0.343 seconds.
+✔ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() passed after 0.345 seconds.
+✔ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() passed after 0.347 seconds.
+✔ Test oldCompletionResponseCannotOverwriteNewLoginIntent() passed after 0.342 seconds.
+✔ Test oldSetResponseCannotOverwriteNewLoginQueue() passed after 0.342 seconds.
+✔ Test convertedReceiptWithOldPlanAndRestoredAddedRowHasOneIdentity() passed after 0.338 seconds.
+✔ Test todayWorkoutDistinguishesMissingPlanFromRestDay() passed after 0.349 seconds.
+✔ Test todayWorkoutViewModelMapsGenericLoadFailureToRetryMessage() passed after 0.348 seconds.
+✔ Test todayWorkoutViewModelMapsExpiredSessionDuringLoadToLoginMessage() passed after 0.348 seconds.
+✔ Test syncingUsesWhiteTrainingButtonForeground() passed after 0.344 seconds.
+✔ Suite SetSyncControlTests passed after 0.350 seconds.
+✔ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() passed after 0.352 seconds.
+✔ Test todayWorkoutKeepsHandedOffPlanWhenRefreshFails() passed after 0.350 seconds.
+✔ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() passed after 0.350 seconds.
+✔ Test "today workout table offset path renders source index zero as set one" passed after 0.587 seconds.
+✔ Test "today workout hero stored-index path renders source index zero as set one" passed after 0.678 seconds.
+✔ Suite "Set number surfaces" passed after 0.683 seconds.
+✔ Test "in-progress hero owns the only ask-coach entry" passed after 0.817 seconds.
+✔ Test "all recorded hides the hero and its ask-coach entry (spec 090)" passed after 0.925 seconds.
+✔ Suite "Today workout set-ref entry layout" passed after 0.935 seconds.
+✔ Test networkRecoveryBypassesBackoff() passed after 0.931 seconds.
+✔ Suite SetSyncNetworkTests passed after 0.937 seconds.
+✔ Test twoDeletedPlanSlotsDoNotOverwriteSameAddedSlot() passed after 0.928 seconds.
+✔ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() passed after 0.952 seconds.
+✔ Test todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() passed after 0.952 seconds.
+✔ Test bodyweightCompactRowsUseTheHeaderUnitAlongsideFixedRows() passed after 1.031 seconds.
+✔ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() passed after 1.033 seconds.
+✔ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() passed after 1.033 seconds.
+✔ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() passed after 1.033 seconds.
+✔ Test todayWorkoutKeepsLogsRecordedBeforeCoachShift() passed after 1.092 seconds.
+✔ Test loadTypeLegacyProjectionEntryPreservesOptionalRPE(mode:targetRPE:) with 6 test cases passed after 1.116 seconds.
+✔ Test invalidSelectedDayFallsBackToSequenceCursor() passed after 1.116 seconds.
+✔ Test pendingAccessoryKeepsEditedWeightAndCanCancelBeforeVideoHydration() passed after 1.115 seconds.
+✔ Suite OfflineAccessoryTests passed after 1.119 seconds.
+✔ Test workoutViewPassesQueueAcrossItsHostingBoundary() passed after 1.116 seconds.
+✔ Suite SetSyncViewInjectionTests passed after 1.119 seconds.
+✔ Test attachingVideoPromotesAnUnfilledRowToASendableRecord() passed after 1.113 seconds.
+✔ Test loadTypeCardKeepsEveryPerSetIntensityTarget() passed after 1.148 seconds.
+✔ Test unfilledEditsAndRemovalPersistWithoutEnteringTheSendQueue() passed after 1.146 seconds.
+✔ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() passed after 1.144 seconds.
+✔ Suite WorkoutKeypadSessionTests passed after 1.152 seconds.
+✔ Test bodyweightCardUsesCompactRowsWithOneWeightCaption() passed after 1.236 seconds.
+✔ Test editingExistingPlannedSetKeepsItsLoggedDate() passed after 1.228 seconds.
+✔ Test timeoutDoesNotRewardAndRetryStartsNewDeadline() passed after 1.231 seconds.
+✔ Suite SetSyncCompletionTests passed after 1.238 seconds.
+✔ Test todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() passed after 1.238 seconds.
+✔ Test todayWorkoutViewModelExplainsServerRecordingFailure() passed after 1.238 seconds.
+✔ Test readOnlyPlaybackKeepsPlayingIntentAcrossAutomaticURLRefresh() passed after 1.231 seconds.
+✔ Test todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() passed after 1.238 seconds.
+✔ Test todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() passed after 1.236 seconds.
+✔ Test todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() passed after 1.236 seconds.
+✔ Test loadTypeQuickLogCannotBypassRequiredWeight() passed after 1.238 seconds.
+✔ Test dateLowerBoundUsesThePreviousDaysTrainingDate() passed after 1.229 seconds.
+✔ Test emptyRefreshKeepsTheLoadedWorkoutAndItsDraft() passed after 1.240 seconds.
+✔ Test ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() passed after 1.239 seconds.
+✔ Test realSaveOverAssumedRecordRestoresSharingImmediately() passed after 1.238 seconds.
+✔ Test excludingEverySetRejectsWithoutWritingOrCompleting() passed after 1.234 seconds.
+✔ Test fullEntryRejectsOtherWeekWrites() passed after 1.240 seconds.
+✔ Test partialFailureWritesSuccessfulSetsBackIntoDrafts() passed after 1.235 seconds.
+✔ Test todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() passed after 1.240 seconds.
+✔ Test loadTypeMainLiftUsesSameExplicitWeightRecording() passed after 1.243 seconds.
+✔ Test lowRPECompletionUsesSegmentedCalculatorAndRecordsE1RM() passed after 1.243 seconds.
+✔ Test todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() passed after 1.242 seconds.
+✔ Test todayWorkoutViewModelUpdatesActualWeight() passed after 1.242 seconds.
+✔ Test failedCompletionDoesNotRecordPointOrDetectPR() passed after 1.242 seconds.
+✔ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() passed after 1.244 seconds.
+✔ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() passed after 1.244 seconds.
+✔ Test workoutKeepsLowRPEInDisplayButRequiresCalibrationForSuggestionBaseline() passed after 1.247 seconds.
+✔ Test completionEdgeStartsTimerWithRPEDuration() passed after 1.248 seconds.
+✔ Test completionEdgePrefersPrescribedRestSecondsOverStudentPreference() passed after 1.247 seconds.
+✔ Test "Custom preference uses actual RPE bands" with 5 test cases passed after 1.247 seconds.
+✔ Test adjustClampsRemainingBetweenZeroAnd900() passed after 1.246 seconds.
+✔ Test trainingPlanRefreshAppliesChangedDayAndKeepsUnsubmittedDraft() passed after 1.249 seconds.
+✔ Test firstCompletionRecordsPointAndDetectsPR() passed after 1.248 seconds.
+✔ Test completionFailureKeepsWrittenSetsAndReturnsSeparateOutcome() passed after 1.242 seconds.
+✔ Test completionPresentsCelebrationWhileSendingThenConfirmsReceipt() passed after 1.247 seconds.
+✔ Test completionDoesNotReopenDismissedReward(failing:) with 2 test cases passed after 1.247 seconds.
+✔ Test e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() passed after 1.247 seconds.
+✔ Test trainingPlanRefreshSkipsASecondRequestInsideTheSharedInterval() passed after 1.246 seconds.
+✔ Test unrecordedAccessoryQuickLogDoesNotSubmitPrescribedOrFallbackRPE() passed after 1.242 seconds.
+✔ Test loadTypeCompletionCannotPersistMissingFreeWeight() passed after 1.249 seconds.
+✔ Test addedCancellationDoesNotRepeatCompletionFeedback() passed after 1.250 seconds.
+✔ Test completionMutationsFetchAndPropagateOneProjectionEach() passed after 1.249 seconds.
+✔ Test deletingAddedSetRemovesItsE1RMAndPR() passed after 1.248 seconds.
+✔ Test silentlyAcknowledgesUnacknowledgedPRsOnLaunch() passed after 1.249 seconds.
+✔ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() passed after 1.247 seconds.
+✔ Test extraFailureKeepsInputAndCanRetry() passed after 1.250 seconds.
+✔ Test editingAlreadyCompletedSetDoesNotRestartTimer() passed after 1.249 seconds.
+✔ Test recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration() passed after 1.249 seconds.
+✔ Test selectingAnotherSequenceDayReusesThePlanLogSnapshot() passed after 1.249 seconds.
+✔ Test reopeningConvertedDayWithCachedPlanKeepsOneRowPerRecord() passed after 1.240 seconds.
+✔ Suite SetSyncReceiptTests passed after 1.250 seconds.
+✔ Test mainSetAndAccessoryReturnBeforeNetworkAndRefreshKeepsEdits() passed after 1.245 seconds.
+✔ Suite OfflineSetRecordingTests passed after 1.251 seconds.
+✔ Test consecutiveCompletionsReplaceTheTimer() passed after 1.250 seconds.
+✔ Test stalePersistDoesNotTouchReloadedState() passed after 1.250 seconds.
+✔ Test sameTimestampCompletionsDoNotDoubleFirePRs() passed after 1.249 seconds.
+✔ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() passed after 1.250 seconds.
+✔ Test unfilledAddedRowsRestoreWithoutSendingOrLockingEffort() passed after 1.246 seconds.
+✔ Test queuedExtraCancellationRepairsDerivedHistory() passed after 1.242 seconds.
+✔ Suite SetSyncDraftTests passed after 1.252 seconds.
+✔ Test prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() passed after 1.245 seconds.
+✔ Suite SetSyncRegressionTests passed after 1.251 seconds.
+✔ Test weekOverviewKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() passed after 1.236 seconds.
+✔ Test todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded() passed after 1.249 seconds.
+✔ Test changingTheDateAfterPartialFailureRewritesEverySetOnTheNewDate() passed after 1.242 seconds.
+✔ Test freshSheetForgetsThePreviousAttempt() passed after 1.242 seconds.
+✔ Test completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest() passed after 1.250 seconds.
+✔ Test accessoryActualRIRSaveAndReloadKeepsOriginalMetric() passed after 1.252 seconds.
+✔ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() passed after 1.252 seconds.
+✔ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() passed after 1.246 seconds.
+✔ Test todayWorkoutViewModelPersistsEditsToCompletedSet() passed after 1.251 seconds.
+✔ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() passed after 1.252 seconds.
+✔ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() passed after 1.250 seconds.
+✔ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() passed after 1.250 seconds.
+✔ Test uncheckingThenRecheckingDoesNotFarmDuplicatePRs() passed after 1.253 seconds.
+✔ Test exclusionsWriteOnlyIncludedPrescriptionSlots() passed after 1.246 seconds.
+✔ Suite TodayWorkoutQuickLogTests passed after 1.253 seconds.
+✔ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() passed after 1.253 seconds.
+✔ Test reconcileCannotConsumeLivePRBeforeE1RMRecordingResumes() passed after 1.252 seconds.
+✔ Test extraCancellationRemovesE1RMAndPR() passed after 1.251 seconds.
+✔ Test overlappingVideoMintAndCompleteApplyInOrder() passed after 1.253 seconds.
+✔ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() passed after 1.254 seconds.
+✔ Test coldLoadKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() passed after 1.238 seconds.
+✔ Test loadTypeBodyweightSaveReloadAndOverwritePreserveWeight() passed after 1.253 seconds.
+✔ Test accessoryOverwriteRestMatchesLiveActivity() passed after 1.251 seconds.
+✔ Suite TodayWorkoutQuickLogDateRangeTests passed after 1.253 seconds.
+✔ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() passed after 1.252 seconds.
+✔ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() passed after 1.254 seconds.
+✔ Test explanationIsAcknowledgedOnceAcrossViewModels() passed after 1.254 seconds.
+✔ Test quickLogCompletesTheDayItWroteEvenIfTheCursorMovesMidFlight() passed after 1.244 seconds.
+✔ Suite TodayWorkoutQuickLogRetryTests passed after 1.254 seconds.
+✔ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() passed after 1.251 seconds.
+✔ Test suspendedRequestDoesNotBlockOtherRowsOrCommit() passed after 1.249 seconds.
+✔ Suite SetSyncSuspendedRequestTests passed after 1.255 seconds.
+✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 1.253 seconds.
+✔ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() passed after 1.253 seconds.
+✔ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() passed after 1.255 seconds.
+✔ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() passed after 1.254 seconds.
+✔ Test lastSetOfTheDayDoesNotStartTimer() passed after 1.257 seconds.
+✔ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) with 9 test cases passed after 1.271 seconds.
+✔ Test resizingPlayerSurfacePreservesActualPlaybackTime() passed after 2.028 seconds.
+✔ Suite SetEntryVideoPlayerTests passed after 2.036 seconds.
+✔ Test run with 258 tests in 32 suites passed after 2.036 seconds.

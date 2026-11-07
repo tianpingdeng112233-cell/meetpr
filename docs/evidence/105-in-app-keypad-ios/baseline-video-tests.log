@@ -1,0 +1,201 @@
+# trimmed to last 200 lines (full log kept locally only)
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:89:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 87 |
+ 88 |   func complete() async throws -> OnboardingProfile {
+ 89 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 90 |     completeCallCount += 1
+ 91 |     let result = completeResults.isEmpty ? nil : completeResults.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:92:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 90 |     completeCallCount += 1
+ 91 |     let result = completeResults.isEmpty ? nil : completeResults.removeFirst()
+ 92 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 93 |     switch result {
+ 94 |     case .success(let profile): return profile
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+[983/1029] Compiling StudentKitTests CoachNoteReviewDisplayTests.swift
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:78:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 76 |
+ 77 |   func upsert(_ patch: OnboardingPatch) async throws -> OnboardingProfile {
+ 78 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 79 |     upsertedPatches.append(patch)
+ 80 |     let error = upsertErrors.isEmpty ? nil : upsertErrors.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:81:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 79 |     upsertedPatches.append(patch)
+ 80 |     let error = upsertErrors.isEmpty ? nil : upsertErrors.removeFirst()
+ 81 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 82 |     if let error { throw error }
+ 83 |     return fetchResult
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:89:10: warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 87 |
+ 88 |   func complete() async throws -> OnboardingProfile {
+ 89 |     lock.lock()
+    |          `- warning: instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 90 |     completeCallCount += 1
+ 91 |     let result = completeResults.isEmpty ? nil : completeResults.removeFirst()
+
+Foundation.NSLock.lock:2:11: note: 'lock()' declared here
+1 | class NSLock {
+2 | open func lock()}
+  |           `- note: 'lock()' declared here
+3 |
+
+/private/tmp/meetpr105-baseline/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:92:10: warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 90 |     completeCallCount += 1
+ 91 |     let result = completeResults.isEmpty ? nil : completeResults.removeFirst()
+ 92 |     lock.unlock()
+    |          `- warning: instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode
+ 93 |     switch result {
+ 94 |     case .success(let profile): return profile
+
+Foundation.NSLock.unlock:2:11: note: 'unlock()' declared here
+1 | class NSLock {
+2 | open func unlock()}
+  |           `- note: 'unlock()' declared here
+3 |
+[984/1029] Compiling StudentKitTests CompletedDayPresentationTests.swift
+[985/1029] Compiling StudentKitTests CompletedVideoReplayTests.swift
+[986/1029] Compiling StudentKitTests EffortExplainerTests.swift
+[987/1029] Compiling StudentKitTests FlexibleTrainingDayTests.swift
+[988/1029] Compiling StudentKitTests HeroCameraUploadTests.swift
+[989/1029] Compiling StudentKitTests HoldToCompleteGestureStateTests.swift
+[990/1029] Compiling StudentKitTests IntensityWeightSuggestionTests.swift
+[991/1029] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[992/1029] Compiling StudentKitTests LoadTypePresentationTests.swift
+[993/1029] Compiling StudentKitTests OfflineAccessoryTests.swift
+[994/1029] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[995/1029] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[996/1029] Compiling StudentKitTests PctAnchorResolverTests.swift
+[997/1029] Compiling StudentKitTests PlanCalendarDayIdentityTests.swift
+[998/1029] Compiling StudentKitTests QuickLogPlanTests.swift
+[999/1029] Compiling StudentKitTests RestTimerExplanationPresentationTests.swift
+[1000/1029] Compiling StudentKitTests RestTimerPolicyTests.swift
+[1001/1029] Compiling StudentKitTests SessionReflectionStoreTests.swift
+[1002/1029] Compiling StudentKitTests SessionReviewStoreTests.swift
+[1003/1029] Compiling StudentKitTests SetDisplayNumberTests.swift
+[1004/1029] Compiling StudentKitTests SetEntryPlateMathTests.swift
+[1005/1029] Compiling StudentKitTests SetEntryRPEScaleTests.swift
+[1006/1029] Compiling StudentKitTests WeekOverviewViewModelTests.swift
+[1007/1029] Compiling StudentKitTests ImportedBaselineTestSupport.swift
+[1008/1029] Compiling StudentKitTests ImportedHistoryBackfillTests.swift
+[1009/1029] Compiling StudentKitTests ImportedHistoryStatisticsTests.swift
+[1010/1029] Compiling StudentKitTests ReconciliationSpyE1RMRepository.swift
+[1011/1029] Compiling StudentKitTests E1RMPREventsContractTests.swift
+[1012/1029] Compiling StudentKitTests E1RMRepositoryTests.swift
+[1013/1029] Compiling StudentKitTests ImportedHistoryReviewStoreTests.swift
+[1014/1029] Compiling StudentKitTests OnboardingRepositoryTests.swift
+[1015/1029] Compiling StudentKitTests StudentAddedCacheTests.swift
+[1016/1029] Compiling StudentKitTests StudentFeedbackRepositoryTests.swift
+[1017/1029] Compiling StudentKitTests StudentPlanIntensityProjectionFixtures.swift
+[1018/1029] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[1019/1029] Compiling StudentKitTests StudentPlanProjectionCoachNoteTests.swift
+[1020/1029] Compiling StudentKitTests StudentPlanRepositoryTests.swift
+[1021/1029] Compiling StudentKitTests StudentTrainingLogRepositoryTests.swift
+[1022/1029] Compiling StudentKitTests StudentFormattingLocalizationTests.swift
+[1023/1029] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[1024/1029] Compiling StudentKitTests StudentKitTestSupport.swift
+[1025/1029] Compiling StudentKitTests StudentRootViewTests.swift
+[1026/1029] Compiling StudentKitTests StudentStringsTests.swift
+[1027/1029] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[1028/1031] Emitting module StudentKitPackageTests
+[1029/1031] Compiling StudentKitPackageTests runner.swift
+[1029/1031] Write Objects.LinkFileList
+[1030/1031] Linking StudentKitPackageTests
+Build complete! (226.04s)
+Test Suite 'Selected tests' started at 2026-11-06 11:08:11.294.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-06 11:08:11.329.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-06 11:08:11.329.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 11:08:11.330.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.036) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test "Cancelling video export removes its partial output" started.
+◇ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() started.
+◇ Test "Video export transcodes source audio to AAC" started.
+◇ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" started.
+◇ Test "Video export preserves the full portrait preferred transform" started.
+◇ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" started.
+◇ Test "Downscaled portrait export rescales the transform translation" started.
+◇ Test "Eligible AAC audio is remuxed without re-encoding either media stream" started.
+◇ Test "Eligible source is remuxed without re-encoding its video samples" started.
+◇ Test passthroughTrimKeepsTheAudioTrack() started.
+◇ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() started.
+◇ Test case passing 1 argument channelCount → 2 to "Video export transcodes source audio to AAC" started.
+◇ Test case passing 1 argument channelCount → 1 to "Video export transcodes source audio to AAC" started.
+◇ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() started.
+◇ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() started.
+◇ Test passthroughTrimExportsRequestedRangeWithoutReencoding() started.
+✘ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" recorded an issue at AVFoundationVideoExporterTests.swift:180:2: Caught error: .unavailable("Cannot Encode")
+✘ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() recorded an issue at PassthroughVideoTrimExporterTests.swift:94:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Downscaled portrait export rescales the transform translation" recorded an issue at AVFoundationVideoExporterTests.swift:150:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Eligible source is remuxed without re-encoding its video samples" recorded an issue at AVFoundationVideoExporterTests.swift:37:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Cancelling video export removes its partial output" recorded an issue at AVFoundationVideoExporterTests.swift:247:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export preserves the full portrait preferred transform" recorded an issue at AVFoundationVideoExporterTests.swift:128:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" failed after 0.320 seconds with 1 issue.
+✘ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() failed after 0.321 seconds with 1 issue.
+✘ Test "Downscaled portrait export rescales the transform translation" failed after 0.321 seconds with 1 issue.
+✘ Test "Eligible source is remuxed without re-encoding its video samples" failed after 0.321 seconds with 1 issue.
+✘ Test "Cancelling video export removes its partial output" failed after 0.321 seconds with 1 issue.
+✘ Test "Video export preserves the full portrait preferred transform" failed after 0.321 seconds with 1 issue.
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" recorded an issue at AVFoundationVideoExporterTests.swift:9:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" failed after 0.364 seconds with 1 issue.
+✘ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() recorded an issue at PassthroughVideoTrimExporterTests.swift:51:2: Caught error: .unavailable("Cannot Encode")
+✘ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() failed after 0.427 seconds with 1 issue.
+✘ Test passthroughTrimKeepsTheAudioTrack() recorded an issue at PassthroughVideoTrimExporterTests.swift:117:2: Caught error: .unavailable("Cannot Encode")
+✘ Test passthroughTrimKeepsTheAudioTrack() failed after 0.459 seconds with 1 issue.
+↳ // Kept to the same 30-frame budget as the other audio fixtures: a longer
+↳ // high-entropy source here starves the encoder when the audio tests run in
+↳ // parallel and wedges the whole suite.
+✘ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() recorded an issue at VideoTrimCompletionTests.swift:168:2: Caught error: .unavailable("Cannot Encode")
+✘ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() failed after 0.495 seconds with 1 issue.
+✘ Test "Video export transcodes source audio to AAC" recorded an issue with 1 argument channelCount → 2 at AVFoundationVideoExporterTests.swift:219:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export transcodes source audio to AAC" recorded an issue with 1 argument channelCount → 1 at AVFoundationVideoExporterTests.swift:219:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export transcodes source audio to AAC" with 2 test cases failed after 0.560 seconds with 2 issues.
+✘ Test "Eligible AAC audio is remuxed without re-encoding either media stream" recorded an issue at AVFoundationVideoExporterTests.swift:72:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Eligible AAC audio is remuxed without re-encoding either media stream" failed after 0.563 seconds with 1 issue.
+✘ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() recorded an issue at PassthroughVideoTrimExporterTests.swift:144:2: Caught error: .unavailable("Cannot Encode")
+✘ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() failed after 0.593 seconds with 1 issue.
+↳ /// The recorder stops one frame *past* the cap, so a full-length recording is
+↳ /// clamped by the selection to exactly `maxDurationSeconds` — and `enqueue`
+↳ /// rejects anything longer than the cap outright ("视频超过 120 秒上限").
+↳ /// A passthrough export that overshot its range by even a few milliseconds
+↳ /// would therefore make a just-recorded video unsendable, so pin the contract.
+✘ Test passthroughTrimExportsRequestedRangeWithoutReencoding() recorded an issue at PassthroughVideoTrimExporterTests.swift:7:2: Caught error: .unavailable("Cannot Encode")
+✘ Test passthroughTrimExportsRequestedRangeWithoutReencoding() failed after 0.624 seconds with 1 issue.
+✘ Test run with 14 tests in 0 suites failed after 0.625 seconds with 15 issues.

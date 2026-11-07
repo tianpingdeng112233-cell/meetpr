@@ -33,6 +33,11 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let keypadOptionalWeight = Key("student.keypadOptionalWeight")
+    static let keypadRequiredWeight = Key("student.keypadRequiredWeight")
+    static let keypadWeight = Key("student.keypadWeight")
+    static let keypadContext = Key("student.keypadContext")
+    static let keypadNext = Key("student.keypadNext")
     static let videoCompletionProgress = Key("student.videoCompletionProgress")
     static let videoCompletionBody = Key("student.videoCompletionBody")
     static let videoCompletionNotification = Key("student.videoCompletionNotification")

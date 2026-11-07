@@ -1,0 +1,10 @@
+2026-11-06, after disk cleanup
+Tool: XcodeBuildMCP/session_show_defaults
+Result: tool call failed; Transport closed
+No client reconnect API exposed in current tool inventory.
+
+Follow-up request: main MeetPR Debug build and DemoStudent screenshots
+XcodeBuildMCP/session_show_defaults -> Transport closed
+XcodeBuildMCP/session_set_defaults (MeetPR Debug, iPhone 17e target UDID) -> Transport closed
+Official CLI simulator list -> CoreSimulatorService connection invalid / Operation not permitted.
+No simulator was booted, installed, or modified.

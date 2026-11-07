@@ -12,6 +12,7 @@ public struct StudentRootView: View {
   @Environment(StudentSetSyncSession.self) private var setSyncSession: StudentSetSyncSession?
   private let loginIdentifier: String
   private let profileCoach: ActiveCoachContext?
+  @State private var workoutKeypad = WorkoutKeypadSession()
   @State private var profileNavigationActive = false
   private let studentID: UUID
   private let plans: any StudentPlanRepository
@@ -263,6 +264,7 @@ extension StudentRootView {
         onPlanChanged: propagatePlanProjection,
         onReturnToToday: { selectedTab = .today }
       )
+      .environment(workoutKeypad)
       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
 
       TrainingHistoryView(
@@ -324,6 +326,10 @@ extension StudentRootView {
         )
       }
     }
+    .overlay(alignment: .bottom) {
+      WorkoutKeypadOverlay(session: workoutKeypad)
+    }
+    .onChange(of: selectedTab) { _, _ in workoutKeypad.cancel() }
     .task {
       handlePushRoute(pushRoute)
       Analytics.shared.screen(.dashboard)

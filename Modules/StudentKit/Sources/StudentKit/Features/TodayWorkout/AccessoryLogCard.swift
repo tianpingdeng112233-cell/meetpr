@@ -8,6 +8,7 @@ struct AccessoryLogCard: View {
   let unit: UnitPreference
   let previousLogs: [Int: StudentSetLog]
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
+  @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var edits: [UUID: AccessoryRow] = [:]
   @State private var effortModeOverride: ActualEffortMode?
   @State private var showsSkipped = false
@@ -120,7 +121,11 @@ struct AccessoryLogCard: View {
               let input = row(for: presentationRow)
               guard input.isWritable || input.isCancellation else { return }
               Task { await viewModel.saveAccessoryRow(input) }
-            })
+            },
+            activeField: keypad?.field(for: presentationRow.id),
+            onInput: { openKeypad(rowID: presentationRow.id, field: $0) }
+          )
+          .id(presentationRow.id)
           if let note = row(for: presentationRow).extraNote {
             Text(note).font(.caption).foregroundStyle(Color.MeetPR.coachNoteText)
           }
@@ -149,8 +154,11 @@ struct AccessoryLogCard: View {
               attemptedRows.insert(presentationRow.id)
               let input = row(for: presentationRow)
               Task { await viewModel.saveAccessoryRow(input) }
-            }
+            },
+            activeField: keypad?.field(for: presentationRow.id),
+            onInput: { openKeypad(rowID: presentationRow.id, field: $0) }
           )
+          .id(presentationRow.id)
         }
         if presentationRow.draft.isExtra {
           HStack {
@@ -219,11 +227,29 @@ struct AccessoryLogCard: View {
     .accessibilityIdentifier("accessory.card")
   }
 
+  private func openKeypad(rowID: UUID, field: MeetPRNumberPad.Field) {
+    let cells = exercise.rows.flatMap { presentationRow in
+      WorkoutKeypadCell.cells(
+        row: row(for: presentationRow), name: exercise.name,
+        number: presentationRow.record.index,
+        includesEffort: presentationRow.draft.prescribed.loadMode != .freeWeight || allowsRIR)
+    }
+    let address = WorkoutKeypadCell.Address(rowID: rowID, field: field)
+    keypad?.open(cells: cells, at: address) { cell, value in
+      guard let presentationRow = exercise.rows.first(where: { $0.id == cell.rowID }) else {
+        return
+      }
+      var updated = row(for: presentationRow)
+      updated.setKeypadValue(value, field: cell.field)
+      edits[cell.rowID] = updated
+    }
+  }
+
   private func row(for row: TodayWorkoutPresentation.Row) -> AccessoryRow {
     var source = AccessoryRow(
       draft: row.draft,
       previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex],
-      unit: row.draft.prescribed.loadMode == .freeWeight && !allowsRIR ? .kg : unit,
+      unit: unit,
       hasVideo: row.record.videoState != .none, hasVideoFailure: row.record.videoState == .failed)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input

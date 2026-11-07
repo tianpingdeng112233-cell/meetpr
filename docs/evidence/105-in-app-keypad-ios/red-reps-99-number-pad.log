@@ -1,0 +1,32 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module DesignSystemTests
+[4/5] Compiling DesignSystemTests NumberPadTextInputTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking DesignSystemPackageTests
+Build complete! (1.29s)
+Test Suite 'Selected tests' started at 2026-11-06 11:01:24.874.
+Test Suite 'DesignSystemPackageTests.xctest' started at 2026-11-06 11:01:24.875.
+Test Suite 'DesignSystemPackageTests.xctest' passed at 2026-11-06 11:01:24.875.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-06 11:01:24.875.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite NumberPadTextInputTests started.
+◇ Test textModeForwardsEmptyAndShowsContextUnitAndNextAction() started.
+◇ Test accessoryWeightDoesNotSnapToBarbell() started.
+◇ Test rejectsInvalidEffortAndIntegerDecimals() started.
+◇ Test deletingInitialValueProducesAnExplicitEmptyValue() started.
+✔ Test accessoryWeightDoesNotSnapToBarbell() passed after 0.041 seconds.
+✔ Test textModeForwardsEmptyAndShowsContextUnitAndNextAction() passed after 0.041 seconds.
+✘ Test rejectsInvalidEffortAndIntegerDecimals() recorded an issue at NumberPadTextInputTests.swift:24:5: Expectation failed: !((NumberPadTextInput(value: "100", field: .reps) → NumberPadTextInput(text: "100", field: DesignSystem.MeetPRNumberPad.Field.reps, replacesInitialValue: true)).isValid → true → true)
+✔ Test deletingInitialValueProducesAnExplicitEmptyValue() passed after 0.042 seconds.
+✘ Test rejectsInvalidEffortAndIntegerDecimals() failed after 0.042 seconds with 1 issue.
+✘ Suite NumberPadTextInputTests failed after 0.042 seconds with 1 issue.
+✘ Test run with 4 tests in 1 suite failed after 0.042 seconds with 1 issue.

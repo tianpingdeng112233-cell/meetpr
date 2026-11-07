@@ -1,3 +1,4 @@
+import CoreModels
 import DesignSystem
 import SwiftUI
 
@@ -10,7 +11,8 @@ struct LoadTypeLogRow: View {
   let showsValidation: Bool
   let onEdit: () -> Void
   let onSave: () -> Void
-  @FocusState private var isFocused: Bool
+  var activeField: MeetPRNumberPad.Field?
+  var onInput: (MeetPRNumberPad.Field) -> Void = { _ in }
 
   private var invalidWeight: Bool {
     showsValidation && row.weightKg == nil
@@ -27,35 +29,47 @@ struct LoadTypeLogRow: View {
       .accessibilityIdentifier("accessory.set.\(number).details")
       VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
         Text(
-          StudentStrings.localized(
-            row.isBodyweight ? .loadTypeOptionalWeight : .loadTypeRequiredWeight)
+          StudentStrings.replacing(
+            row.isBodyweight ? .keypadOptionalWeight : .keypadRequiredWeight,
+            values: [UnitDisplay.weightUnitSuffix(row.unit).uppercased()])
         )
         .font(.caption2)
         .foregroundStyle(invalidWeight ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
         .fixedSize(horizontal: false, vertical: true)
-        TextField(
-          StudentStrings.localized(
-            row.isBodyweight ? .loadTypeOptionalPlaceholder : .loadTypeRequiredPlaceholder),
-          text: $row.input.weight
+        Button {
+          onInput(.weight)
+        } label: {
+          Text(
+            row.input.weight.isEmpty
+              ? StudentStrings.localized(
+                row.isBodyweight ? .loadTypeOptionalPlaceholder : .loadTypeRequiredPlaceholder)
+              : row.input.weight
+          )
+          .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+        }
+        .modifier(LoadTypeInputStyle(invalid: invalidWeight, active: activeField == .weight))
+        .accessibilityLabel(
+          StudentStrings.replacing(.accessoryWeightLabel, values: [String(number)])
         )
-        .focused($isFocused)
-        .modifier(LoadTypeInputStyle(invalid: invalidWeight))
+        .accessibilityValue(row.input.weight)
         .accessibilityIdentifier("accessory.set.\(number).weight")
-        #if os(iOS)
-          .keyboardType(.decimalPad)
-        #endif
       }
       VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
         Text(StudentStrings.localized(.setEntrySheet003)).font(.caption2)
           .foregroundStyle(Color.MeetPR.textSecondary)
-        TextField("", text: $row.input.reps)
-          .focused($isFocused)
-          .modifier(LoadTypeInputStyle(invalid: showsValidation && row.reps == nil))
-          .accessibilityLabel(StudentStrings.localized(.setEntrySheet003))
-          .accessibilityIdentifier("accessory.set.\(number).reps")
-          #if os(iOS)
-            .keyboardType(.numberPad)
-          #endif
+        Button {
+          onInput(.reps)
+        } label: {
+          Text(row.input.reps.isEmpty ? "—" : row.input.reps)
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+        }
+        .modifier(
+          LoadTypeInputStyle(
+            invalid: showsValidation && row.reps == nil, active: activeField == .reps)
+        )
+        .accessibilityLabel(StudentStrings.localized(.setEntrySheet003))
+        .accessibilityValue(row.input.reps)
+        .accessibilityIdentifier("accessory.set.\(number).reps")
       }
       .frame(maxWidth: MeetPRSpacing.minimumHitTarget)
       Button(action: onSave) {
@@ -74,32 +88,32 @@ struct LoadTypeLogRow: View {
       .accessibilityIdentifier("accessory.set.\(number).save")
     }
     .disabled(isDisabled)
-    #if os(iOS)
-      .toolbar {
-        if isFocused {
-          ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            Button(StudentStrings.localized(.loadTypeComplete)) { isFocused = false }
-          }
-        }
-      }
-    #endif
+    .buttonStyle(.plain)
+    .background(
+      activeField != nil ? Color.MeetPR.goldRGB.opacity(0.08) : .clear,
+      in: .rect(cornerRadius: MeetPRRadius.inset))
   }
 }
 
 private struct LoadTypeInputStyle: ViewModifier {
   let invalid: Bool
+  var active = false
 
   func body(content: Content) -> some View {
     content
-      .textFieldStyle(.plain)
+      .foregroundStyle(Color.MeetPR.textPrimary)
       .font(.body.monospacedDigit())
       .padding(.horizontal, MeetPRSpacing.space2)
       .frame(minHeight: MeetPRSpacing.minimumHitTarget)
       .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.inset))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.inset)
-          .strokeBorder(invalid ? Color.MeetPR.danger : Color.MeetPR.borderStrong)
+          .strokeBorder(
+            active
+              ? Color.MeetPR.gold500
+              : invalid
+                ? Color.MeetPR.danger
+                : Color.MeetPR.borderStrong, lineWidth: active ? 2 : 1)
       }
   }
 }

@@ -10,10 +10,9 @@ struct AccessoryLogRow: View {
   let showsValidation: Bool
   let onEdit: () -> Void
   let onSave: () -> Void
-  @FocusState private var focusedField: Field?
+  var activeField: MeetPRNumberPad.Field?
+  var onInput: (MeetPRNumberPad.Field) -> Void = { _ in }
   @State private var editedWeight = false
-
-  private enum Field: Hashable { case weight, reps, rpe }
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
@@ -97,7 +96,9 @@ struct AccessoryLogRow: View {
       }
       .padding(.vertical, MeetPRSpacing.space1)
       .background(
-        row.draft.completed ? Color.MeetPR.success.opacity(0.1) : .clear,
+        activeField != nil
+          ? Color.MeetPR.goldRGB.opacity(0.08)
+          : row.draft.completed ? Color.MeetPR.success.opacity(0.1) : .clear,
         in: .rect(cornerRadius: MeetPRRadius.inset)
       )
       .buttonStyle(.plain)
@@ -109,52 +110,48 @@ struct AccessoryLogRow: View {
           .fixedSize(horizontal: false, vertical: true)
       }
     }
-    #if os(iOS)
-      .toolbar {
-        if focusedField != nil {
-          ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            Button(StudentStrings.localized(.workoutCompletionFlowView003)) { focusedField = nil }
-          }
-        }
-      }
-    #endif
   }
 
   private func field(
-    _ field: Field, text: Binding<String>, placeholder: String, invalid: Bool
+    _ field: MeetPRNumberPad.Field, text: Binding<String>, placeholder: String, invalid: Bool
   ) -> some View {
-    TextField(placeholder, text: text)
-      .textFieldStyle(.plain)
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .semibold))
-      .multilineTextAlignment(.center)
-      .minimumScaleFactor(0.5)
-      .focused($focusedField, equals: field)
-      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-      .background(
-        row.draft.completed ? .clear : Color.MeetPR.surfaceCard,
-        in: .rect(cornerRadius: MeetPRRadius.inset)
+    let resolvedField: MeetPRNumberPad.Field =
+      field == .rpe && row.input.effortMode == .rir ? .rir : field
+    let active = activeField == resolvedField
+    return Button {
+      onInput(resolvedField)
+    } label: {
+      Text(
+        text.wrappedValue.isEmpty ? (placeholder.isEmpty ? "—" : placeholder) : text.wrappedValue
       )
-      .overlay(
-        RoundedRectangle(cornerRadius: MeetPRRadius.inset).strokeBorder(
-          invalid ? Color.MeetPR.danger : Color.MeetPR.borderStrong,
-          lineWidth: row.draft.completed && !invalid && focusedField != field ? 0 : 1)
-      )
-      .accessibilityLabel(
-        copy(
-          field == .weight
-            ? .accessoryWeightLabel
-            : field == .reps
-              ? .accessoryRepsLabel
-              : row.input.effortMode == .rir ? .accessoryRirLabel : .accessoryRpeLabel)
-      )
-      .accessibilityIdentifier("accessory.set.\(number).\(field)")
-      .onChange(of: row.input.weight) { _, _ in editedWeight = true }
-      #if os(iOS)
-        .keyboardType(
-          (field == .reps || (field == .rpe && row.input.effortMode == .rir))
-            ? .numberPad : .decimalPad)
-      #endif
+      .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+    }
+    .foregroundStyle(Color.MeetPR.textPrimary)
+    .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .semibold))
+    .multilineTextAlignment(.center)
+    .minimumScaleFactor(0.5)
+    .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+    .background(
+      row.draft.completed ? .clear : Color.MeetPR.surfaceCard,
+      in: .rect(cornerRadius: MeetPRRadius.inset)
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: MeetPRRadius.inset).strokeBorder(
+        active ? Color.MeetPR.gold500 : invalid ? Color.MeetPR.danger : Color.MeetPR.borderStrong,
+        lineWidth: active ? 2 : row.draft.completed && !invalid ? 0 : 1)
+    )
+    .accessibilityLabel(
+      copy(
+        field == .weight
+          ? .accessoryWeightLabel
+          : field == .reps
+            ? .accessoryRepsLabel
+            : row.input.effortMode == .rir ? .accessoryRirLabel : .accessoryRpeLabel)
+    )
+    .accessibilityValue(text.wrappedValue.isEmpty ? placeholder : text.wrappedValue)
+    .accessibilityIdentifier("accessory.set.\(number).\(field)")
+    .onChange(of: row.input.weight) { _, _ in editedWeight = true }
+
   }
 
   private func copy(_ key: StudentStrings.Key) -> String {
