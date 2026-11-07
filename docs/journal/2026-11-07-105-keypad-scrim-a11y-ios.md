@@ -70,3 +70,8 @@ StudentKit 相关集 filter：`WorkoutKeypad|[Aa]ccessory|[Ss]etEntry|[Tt]odayWo
     WorkoutKeypadOverlay(session: workoutKeypad)
   }
 ```
+
+## 2026-11-07 Opus 设备复验
+- 干净 DerivedData 重编 DemoStudent 装 iPhone 17e（上一轮共用 DerivedData 装到的是旧二进制，遮罩仍带「取消」标签，已排除）。
+- 面板打开后在「下一项」位置做无障碍按压：修复前命中遮罩「取消」并关闭面板；修复后命中面板主按钮，面板跳到「坐姿划船 · 第 2 组 · 次数」。原缺陷关闭。
+- XcodeBuildMCP 运行时快照里遮罩仍以无标签按钮出现（`workout.keypad.dismiss`），背后列表元素也仍在快照中；快照工具是否尊重 accessibilityHidden 未核实，VoiceOver 真机体验留待真机复核。
