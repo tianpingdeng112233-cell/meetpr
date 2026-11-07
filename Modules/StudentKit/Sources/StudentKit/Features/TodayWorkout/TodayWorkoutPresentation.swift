@@ -60,6 +60,12 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     case recording
   }
 
+  struct PrescriptionRow: Equatable, Sendable, Identifiable {
+    let id: UUID
+    let number: Int
+    let text: String
+  }
+
   struct Exercise: Equatable, Sendable, Identifiable {
     let id: UUID
     let stableIndex: Int
@@ -71,6 +77,23 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
 
     var allRecorded: Bool {
       !prescribedRows.isEmpty && prescribedRows.allSatisfy { $0.record.status != .pending }
+    }
+
+    var prescriptionRows: [PrescriptionRow] {
+      prescribedRows.map { row in
+        let text: String
+        if row.draft.prescribed.isLegacyPrescription {
+          let weight =
+            row.record.weight.map { TodayWorkoutPresentation.numberText($0) + "kg" } ?? "—"
+          text = "\(weight) × \(row.record.reps)"
+        } else {
+          text = StudentFormatting.prescribed(
+            row.draft.prescribed, percentageOutcome: row.suggestionOutcome)
+        }
+        return PrescriptionRow(
+          id: row.id, number: SetDisplayNumber.number(for: row.draft),
+          text: text)
+      }
     }
 
     /// New-form rows summarize the prescription; all-legacy exercises return

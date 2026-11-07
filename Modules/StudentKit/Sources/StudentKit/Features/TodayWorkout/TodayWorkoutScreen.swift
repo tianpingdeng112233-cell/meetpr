@@ -899,46 +899,93 @@ private struct TodayWorkoutActionSummaryHeader: View {
 
 struct TodayWorkoutActionSummaryRow: View {
   let exercise: TodayWorkoutPresentation.Exercise
+  @State private var expanded = false
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.point11) {
-      Text((exercise.stableIndex + 1).formatted())
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-        .foregroundStyle(Color.MeetPR.goldText)
-        .frame(width: 22, height: 22)
-        .background(Color.MeetPR.goldRGB.opacity(0.12))
-        .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
+    TodayWorkoutActionSummaryRowContent(exercise: exercise, expanded: $expanded)
+  }
+}
 
-      Text(exercise.name)
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
+struct TodayWorkoutActionSummaryRowContent: View {
+  let exercise: TodayWorkoutPresentation.Exercise
+  @Binding var expanded: Bool
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-      Spacer(minLength: MeetPRSpacing.space2)
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+      Button {
+        expanded.toggle()
+      } label: {
+        HStack(spacing: MeetPRSpacing.point11) {
+          Text((exercise.stableIndex + 1).formatted())
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+            .foregroundStyle(Color.MeetPR.goldText)
+            .frame(width: MeetPRSpacing.point22, height: MeetPRSpacing.point22)
+            .background(Color.MeetPR.goldRGB.opacity(0.12))
+            .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
 
-      if let prescriptionSummary = exercise.prescriptionSummary {
-        Text(prescriptionSummary)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textTertiary)
-      } else if let first = exercise.rows.first?.record {
-        // Pre-072 record-based summary, unchanged for legacy prescriptions.
-        let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
-        Text(
-          StudentStrings.replacing(
-            .todayWorkoutScreen020,
-            values: ["\(weight)", "\(first.reps)", "\(exercise.rows.count)"])
-        )
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textTertiary)
+          let layout =
+            dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: MeetPRSpacing.space1))
+            : AnyLayout(HStackLayout(spacing: MeetPRSpacing.space2))
+          layout {
+            Text(exercise.name)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+              .frame(maxWidth: .infinity, alignment: .leading)
+            if let summary {
+              Text(summary)
+                .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+                .foregroundStyle(Color.MeetPR.textTertiary)
+            }
+          }
+          Image(systemName: expanded ? "chevron.down" : "chevron.right")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textMuted)
+        }
+        .padding(.horizontal, MeetPRSpacing.point13)
+        .padding(.vertical, MeetPRSpacing.point11)
+        .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+        .contentShape(.rect)
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(summary.map { exercise.name + ", " + $0 } ?? exercise.name)
+      .accessibilityValue(expanded ? DesignSystemStrings.expanded : DesignSystemStrings.collapsed)
+      .accessibilityIdentifier("training.actionSummary.exercise.\(exercise.stableIndex + 1)")
+      if expanded {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+          ForEach(exercise.prescriptionRows) { row in
+            HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
+              Text(row.number.formatted())
+                .foregroundStyle(Color.MeetPR.textMuted)
+              Text(row.text)
+                .foregroundStyle(Color.MeetPR.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+          }
+        }
+        .padding(.horizontal, MeetPRSpacing.point13)
+        .padding(.bottom, MeetPRSpacing.point11)
       }
     }
-    .padding(.horizontal, MeetPRSpacing.point13)
-    .padding(.vertical, MeetPRSpacing.point11)
-    .background(Color.MeetPR.surfaceCard)
+    .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.control))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.control)
         .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+  }
+
+  private var summary: String? {
+    if let prescriptionSummary = exercise.prescriptionSummary {
+      return prescriptionSummary
+    }
+    guard let first = exercise.rows.first?.record else { return nil }
+    // Pre-072 record-based summary, unchanged for legacy prescriptions.
+    let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
+    return StudentStrings.replacing(
+      .todayWorkoutScreen020,
+      values: ["\(weight)", "\(first.reps)", "\(exercise.rows.count)"])
   }
 
   private func numberText(_ value: Double) -> String {
