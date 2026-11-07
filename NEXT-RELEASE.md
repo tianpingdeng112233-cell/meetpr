@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (33)
 - 基底：`beta/1.0-32` @ `d76de385`；1.0(32) 已于 2026-11-05 上传（David 口报「传好了」），内容（101 A/B / 102 / 视频 P0 / 090 / 聊天「+」）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：工程内为 32，切 33 时再 `agvtool new-version 33`；marketing version 保持 1.0。
+- build 号：工程内已 bump 为 33（`agvtool new-version 33`，2026-11-07 切包），tag `beta/1.0-33`；marketing version 保持 1.0。
 
 ## 本版将包含
 
