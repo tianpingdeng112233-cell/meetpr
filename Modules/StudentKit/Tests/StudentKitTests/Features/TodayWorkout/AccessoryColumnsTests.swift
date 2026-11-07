@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import Foundation
 import SwiftUI
 import Testing
@@ -12,6 +13,26 @@ import ViewInspector
 
 @MainActor
 struct AccessoryColumnsTests {
+  @Test(arguments: [false, true])
+  func videoBadgeUsesSuccessUnlessUploadFailed(hasVideoFailure: Bool) async throws {
+    let fixture = try await accessoryFixture(logs: InMemoryStudentTrainingLogRepository())
+    let row = AccessoryRow(
+      draft: try #require(fixture.model.currentDrafts?.first), previous: nil, unit: .kg,
+      hasVideo: true, hasVideoFailure: hasVideoFailure)
+    let view = AccessoryLogRow(
+      row: .constant(row), number: 1, isSaving: false, isDisabled: false,
+      showsValidation: false, onEdit: {}, onSave: {})
+    let badge = try view.inspect()
+      .find(viewWithAccessibilityIdentifier: "accessory.set.1.details")
+      .find(ViewType.Image.self)
+    #expect(
+      try badge.actualImage().name()
+        == (hasVideoFailure ? "exclamationmark.triangle.fill" : "video.fill"))
+    #expect(
+      try badge.foregroundStyleShapeStyle(Color.self)
+        == (hasVideoFailure ? Color.MeetPR.danger : Color.MeetPR.success))
+  }
+
   #if os(macOS)
     @Test func helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() throws {
       let icon = try EffortExplainerButton(kind: .rir, isAccessoryHeader: true)
