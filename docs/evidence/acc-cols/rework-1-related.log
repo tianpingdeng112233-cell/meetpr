@@ -1,0 +1,174 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling StudentKit AccessoryLogCard.swift
+[5/6] Emitting module StudentKit
+[6/9] Emitting module StudentKitTests
+[7/9] Compiling StudentKitTests AccessoryColumnsTests.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking StudentKitPackageTests
+Build complete! (30.57s)
+Test Suite 'Selected tests' started at 2026-11-07 04:22:26.637.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-07 04:22:26.639.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-07 04:22:26.639.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-07 04:22:26.639.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test accessoryClassificationRequiresResolvedCatalogType() started.
+✔ Test accessoryClassificationRequiresResolvedCatalogType() passed after 0.001 seconds.
+◇ Suite AccessoryColumnsTests started.
+◇ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() started.
+✔ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() passed after 0.059 seconds.
+◇ Test previousTextUsesRecordedEffortWithoutChangingCopyAction() started.
+✔ Test previousTextUsesRecordedEffortWithoutChangingCopyAction() passed after 0.003 seconds.
+◇ Test effortMatchesRepsAndFreedWidthGoesToPrevious() started.
+✔ Test effortMatchesRepsAndFreedWidthGoesToPrevious() passed after 0.001 seconds.
+✔ Suite AccessoryColumnsTests passed after 0.063 seconds.
+◇ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() started.
+✔ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() passed after 0.002 seconds.
+◇ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() started.
+✔ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() passed after 0.001 seconds.
+◇ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() started.
+✔ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() passed after 0.001 seconds.
+◇ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() started.
+✔ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() passed after 0.001 seconds.
+◇ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() started.
+✔ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() passed after 0.002 seconds.
+◇ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() started.
+✔ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() passed after 0.001 seconds.
+◇ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() started.
+✔ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() passed after 0.003 seconds.
+◇ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() started.
+✔ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() passed after 0.001 seconds.
+◇ Test accessoryOverwriteRestMatchesLiveActivity() started.
+✔ Test accessoryOverwriteRestMatchesLiveActivity() passed after 0.001 seconds.
+◇ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() started.
+✔ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() passed after 0.001 seconds.
+◇ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() started.
+✔ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() passed after 0.002 seconds.
+◇ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() started.
+✔ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() passed after 0.001 seconds.
+◇ Suite EffortExplainerTests started.
+◇ Test cardsMatchApprovedCopyWithoutCrossReferencingTheOtherScale() started.
+✔ Test cardsMatchApprovedCopyWithoutCrossReferencingTheOtherScale() passed after 0.001 seconds.
+✔ Suite EffortExplainerTests passed after 0.001 seconds.
+◇ Suite RIRStepperCopyTests started.
+◇ Test hintUsesRemainingRepsWithoutRPEConversion() started.
+✔ Test hintUsesRemainingRepsWithoutRPEConversion() passed after 0.001 seconds.
+✔ Suite RIRStepperCopyTests passed after 0.001 seconds.
+◇ Suite IntensityWeightSuggestionTests started.
+◇ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .rir(2) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .rpeRange(8, 9) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .weightRange(165, 175) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+✔ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) with 3 test cases passed after 0.001 seconds.
+◇ Test accessoryPercentageIsUnresolvedAndNeverPrefills() started.
+✔ Test accessoryPercentageIsUnresolvedAndNeverPrefills() passed after 0.001 seconds.
+✔ Suite IntensityWeightSuggestionTests passed after 0.001 seconds.
+◇ Test accessoryEffortSwitchClearsOnlyUnrecordedEffortAndPreservesSavedRIR() started.
+✔ Test accessoryEffortSwitchClearsOnlyUnrecordedEffortAndPreservesSavedRIR() passed after 0.001 seconds.
+◇ Test accessoryActualRIRSaveAndReloadKeepsOriginalMetric() started.
+✔ Test accessoryActualRIRSaveAndReloadKeepsOriginalMetric() passed after 0.001 seconds.
+◇ Suite OfflineAccessoryTests started.
+◇ Test pendingAccessoryKeepsEditedWeightAndCanCancelBeforeVideoHydration() started.
+✔ Test pendingAccessoryKeepsEditedWeightAndCanCancelBeforeVideoHydration() passed after 0.002 seconds.
+✔ Suite OfflineAccessoryTests passed after 0.002 seconds.
+◇ Suite OfflineSetRecordingTests started.
+◇ Test mainSetAndAccessoryReturnBeforeNetworkAndRefreshKeepsEdits() started.
+✔ Test mainSetAndAccessoryReturnBeforeNetworkAndRefreshKeepsEdits() passed after 0.001 seconds.
+✔ Suite OfflineSetRecordingTests passed after 0.001 seconds.
+◇ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() started.
+✔ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() passed after 0.001 seconds.
+◇ Suite SBDWeekBadgeTests started.
+◇ Test mixedMainAndAccessoryKeepsOnlyMain() started.
+✔ Test mixedMainAndAccessoryKeepsOnlyMain() passed after 0.001 seconds.
+✔ Suite SBDWeekBadgeTests passed after 0.001 seconds.
+◇ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() started.
+✔ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() passed after 0.003 seconds.
+◇ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() started.
+✔ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() passed after 0.001 seconds.
+◇ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() started.
+✔ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() passed after 0.001 seconds.
+◇ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() started.
+✔ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() passed after 0.001 seconds.
+◇ Test addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_ATTACHMENT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_COACH_FEEDBACK" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SETS_ADHOC_DAY_CONFLICT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_NOT_STUDENT_ADDED" to addedErrorsHaveSpecificRecovery(code:) started.
+✔ Test addedErrorsHaveSpecificRecovery(code:) with 4 test cases passed after 0.001 seconds.
+◇ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() started.
+✔ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() passed after 0.001 seconds.
+◇ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() started.
+✔ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() passed after 0.001 seconds.
+◇ Test extraFailureKeepsInputAndCanRetry() started.
+✔ Test extraFailureKeepsInputAndCanRetry() passed after 0.001 seconds.
+◇ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() started.
+✔ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() passed after 0.001 seconds.
+◇ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() started.
+✔ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() passed after 0.001 seconds.
+◇ Test extraRowsNeverReplacePrescriptionProgressAndBatch() started.
+✔ Test extraRowsNeverReplacePrescriptionProgressAndBatch() passed after 0.001 seconds.
+◇ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() started.
+✔ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() passed after 0.001 seconds.
+◇ Test addedHistoryMarksExtraAndIncludesFamilyRecords() started.
+✔ Test addedHistoryMarksExtraAndIncludesFamilyRecords() passed after 0.001 seconds.
+◇ Test extraPrefillUsesMostRecentlyRecordedSet() started.
+✔ Test extraPrefillUsesMostRecentlyRecordedSet() passed after 0.001 seconds.
+◇ Test addedRecordsContributeToHistoryStatsAndCSV() started.
+✔ Test addedRecordsContributeToHistoryStatsAndCSV() passed after 0.001 seconds.
+◇ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() started.
+✔ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() passed after 0.001 seconds.
+◇ Test restoredAccessoryExtraKeepsActualRIRWhenWeightChanges() started.
+✔ Test restoredAccessoryExtraKeepsActualRIRWhenWeightChanges() passed after 0.001 seconds.
+◇ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() started.
+✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 0.001 seconds.
+◇ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() started.
+✔ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() passed after 0.001 seconds.
+◇ Test addedCancellationDoesNotRepeatCompletionFeedback() started.
+✔ Test addedCancellationDoesNotRepeatCompletionFeedback() passed after 0.001 seconds.
+◇ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() started.
+✔ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() passed after 0.001 seconds.
+◇ Test deletingAddedSetRemovesItsE1RMAndPR() started.
+✔ Test deletingAddedSetRemovesItsE1RMAndPR() passed after 0.001 seconds.
+◇ Test fullEntryRejectsOtherWeekWrites() started.
+✔ Test fullEntryRejectsOtherWeekWrites() passed after 0.001 seconds.
+◇ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() started.
+✔ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() passed after 0.001 seconds.
+◇ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() started.
+✔ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() passed after 0.001 seconds.
+◇ Test deletedHighestAddedWeightRestoresNonPRBaseline() started.
+✔ Test deletedHighestAddedWeightRestoresNonPRBaseline() passed after 0.001 seconds.
+◇ Test extraCancellationRemovesE1RMAndPR() started.
+✔ Test extraCancellationRemovesE1RMAndPR() passed after 0.001 seconds.
+◇ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() started.
+✔ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() passed after 0.001 seconds.
+◇ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() started.
+✔ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() passed after 0.001 seconds.
+◇ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() started.
+✔ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() passed after 0.001 seconds.
+◇ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() started.
+✔ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() passed after 0.001 seconds.
+◇ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() started.
+✔ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() passed after 0.001 seconds.
+◇ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() started.
+✔ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() passed after 0.005 seconds.
+◇ Suite TodayWorkoutQuickLogTests started.
+◇ Test unrecordedAccessoryQuickLogDoesNotSubmitPrescribedOrFallbackRPE() started.
+✔ Test unrecordedAccessoryQuickLogDoesNotSubmitPrescribedOrFallbackRPE() passed after 0.001 seconds.
+✔ Suite TodayWorkoutQuickLogTests passed after 0.001 seconds.
+◇ Suite TrainingFlowTests started.
+◇ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() started.
+✔ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() passed after 0.001 seconds.
+✔ Suite TrainingFlowTests passed after 0.001 seconds.
+◇ Suite TrainingHistoryVideoTests started.
+◇ Test historyUsesActualLogIDForExtraAndStudentAddedSets() started.
+✔ Test historyUsesActualLogIDForExtraAndStudentAddedSets() passed after 0.001 seconds.
+✔ Suite TrainingHistoryVideoTests passed after 0.001 seconds.
+✔ Test run with 62 tests in 10 suites passed after 0.135 seconds.

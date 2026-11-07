@@ -34,6 +34,13 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   var isRecorded: Bool { draft.completed || draft.failed }
   var isCancellation: Bool { draft.completed && !draft.failed && input == initialInput }
   var weightPlaceholder: String { UnitDisplay.weightText(kg: previousWeight, unit: unit) }
+  var previousText: String {
+    guard let previousReps else { return "—" }
+    let rir = previous?.actualRIR ?? previousAdded?.actualRIR
+    let rpe = previous?.rpe ?? previousAdded?.rpe
+    let effort = rir.map(String.init) ?? rpe.map(SetEntryValue.text)
+    return "\(weightPlaceholder)×\(previousReps)" + (effort.map { "@\($0)" } ?? "")
+  }
   var rpePlaceholder: String {
     switch (input.effortMode, draft.prescribed.intensity) {
     case (.rir, .rir(let value)): String(value)

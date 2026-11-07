@@ -47,18 +47,11 @@ struct AccessoryLogRow: View {
         Button {
           row.usePrevious()
         } label: {
-          Text(
-            row.previousReps.map {
-              [
-                row.weightPlaceholder,
-                String($0),
-              ].joined(separator: " × ")
-            } ?? "—"
-          )
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-          .lineLimit(1)
-          .minimumScaleFactor(0.5)
-          .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+          Text(row.previousText)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+            .lineLimit(1)
+            .minimumScaleFactor(MeetPRFontMetrics.size10 / MeetPRFontMetrics.size11)
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
         }
         .foregroundStyle(Color.MeetPR.textMuted)
         .disabled(row.previousReps == nil)

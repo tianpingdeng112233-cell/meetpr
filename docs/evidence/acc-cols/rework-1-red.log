@@ -1,0 +1,28 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-11-07 04:19:24.484.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-07 04:19:24.485.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-07 04:19:24.485.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-07 04:19:24.485.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryColumnsTests started.
+◇ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() started.
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:31:9: Expectation failed: (helpHit → (18.450000000000003, 0.0, 14.0, 44.0)).contains(visibleBadge → (17.450000000000003, 6.0, 16.0, 16.0))
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:33:9: Expectation failed: (visibleBadge.intersection(toggleHit) → (17.450000000000003, 6.0, 1.0, 16.0)).isNull → false
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:31:9: Expectation failed: (helpHit → (25.78333333333333, 0.0, 14.0, 44.0)).contains(visibleBadge → (24.78333333333333, 6.0, 16.0, 16.0))
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:33:9: Expectation failed: (visibleBadge.intersection(toggleHit) → (24.78333333333333, 6.0, 1.0, 16.0)).isNull → false
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:31:9: Expectation failed: (helpHit → (30.0, 0.0, 14.0, 44.0)).contains(visibleBadge → (29.0, 6.0, 16.0, 16.0))
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:33:9: Expectation failed: (visibleBadge.intersection(toggleHit) → (29.0, 6.0, 1.0, 16.0)).isNull → false
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:31:9: Expectation failed: (helpHit → (33.11666666666667, 0.0, 14.0, 44.0)).contains(visibleBadge → (32.11666666666667, 6.0, 16.0, 16.0))
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:33:9: Expectation failed: (visibleBadge.intersection(toggleHit) → (32.11666666666667, 6.0, 1.0, 16.0)).isNull → false
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:31:9: Expectation failed: (helpHit → (38.61666666666667, 0.0, 14.0, 44.0)).contains(visibleBadge → (37.61666666666667, 6.0, 16.0, 16.0))
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() recorded an issue at AccessoryColumnsTests.swift:33:9: Expectation failed: (visibleBadge.intersection(toggleHit) → (37.61666666666667, 6.0, 1.0, 16.0)).isNull → false
+✘ Test helpHitAreaContainsVisibleBadgeWithoutEnteringToggle() failed after 0.046 seconds with 10 issues.
+✘ Suite AccessoryColumnsTests failed after 0.046 seconds with 10 issues.
+✘ Test run with 1 test in 1 suite failed after 0.046 seconds with 10 issues.

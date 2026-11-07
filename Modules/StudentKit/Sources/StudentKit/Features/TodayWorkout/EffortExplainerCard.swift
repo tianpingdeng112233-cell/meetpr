@@ -4,6 +4,7 @@ import SwiftUI
 /// A separate presentation leaves the underlying input and effort switch untouched.
 struct EffortExplainerButton: View {
   let kind: ActualEffortMode
+  var isAccessoryHeader = false
   @Environment(\.colorScheme) private var colorScheme
   @State private var isPresented = false
 
@@ -11,10 +12,11 @@ struct EffortExplainerButton: View {
     Button {
       isPresented = true
     } label: {
-      Image(systemName: "questionmark.circle")
-        .font(.system(size: 18, weight: .regular))
-        .foregroundStyle(Color.MeetPR.textMuted)
-        .frame(width: 44, height: 44)
+      EffortHelpIcon(isAccessoryHeader: isAccessoryHeader)
+        .offset(y: isAccessoryHeader ? -MeetPRSpacing.space2 : 0)
+        .frame(
+          width: isAccessoryHeader ? AccessoryEffortHeaderLayout.badgeWidth : 44, height: 44
+        )
         .contentShape(.rect)
     }
     .buttonStyle(.plain)
@@ -33,6 +35,29 @@ struct EffortExplainerButton: View {
         .presentationBackground(.clear)
       }
     #endif
+  }
+}
+
+struct EffortHelpIcon: View {
+  let isAccessoryHeader: Bool
+
+  var body: some View {
+    Group {
+      if isAccessoryHeader {
+        // A 14pt symbol font has a larger intrinsic image size. Constrain the image itself,
+        // not just the surrounding hit frame, so its left edge cannot enter the toggle.
+        Image(systemName: "questionmark.circle")
+          .resizable()
+          .scaledToFit()
+          .frame(
+            width: AccessoryEffortHeaderLayout.badgeWidth,
+            height: AccessoryEffortHeaderLayout.badgeWidth)
+      } else {
+        Image(systemName: "questionmark.circle")
+          .font(.system(size: 18, weight: .regular))
+      }
+    }
+    .foregroundStyle(Color.MeetPR.textMuted)
   }
 }
 
