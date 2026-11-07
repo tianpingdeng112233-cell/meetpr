@@ -1,0 +1,7 @@
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogCard.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogRow.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryRow.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/EffortExplainerCard.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryColumnsTests.swift
+Linting 'EffortExplainerCard.swift' (2/5)
+Linting 'AccessoryColumnsTests.swift' (1/5)
+Linting 'AccessoryLogCard.swift' (3/5)
+Linting 'AccessoryLogRow.swift' (4/5)
+Linting 'AccessoryRow.swift' (5/5)
+Done linting! Found 0 violations, 0 serious in 5 files.

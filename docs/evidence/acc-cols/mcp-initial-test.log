@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "tool call error: tool call failed for `XcodeBuildMCP/swift_package_test`\n\nCaused by:\n    timed out awaiting tools/call after 300s"
+    }
+  ],
+  "isError": true
+}

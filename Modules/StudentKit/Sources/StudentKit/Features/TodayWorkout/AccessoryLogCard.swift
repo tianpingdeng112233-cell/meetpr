@@ -72,22 +72,23 @@ struct AccessoryLogCard: View {
           ) { label in
             Group {
               if label == effortMode.label {
-                HStack(spacing: 0) {
+                AccessoryEffortHeaderLayout {
                   if allowsRIR {
-                    Button(action: switchEffort) { EffortToggleLabel(text: label) }
-                      .buttonStyle(.plain)
-                      .frame(
-                        minWidth: MeetPRSpacing.minimumHitTarget,
-                        minHeight: MeetPRSpacing.minimumHitTarget
-                      )
-                      .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
-                      .disabled(
-                        viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
-                          || !exercise.rows.contains(where: { !$0.draft.hasSavedRecord }))
+                    Button(action: switchEffort) {
+                      EffortToggleLabel(text: label, isCompact: true)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+                        .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
+                    .disabled(
+                      viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
+                        || !exercise.rows.contains(where: { !$0.draft.hasSavedRecord }))
                   } else {
-                    Text(label).frame(minWidth: MeetPRSpacing.minimumHitTarget)
+                    Text(label).frame(maxWidth: .infinity)
                   }
-                  EffortExplainerButton(kind: effortMode)
+                  EffortExplainerButton(kind: effortMode, isAccessoryHeader: true)
                 }
               } else {
                 Text(label)
@@ -260,6 +261,36 @@ struct AccessoryLogCard: View {
   }
 }
 
+/// Partition the narrow header before placing either button; intrinsic label sizes cannot
+/// borrow the badge's horizontal hit area.
+struct AccessoryEffortHeaderLayout: Layout {
+  static let badgeWidth: CGFloat = 14
+
+  func hitAreas(width: CGFloat) -> (toggle: CGRect, help: CGRect) {
+    let toggleWidth = max(0, width - Self.badgeWidth)
+    let height = MeetPRSpacing.minimumHitTarget
+    return (
+      CGRect(x: 0, y: 0, width: toggleWidth, height: height),
+      CGRect(x: toggleWidth, y: 0, width: Self.badgeWidth, height: height)
+    )
+  }
+
+  func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    CGSize(width: proposal.width ?? 44, height: MeetPRSpacing.minimumHitTarget)
+  }
+
+  func placeSubviews(
+    in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
+  ) {
+    let areas = hitAreas(width: bounds.width)
+    for (subview, area) in zip(subviews, [areas.toggle, areas.help]) {
+      subview.place(
+        at: CGPoint(x: bounds.minX + area.minX, y: bounds.minY + area.minY),
+        anchor: .topLeading, proposal: ProposedViewSize(area.size))
+    }
+  }
+}
+
 /// One allocation for the header and every row, including narrow phone widths.
 struct AccessoryColumns: Layout {
   private let weights: [CGFloat] = [36, 56, 64, 44, 48, 40]
@@ -287,14 +318,19 @@ struct AccessoryColumns: Layout {
     }
   }
 
-  private func widths(_ width: CGFloat) -> [CGFloat] {
+  func widths(_ width: CGFloat) -> [CGFloat] {
     let available = max(0, width - gap * CGFloat(weights.count - 1))
-    // Reserve separate 44pt targets for the effort switch and its help button.
-    let effortWidth = MeetPRSpacing.minimumHitTarget * 2
-    let remaining = max(0, available - effortWidth)
+    // Preserve the other columns' allocation; transfer the old help allowance to history.
+    let previousEffortWidth = min(88, available)
+    let remaining = available - previousEffortWidth
     let remainingWeight = weights.reduce(0, +) - weights[4]
+    let effortWidth = remaining * weights[3] / remainingWeight
     return weights.enumerated().map { index, weight in
-      index == 4 ? effortWidth : remaining * weight / remainingWeight
+      switch index {
+      case 4: effortWidth
+      case 1: remaining * weight / remainingWeight + previousEffortWidth - effortWidth
+      default: remaining * weight / remainingWeight
+      }
     }
   }
 }
@@ -302,11 +338,12 @@ struct AccessoryColumns: Layout {
 /// A compact visible control with the surrounding button retaining its touch target.
 struct EffortToggleLabel: View {
   let text: String
+  var isCompact = false
   var body: some View {
     Text(text)
       .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
       .foregroundStyle(Color.MeetPR.textPrimary)
-      .padding(.horizontal, MeetPRSpacing.space2)
+      .padding(.horizontal, isCompact ? MeetPRSpacing.zero : MeetPRSpacing.space2)
       .padding(.vertical, MeetPRSpacing.space1)
       .background(Color.MeetPR.surfaceRaised, in: .rect(cornerRadius: MeetPRRadius.micro))
       .overlay(
