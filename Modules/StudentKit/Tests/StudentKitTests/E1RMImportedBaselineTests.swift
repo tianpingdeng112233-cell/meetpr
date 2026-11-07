@@ -27,7 +27,7 @@ import Testing
   let history = try await repository.fetchHistory(studentId: studentID, family: .deadlift)
   let live = try #require(history.first { $0.origin == .logged })
   #expect(live.confidence == .normal)
-  #expect(abs(live.e1RMKg - 192.8571428571) < 0.001)
+  #expect(abs(live.e1RMKg - 177.1653543307) < 0.001)
   #expect(history.contains(imported))
 }
 
@@ -62,7 +62,7 @@ import Testing
   )
   #expect(after.cardState == .chart)
   #expect(after.samples.count == 8)
-  #expect(abs((after.currentKg ?? 0) - 221.4285714286) < 0.001)
+  #expect(abs((after.currentKg ?? 0) - 203.5623409669) < 0.001)
   let mutations = await e1rm.mutationCallCount
   #expect(try await reconciler.reconcile(studentID: fixture.studentID).didReconcile == false)
   #expect(await e1rm.mutationCallCount == mutations)
@@ -166,7 +166,7 @@ func importedBaselineRepairPreservesRetiredFamilyReviewAndPR(missingPoint: Bool)
     from: viewModel, family: .deadlift, range: .ninetyDays, now: fixture.now
   )
   #expect(snapshot.cardState == .chart)
-  #expect(abs((snapshot.currentKg ?? 0) - 221.4285714286) < 0.001)
+  #expect(abs((snapshot.currentKg ?? 0) - 203.5623409669) < 0.001)
   #expect(
     try await fixture.reconciler(e1rm: reopened)
       .reconcile(studentID: fixture.studentID).didReconcile == false)

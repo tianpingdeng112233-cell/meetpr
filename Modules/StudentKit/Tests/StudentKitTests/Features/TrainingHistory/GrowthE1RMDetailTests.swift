@@ -22,7 +22,7 @@ import Testing
     #expect(detail.exerciseName == StudentExerciseName.display(exercise.exercise))
     #expect(detail.point.sourceWeightKg == 152)
     #expect(detail.point.sourceReps == 5)
-    #expect(detail.calculation == .rts(intensity: 0.78))
+    #expect(detail.calculation == .rts(intensity: 0.811))
   }
 
   @Test(arguments: [nil, 5.5] as [Double?])
@@ -48,7 +48,7 @@ import Testing
     let detail = GrowthE1RMDetail(point: restored, logs: [], days: [])
     #expect(detail.point.sourceRPE == 7.5)
     #expect(detail.point.sourceCoachRPE == 8)
-    #expect(detail.calculation == .rts(intensity: 0.78))
+    #expect(detail.calculation == .rts(intensity: 0.811))
     #expect(detail.setNumber == nil)
   }
 
@@ -63,7 +63,7 @@ import Testing
   }
 
   private func makePoint(
-    exerciseID: UUID = UUID(), weight: Double = 152, value: Double = 194.9,
+    exerciseID: UUID = UUID(), weight: Double = 152, value: Double = 187.4229346486,
     rpe: Double? = 8, coachRPE: Double? = nil
   ) -> E1RMHistoryPoint {
     E1RMHistoryPoint(

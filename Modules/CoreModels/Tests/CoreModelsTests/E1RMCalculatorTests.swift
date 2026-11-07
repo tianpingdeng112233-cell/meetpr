@@ -3,22 +3,22 @@ import Testing
 
 @testable import CoreModels
 
-/// Spec 028 §2 lock: the RTS table below is copied from the SPEC document
+/// Spec 106: the extended RPE table below is copied from the SPEC document
 /// (independent of the implementation's table) so any formula/table drift in
 /// E1RMCalculator fails here. Rows reps 1-12, columns RPE 6.0...10.0 step 0.5.
 private let specRTSTable: [[Double]] = [
-  [0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.98, 1.00],
-  [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96],
-  [0.76, 0.78, 0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92],
-  [0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84, 0.86, 0.88],
-  [0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84, 0.86],
-  [0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84],
-  [0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82],
-  [0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80],
-  [0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78],
-  [0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76],
-  [0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74],
-  [0.56, 0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72],
+  [0.863, 0.878, 0.892, 0.907, 0.922, 0.939, 0.955, 0.978, 1],
+  [0.837, 0.85, 0.863, 0.878, 0.892, 0.907, 0.922, 0.939, 0.955],
+  [0.811, 0.824, 0.837, 0.85, 0.863, 0.878, 0.892, 0.907, 0.922],
+  [0.786, 0.799, 0.811, 0.824, 0.837, 0.85, 0.863, 0.878, 0.892],
+  [0.762, 0.774, 0.786, 0.799, 0.811, 0.824, 0.837, 0.85, 0.863],
+  [0.739, 0.751, 0.762, 0.774, 0.786, 0.799, 0.811, 0.824, 0.837],
+  [0.707, 0.723, 0.739, 0.751, 0.762, 0.774, 0.786, 0.799, 0.811],
+  [0.68, 0.694, 0.707, 0.723, 0.739, 0.751, 0.762, 0.774, 0.786],
+  [0.653, 0.667, 0.68, 0.694, 0.707, 0.723, 0.739, 0.751, 0.762],
+  [0.626, 0.64, 0.653, 0.667, 0.68, 0.694, 0.707, 0.723, 0.739],
+  [0.599, 0.6125, 0.626, 0.64, 0.653, 0.667, 0.68, 0.694, 0.707],
+  [0.572, 0.5855, 0.599, 0.6125, 0.626, 0.64, 0.653, 0.667, 0.68],
 ]
 
 @Test func rtsTableAll108CellsMatchSpec() {
@@ -32,7 +32,7 @@ private let specRTSTable: [[Double]] = [
       #expect(actual != nil, "reps=\(reps) rpe=\(rpe) returned nil")
       if let actual {
         #expect(
-          abs(actual - expected) < 0.5,
+          abs(actual - expected) < 1e-10,
           "reps=\(reps) rpe=\(rpe): got \(actual), spec table says \(expected)"
         )
       }
@@ -40,11 +40,26 @@ private let specRTSTable: [[Double]] = [
   }
 }
 
-@Test func spec028CanonicalFixture() {
-  // 100kg × 5 @ RPE 8 → intensity 0.78 → ≈128.2 kg (spec 028 §2 callout).
+@Test func spec106CanonicalFixture() {
+  // 100kg × 5 @ RPE 8 → intensity 0.811 → ≈123.30 kg (spec 106 C1).
   let result = E1RMCalculator.calculate(weightKg: 100, reps: 5, rpe: 8.0)
   #expect(result != nil)
-  if let result { #expect(abs(result - 128.2) < 0.1) }
+  if let result { #expect(abs(result - 123.30) < 0.01) }
+}
+
+@Test(arguments: [(3, 9.0, 112.11), (1, 10.0, 100.0), (11, 8.0, 153.14), (12, 8.0, 159.74)])
+func extendedTableCanonicalExamples(reps: Int, rpe: Double, expected: Double) throws {
+  let actual = try #require(E1RMCalculator.calculate(weightKg: 100, reps: reps, rpe: rpe))
+  #expect(abs(actual - expected) < 0.01)
+}
+
+@Test func extendedTableSuggestedWeightPreservesRawRoundTrip() throws {
+  let suggested = try #require(E1RMCalculator.suggestedWeight(e1RM: 123.3, reps: 2, rpe: 9))
+  // The calculator returns raw kg; the existing prescription layer rounds to 2.5 kg.
+  #expect(abs(suggested - 113.6826) < 1e-10)
+  let estimate = try #require(E1RMCalculator.calculate(weightKg: 100, reps: 5, rpe: 8))
+  let roundTrip = try #require(E1RMCalculator.suggestedWeight(e1RM: estimate, reps: 5, rpe: 8))
+  #expect(abs(roundTrip - 100) < 1e-10)
 }
 
 private struct EpleyCase {
@@ -83,11 +98,11 @@ private struct EpleyCase {
 
 @Test func rpeInterpolationBetweenHalfSteps() {
   // 1-D linear interpolation along RPE only (spec 028 §2).
-  // reps=5: RPE 8.0 → 0.78, RPE 8.5 → 0.80 ⇒ RPE 8.25 → 0.79.
+  // reps=5: RPE 7.5 → 0.799, RPE 8 → 0.811 ⇒ RPE 7.75 → 0.805.
   let cases: [(Double, Double)] = [
-    (8.25, 100 / 0.79),
-    (7.25, 100 / 0.75),
-    (9.25, 100 / 0.83),
+    (7.75, 100 / 0.805),
+    (7.25, 100 / 0.7925),
+    (9.25, 100 / 0.8435),
   ]
   for (rpe, expected) in cases {
     let actual = E1RMCalculator.calculate(weightKg: 100, reps: 5, rpe: rpe)
@@ -114,7 +129,7 @@ private struct EpleyCase {
 
 @Test func suggestedWeightReversesRTSTable() throws {
   let suggested = try #require(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 10))
-  #expect(abs(suggested - 86.0) < 0.001)
+  #expect(abs(suggested - 86.3) < 0.001)
 
   let roundTrip = E1RMCalculator.calculate(weightKg: suggested, reps: 5, rpe: 10)
   #expect(roundTrip != nil)
@@ -128,8 +143,8 @@ private struct EpleyCase {
     E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 5.5))
   let rpeFive = try #require(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 5))
 
-  #expect(abs(rpeFivePointFive - 68) < 0.001)
-  #expect(abs(rpeFive - 66) < 0.001)
+  #expect(abs(rpeFivePointFive - 75) < 0.001)
+  #expect(abs(rpeFive - 73.8) < 0.001)
 }
 
 @Test func suggestedWeightRejectsInputsOutsideReverseTable() {
