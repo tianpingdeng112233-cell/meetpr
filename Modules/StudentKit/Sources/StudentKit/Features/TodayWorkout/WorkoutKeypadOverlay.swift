@@ -4,6 +4,7 @@ import SwiftUI
 /// Hosted outside the tab inset so neither the tab rail nor rest controls cover the pad.
 struct WorkoutKeypadOverlay: View {
   let session: WorkoutKeypadSession
+  @AccessibilityFocusState private var focusedCell: WorkoutKeypadCell.Address?
 
   var body: some View {
     if let cell = session.current {
@@ -12,7 +13,7 @@ struct WorkoutKeypadOverlay: View {
           Color.black.opacity(0.2).contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(StudentStrings.localized(.addedCancel))
+        .accessibilityHidden(true)
         .accessibilityIdentifier("workout.keypad.dismiss")
         .ignoresSafeArea()
 
@@ -23,6 +24,12 @@ struct WorkoutKeypadOverlay: View {
           },
           onTextCommit: session.commit, onCancel: session.cancel
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(cell.context)
+        .accessibilityAddTraits(.isModal)
+        .accessibilityAction(.escape) { session.cancel() }
+        .accessibilityFocused($focusedCell, equals: cell.id)
+        .onAppear { focusedCell = cell.id }
         .id(cell.id)
         .onGeometryChange(for: CGFloat.self) {
           $0.frame(in: .global).minY

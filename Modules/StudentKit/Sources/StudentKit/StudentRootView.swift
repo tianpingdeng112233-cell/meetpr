@@ -326,6 +326,7 @@ extension StudentRootView {
         )
       }
     }
+    .accessibilityHidden(workoutKeypad.current != nil)
     .overlay(alignment: .bottom) {
       WorkoutKeypadOverlay(session: workoutKeypad)
     }
