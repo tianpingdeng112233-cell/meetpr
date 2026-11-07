@@ -22,8 +22,9 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
   /// Clip duration when the feedback projection can provide it.
   ///
   /// Older backend payloads omit this field, so the student chat keeps it
-  /// optional and renders a neutral placeholder when unavailable.
+  /// optional and hides the duration badge when unavailable.
   public let durationSeconds: Int?
+  public let posterURL: URL?
 
   public init(
     id: UUID,
@@ -34,7 +35,8 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     reps: Int? = nil,
     rpe: String? = nil,
     loggedAt: Date? = nil,
-    durationSeconds: Int? = nil
+    durationSeconds: Int? = nil,
+    posterURL: URL? = nil
   ) {
     self.id = id
     self.exerciseName = exerciseName
@@ -45,5 +47,10 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     self.rpe = rpe
     self.loggedAt = loggedAt
     self.durationSeconds = durationSeconds
+    self.posterURL = posterURL
+  }
+  private enum CodingKeys: String, CodingKey {
+    case id, exerciseName, exerciseNameEn, setIndex, weightKg, reps, rpe, loggedAt, durationSeconds
+    case posterURL = "posterUrl"
   }
 }

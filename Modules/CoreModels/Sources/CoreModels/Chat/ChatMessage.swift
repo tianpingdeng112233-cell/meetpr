@@ -13,6 +13,8 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
   public let setRef: SetRefV1?
   public let videoURL: URL?
   public let videoExpiresIn: Int?
+  public let posterURL: URL?
+  public let durationSeconds: Int?
   public let clientID: String
   public let createdAt: Date
 
@@ -29,6 +31,8 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     setRef: SetRefV1? = nil,
     videoURL: URL? = nil,
     videoExpiresIn: Int? = nil,
+    posterURL: URL? = nil,
+    durationSeconds: Int? = nil,
     clientID: String,
     createdAt: Date
   ) {
@@ -44,6 +48,8 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     self.setRef = setRef
     self.videoURL = videoURL
     self.videoExpiresIn = videoExpiresIn
+    self.posterURL = posterURL
+    self.durationSeconds = durationSeconds
     self.clientID = clientID
     self.createdAt = createdAt
   }
@@ -62,6 +68,8 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     setRef = try? container.decode(SetRefV1ReadValue.self, forKey: .setRef).value
     videoURL = try container.decodeIfPresent(URL.self, forKey: .videoURL)
     videoExpiresIn = try container.decodeIfPresent(Int.self, forKey: .videoExpiresIn)
+    posterURL = try? container.decodeIfPresent(URL.self, forKey: .posterURL)
+    durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds)
     clientID = try container.decode(String.self, forKey: .clientID)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
@@ -79,6 +87,8 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     case setRef
     case videoURL = "videoUrl"
     case videoExpiresIn
+    case posterURL = "posterUrl"
+    case durationSeconds
     case clientID = "clientId"
     case createdAt
   }

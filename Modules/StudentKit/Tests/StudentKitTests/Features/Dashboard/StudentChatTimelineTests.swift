@@ -62,7 +62,9 @@ private func itemKind(_ item: StudentChatTimelineItem) -> TimelineItemKind {
   switch item {
   case .plan:
     .plan
-  case .message(let message):
+  case .chat(.pending):
+    .studentMessage
+  case .chat(.message(let message, _)):
     message.text == "教练消息" ? .coachMessage : .studentMessage
   case .feedback:
     .feedback

@@ -75,10 +75,28 @@ private struct ChatSetAttachmentRow: View {
   var body: some View {
     HStack(spacing: MeetPRSpacing.sm) {
       if presentation.hasVideo {
-        Image(systemName: "play.fill")
-          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
-          .background(Color.MeetPR.surfaceElevated, in: .rect(cornerRadius: MeetPRRadius.sm))
-          .accessibilityLabel(ChatStrings.playVideo)
+        ZStack {
+          Color.MeetPR.surfaceElevated
+          ChatVideoPoster(url: presentation.cover.posterURL)
+          Image(systemName: "play.fill")
+            .foregroundStyle(.white)
+            .padding(MeetPRSpacing.xs)
+            .background(.black.opacity(0.45), in: .circle)
+        }
+        .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+        .overlay(alignment: .bottomTrailing) {
+          if let duration = presentation.cover.durationText {
+            Text(duration)
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+              .lineLimit(1)
+              .minimumScaleFactor(0.5)
+              .foregroundStyle(.white)
+              .padding(.horizontal, MeetPRSpacing.point2)
+              .background(.black.opacity(0.6), in: .rect(cornerRadius: MeetPRSpacing.point2))
+          }
+        }
+        .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+        .accessibilityLabel(ChatStrings.playVideo)
       }
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         Text(presentation.exerciseName).font(.MeetPR.bodyEmphasis)

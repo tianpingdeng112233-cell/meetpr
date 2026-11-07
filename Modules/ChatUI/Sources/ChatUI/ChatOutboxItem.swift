@@ -18,18 +18,21 @@ public struct ChatOutboxItem: Sendable {
   public let senderID: UUID
   public let draft: PendingChatMessage
   public let state: ChatSendState
+  public let createdAt: Date
 
   public init(
     clientID: String,
     conversationID: UUID,
     senderID: UUID,
     draft: PendingChatMessage,
-    state: ChatSendState
+    state: ChatSendState,
+    createdAt: Date = Date()
   ) {
     self.clientID = clientID
     self.conversationID = conversationID
     self.senderID = senderID
     self.draft = draft
     self.state = state
+    self.createdAt = createdAt
   }
 }

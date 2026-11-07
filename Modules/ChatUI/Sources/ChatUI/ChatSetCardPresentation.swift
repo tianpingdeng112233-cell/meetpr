@@ -12,6 +12,7 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
   let createdAt: Date
   let note: String?
   let videoURL: URL?
+  let cover: ChatVideoCoverPresentation
   let attachmentSummary: String
 
   var visibleNote: String? {
@@ -66,6 +67,8 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
     rpe = setRef.rpe
     createdAt = message.createdAt
     self.note = note
+    cover = ChatVideoCoverPresentation(
+      posterURL: message.posterURL, durationSeconds: message.durationSeconds)
     videoURL = message.videoURL.flatMap { $0.absoluteString.isEmpty ? nil : $0 }
   }
 }

@@ -55,6 +55,8 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
   public let reps: Int?
   public let rpe: String?
   public let loggedAt: Date?
+  public let posterURL: URL?
+  public let durationSeconds: Int?
 
   public init(
     id: UUID,
@@ -64,7 +66,9 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
     weightKg: String? = nil,
     reps: Int? = nil,
     rpe: String? = nil,
-    loggedAt: Date? = nil
+    loggedAt: Date? = nil,
+    posterURL: URL? = nil,
+    durationSeconds: Int? = nil
   ) {
     self.id = id
     self.exerciseName = exerciseName
@@ -74,6 +78,12 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
     self.reps = reps
     self.rpe = rpe
     self.loggedAt = loggedAt
+    self.posterURL = posterURL
+    self.durationSeconds = durationSeconds
+  }
+  private enum CodingKeys: String, CodingKey {
+    case id, exerciseName, exerciseNameEn, setIndex, weightKg, reps, rpe, loggedAt, durationSeconds
+    case posterURL = "posterUrl"
   }
 }
 

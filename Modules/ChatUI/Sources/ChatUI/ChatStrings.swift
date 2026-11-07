@@ -1,6 +1,30 @@
+import CoreModels
 import Foundation
 
 enum ChatStrings {
+  static func yesterday(locale: Locale) -> String {
+    let language = InterfaceLanguage(locale: locale).rawValue
+    #if DEBUG && os(macOS)
+      // SwiftPM on macOS copies catalogs without compiling their strings.
+      if let url = Bundle.module.url(forResource: "Localizable", withExtension: "xcstrings"),
+        let data = try? Data(contentsOf: url),
+        let catalog = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+        let strings = catalog["strings"] as? [String: Any],
+        let entry = strings["chat.timestamp.yesterday"] as? [String: Any],
+        let localizations = entry["localizations"] as? [String: Any],
+        let localization = localizations[language] as? [String: Any],
+        let unit = localization["stringUnit"] as? [String: Any],
+        let value = unit["value"] as? String
+      {
+        return value
+      }
+    #endif
+    let bundle =
+      Bundle.module.path(forResource: language, ofType: "lproj")
+      .flatMap(Bundle.init(path:)) ?? .module
+    return String(localized: "chat.timestamp.yesterday", bundle: bundle, locale: locale)
+  }
+
   static let askCoach = localized("chat.askCoach")
   static let setRefPrompt = localized("chat.setRefPrompt")
   static let setRefQuestion = localized("chat.setRefQuestion")
