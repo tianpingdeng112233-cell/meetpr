@@ -1,5 +1,6 @@
 import AuthenticationServices
 import Foundation
+import Networking
 
 #if os(iOS)
   import UIKit
@@ -145,6 +146,7 @@ final class GoogleOAuthService: NSObject, GoogleOAuthAuthorizing {
       callbackScheme: String
     ) async throws -> URL {
       try await withCheckedThrowingContinuation { continuation in
+        let resumer = ResumeOnce<URL> { continuation.resume(with: $0) }
         let session = ASWebAuthenticationSession(
           url: url,
           callbackURLScheme: callbackScheme
@@ -154,13 +156,13 @@ final class GoogleOAuthService: NSObject, GoogleOAuthAuthorizing {
             if let authenticationError = error as? ASWebAuthenticationSessionError,
               authenticationError.code == .canceledLogin
             {
-              continuation.resume(throwing: GlobalOAuthError.cancelled)
+              resumer.resume(with: .failure(GlobalOAuthError.cancelled))
             } else if error != nil {
-              continuation.resume(throwing: GlobalOAuthError.authorizationFailed)
+              resumer.resume(with: .failure(GlobalOAuthError.authorizationFailed))
             } else if let callbackURL {
-              continuation.resume(returning: callbackURL)
+              resumer.resume(with: .success(callbackURL))
             } else {
-              continuation.resume(throwing: GlobalOAuthError.invalidCallback)
+              resumer.resume(with: .failure(GlobalOAuthError.invalidCallback))
             }
           }
         }
@@ -169,7 +171,7 @@ final class GoogleOAuthService: NSObject, GoogleOAuthAuthorizing {
         authenticationSession = session
         guard session.start() else {
           authenticationSession = nil
-          continuation.resume(throwing: GlobalOAuthError.authorizationFailed)
+          resumer.resume(with: .failure(GlobalOAuthError.authorizationFailed))
           return
         }
       }
