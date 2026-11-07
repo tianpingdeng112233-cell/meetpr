@@ -35,7 +35,7 @@ struct AccessoryLogRow: View {
                 systemName: row.hasVideoFailure ? "exclamationmark.triangle.fill" : "video.fill"
               )
               .font(.caption2)
-              .foregroundStyle(row.hasVideoFailure ? Color.MeetPR.danger : Color.MeetPR.goldText)
+              .foregroundStyle(row.hasVideoFailure ? Color.MeetPR.danger : Color.MeetPR.success)
             }
           }
           .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
