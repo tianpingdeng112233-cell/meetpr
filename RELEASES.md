@@ -18,7 +18,7 @@
 
 ---
 
-## 1.0 (32) — 已上传（2026-11-05 David 口报「传好了」；外测组 Ceshi 已填 What to Test 提交 Beta App Review）
+## 1.0 (32) — 已发外测（2026-11-05 上传；2026-11-07 David 截图确认外测组 Ceshi 已 Testing，26 名测试员）
 - 打包来源：annotated tag `beta/1.0-32` @ `d76de385`（`release/1.0`，基底 `beta/1.0-31`）。tag CI run 42023106935 全绿（swift-format / SwiftLint / Swift Build & Test）。
 - 切包前 ASC 最新为 1.0(31)（David 截图）。双端 demo 从 tag 现建（iPhone 17 教练 / iPhone 17 Pro 学员），产物 CFBundleVersion 实读 32。
 - 2026-11-05 David 在 iPhone 12 真机（Debug 包）验收 iOS 通过并放行全部 6 项；TestFlight 32 覆盖升级后的真机首屏未单独核。
