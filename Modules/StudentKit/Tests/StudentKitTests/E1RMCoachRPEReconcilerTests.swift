@@ -59,7 +59,7 @@ private func expectCalibrated(
 ) {
   #expect(result.didReconcile)
   #expect(point.sourceCoachRPE == 8)
-  #expect(abs(point.e1RMKg - 179.49) < 0.01)
+  #expect(abs(point.e1RMKg - 172.6263871763) < 0.01)
   #expect(suggestion != nil)
 }
 
@@ -70,7 +70,7 @@ private func expectReverted(
 ) {
   #expect(result.didReconcile)
   #expect(point.sourceCoachRPE == nil)
-  #expect(abs(point.e1RMKg - 200) < 0.01)
+  #expect(abs(point.e1RMKg - 183.7270341207) < 0.01)
   expectNoSuggestionBaseline(points)
 }
 
@@ -136,7 +136,7 @@ private func reconcileReversion(
 @Test func coachRPEReconciliationRebuildsConfidenceChronologically() async throws {
   let fixture = makeCoachRPEFixture()
   let originalLogs = [
-    coachRPELog(fixture: fixture, weightKg: 100, rpe: 8, date: fixture.anchor),
+    coachRPELog(fixture: fixture, weightKg: 105, rpe: 8, date: fixture.anchor),
     coachRPELog(
       fixture: fixture,
       setIndex: 1,

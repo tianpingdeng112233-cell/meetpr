@@ -230,7 +230,7 @@ import Testing
     try await e1rm.fetchHistory(studentId: studentID, exerciseId: exercise.id).first
   )
 
-  #expect(abs(point.e1RMKg - 179.49) < 0.01)
+  #expect(abs(point.e1RMKg - 172.6263871763) < 0.01)
   #expect(point.sourceRPE == 6)
   #expect(point.sourceCoachRPE == 8)
 }

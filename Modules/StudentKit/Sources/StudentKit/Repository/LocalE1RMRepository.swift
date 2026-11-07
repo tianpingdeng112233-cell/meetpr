@@ -59,6 +59,17 @@ public actor LocalE1RMRepository: E1RMRepository {
 
   // MARK: - E1RMRepository
 
+  /// No suspension between reading and atomically saving: concurrent records
+  /// land either before this transform or after it, never inside a stale snapshot.
+  func recalculateExtendedRPEHistory(studentID: UUID) throws {
+    var state = try loadState()
+    state.points = state.points.map { point in
+      point.studentId == studentID ? point.recalculatedWithExtendedRPETable() : point
+    }
+    try save(state)
+    incrementRevision(for: studentID)
+  }
+
   public func recordPoint(_ point: E1RMHistoryPoint) async throws {
     var state = try loadState()
     state.points.append(point)

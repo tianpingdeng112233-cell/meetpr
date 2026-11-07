@@ -4,20 +4,20 @@ import Testing
 
 @testable import StudentKit
 
-// Acceptance fixture (spec 032): 100kg × 5 @ RPE8 → RTS intensity 0.78 →
-// raw e1RM 128.205… → 128.0 on the 0.5 grid; 90% of raw = 115.385 → 115.5.
+// Acceptance fixture (specs 032 / 106): 100kg × 5 @ RPE8 → intensity 0.811 →
+// raw e1RM 123.304… → 123.5 on the 0.5 grid; 90% of raw = 110.974 → 111.
 
-@Test func estimatorMatchesSpec028Fixture() {
+@Test func estimatorMatchesSpec106Fixture() {
   let estimate = OneRMEstimator.estimate(weightKg: 100, reps: 5, rpe: 8)
-  #expect(estimate?.estimated == Decimal(128))
-  #expect(estimate?.conservative == Decimal(string: "115.5"))
+  #expect(estimate?.estimated == Decimal(string: "123.5"))
+  #expect(estimate?.conservative == Decimal(111))
 }
 
 @Test func conservativeIsNinetyPercentOfRawNotRounded() {
-  // If 90% were taken from the ROUNDED estimate (128.0), the result would
-  // be 115.0 — the wiki copy expects 115.5 (raw → 90% → grid).
-  let estimate = OneRMEstimator.estimate(weightKg: 100, reps: 5, rpe: 8)
-  #expect(estimate?.conservative != Decimal(115))
+  // 102 / 0.811 = 125.7707: raw → 90% → grid is 113;
+  // rounding the estimate to 126 first would instead produce 113.5.
+  let estimate = OneRMEstimator.estimate(weightKg: 102, reps: 5, rpe: 8)
+  #expect(estimate?.conservative == Decimal(113))
 }
 
 @Test func estimatesSnapToHalfKiloGrid() {
