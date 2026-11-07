@@ -18,7 +18,7 @@
 
 ---
 
-## 1.0 (33) — 已上传（2026-11-07；同日 David 截图：外测组 Ceshi 正在提交 Beta App Review，内测组 Neice 状态未核实）
+## 1.0 (33) — 已上传（2026-11-07；同日 David 截图：外测组 Ceshi 正在提交 Beta App Review；David 口报内测组 Neice 已拿到 33）
 - 打包来源：annotated tag `beta/1.0-33` @ `171a810a`（`release/1.0`，基底 `beta/1.0-32`；tag = 发版线 tip，零落差）。tag CI run 42366435179 全绿。
 - 候选七个 PR（#414 #418 #421 #423 #424 #425 #427）均已合入 release/1.0。双端 demo 从 tag 现建（iPhone 17 教练 / iPhone 17 Pro 学员），已装 CFBundleVersion 实读 33。
 - 外测 What to Test 用纯文字五条更新 + 三个重点（数字面板 / 隔天撤销 / 老视频首图）。
