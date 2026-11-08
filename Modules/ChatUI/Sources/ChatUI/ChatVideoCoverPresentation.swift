@@ -1,6 +1,13 @@
 import Foundation
 
 public struct ChatVideoCoverPresentation: Equatable, Sendable {
+  public static func frameSize(imageSize: CGSize?, availableWidth: CGFloat) -> CGSize {
+    guard let imageSize, imageSize.width > 0, imageSize.height > imageSize.width,
+      imageSize.width.isFinite, imageSize.height.isFinite
+    else { return CGSize(width: availableWidth, height: 150) }
+    return CGSize(width: max(135, 240 * imageSize.width / imageSize.height), height: 240)
+  }
+
   public let posterURL: URL?
   public let durationText: String?
 
