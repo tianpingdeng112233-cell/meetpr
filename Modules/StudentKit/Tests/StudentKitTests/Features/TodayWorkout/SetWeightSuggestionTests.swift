@@ -177,7 +177,7 @@ import Testing
     let actual = draft(
       exerciseID: exerciseID,
       prescribed: prescription(setIndex: 0, reps: 5, rpe: 8),
-      actualWeight: 80
+      actualWeight: 85
     )
     let prescribed = draft(
       exerciseID: exerciseID,

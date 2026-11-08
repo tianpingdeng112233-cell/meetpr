@@ -8,11 +8,12 @@ protocol E1RMMigrationStoring: Sendable {
 }
 
 actor UserDefaultsE1RMMigrationStore: E1RMMigrationStoring {
-  private static let version = "coach-rpe-low-rpe-replay-v2"
+  private let version: String
   private let defaults: UserDefaults
 
-  init(defaults: UserDefaults = .standard) {
+  init(defaults: UserDefaults = .standard, version: String = "coach-rpe-low-rpe-replay-v2") {
     self.defaults = defaults
+    self.version = version
   }
 
   func isCompleted(studentID: UUID) -> Bool {
@@ -24,7 +25,7 @@ actor UserDefaultsE1RMMigrationStore: E1RMMigrationStoring {
   }
 
   private func key(studentID: UUID) -> String {
-    "e1rm-migration.\(Self.version).\(studentID.uuidString.lowercased())"
+    "e1rm-migration.\(version).\(studentID.uuidString.lowercased())"
   }
 }
 
@@ -76,6 +77,23 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
   }
 
   func runIfNeeded(studentID: UUID) async throws -> Result {
+    let result = try await rebuildIfNeeded(studentID: studentID)
+    // Persistent histories need the one-shot table update even when the older
+    // replay marker is complete. In-memory demo seed values stay unchanged.
+    if let local = e1rm as? LocalE1RMRepository {
+      do {
+        try await E1RMExtendedRPETableMigration(e1rm: local).runIfNeeded(studentID: studentID)
+      } catch is CancellationError {
+        throw CancellationError()
+      } catch {
+        // Keep the marker incomplete for retry, and let existing history readers
+        // provide their read-only fallback instead of blocking the student root.
+      }
+    }
+    return result
+  }
+
+  private func rebuildIfNeeded(studentID: UUID) async throws -> Result {
     guard !(await marker.isCompleted(studentID: studentID)) else {
       return Result(didRun: false, pointCount: 0)
     }
