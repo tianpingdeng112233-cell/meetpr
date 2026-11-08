@@ -720,7 +720,8 @@ private struct StudentPlanChatCard: View {
 }
 
 /// Mockup line 643: 3pt gold rail, 5/16/16/5 corners, read state, and a
-/// 150pt video cover with label, play control, and duration.
+/// adaptive video cover with label, play control, and duration.
+@MainActor
 private struct StudentFeedbackChatCard: View {
   let feedback: CoachFeedback
 
@@ -791,6 +792,13 @@ private struct StudentFeedbackChatCard: View {
   private var videoCover: some View {
     let cover = ChatVideoCoverPresentation(
       posterURL: feedback.video?.posterURL, durationSeconds: feedback.video?.durationSeconds)
+    let imageSize =
+      cover.posterURL == nil
+      ? nil
+      : feedback.videoID.flatMap {
+        ChatVideoPosterDimensions.shared.imageSize(for: $0)
+      }
+    let size = ChatVideoCoverPresentation.frameSize(imageSize: imageSize, availableWidth: 0)
     return ZStack {
       LinearGradient(
         colors: [Color.MeetPR.borderStrong, Color.MeetPR.surfaceCard],
@@ -798,7 +806,7 @@ private struct StudentFeedbackChatCard: View {
         endPoint: .bottomTrailing
       )
 
-      ChatVideoPoster(url: cover.posterURL)
+      ChatVideoPoster(url: cover.posterURL, videoID: feedback.videoID)
 
       Image(systemName: "play.fill")
         .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .medium))
@@ -810,6 +818,8 @@ private struct StudentFeedbackChatCard: View {
         }
 
       Text(videoLabel)
+        .lineLimit(1)
+        .truncationMode(.tail)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
         .foregroundStyle(.white)
         .padding(.horizontal, MeetPRSpacing.point7)
@@ -818,7 +828,7 @@ private struct StudentFeedbackChatCard: View {
         .clipShape(.rect(cornerRadius: 5))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(.top, MeetPRSpacing.space2)
-        .padding(.leading, MeetPRSpacing.point9)
+        .padding(.horizontal, MeetPRSpacing.point9)
 
       if let duration = cover.durationText {
         Text(duration)
@@ -833,7 +843,7 @@ private struct StudentFeedbackChatCard: View {
           .padding(.trailing, MeetPRSpacing.point9)
       }
     }
-    .frame(height: 150)
+    .frame(width: size.height == 240 ? size.width : nil, height: size.height)
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 
