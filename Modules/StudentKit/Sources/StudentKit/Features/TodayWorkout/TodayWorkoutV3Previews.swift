@@ -30,7 +30,7 @@
         unreadCount: 3,
         showsNotifications: true,
         coachName: StudentStrings.localized(.todayWorkoutV3Previews001),
-        showsAskCoach: state == .recording || state == .complete,
+        showsAskCoach: state == .list || state == .recording,
         isPreparingAskCoach: false,
         collapsedExercises: $collapsed,
         sequenceContent: TrainingWeekStrip(

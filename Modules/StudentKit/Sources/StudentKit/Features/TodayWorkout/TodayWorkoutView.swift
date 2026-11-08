@@ -1153,7 +1153,9 @@ enum SetRefEntryVisibility {
   ) -> Bool {
     shouldShow(
       isEditable: isEditable,
-      hasAvailableSet: !drafts.isEmpty,
+      hasAvailableSet: drafts.contains {
+        !$0.isExtra && !$0.isStudentAdded && $0.needsTrainingResult
+      },
       hasActiveCoach: hasActiveCoach,
       hasSharingContext: hasSharingContext
     )

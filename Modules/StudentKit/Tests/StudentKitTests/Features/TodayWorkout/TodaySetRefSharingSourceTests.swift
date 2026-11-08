@@ -8,6 +8,19 @@ import Testing
 // swiftlint:disable file_length type_body_length
 @Suite("Today set-ref sharing")
 struct TodaySetRefSharingSourceTests {
+  @MainActor
+  @Test("ask coach hides after every prescribed set has a result")
+  func allRecordedSetsHideAskCoach() throws {
+    let fixture = makeFixture()
+    let day = try #require(fixture.plan.days.first)
+    var drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+    for index in drafts.indices { drafts[index].completed = true }
+
+    #expect(
+      !SetRefEntryVisibility.shouldShow(
+        drafts: drafts, isEditable: true, hasActiveCoach: true, hasSharingContext: true))
+  }
+
   @Test("every recorded row is selectable and replaces its planned candidate")
   func everyRecordedRowIsSelectableAndReplacesItsPlannedCandidate() async throws {
     let fixture = makeFixture()
