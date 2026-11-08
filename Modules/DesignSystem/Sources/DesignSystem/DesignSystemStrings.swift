@@ -5,6 +5,7 @@ public enum DesignSystemStrings {
   public static let squatBenchDeadlift = localized("designSystem.action.squatBenchDeadlift")
 
   static let cancel = localized("designSystem.action.cancel")
+  public static let done = localized("designSystem.numberPad.done")
   static let confirm = localized("designSystem.action.confirm")
   static let shiftOneDay = localized("designSystem.action.shiftOneDay")
   static let signOut = localized("designSystem.action.signOut")

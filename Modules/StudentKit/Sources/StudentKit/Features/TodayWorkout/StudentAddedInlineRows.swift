@@ -70,14 +70,13 @@ struct StudentAddedInlineRows: View {
     let cells = drafts.flatMap { draft in
       WorkoutKeypadCell.cells(
         row: row(draft), name: draft.displayExerciseName,
-        number: draft.prescribed.setIndex + 1, includesEffort: true)
+        number: draft.prescribed.setIndex + 1, includesEffort: true, effortMode: .rpe)
     }
     let address = WorkoutKeypadCell.Address(rowID: rowID, field: field)
-    keypad?.open(cells: cells, at: address) { cell, value in
-      guard let draft = drafts.first(where: { $0.id == cell.rowID }) else { return }
-      var updated = row(draft)
-      updated.setKeypadValue(value, field: cell.field)
-      edits[cell.rowID] = updated
+    keypad?.edit(
+      cells: cells, rows: drafts.map { row($0) }, at: address
+    ) { updated in
+      edits[updated.id] = updated
     }
   }
 

@@ -7,7 +7,7 @@ import Testing
 
 @MainActor
 struct WorkoutKeypadSessionTests {
-  @Test func advancesAcrossRowsAndSkipsUnavailableFields() {
+  @Test func advancesAcrossRowsAndSkipsUnavailableFields() async {
     let first = UUID()
     let second = UUID()
     let session = WorkoutKeypadSession()
@@ -19,7 +19,9 @@ struct WorkoutKeypadSessionTests {
       WorkoutKeypadCell(rowID: second, field: .reps, value: "10"),
       WorkoutKeypadCell(rowID: second, field: .rir, value: "2"),
     ]
-    session.open(cells: cells, at: cells[0].id) { _, value in values.append(value) }
+    session.open(cells: cells, at: cells[0].id) { _, value in
+      values.append(value)
+    }
     session.commit("7.5")
     #expect(session.current?.field == .reps)
     session.commit("12")
@@ -31,9 +33,9 @@ struct WorkoutKeypadSessionTests {
     #expect(session.next == nil)
     session.commit("0")
     #expect(session.current == nil)
-    #expect(values == ["7.5", "12", "9.5", "10", "0"])
+    #expect(values == ["7.5", "12", "9.5", "0"])
   }
-  @Test func cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() {
+  @Test func cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() async {
     let session = WorkoutKeypadSession()
     let rowID = UUID()
     var values: [String] = []
@@ -43,21 +45,27 @@ struct WorkoutKeypadSessionTests {
       WorkoutKeypadCell(rowID: rowID, field: .rpe, value: "9.5"),
       WorkoutKeypadCell(rowID: UUID(), field: .rir, value: "2"),
     ]
-    session.open(cells: cells, at: cells[0].id) { _, value in values.append(value) }
-    session.cancel()
+    session.open(cells: cells, at: cells[0].id) { _, value in
+      values.append(value)
+    }
+    session.dismiss()
     #expect(values.isEmpty)
     #expect(session.current == nil)
-    session.open(cells: cells, at: cells[0].id) { _, value in values.append(value) }
+    session.open(cells: cells, at: cells[0].id) { _, value in
+      values.append(value)
+    }
     for _ in cells { session.commit("") }
     #expect(values == ["7.5", "8", "", ""])
     #expect(session.current == nil)
   }
 
-  @Test func invalidValueDoesNotAdvanceOrCommit() {
+  @Test func invalidValueDoesNotAdvanceOrCommit() async {
     let session = WorkoutKeypadSession()
     let cell = WorkoutKeypadCell(rowID: UUID(), field: .rpe, value: "8")
     var value: String?
-    session.open(cells: [cell], at: cell.id) { _, text in value = text }
+    session.open(cells: [cell], at: cell.id) { _, text in
+      value = text
+    }
     session.commit("10.5")
     #expect(session.current?.id == cell.id)
     #expect(value == nil)

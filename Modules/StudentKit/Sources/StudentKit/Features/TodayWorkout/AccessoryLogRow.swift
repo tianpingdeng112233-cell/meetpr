@@ -109,7 +109,7 @@ struct AccessoryLogRow: View {
     _ field: MeetPRNumberPad.Field, text: Binding<String>, placeholder: String, invalid: Bool
   ) -> some View {
     let resolvedField: MeetPRNumberPad.Field =
-      field == .rpe && row.input.effortMode == .rir ? .rir : field
+      field == .rpe && columnEffortMode == .rir ? .rir : field
     let active = activeField == resolvedField
     return Button {
       onInput(resolvedField)

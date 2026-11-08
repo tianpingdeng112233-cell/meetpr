@@ -1,0 +1,2382 @@
+Fetching https://github.com/nalexn/ViewInspector from cache
+Fetching https://github.com/CoreOffice/CoreXLSX from cache
+Fetched https://github.com/nalexn/ViewInspector from cache (1.07s)
+Fetched https://github.com/CoreOffice/CoreXLSX from cache (1.72s)
+Computing version for https://github.com/CoreOffice/CoreXLSX
+Computed https://github.com/CoreOffice/CoreXLSX at 0.14.2 (2.45s)
+Fetching https://github.com/weichsel/ZIPFoundation.git from cache
+Fetching https://github.com/maxdesiatov/XMLCoder.git from cache
+Fetched https://github.com/maxdesiatov/XMLCoder.git from cache (1.80s)
+Fetched https://github.com/weichsel/ZIPFoundation.git from cache (1.83s)
+Computing version for https://github.com/nalexn/ViewInspector
+Computed https://github.com/nalexn/ViewInspector at 0.10.3 (1.87s)
+Computing version for https://github.com/maxdesiatov/XMLCoder.git
+Computed https://github.com/maxdesiatov/XMLCoder.git at 0.14.0 (0.62s)
+Computing version for https://github.com/weichsel/ZIPFoundation.git
+Computed https://github.com/weichsel/ZIPFoundation.git at 0.9.20 (0.35s)
+Creating working copy for https://github.com/weichsel/ZIPFoundation.git
+Working copy of https://github.com/weichsel/ZIPFoundation.git resolved at 0.9.20
+Creating working copy for https://github.com/CoreOffice/CoreXLSX
+Working copy of https://github.com/CoreOffice/CoreXLSX resolved at 0.14.2
+Creating working copy for https://github.com/nalexn/ViewInspector
+Working copy of https://github.com/nalexn/ViewInspector resolved at 0.10.3
+Creating working copy for https://github.com/maxdesiatov/XMLCoder.git
+Working copy of https://github.com/maxdesiatov/XMLCoder.git resolved at 0.14.0
+Building for debugging...
+[0/38] /Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/.build/arm64-apple-macosx/debug/CoachKitPackageTests.derived/runner.swift
+[1/38] Write sources
+[2/38] Copying PrivacyInfo.xcprivacy
+[2/38] Write sources
+[5/38] Copying Info.plist
+[5/38] Write sources
+[10/38] Copying Localizable.xcstrings
+[10/38] Copying Info.plist
+[10/38] Copying Localizable.xcstrings
+[14/38] Write sources
+[14/38] Copying OpenCC-NOTICE.txt
+[14/38] Copying exercise-names-zh-Hant.json
+[14/38] Copying OpenCC-LICENSE.txt
+[14/38] Copying Localizable.xcstrings
+[14/38] Copying exercise-search-zh-Hant.json
+[19/38] Copying Info.plist
+[21/38] Write sources
+[22/38] Copying Localizable.xcstrings
+[22/38] Copying exercise-catalog-v2.json
+[22/38] Copying Info.plist
+[22/38] Copying exercise-aliases.json
+[22/38] Write sources
+[29/38] Copying Info.plist
+[30/38] Copying Localizable.xcstrings
+[33/38] Copying InviteShare.xcassets
+[34/38] Copying Media.xcassets
+[35/38] Write swift-version--58304C5D6DBC2206.txt
+[37/351] Compiling ViewInspector AngularGradient.swift
+[38/351] Compiling ViewInspector AnyView.swift
+[39/351] Emitting module ZIPFoundation
+[40/351] Compiling ViewInspector LazyGroup.swift
+[41/351] Compiling ViewInspector AccessibilityModifiers.swift
+[42/351] Compiling ViewInspector AnimationModifiers.swift
+[43/351] Compiling ViewInspector EnvironmentInjection.swift
+[44/351] Compiling ViewInspector InspectableView+RandomAccessCollection.swift
+[45/351] Compiling ViewInspector InspectableView.swift
+[46/351] Compiling ViewInspector InspectionEmissary.swift
+[47/351] Compiling ViewInspector Inspector.swift
+[48/351] Compiling ViewInspector EnvironmentModifiers.swift
+[49/351] Compiling ViewInspector Alert.swift
+[50/351] Compiling ViewInspector AsyncImage.swift
+[51/351] Compiling ViewInspector Button.swift
+[52/351] Compiling ViewInspector Canvas.swift
+[53/351] Compiling ViewInspector ClassifiedView.swift
+[54/353] Compiling ViewInspector ConfigurationModifiers.swift
+[55/353] Compiling ViewInspector CustomStyleModifiers.swift
+[59/357] Compiling ViewInspector TransitiveModifiers.swift
+[60/357] Compiling ViewInspector VisualEffectModifiers.swift
+[61/357] Compiling ViewInspector PopupPresenter.swift
+[62/357] Compiling ViewInspector ActionSheet.swift
+[63/357] Compiling ViewInspector Gesture.swift
+[64/357] Compiling ViewInspector PositioningModifiers.swift
+[65/357] Compiling ViewInspector PreviewModifiers.swift
+[66/357] Compiling ViewInspector SizingModifiers.swift
+[67/357] Compiling ViewInspector TextInputModifiers.swift
+[68/357] Compiling ViewInspector TransformingModifiers.swift
+[69/357] Compiling ViewInspector ControlGroup.swift
+[70/357] Compiling ViewInspector EventsModifiers.swift
+[71/357] Compiling ViewInspector GestureModifiers.swift
+[72/357] Compiling ViewInspector InteractionModifiers.swift
+[73/357] Compiling ViewInspector NavigationBarModifiers.swift
+[74/357] Compiling ViewInspector Grid.swift
+[75/357] Compiling ViewInspector Group.swift
+[76/357] Compiling ViewInspector GroupBox.swift
+[77/357] Compiling ViewInspector HSplitView.swift
+[78/357] Compiling ViewInspector HStack.swift
+[79/357] Compiling ViewInspector GeometryReader.swift
+[80/357] Compiling ViewInspector Spacer.swift
+[81/357] Compiling ViewInspector Stepper.swift
+[82/357] Compiling ViewInspector StyleConfiguration.swift
+[83/357] Compiling ViewInspector SubscriptionView.swift
+[84/357] Compiling ViewInspector TabView.swift
+[85/357] Compiling ViewInspector Text.swift
+[86/357] Compiling ViewInspector TextAttributes.swift
+[95/364] Compiling ZIPFoundation URL+ZIP.swift
+[96/364] Compiling ZIPFoundation resource_bundle_accessor.swift
+[97/364] Compiling ViewInspector ConditionalContent.swift
+[98/364] Compiling ViewInspector ConfirmationDialog.swift
+[99/364] Compiling ViewInspector ContentUnavailableView.swift
+[101/364] Compiling XMLCoder XMLUnkeyedEncodingContainer.swift
+[104/364] Compiling ViewInspector LabeledContent.swift
+[107/364] Compiling ViewInspector LazyHGrid.swift
+[108/364] Compiling ViewInspector CustomView.swift
+[109/364] Compiling ViewInspector CustomViewModifier.swift
+[110/364] Compiling ViewInspector DatePicker.swift
+[111/364] Compiling ViewInspector DelayedPreferenceView.swift
+[112/364] Compiling ViewInspector DisclosureGroup.swift
+[113/364] Compiling ViewInspector Divider.swift
+[114/364] Compiling ViewInspector EditButton.swift
+[115/364] Compiling ViewInspector EllipticalGradient.swift
+[116/364] Compiling ViewInspector EmptyView.swift
+[117/364] Compiling ViewInspector EquatableView.swift
+[118/364] Compiling ViewInspector ForEach.swift
+[119/364] Compiling ViewInspector Form.swift
+[120/364] Compiling ViewInspector BaseTypes.swift
+[121/364] Compiling ViewInspector ContentExtraction.swift
+[129/364] Emitting module XMLCoder
+[145/364] Emitting module CoreModels
+[154/364] Compiling XMLCoder XMLEncodingStorage.swift
+[155/364] Compiling XMLCoder XMLKeyedEncodingContainer.swift
+[156/364] Compiling XMLCoder XMLReferencingEncoder.swift
+[182/364] Compiling CoreModels UnitSystem.swift
+[183/364] Compiling CoreModels UserRole.swift
+[184/364] Compiling CoreModels ExerciseSearchText.swift
+[185/364] Compiling CoreModels InterfaceLanguage.swift
+[186/364] Compiling CoreModels PushNotificationRouting.swift
+[187/364] Compiling CoreModels TaskCancellation.swift
+[188/364] Compiling CoreModels resource_bundle_accessor.swift
+[189/395] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[190/395] Compiling RepositoryContracts InviteCodeRepository.swift
+[191/395] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[192/395] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[193/397] Compiling RepositoryContracts RepositoryStrings.swift
+[194/397] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[195/397] Compiling RepositoryContracts OnboardingRepository.swift
+[196/397] Compiling RepositoryContracts ReadinessRepository.swift
+[197/397] Compiling RepositoryContracts E1RMRepository.swift
+[198/397] Compiling RepositoryContracts EvaluationRepository.swift
+[199/397] Compiling RepositoryContracts StudentPlanRepository.swift
+[200/397] Compiling RepositoryContracts StudentPlanStore.swift
+[201/397] Compiling RepositoryContracts VideoMarkerRepository.swift
+[202/397] Compiling RepositoryContracts resource_bundle_accessor.swift
+[203/397] Emitting module RepositoryContracts
+[204/397] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[205/397] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[206/397] Compiling RepositoryContracts AccountRepository.swift
+[207/397] Compiling RepositoryContracts BindRepository.swift
+[208/397] Compiling RepositoryContracts ChatRepository.swift
+[209/397] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[210/451] Compiling CoreXLSX Worksheet.swift
+[211/451] Compiling CoreXLSX CellQueries.swift
+[212/451] Compiling CoreXLSX ColumnReference.swift
+[213/451] Compiling CoreXLSX Cell.swift
+[214/451] Compiling CoreXLSX CellReference.swift
+[215/452] Compiling Networking FeedbackCache.swift
+[216/452] Compiling Networking JSONFileCache.swift
+[217/452] Compiling Networking PlanCache.swift
+[218/452] Compiling Networking StudentPlanCache.swift
+[219/452] Compiling Networking TrainingLogCache.swift
+[220/452] Compiling Networking AllStudentSetLogsDTO.swift
+[221/457] Emitting module DesignSystem
+[222/463] Compiling CoreXLSX XLSXFile.swift
+[223/463] Compiling Networking APIClient+StudentAddedSets.swift
+[224/463] Compiling Networking APIClient+StudentVideos.swift
+[225/463] Compiling Networking APIClient+Students.swift
+[226/463] Compiling Networking APIClient+Uploads.swift
+[227/463] Compiling Networking APIClient+VideoMarkers.swift
+[228/463] Compiling Networking APIClient.swift
+[229/463] Compiling Networking APIClient+Account.swift
+[230/463] Compiling Networking APIClient+Bind.swift
+[231/463] Compiling Networking APIClient+BindQueue.swift
+[232/463] Compiling Networking APIClient+CoachSets.swift
+[233/463] Compiling Networking APIClient+Devices.swift
+[234/463] Compiling Networking APIClient+Evaluations.swift
+[237/463] Compiling CoreXLSX Workbook.swift
+[240/463] Emitting module CoreXLSX
+[241/463] Compiling CoreXLSX Styles.swift
+[242/463] Compiling Networking UploadDTOs.swift
+[243/463] Compiling Networking VideoMarkerDTOs.swift
+[244/463] Compiling Networking WireFormatting.swift
+[245/463] Compiling Networking Endpoints.swift
+[246/463] Compiling Networking ErrorEnvelope.swift
+[247/463] Emitting module Networking
+[248/463] Compiling Networking APIClient+Exercises.swift
+[249/463] Compiling Networking APIClient+Feedback.swift
+[250/463] Compiling Networking APIClient+Onboarding.swift
+[251/463] Compiling Networking APIClient+Plans.swift
+[252/463] Compiling Networking APIClient+Readiness.swift
+[253/463] Compiling Networking APIClient+Sets.swift
+[254/463] Compiling Networking DomainMapping.swift
+[255/463] Compiling Networking NetworkChatRepository.swift
+[256/463] Compiling Networking OSSPartUploader.swift
+[257/463] Compiling Networking RealtimeClient.swift
+[258/463] Compiling Networking RealtimeEvent.swift
+[259/463] Compiling Networking DecimalCoding.swift
+[260/463] Compiling Networking EvaluationDTOs.swift
+[261/463] Compiling Networking ExerciseDTOs.swift
+[262/463] Compiling Networking ExerciseStatsDTOs.swift
+[263/463] Compiling Networking FeedbackDTOs.swift
+[264/463] Compiling Networking OnboardingDTOs.swift
+[265/463] Compiling Networking OnboardingPatchDTO.swift
+[266/463] Compiling Networking PlanDTOs.swift
+[267/463] Compiling Networking PlanRequestDTOs.swift
+[268/463] Compiling Networking ReadinessDTOs.swift
+[269/463] Compiling Networking SetLogDTOs.swift
+[270/463] Compiling Networking StudentVideoDTOs.swift
+[271/463] Compiling Networking BindDTOs.swift
+[272/463] Compiling Networking BindQueueDTOs.swift
+[273/463] Compiling Networking ChatDTOs.swift
+[274/463] Compiling Networking CoachSetLogDTO.swift
+[275/463] Compiling Networking CoachStudentDTOs.swift
+[276/463] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[277/463] Compiling Networking APIClient+Auth.swift
+[278/463] Compiling Networking AuthDTOs.swift
+[279/463] Compiling Networking SessionStateReader.swift
+[280/463] Compiling Networking BackendVideoMarkerRepository.swift
+[281/463] Compiling Networking BuildConfig.swift
+[282/463] Compiling Networking ExerciseCatalogCache.swift
+[283/463] Compiling DesignSystem SemanticTone.swift
+[284/463] Compiling DesignSystem Spacing.swift
+[285/463] Compiling DesignSystem Typography.swift
+[286/463] Compiling DesignSystem VideoColors.swift
+[287/463] Compiling DesignSystem VisualEffects.swift
+[288/463] Compiling DesignSystem resource_bundle_accessor.swift
+[301/475] Compiling Analytics AnalyticsCore.swift
+[302/475] Compiling Analytics AnalyticsEnvelope.swift
+[303/475] Compiling Analytics Analytics+Events.swift
+[304/475] Compiling Analytics Analytics.swift
+[349/521] Compiling Analytics EventQueueStore.swift
+[350/521] Compiling Analytics AnalyticsTypes.swift
+[351/521] Compiling ChatUI ChatTimestampSeparator.swift
+[352/521] Compiling ChatUI ChatVideoCoverPresentation.swift
+[353/521] Emitting module Analytics
+[354/521] Compiling ChatUI ChatTaskCancellation.swift
+[355/521] Compiling ChatUI ChatTimelineItem.swift
+[356/521] Compiling Analytics EventFlusher.swift
+[357/521] Compiling Analytics AnalyticsStrings.swift
+[358/521] Compiling Analytics AnalyticsSessionStore.swift
+[359/521] Compiling Analytics FrictionFeedback.swift
+[360/521] Compiling Analytics CrashCapture.swift
+[361/522] Compiling Analytics resource_bundle_accessor.swift
+[362/522] Compiling ChatUI ChatOutboxItem.swift
+[363/522] Compiling ChatUI ChatPosterLoader.swift
+[364/522] Compiling ChatUI ChatRealtimeRouter.swift
+[365/522] Compiling ChatUI ChatRelativeTime.swift
+[366/522] Compiling ChatUI ChatSendCoordinator+SetRef.swift
+[371/526] Compiling ChatUI ChatVideoPoster.swift
+[372/526] Emitting module ChatUI
+[373/526] Compiling ChatUI VideoBadgeInfo.swift
+[374/526] Compiling ChatUI VideoBadgeOverlay.swift
+[375/526] Compiling ChatUI VideoBadgePhotoLibrary.swift
+[376/526] Compiling ChatUI resource_bundle_accessor.swift
+[377/526] Compiling ChatUI VideoBadgeCard.swift
+[378/526] Compiling ChatUI VideoBadgeExporter.swift
+[384/526] Compiling ChatUI ChatSendCoordinator.swift
+[385/526] Compiling ChatUI ChatSetCardPresentation.swift
+[386/526] Compiling ChatUI ChatSetCardView.swift
+[387/526] Compiling ChatUI ChatSetRefDisplayFormatter.swift
+[388/526] Compiling ChatUI ChatStrings.swift
+[389/526] Compiling ChatUI FeedbackVideoPlayerView.swift
+[390/538] Compiling ChatUI ConversationViewModel+Images.swift
+[391/538] Compiling ChatUI ConversationViewModel+Loading.swift
+[392/538] Compiling ChatUI ConversationViewModel+Videos.swift
+[393/538] Compiling ChatUI ConversationViewModel.swift
+[394/538] Compiling ChatUI FeedbackVideoAnnotationOverlay.swift
+[426/538] Compiling ChatUI FeedbackVideoFailureCard.swift
+[427/538] Compiling ChatUI FeedbackVideoMarkerOverlay.swift
+[428/538] Compiling ChatUI FeedbackVideoPlayerActions.swift
+[429/538] Compiling ChatUI FeedbackVideoPlayerChrome.swift
+[430/538] Compiling ChatUI FeedbackVideoPlayerMetrics.swift
+[437/538] Compiling ViewInspector NavigationDestination.swift
+[438/538] Compiling ViewInspector NavigationLink.swift
+[439/538] Compiling ViewInspector NavigationSplitView.swift
+[440/538] Compiling ViewInspector NavigationStack.swift
+[441/538] Compiling ViewInspector NavigationView.swift
+[442/538] Compiling ViewInspector OptionalContent.swift
+[443/538] Compiling ViewInspector OutlineGroup.swift
+[444/538] Compiling ViewInspector Overlay.swift
+[445/538] Compiling ViewInspector PasteButton.swift
+[446/538] Compiling ViewInspector Picker.swift
+[447/538] Compiling ViewInspector Popover.swift
+[448/538] Compiling ViewInspector PopoverContent.swift
+[449/538] Compiling ChatUI ChatVideoPosterDimensions.swift
+[450/538] Compiling ChatUI ConversationListSection.swift
+[451/538] Compiling ChatUI ConversationMessageRows.swift
+[452/538] Compiling ChatUI ConversationTimelinePresentation.swift
+[453/538] Compiling ChatUI ConversationView.swift
+[454/538] Compiling ChatUI ChatComposer.swift
+[455/538] Compiling ChatUI ChatDemoSeed.swift
+[456/538] Compiling ChatUI ChatEntryButton.swift
+[457/538] Compiling ChatUI ChatImageDownsampler.swift
+[458/538] Compiling ChatUI ChatInboxViewModel.swift
+[464/538] Compiling ChatUI SetRefSendIntent.swift
+[465/538] Compiling ChatUI SetRefSharePicker.swift
+[466/538] Compiling ChatUI SetRefSharingContext.swift
+[470/538] Compiling ChatUI FeedbackVideoScrubber.swift
+[471/538] Compiling ChatUI FeedbackVideoWorkbenchPlayer.swift
+[472/538] Compiling ChatUI InMemoryChatRepository.swift
+[473/538] Compiling ChatUI SetRefPickerPresentation.swift
+[476/538] Compiling ViewInspector LazyVStack.swift
+[477/538] Compiling ViewInspector LinearGradient.swift
+[478/538] Compiling ViewInspector Link.swift
+[479/538] Compiling ViewInspector List.swift
+[480/538] Compiling ViewInspector LocationButton.swift
+[481/538] Compiling ViewInspector Map.swift
+[482/538] Compiling ViewInspector MapAnnotation.swift
+[483/538] Compiling ViewInspector Menu.swift
+[484/538] Compiling ViewInspector MenuButton.swift
+[485/538] Compiling ViewInspector MultiDatePicker.swift
+[486/538] Compiling ViewInspector ProgressView.swift
+[487/538] Compiling ViewInspector RadialGradient.swift
+[488/538] Compiling ViewInspector SafeAreaInset.swift
+[489/538] Compiling ViewInspector ScrollView.swift
+[490/538] Compiling ViewInspector ScrollViewReader.swift
+[491/538] Compiling ViewInspector Section.swift
+[492/538] Compiling ViewInspector SecureField.swift
+[493/538] Compiling ViewInspector Shape.swift
+[494/538] Compiling ViewInspector ShareLink.swift
+[495/538] Compiling ViewInspector Sheet.swift
+[496/538] Compiling ViewInspector SignInWithAppleButton.swift
+[497/538] Compiling ViewInspector Slider.swift
+[511/557] Emitting module ViewInspector
+[512/557] Compiling CoachKit CoachRootView.swift
+[513/557] Compiling CoachKit CoachTabAccessibilityHost.swift
+[514/557] Compiling CoachKit AcceptBindRequestSheet.swift
+[515/557] Compiling CoachKit BackendCoachBindQueueRepository.swift
+[516/557] Compiling CoachKit BindQueueViewModel.swift
+[517/557] Compiling CoachKit BindRequestCard.swift
+[518/557] Compiling CoachKit CoachBindStrings.swift
+[519/557] Compiling CoachKit CoachOnboardingDisplay.swift
+[520/557] Compiling CoachKit InMemoryCoachBindQueueRepository.swift
+[521/557] Compiling CoachKit StudentOnboardingProfileView.swift
+[522/557] Compiling CoachKit CoachChatContext.swift
+[523/557] Compiling CoachKit CoachChatHeaderButton.swift
+[524/557] Compiling CoachKit CoachChatStatusSubtitle.swift
+[525/708] Compiling CoachKit CoachMyProfileViewModel.swift
+[526/708] Compiling CoachKit DraftStore.swift
+[527/708] Compiling CoachKit DraftTrainingPlan.swift
+[528/708] Compiling CoachKit CellGrid.swift
+[529/708] Compiling CoachKit CoachImportStrings.swift
+[530/708] Compiling CoachKit ExerciseAliasTable.swift
+[531/708] Compiling CoachKit ExerciseMatcher.swift
+[532/708] Compiling CoachKit ImportPlanAssembler.swift
+[533/708] Compiling CoachKit ImportReviewModel.swift
+[534/708] Compiling CoachKit ImportReviewViewModel.swift
+[535/708] Compiling CoachKit ParsedPlan.swift
+[536/708] Compiling CoachKit PlanImportCapability.swift
+[537/708] Compiling CoachKit PlanPublishAssembler.swift
+[538/708] Compiling CoachKit PlanToStudentProjection.swift
+[539/708] Compiling CoachKit AbnormalReason.swift
+[540/708] Compiling CoachKit BackendPlanRepository.swift
+[541/708] Compiling CoachKit CoachStudentStatus.swift
+[542/708] Compiling CoachKit CoachStudentSummary.swift
+[543/708] Compiling CoachKit InMemoryPlanRepository.swift
+[544/708] Compiling CoachKit PlanPublishErrorMapping.swift
+[545/708] Compiling CoachKit PlanRepository.swift
+[546/708] Compiling CoachKit AccessoryFilters.swift
+[547/708] Compiling CoachKit DayLiftKey.swift
+[548/708] Compiling CoachKit DraftProgressionRule.swift
+[549/708] Compiling CoachKit DraftSetSpec.swift
+[550/708] Compiling CoachKit DraftSetSpecCompletion.swift
+[551/708] Compiling CoachKit ExerciseSearch.swift
+[552/708] Compiling CoachKit ExerciseUsageTracker.swift
+[553/708] Compiling CoachKit PlanningDecimal.swift
+[554/708] Compiling CoachKit PlanningIntent.swift
+[555/726] Emitting module CoachKit
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[567/726] Compiling CoachKit PlanSheetGeometry.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[568/726] Compiling CoachKit PlanSheetParser.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[569/726] Compiling CoachKit SetLineParser.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[570/726] Compiling CoachKit ExerciseMatchSection.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[571/726] Compiling CoachKit ImportEntryButton.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[572/726] Compiling CoachKit ImportReviewSheet.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[573/726] Compiling CoachKit IntensityReviewSection.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[574/726] Compiling CoachKit XLSXReader.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[575/726] Compiling CoachKit CoachWeekOverview.swift
+[576/726] Compiling CoachKit BackendCoachEvaluationRepositories.swift
+[577/726] Compiling CoachKit InMemoryCoachEvaluationRepositories.swift
+[578/726] Compiling CoachKit BackendInviteCodeRepository.swift
+[579/726] Compiling CoachKit CoachInvitationActions.swift
+[580/726] Compiling CoachKit CoachInvitationActivityItemSource.swift
+[581/726] Compiling CoachKit CoachInvitationActivitySheet.swift
+[582/726] Compiling CoachKit CoachInvitationCard.swift
+[583/726] Compiling CoachKit CoachInvitationMessage.swift
+[584/726] Compiling CoachKit InMemoryInviteCodeRepository.swift
+[585/726] Compiling CoachKit InviteCodeStatus.swift
+[586/726] Compiling CoachKit InviteCodeStrings.swift
+[587/726] Compiling CoachKit InviteCodesView.swift
+[588/726] Compiling CoachKit InviteCodesViewModel.swift
+[589/726] Compiling CoachKit CoachHelpFeedbackSheet.swift
+[590/726] Compiling CoachKit CoachLogoutConfirmationView.swift
+[591/726] Compiling CoachKit CoachMyProfileStrings.swift
+[592/726] Compiling CoachKit CoachMyProfileView.swift
+[594/726] Compiling CoachKit VideoFeedbackPlayerCard.swift
+[595/726] Compiling CoachKit VideoFeedbackQueueNavigator.swift
+[596/726] Compiling CoachKit VideoMarkerRowLabel.swift
+[597/726] Compiling CoachKit VideoSetInfo.swift
+[598/726] Compiling CoachKit VideoSetInfoCard.swift
+[599/726] Compiling CoachKit VideoSetInfoStatusView.swift
+[600/726] Compiling CoachKit BackendCoachStudentVideoRepository.swift
+[601/726] Compiling CoachKit CoachDayActivity.swift
+[602/726] Compiling CoachKit CoachDayExerciseCatalog.swift
+[603/726] Compiling CoachKit CoachDemoSeed.swift
+[604/726] Compiling CoachKit CoachFlexibleDayDemoView.swift
+[605/726] Compiling CoachKit CoachLocalization.swift
+[606/726] Compiling CoachKit CoachNowEnvironment.swift
+[607/726] Compiling CoachKit CoachSharedStrings.swift
+[608/726] Compiling CoachKit CoachShellStrings.swift
+[609/726] Compiling CoachKit CoachStudentDetailContext.swift
+[610/726] Compiling CoachKit CoachStudentFormatting.swift
+[611/726] Compiling CoachKit CoachTrainingLogReader.swift
+[612/726] Compiling CoachKit CoachVideoBadgeContext.swift
+[613/726] Compiling CoachKit PlanningStep.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[614/726] Compiling CoachKit PlanningValidationError.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[615/726] Compiling CoachKit PlanningViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[616/726] Compiling CoachKit ProgressionRuleDimension.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[617/726] Compiling CoachKit ProgressionRuleType.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[618/726] Compiling CoachKit SBDFrequency.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[619/726] Compiling CoachKit WeekDerivation.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[620/726] Compiling CoachKit WeightEntryDraft.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[621/726] Compiling CoachKit WeightPercentPresets.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[622/726] Compiling CoachKit AccessoryFilterSection.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[623/726] Compiling CoachKit AccessoryLibrarySheet.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[624/726] Compiling CoachKit AccessoryMatchListSection.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[625/726] Compiling CoachKit DayChipBar.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[626/726] Compiling CoachKit ExerciseRestEditorSection.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[627/726] Compiling CoachKit ExerciseSetEditorCard.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[628/726] Compiling CoachKit IntensityModeToggle.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[629/726] Compiling CoachKit PlanningCoordinatorView.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[630/726] Compiling CoachKit PlanningCountPicker.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[631/726] Compiling CoachKit CoachVideoBadgeResolver.swift
+[632/726] Compiling CoachKit EmptyStudentRepositories.swift
+[633/726] Compiling CoachKit InMemoryCoachStudentVideoRepository.swift
+[634/726] Compiling CoachKit CoachDetailStrings.swift
+[635/726] Compiling CoachKit CoachStudentDetailStrings.swift
+[636/726] Compiling CoachKit CoachEvaluationSeal.swift
+[637/726] Compiling CoachKit EvaluationBannerViewModel.swift
+[638/726] Compiling CoachKit EvaluationStatusBanner.swift
+[639/726] Compiling CoachKit EvaluationSummaryEditorView.swift
+[640/726] Compiling CoachKit EvaluationSummaryEditorViewModel.swift
+[641/726] Compiling CoachKit CoachDayDetailPresentation.swift
+[642/726] Compiling CoachKit CoachDayDetailView.swift
+[643/726] Compiling CoachKit CoachSetReadOnlyRow.swift
+[644/726] Compiling CoachKit StudentExecutionView.swift
+[645/726] Compiling CoachKit CoachFeedbackHistoryView.swift
+[646/726] Compiling CoachKit FeedbackComposerView.swift
+[647/726] Compiling CoachKit FeedbackComposerViewModel.swift
+[648/726] Compiling CoachKit CoachExerciseStatsRepository.swift
+[649/726] Compiling CoachKit StudentGrowthView.swift
+[663/726] Compiling CoachKit CoachStrings.swift
+[664/726] Compiling CoachKit ConversationListView.swift
+[665/726] Compiling CoachKit CoachDashboardView.swift
+[666/726] Compiling CoachKit CoachTodayFormatting.swift
+[667/726] Compiling CoachKit CoachTodayStrings.swift
+[668/726] Compiling CoachKit CoachTodayTodoList.swift
+[669/726] Compiling CoachKit CoachPrivacyTermsSheet.swift
+[670/726] Compiling CoachKit CoachProfileSheetScaffold.swift
+[671/726] Compiling CoachKit CoachPlanningHomeView.swift
+[672/726] Compiling CoachKit PlanningWorkspaceModels.swift
+[673/726] Compiling CoachKit PlanningWorkspaceSections.swift
+[674/726] Compiling CoachKit PlanningWorkspaceStrings.swift
+[675/726] Compiling CoachKit PlanningWorkspaceViewModel.swift
+[676/726] Compiling CoachKit AggregatingCoachVideoQueueRepository.swift
+[677/726] Compiling CoachKit CoachInboxPresentation.swift
+[678/726] Compiling CoachKit CoachInboxStrings.swift
+[679/726] Compiling CoachKit CoachReceivingView.swift
+[680/726] Compiling CoachKit CoachVideoFeedbackStrings.swift
+[681/726] Compiling CoachKit CoachVideoQueueViewModel.swift
+[682/726] Compiling CoachKit InMemoryCoachVideoQueueRepository.swift
+[683/726] Compiling CoachKit StudentPendingVideosView.swift
+[684/726] Compiling CoachKit VideoFeedbackComposer.swift
+[685/726] Compiling CoachKit VideoFeedbackDetailModel.swift
+[686/726] Compiling CoachKit VideoFeedbackDetailView.swift
+[687/726] Compiling CoachKit VideoFeedbackHeader.swift
+[688/726] Compiling CoachKit StudentGrowthViewModel.swift
+[689/726] Compiling CoachKit StudentOverviewSection.swift
+[690/726] Compiling CoachKit CoachProfileStrings.swift
+[691/726] Compiling CoachKit StudentProfileSection.swift
+[692/726] Compiling CoachKit StudentDetailView.swift
+[693/726] Compiling CoachKit StudentDetailViewModel.swift
+[694/726] Compiling CoachKit CoachVideoPlayerView.swift
+[695/726] Compiling CoachKit StudentVideoGridView.swift
+[696/726] Compiling CoachKit StudentVideoGridViewModel.swift
+[697/726] Compiling CoachKit CoachApplicationCard.swift
+[698/726] Compiling CoachKit CoachRosterStrings.swift
+[699/726] Compiling CoachKit StudentRosterRow.swift
+[700/726] Compiling CoachKit StudentRosterView.swift
+[701/726] Compiling CoachKit StudentRosterViewModel.swift
+[702/726] Compiling CoachKit TriageSignal.swift
+[703/726] Compiling CoachKit CoachPlanningStrings.swift
+[704/726] Compiling CoachKit DraftMapping.swift
+[705/726] Compiling CoachKit DraftPlanDay.swift
+[706/726] Compiling CoachKit DraftPlanExercise.swift
+[707/726] Compiling CoachKit PlanningDisplay.swift
+[708/726] Compiling CoachKit PlanningNumberField.swift
+[709/726] Compiling CoachKit PlanningPreviewFactory.swift
+[710/726] Compiling CoachKit PlanningStudentHeaderView.swift
+[711/726] Compiling CoachKit ProgressionRuleEditorCard.swift
+[712/726] Compiling CoachKit Step0SelectStudentView.swift
+[713/726] Compiling CoachKit Step1SelectDurationView.swift
+[714/726] Compiling CoachKit Step2AssignFrequencyView.swift
+[715/726] Compiling CoachKit Step3SelectMainLiftsView.swift
+[716/726] Compiling CoachKit Step4SelectAccessoriesView.swift
+[717/726] Compiling CoachKit Step6ProgressionRulesView.swift
+[718/726] Compiling CoachKit Step7WeekCardSwipeView.swift
+[719/726] Compiling CoachKit StudentProfileSummary.swift
+[720/726] Compiling CoachKit WeekCardView.swift
+[721/726] Compiling CoachKit WeightEntryPanel.swift
+[722/726] Compiling CoachKit WeightInputField.swift
+[723/726] Compiling CoachKit WeightPercentSection.swift
+[724/726] Compiling CoachKit resource_bundle_accessor.swift
+[725/807] Compiling CoachKitTests BackendPlanRepositoryTests.swift
+[726/807] Compiling CoachKitTests DraftMappingTests.swift
+[727/807] Compiling CoachKitTests DraftProgressionRuleCodableTests.swift
+[728/807] Compiling CoachKitTests DraftSetSpecCodableTests.swift
+[729/807] Compiling CoachKitTests DraftStoreTests.swift
+[730/807] Compiling CoachKitTests ExerciseSearchTests.swift
+[731/807] Compiling CoachKitTests ExerciseUsageTrackerTests.swift
+[732/807] Compiling CoachKitTests PlanningFixtures.swift
+[733/807] Compiling CoachKitTests PlanningNoOneRMFixtures.swift
+[734/815] Compiling CoachKitTests ActualEffortProjectionTests.swift
+[735/815] Compiling CoachKitTests CoachLocalizationRuntimeTests.swift
+[736/815] Compiling CoachKitTests CoachLocalizationTests.swift
+[737/815] Compiling CoachKitTests CoachRootViewTests.swift
+[738/815] Compiling CoachKitTests AcceptBindRequestSheetTests.swift
+[739/815] Compiling CoachKitTests BindQueueTestSupport.swift
+[740/815] Compiling CoachKitTests BindQueueViewModelTests.swift
+[741/815] Compiling CoachKitTests CoachChatStatusSubtitleTests.swift
+[742/815] Compiling CoachKitTests CoachChatWiringTests.swift
+[743/815] Emitting module CoachKitTests
+[744/815] Compiling CoachKitTests Spec007Fixtures.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[745/815] Compiling CoachKitTests ExerciseAliasTableTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[746/815] Compiling CoachKitTests ExerciseMatcherTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[747/815] Compiling CoachKitTests ImportAssemblerTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[748/815] Compiling CoachKitTests ImportCompletenessTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[749/815] Compiling CoachKitTests PlanSheetGeometryTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[750/815] Compiling CoachKitTests PlanSheetParserTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[751/815] Compiling CoachKitTests SetLineParserTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[752/815] Compiling CoachKitTests InMemoryAccessoryRepositoryTests.swift
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 50 | @Test func assemblesPerSetTargetsAndRenumbersWeeks() throws {
+ 51 |   var counter = 0
+ 52 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 53 |   let traineeID = UUID()
+ 54 |   let weeks = [
+
+/Users/david/Projects/apps/MeetPR-wt-105fix/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81:76: warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 79 | @Test func deselectingFirstWeekRenumbersRemainingToOne() throws {
+ 80 |   var counter = 0
+ 81 |   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
+    |                                                                            `- warning: mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 82 |   let weeks = [
+ 83 |     week(
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[753/815] Compiling CoachKitTests CoachEmptyStateCoverageTests.swift
+[754/815] Compiling CoachKitTests CoachRefreshCancellationTests.swift
+[755/815] Compiling CoachKitTests CoachSecondaryCancellationTests.swift
+[756/815] Compiling CoachKitTests CoachStudentFeatureTestSupport.swift
+[757/815] Compiling CoachKitTests CoachTodayFormattingTests.swift
+[758/815] Compiling CoachKitTests CoachTodayTodoListTests.swift
+[759/815] Compiling CoachKitTests CoachWeekOverviewCompletionTests.swift
+[760/815] Compiling CoachKitTests CoachWeekOverviewTests.swift
+[761/815] Compiling CoachKitTests CoachInvitationActionsTests.swift
+[762/815] Compiling CoachKitTests CoachInvitationActivityItemSourceTests.swift
+[763/815] Compiling CoachKitTests CoachInvitationMessageTests.swift
+[764/815] Compiling CoachKitTests InviteCodesViewModelTests.swift
+[765/815] Compiling CoachKitTests CoachMyProfileViewModelTests.swift
+[766/815] Compiling CoachKitTests PlanningWorkspaceViewModelTests.swift
+[767/815] Compiling CoachKitTests CoachInboxPresentationTests.swift
+[768/815] Compiling CoachKitTests CoachVideoInboxTestSupport.swift
+[769/815] Compiling CoachKitTests CoachVideoQueueRepositoryTests.swift
+[770/815] Compiling CoachKitTests CoachVideoQueueViewModelTests.swift
+[771/815] Compiling CoachKitTests EvaluationSummaryEditorViewModelTests.swift
+[772/815] Compiling CoachKitTests FeedbackComposerViewModelTests.swift
+[773/815] Compiling CoachKitTests StudentGrowthViewModelTests.swift
+[774/815] Compiling CoachKitTests StudentDetailViewModelTests.swift
+[775/815] Compiling CoachKitTests StudentVideoGridViewModelTests.swift
+[776/815] Compiling CoachKitTests StudentRosterCancellationTests.swift
+[777/815] Compiling CoachKitTests StudentRosterViewModelTests.swift
+[778/815] Compiling CoachKitTests TriageSignalTests.swift
+[779/815] Compiling CoachKitTests AccessoryFiltersTests.swift
+[780/815] Compiling CoachKitTests PlanPublishAssemblerTests.swift
+[781/815] Compiling CoachKitTests PlanRepositoryTests.swift
+[782/815] Compiling CoachKitTests PlanToStudentIntensityProjectionTests.swift
+[783/815] Compiling CoachKitTests PlanToStudentProjectionSetNumberTests.swift
+[784/815] Compiling CoachKitTests PlanToStudentProjectionTests.swift
+[785/815] Compiling CoachKitTests PlanningCoachPolishTests.swift
+[786/815] Compiling CoachKitTests PlanningCountPickerTests.swift
+[787/815] Compiling CoachKitTests PlanningFlowSnapshotTests.swift
+[788/815] Compiling CoachKitTests PlanningNumberFieldTests.swift
+[789/815] Compiling CoachKitTests VideoFeedbackDetailModelTests.swift
+[790/815] Compiling CoachKitTests VideoFeedbackPresentationTests.swift
+[791/815] Compiling CoachKitTests CoachStudentFormattingReadinessTests.swift
+[792/815] Compiling CoachKitTests CoachDayActivityTests.swift
+[793/815] Compiling CoachKitTests CoachDayDetailPresentationTests.swift
+[794/815] Compiling CoachKitTests CoachDayDetailSetNumberTests.swift
+[795/815] Compiling CoachKitTests CoachDetailRefreshTests.swift
+[796/815] Compiling CoachKitTests CoachEvaluationSealTests.swift
+[797/815] Compiling CoachKitTests EvaluationBannerViewModelTests.swift
+[798/815] Compiling CoachKitTests PlanningViewModelPrefillTests.swift
+[799/815] Compiling CoachKitTests PlanningViewModelTests.swift
+[800/815] Compiling CoachKitTests PreviewCatalogV2Tests.swift
+[801/815] Compiling CoachKitTests Step4FlowSnapshotTests.swift
+[802/815] Compiling CoachKitTests Step4ViewModelTests.swift
+[803/815] Compiling CoachKitTests Step5FlowSnapshotTests.swift
+[804/815] Compiling CoachKitTests Step5IntensityViewModelTests.swift
+[805/815] Compiling CoachKitTests Step6FlowSnapshotTests.swift
+[806/815] Compiling CoachKitTests Step6ProgressionRulesViewModelTests.swift
+[807/815] Compiling CoachKitTests Step7FlowSnapshotTests.swift
+[808/815] Compiling CoachKitTests Step7WeekCardSwipeViewModelTests.swift
+[809/815] Compiling CoachKitTests WeekDerivationTests.swift
+[810/815] Compiling CoachKitTests WeightEntryPanelTests.swift
+[811/815] Compiling CoachKitTests WeightInputFieldTests.swift
+[812/815] Compiling CoachKitTests TraditionalChineseAliasTests.swift
+[813/815] Compiling CoachKitTests TraditionalChinesePresentationTests.swift
+[814/817] Emitting module CoachKitPackageTests
+[815/817] Compiling CoachKitPackageTests runner.swift
+[815/817] Write Objects.LinkFileList
+[816/817] Linking CoachKitPackageTests
+Build complete! (40.05s)
+Test Suite 'All tests' started at 2026-11-08 07:16:55.758.
+Test Suite 'All tests' passed at 2026-11-08 07:16:55.759.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test sharedRPE() started.
+◇ Test step4ProceedAllowsEmptyAccessoryDays() started.
+◇ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() started.
+◇ Test step6UpdateRuleMutatesByID() started.
+◇ Test planningNumberFieldFormattedDisplayFormatsValue() started.
+◇ Test studentGroupsAreOnePerStudentNewestUploadFirst() started.
+◇ Suite "Coach week overview" started.
+◇ Test draftMappingExpandsSetSpecToPlanSets() started.
+◇ Test step5ToggleIntensityModePreservesPreviousValues() started.
+◇ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() started.
+◇ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() started.
+◇ Test exerciseUsageTrackerStartsAtZero() started.
+◇ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() started.
+◇ Test transportFailureOnCompleteKeepsBannerWithError() started.
+◇ Test planningCountPickerClampsExternalValueAboveUpperBound() started.
+◇ Test projectionMapsSingleWeekSingleExerciseHappyPath() started.
+◇ Suite CoachRefreshCancellationTests started.
+◇ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() started.
+◇ Test step5TargetRepsIsClampedToAtLeastOne() started.
+◇ Test planningNumberFieldEditingValueCanPersistBeforeBlur() started.
+◇ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() started.
+◇ Test rosterLoadsStudentsAndComputesAttentionBadge() started.
+◇ Test growthMissingSeriesLoadsAsExistingEmptyState() started.
+◇ Test chinaInvitationActionsPutShareBeforeCopy() started.
+◇ Test draftSetSpecPreservesNilRepsMax() started.
+◇ Test planningStepCodableRoundTripsEveryCase() started.
+◇ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() started.
+◇ Test previewCatalogCoversAllLiftFamilies() started.
+◇ Test step5WeightValueRoundsToHalfKilogramIncrement() started.
+◇ Test projectionMatchesStudentGoldenMatrixForAllForms() started.
+◇ Test traditionalDemoVideoNamesUseCatalogProvenance() started.
+◇ Test blankFlowLoadsSlotsFromSelectedStudentProfile() started.
+◇ Test oneRMTrioStripsTrailingZeros() started.
+◇ Test legacyMarkerCoachProjectionKeepsCanonicalIntensity() started.
+◇ Test weightInputFieldExplainsMissingOneRM() started.
+◇ Test statusCountsRemainingDaysForTimeLimited() started.
+◇ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() started.
+◇ Test step3RendersPerDayMainLiftPickers() started.
+◇ Test degradedSummaryReportsIncomplete() started.
+◇ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() started.
+◇ Test unmatchedNameFallsThroughToCandidates() started.
+◇ Test divideByZeroShowsPlaceholderAndCommitsZero() started.
+◇ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() started.
+◇ Test personalPermanentNeverExpiresOrExhausts() started.
+◇ Test coachInboxPrioritizesVideosThenUnreadThenRecency() started.
+◇ Test weekDerivationIgnoresRulesForOtherExercises() started.
+◇ Suite "Coach day detail set numbers" started.
+◇ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() started.
+◇ Suite "Coach week overview · completion" started.
+◇ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() started.
+◇ Suite "Coach video feedback workbench presentation" started.
+◇ Test perSetWeightList() started.
+◇ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() started.
+◇ Test step6RuleRequiresExerciseBeforeShowingValues() started.
+◇ Test draftSetSpecRoundTripsWeightMode() started.
+◇ Test exactFoldBindsLowBarSquat() started.
+◇ Test inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test previewCatalogCompetitionStancesMatchBackendMetadata() started.
+◇ Test barCharacterFoldsBothWays() started.
+◇ Suite "CoachKit localization runtime" started.
+◇ Test projectionSortsDaysChronologicallyByDayOfWeek() started.
+◇ Suite "Coach day ownership" started.
+◇ Suite "Coach today formatting" started.
+◇ Test bootstrapLoadsStudentsAndCatalog() started.
+◇ Test rosterTriageSignalsStayScopedPerStudent() started.
+◇ Test padDigitsAppendWithTwoDecimalPlaces() started.
+◇ Test intentResumesExistingDraftInsteadOfOverwriting() started.
+◇ Test timeLimitedCreationCarriesExpiry() started.
+◇ Test composerSendsTrimmedTextWithOptionalLinks() started.
+◇ Suite "Coach self-added detail" started.
+◇ Test profileSummaryReturnsNilForEmptyFields() started.
+◇ Test previewCatalogContainsFourSyntheticCompetitionLifts() started.
+◇ Test evaluationStudentCannotSelectFourWeeks() started.
+◇ Test accessoryFiltersAreEquatableAndHashable() started.
+◇ Suite "Coach chat status subtitle" started.
+◇ Test rejectRemovesItemSilently() started.
+◇ Test bannerHiddenWhenNoEvaluationOrCompleted() started.
+◇ Test trainingDayTokensMapToWeekdayInts() started.
+◇ Test weekDerivationAppliesWeightIncrease() started.
+◇ Test accessoryMatchListSectionAddButtonTriggersCallback() started.
+◇ Test step5W1SetSpecRestoresFromDraftStore() started.
+◇ Test weightInputFieldRoundTripStableAtCommonBenchmark() started.
+◇ Test publishesThroughRepository() started.
+◇ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() started.
+◇ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() started.
+◇ Test videoQueueLoadsItemsNewestFirst() started.
+◇ Test trailingAndRepeatedOperatorsAreForgiving() started.
+◇ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() started.
+◇ Test planningNumberFieldDecrementButtonSubtractsStep() started.
+◇ Test detailLoadsVideoWallAndTodayReadiness() started.
+◇ Test step6ToggleAppliedWeekNeverAddsW1() started.
+◇ Test step7CurrentPreviewWeekDefaultsToOne() started.
+◇ Test "receiving inbox never renders empty before its initial load finishes" started.
+◇ Test videoQueueLoadFailureMovesToFailed() started.
+◇ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() started.
+◇ Suite CoachSecondaryCancellationTests started.
+◇ Test completeHidesBannerOnSuccess() started.
+◇ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() started.
+◇ Test composerRejectsEmptyText() started.
+◇ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() started.
+◇ Test inMemoryRevokeIsIdempotent() started.
+◇ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() started.
+◇ Test step1ShowsOnlyFourWeekCardForRegularStudent() started.
+◇ Test completionChainIgnoresConcurrentCompleteConflict() started.
+◇ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() started.
+◇ Test daySectionsGroupByTrainingDayNewestFirst() started.
+◇ Test draftProgressionRulePreservesExerciseIDSet() started.
+◇ Test planningCountPickerDecrementButtonSubtractsStep() started.
+◇ Test assemblesPerSetTargetsAndRenumbersWeeks() started.
+◇ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() started.
+◇ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() started.
+◇ Test draftProgressionRuleEncodesDecimalAsString() started.
+◇ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() started.
+◇ Test coachRootViewInitializes() started.
+◇ Test draftDaysMapToDomainDays() started.
+◇ Test step5SetCountIsClampedToAtLeastOne() started.
+◇ Test projectionWeightModeSetHasWeightAndNilRPE() started.
+◇ Test aliasBindsWhenNoExactMatch() started.
+◇ Test navigationMovesForwardAndBackWithoutDroppingFields() started.
+◇ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() started.
+◇ Test weightInputFieldNegativeOneRMReturnsZero() started.
+◇ Test messageBadgeIncludesVideosAndChatUnread() started.
+◇ Test ageDerivesFromBirthDateClientSide() started.
+◇ Test "student detail replaces the zero-progress plan shell with guidance" started.
+◇ Test blankFlowWithEvaluationStudentForcesAdaptationKind() started.
+◇ Test emptyStateHasNoPersonalCode() started.
+◇ Test step6CustomSequenceLengthTracksAppliedWeeks() started.
+◇ Test finishWritesDraftAndMarksFlowFinished() started.
+◇ Test tempoFloatBecomesCoachNote() started.
+◇ Test accessoryRepositoryFiltersSingleFacetSingleValue() started.
+◇ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() started.
+◇ Test previewCatalogHasNoDuplicateIDs() started.
+◇ Test assemblerMaterializesEveryWeekFromTheW1Draft() started.
+◇ Test endDateSpansSelectedWeeks() started.
+◇ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() started.
+◇ Suite StudentRosterCancellationTests started.
+◇ Test planningCountPickerEnumeratesTagsByStepWithinRange() started.
+◇ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() started.
+◇ Test plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test draftMappingEncodesRulesEmptyAndNonEmpty() started.
+◇ Test aggregatorLinkedClipDropsAfterSendAndRefetch() started.
+◇ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() started.
+◇ Test newCatalogExercisesBindExactly(name:) started.
+◇ Test percentStyleMathViaMultiply() started.
+◇ Test prefilledOneRMFeedsOneRMLookupForMainLifts() started.
+◇ Suite "CoachKit localization" started.
+◇ Test planningCountPickerIncrementDisabledAtUpperBound() started.
+◇ Test prefilledEquipmentSeedsDefaultAccessoryFilters() started.
+◇ Test notTrainedSignalIgnoresTodayAndCompletedDays() started.
+◇ Test demoSeedHasPersonalPlusTwoSecondaryCodes() started.
+◇ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() started.
+◇ Test weekDerivationUsesHigherDisplayOrderForSameDimension() started.
+◇ Test step6ViewRendersEmptyRulesState() started.
+◇ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() started.
+◇ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() started.
+◇ Test videoQueueSendFailureKeepsRowAndBanners() started.
+◇ Suite "Coach today todo ordering" started.
+◇ Test singleLegDeadliftAndSingleLegRDLStayDistinct() started.
+◇ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() started.
+◇ Test acceptSheetSealsEvaluationChoice() started.
+◇ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() started.
+◇ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() started.
+◇ Test expiringSoonOnlyWithin24Hours() started.
+◇ Test planningNumberFieldEmptyInputResetsToZero() started.
+◇ Test exerciseMustBeBoundAndAllSetsComplete() started.
+◇ Test planNeedReasonDetectsEndedCycle() started.
+◇ Test muscleGroupTextCoversAllEightAllowedGroups() started.
+◇ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() started.
+◇ Test step6ViewRendersSingleRuleChips() started.
+◇ Test demoSeedPendingVideosAreWellFormed() started.
+◇ Test draftTrainingPlanMapsToDomainPlan() started.
+◇ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() started.
+◇ Test planningNumberFieldIncrementDisabledAtUpperBound() started.
+◇ Test skipEvaluationStudentChainSkipsCompleteStep() started.
+◇ Test readinessFatigueTextHandlesNoFatigue() started.
+◇ Test unmatchedNameDoesNotBind() started.
+◇ Test backoffKeepsCueAndType() started.
+◇ Test statusTextCountsDownFromExpectedEnd() started.
+◇ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() started.
+◇ Test previewCatalogHasNoDuplicateChineseNames() started.
+◇ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() started.
+◇ Test step4KeepsFiltersAndSelectionsIndependentPerDay() started.
+◇ Test aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test inMemoryListIsNewestFirst() started.
+◇ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() started.
+◇ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() started.
+◇ Test draftSetSpecPreservesNonNilRepsMax() started.
+◇ Test coachInboxCountAddsPendingVideosAndUnreadMessages() started.
+◇ Test weightInputFieldPercentToKgBasicConversion() started.
+◇ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() started.
+◇ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() started.
+◇ Test planNeedReasonDetectsMissingCurrentPlan() started.
+◇ Test waitingTextScalesWithElapsedTime() started.
+◇ Test draftSetSpecRoundTripsRestFields() started.
+◇ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() started.
+◇ Test "marker actions update the current item and marker load failures stay hidden" started.
+◇ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() started.
+◇ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() started.
+◇ Test percentPresetStoreRoundTripsNormalized() started.
+◇ Test markStudentActiveDropsInEvaluationBadgeInPlace() started.
+◇ Test draftStoreDeleteDraftRemovesMatchingTrainee() started.
+◇ Test rosterMovesToFailedStateWhenStudentsCannotLoad() started.
+◇ Test generatePersonalCodeShowsUpAfterReload() started.
+◇ Test loadEntersFirstSaveModeWithoutExistingSummary() started.
+◇ Test inMemoryRepositoryStoresPublishedPlans() started.
+◇ Test exerciseUsageTrackerResetClearsCounts() started.
+◇ Test previewCatalogAllExercisesHaveValidEnums() started.
+◇ Test step6ProceedAllowsEmptyRules() started.
+◇ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() started.
+◇ Test "roster shows loading before empty and distinguishes search misses" started.
+◇ Test step7DerivedPreviewReflectsWeightRule() started.
+◇ Test exerciseUsageTrackerIncrementsCount() started.
+◇ Test detailAppendPostedFeedbackRefreshesLatestOverview() started.
+◇ Test adaptationDraftNameUsesAdaptationTemplate() started.
+◇ Test step7PublishOfCompletePlanFinishesWithoutIssues() started.
+◇ Test planNeedReasonDetectsCycleEndingThisWeek() started.
+◇ Test draftStartsEmptyForZeroAndFormattedOtherwise() started.
+◇ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() started.
+◇ Test draftExercisesMapToDomainExercises() started.
+◇ Test revokeMovesCodeToDefunctSection() started.
+◇ Test bundledAliasSeedIncludesTaiwanVocabulary() started.
+◇ Test accessorySearchFoldsBarCharacterAcrossSpellings() started.
+◇ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() started.
+◇ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() started.
+◇ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() started.
+◇ Test statusTextFlipsToOverdueCopyPastExpectedEnd() started.
+◇ Test weightInputFieldKgToPercentBasicConversion() started.
+◇ Test parsesSetsAndRepsForms() started.
+◇ Test traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test composerClearsExerciseWhenLinkedDayChanges() started.
+◇ Test accessorySearchMatchesEnglishNameCaseInsensitively() started.
+◇ Test weekCardRendersDerivedWeekFooter() started.
+◇ Test draftMappingEncodesAndDecodesSetSpec() started.
+◇ Test weekStartAnchorsToPlanWeekContainingToday() started.
+◇ Test coachProfileUsesBackendNameWhenPresent() started.
+◇ Test weekDerivationAppliesRPEIncrease() started.
+◇ Test "single-student video list renders loading, failure, and empty distinctly" started.
+◇ Test notTrainedSignalFiresAtThreshold() started.
+◇ Test previewRepositoryStudentIDsAreStableAcrossLaunches() started.
+◇ Test accessoryFiltersEmptyStaticHasNoFacetSelections() started.
+◇ Test step4UpdateFiltersReloadsMatchesForDay() started.
+◇ Test singleWeightAppliesToEverySet() started.
+◇ Test noSignalWhenRecentLogAlreadyHasFeedback() started.
+◇ Test intensityModeToggleRendersBothModes() started.
+◇ Test readinessScalesTextShowsRawValuesWithoutInversion() started.
+◇ Test traditionalAmbiguousNamesRemainUnbound() started.
+◇ Test trainingYearsNotchLabels() started.
+◇ Test "dashboard with zero students shows invitation guidance" started.
+◇ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() started.
+◇ Test dayChipBarRendersAssignedDayChips() started.
+◇ Test directMessageEntryReopensTheSameConversation() started.
+◇ Test "an empty current week never falls back to whole-plan totals" started.
+◇ Test everyAliasCanonicalResolvesUniquely() started.
+◇ Test "current-week training days produce the expected progress and cells" started.
+◇ Test draftProgressSummaryMapsStepNameAndWeeks() started.
+◇ Test detailLoadsExecutionAndFeedbackSummaries() started.
+◇ Test "aggregates real plan dates into Monday through Sunday cells" started.
+◇ Test repickingAnotherStudentDropsPreviousStudentSlots() started.
+◇ Test composerSurfacesSendFailure() started.
+◇ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() started.
+◇ Test statusIsActiveForUnusedSingleUse() started.
+◇ Test "ISO week and columns stay correct across a calendar-year boundary" started.
+◇ Test "the same retained dates remap when Sunday rolls into Monday" started.
+◇ Test weekDerivationAppliesRPEDecreaseAndClamps() started.
+◇ Test aggregatorSkipsStudentsWithNoVideos() started.
+◇ Test multiLineCellSplitsIntoAccessories() started.
+◇ Test "column mapping uses the supplied positive or negative time zone" started.
+◇ Test insertingBaseReplacesCurrentOperand() started.
+◇ Test weightInputFieldShowsPercentConversionWhenOneRMExists() started.
+◇ Test failedCompleteDoesNotNotifyCompletionCallback() started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test incompleteSelectionThrows() started.
+◇ Test weightInputFieldRoundsRawInputBeforeConverting() started.
+◇ Test draftSetSpecRoundTripsRPEMode() started.
+◇ Test traditionalSetInputMatchesSimplifiedParsing() started.
+◇ Test statusIsUsedWhenSingleUseBudgetExhausted() started.
+◇ Test profileSharesOnlyOnChinaTrack() started.
+◇ Test legacyFillW1IntensityDraftRestoresToSingleStep4() started.
+◇ Test draftMappingDecodeSetSpecReturnsNilForNilData() started.
+◇ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() started.
+◇ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() started.
+◇ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() started.
+◇ Test ladderHandlesFractionalStep() started.
+◇ Test prefillProfileMissReturnsNilWithNotice() started.
+◇ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test adaptationIntentPresetsStudentDurationAndKind() started.
+◇ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() started.
+◇ Test corruptDateRowStillOpensABlock() started.
+◇ Test detailDefinesFiveSectionsInSpecOrder() started.
+◇ Test previewCatalogCoversAllExerciseTypes() started.
+◇ Test bootstrapRestoresSavedDraftStepAndAssignments() started.
+◇ Test profileSummaryFormatsKeyFields() started.
+◇ Test adaptationIntentLoadsSlotsOnBootstrap() started.
+◇ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() started.
+◇ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() started.
+◇ Test legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test percentOfBaseLandsOnPlateGrid() started.
+◇ Test "marker write failures surface instead of silently dropping the action" started.
+◇ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() started.
+◇ Test step5ProceedRoutesFourWeekPlanToRules() started.
+◇ Test weekCardRendersDaySectionsAndRows() started.
+◇ Test oneRMsMapPerFamilyDroppingMissing() started.
+◇ Test statusFlipsToExpiredAtBoundary() started.
+◇ Test step5RestSecondsPerSetClampsToSetCount() started.
+◇ Test weightInputFieldZeroOneRMReturnsZero() started.
+◇ Test inMemoryPlaybackURLHitAndMiss() started.
+◇ Test videoGridPlayExchangesIDForPresignedURL() started.
+◇ Test bindQueueCancellation(urlCancellation:) started.
+◇ Test videoQueueCancellation(urlCancellation:) started.
+◇ Test detailReadinessDistinguishesNotFiledFromFetchFailure() started.
+◇ Test step4ViewRendersMainLiftAndAccessoryCards() started.
+◇ Test planningCountPickerSnapsValueOutsideGrid() started.
+◇ Test detailCancellation(urlCancellation:) started.
+◇ Test planNeedReasonSkipsRunningCycle() started.
+◇ Test workspaceCancellation(urlCancellation:) started.
+◇ Test notTrainedSignalStaysSilentBelowThreshold() started.
+◇ Test inviteCodesCancellation(urlCancellation:) started.
+◇ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() started.
+◇ Test weekDerivationAppliesWeightDecrease() started.
+◇ Test weightInputFieldPercentToKgRoundsResultToHalfKg() started.
+✔ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() passed after 0.014 seconds.
+◇ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() started.
+◇ Test inviteURLUsesBackendBaseAndUngroupedCode() started.
+◇ Test videoQueueSendFeedbackDropsRowAndToasts() started.
+◇ Test retryAfterTransportFailureRecoversBanner() started.
+◇ Test weekCardRendersOneWeekTitle() started.
+◇ Test weekDerivationCombinesDifferentDimensions() started.
+◇ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() started.
+◇ Test accessoryLibrarySheetRendersFilterAndMatchSections() started.
+◇ Test draftStoreSavesAndLoadsDraft() started.
+◇ Test aggregatorCarriesStudentVideoSetLogID() started.
+◇ Test revokedWinsOverEverything() started.
+◇ Test step6RuleIncrementRoundsToPlanningIncrement() started.
+◇ Test completionChainRunsPutThenCompleteThenSoftRecommendation() started.
+◇ Test growthCancellation(urlCancellation:) started.
+◇ Test workspaceViewModelEmptyCoachFallsBackToNoSections() started.
+◇ Test step2RendersDisabledTemplateEntrypoints() started.
+◇ Test "video set information distinguishes unlinked videos from load failures" started.
+◇ Test equipmentFilterFollowsGymTierTable() started.
+◇ Test weekDerivationDispatchesCustomRuleToEachDimension() started.
+◇ Test step4ScreenRendersSelectedSectionAndLibraryButton() started.
+◇ Test restDayHasNoExercises() started.
+◇ Test previewCatalogTotalCountIsTwelveSixteen() started.
+◇ Test step7SetCurrentPreviewWeekClampsToPlanBounds() started.
+◇ Test planningNumberFieldTextFieldClampsAboveRange() started.
+◇ Test planningNumberFieldIncrementButtonAddsStep() started.
+◇ Test coachCompleteRequiresRealLoad() started.
+◇ Test "rapid item changes reject stale playback and set-log results" started.
+◇ Test "planning step zero replaces empty student sections with guidance" started.
+◇ Test queueLoadsPendingItemsAndExposesCount() started.
+◇ Test step5OneRMOnlyAvailableForMainLiftFamily() started.
+◇ Test editModeSaveUsesNotifyCheckbox() started.
+◇ Test notTrainedSignalDoesNotCountShiftedOriginalDates() started.
+◇ Test videoQueueRejectsBlankFeedbackWithoutDropping() started.
+◇ Test planningCountPickerDecrementDisabledAtLowerBound() started.
+◇ Test parsesTwoWeekFixtureStructure() started.
+◇ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test weekStartClampsToCycleBounds() started.
+◇ Test blankFlowOneRMStaysNil() started.
+◇ Test step6AddRuleAppendsWithDisplayOrder() started.
+◇ Test operationsEvaluateWithMultiplicationPrecedence() started.
+◇ Test tempoSuffixStrippedFromName() started.
+◇ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() started.
+◇ Test saveDraftNeverNotifiesInFirstSaveMode() started.
+◇ Test draftStoreDeleteAllRemovesEveryDraft() started.
+◇ Test exerciseUsageTrackerTracksMultipleIDsIndependently() started.
+✔ Test planningStepCodableRoundTripsEveryCase() passed after 0.016 seconds.
+◇ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() started.
+◇ Test restoredConfigureRulesPathDoesNotDuplicateStep4() started.
+◇ Test inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() started.
+◇ Test defaultStartDateIsNextMonday() started.
+✔ Test projectionMapsSingleWeekSingleExerciseHappyPath() passed after 0.016 seconds.
+◇ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() started.
+◇ Test step5UpdateW1SetSpecWritesDraftData() started.
+◇ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() started.
+◇ Test draftStoreLoadDraftKeepsOtherStudents() started.
+◇ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() started.
+◇ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() started.
+◇ Test sealedStudentDetailDoesNotRenderEvaluationBanner() started.
+◇ Test inMemoryRepositoryFetchesAllStudents() started.
+◇ Test growthFailureRendersRetryAndRetrySuccessShowsData() started.
+◇ Test dayColumnsUseFiveColumnStride() started.
+◇ Test regenerateRevokesOldPersonalCode() started.
+◇ Test steppersClampAtZeroAndStayOnHalfGrid() started.
+◇ Test step6ViewRendersUncoveredSummary() started.
+◇ Test blankFlowLoadsOneRMAndEquipmentFromProfile() started.
+◇ Test localDayStringMatchesCheckinDateWireShape() started.
+◇ Test inMemoryRepositoryFiltersMainLiftCatalog() started.
+◇ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() started.
+◇ Test ladderClampsAtCap() started.
+✔ Test draftSetSpecPreservesNilRepsMax() passed after 0.017 seconds.
+◇ Test step0RendersThreeStudentSections() started.
+◇ Test blankSkipReasonIsDroppedNotSentEmpty() started.
+◇ Test aggregatorResolvesExerciseNameFromPlan() started.
+◇ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() started.
+✔ Test oneRMTrioStripsTrailingZeros() passed after 0.017 seconds.
+◇ Test percentPresetsNormalizeClampDedupeSortCap() started.
+◇ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() started.
+◇ Test noEvaluationIsNotALoadFailure() started.
+✔ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() passed after 0.017 seconds.
+◇ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() started.
+◇ Test bannerVisibleOnlyForLiveEvaluation() started.
+◇ Test coachProfileLogoutRunsInjectedAction() started.
+◇ Test planningNumberFieldTextFieldClampsBelowRange() started.
+✔ Test projectionMatchesStudentGoldenMatrixForAllForms() passed after 0.017 seconds.
+◇ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() started.
+◇ Test legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test growthLoadingRendersProgressWithoutFlashingEmptyState() started.
+◇ Test editorCompletionChainNotifiesCompletionCallback() started.
+◇ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() started.
+◇ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() started.
+◇ Test requiredFieldsGateSaving() started.
+◇ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() started.
+◇ Test exactMatchWinsOverAlias() started.
+◇ Test weekDerivationReturnsW1Baseline() started.
+◇ Test percentTopLeftEmptyWithCue() started.
+◇ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() started.
+◇ Test setNeedsRepsAndAValidTarget() started.
+◇ Test planningNumberFieldDecrementDisabledAtLowerBound() started.
+◇ Test completeNotifiesCompletionCallback() started.
+◇ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() started.
+◇ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() started.
+◇ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() started.
+◇ Test "markers resolved for a previous video never render under a newer one" started.
+◇ Test completionChainDegradesWhenCompleteFailsButSummarySaved() started.
+◇ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() started.
+◇ Test weekDerivationCarriesRestFieldsUnchanged() started.
+◇ Test executionDaysShowCurrentPlanWeekRows() started.
+◇ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() started.
+◇ Test amrapDefersRepsAndKeepsCue() started.
+✔ Test legacyMarkerCoachProjectionKeepsCanonicalIntensity() passed after 0.028 seconds.
+◇ Test loadPrefillsEditModeFromExistingSummary() started.
+◇ Test case passing 1 argument rir → 0 to plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test case passing 1 argument rir → 2 to plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test perSetRPEFromFloatDigits() started.
+◇ Test step6DeleteRuleRemovesAndReorders() started.
+◇ Test inMemoryRevokeUnknownIdThrowsNotFound() started.
+◇ Test case passing 1 argument name → "离心卧推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "弹力带窄推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "安全杠节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "低杠位暂停深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "低杠位节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test step5RPEValueIsClampedIntoRange() started.
+◇ Test notTrainedSignalCountsMissesAboveThreshold() started.
+◇ Test blankFlowKeepsAllSevenSlots() started.
+◇ Test customProgressionRuleRoundTripsSequenceAndDimension() started.
+◇ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() started.
+◇ Test staleAssignmentOutsidePreferredSlotsStaysVisible() started.
+✔ Test degradedSummaryReportsIncomplete() passed after 0.079 seconds.
+◇ Test chinaInviteCopyIncludesLinkGroupedCodeAndCoachWhileGlobalCopiesCode() started.
+◇ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() started.
+◇ Test readinessFatigueTextOrdersByAllowedChipOrder() started.
+◇ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() started.
+◇ Test triageSignalsCanCoexistForOneStudent() started.
+◇ Test corruptDateRowSecondWeekStillParses() started.
+◇ Test rejectExpiredBannerAndRefresh() started.
+◇ Test acceptMachineCodeErrorsBannerAndForceRefresh() started.
+◇ Test planningCountPickerIncrementButtonAddsStep() started.
+◇ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() started.
+◇ Test inMemoryReturnsSeedNewestFirst() started.
+◇ Test assembledTreeIsInternallyLinked() started.
+◇ Test detectsDateRowsAndSplitsBlocks() started.
+◇ Test step7ViewRendersFourWeekTabTitles() started.
+◇ Test projectionSkipsExerciseMissingFromCatalog() started.
+◇ Test deselectingFirstWeekRenumbersRemainingToOne() started.
+◇ Test planningCountPickerTagValueRoundTrips() started.
+◇ Test progressionRuleTypeRawValuesStaySnakeCase() started.
+◇ Test domainPlanDaysAndExercisesRebuildDraft() started.
+◇ Test projectionExpandsMultipleSetsSortedBySetNumber() started.
+◇ Test step5ZeroOneRMIsTreatedAsUnavailable() started.
+✔ Test personalPermanentNeverExpiresOrExhausts() passed after 0.082 seconds.
+◇ Test case passing 2 arguments rawName → "低杆深蹲", canonical → "低杠位深蹲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "卧推", canonical → "杠铃卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "传统硬拉", canonical → "比赛式传统硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑硬拉", canonical → "比赛式相扑硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "窄推", canonical → "窄握卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "长暂停卧推", canonical → "暂停卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带绕髋RDL", canonical → "弹力带绕髋罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "抓举握距RDL", canonical → "抓举握距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "前后站单腿罗拉", canonical → "前后站单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑RDL", canonical → "相扑罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "节奏RDL", canonical → "节奏罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿RDL", canonical → "单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(纯单腿)", canonical → "单腿罗马尼亚硬拉(纯单腿)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "B 站距 RDL", canonical → "B 站距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(B 站距)", canonical → "单腿罗马尼亚硬拉(B 站距)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "臀推", canonical → "杠铃臀冲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "器械胸推", canonical → "器械推胸" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "绳索夹胸", canonical → "绳索飞鸟" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带-腿外展", canonical → "弹力带髋外展" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单侧射手俯卧撑", canonical → "射手俯卧撑" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "坐姿推肩", canonical → "坐姿哑铃推举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "两头起", canonical → "V字上举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "帕洛夫推", canonical → "弹力带 pallof 推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "对握弯举", canonical → "绳索锤式弯举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+✔ Test weekDerivationIgnoresRulesForOtherExercises() passed after 0.298 seconds.
+◇ Test "planned first set log renders hash one" started.
+◇ Test "free first set log renders hash one" started.
+◇ Test "completion is re-decided per calendar, not frozen at fetch time" started.
+◇ Test "a log outside the pairing window never counts as completion" started.
+✔ Test divideByZeroShowsPlaceholderAndCommitsZero() passed after 0.310 seconds.
+✔ Test statusCountsRemainingDaysForTimeLimited() passed after 0.311 seconds.
+✔ Test coachInboxPrioritizesVideosThenUnreadThenRecency() passed after 0.311 seconds.
+◇ Test case passing 2 arguments query → "滑輪下拉", canonical → "高位下拉" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴窄臥推", canonical → "窄握卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "不碰胸暫停1秒槓鈴臥推（3cm)", canonical → "spoto 卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test "missing RPE stays absent instead of becoming zero" started.
+◇ Test case passing 2 arguments query → "保護槓重啟槓鈴深蹲", canonical → "架上(PIN)深蹲" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test "empty student list stays alive while the global workbench advances" started.
+◇ Test case passing 2 arguments query → "彈力繩臥推", canonical → "弹力带卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "彈力繩相撲硬舉", canonical → "弹力带辅助相扑硬拉" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴屈體划船", canonical → "杠铃划船" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴早安", canonical → "早安式" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "啞鈴後腳抬高蹲", canonical → "后脚抬高分腿蹲" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test "missing RPE card renders the localized em dash" started.
+◇ Test "pending video badge reuses resolved set data and display-ready ordinal" started.
+◇ Test "global queue advances across students and wraps after its final item" started.
+◇ Test "empty queue has no position or post-send next item" started.
+◇ Test "post-send navigation resolves from the latest remaining queue" started.
+◇ Test "unlinked video resolves no set-info card" started.
+◇ Test "RPE formats whole and half values without decimal noise" started.
+◇ Test "zero-based set index displays as one-based" started.
+✔ Test draftSetSpecRoundTripsWeightMode() passed after 0.417 seconds.
+✔ Test traditionalDemoVideoNamesUseCatalogProvenance() passed after 0.422 seconds.
+✔ Test inviteShareTitleUsesTrimmedCoachName(language:) with 2 test cases passed after 0.436 seconds.
+✔ Test exactFoldBindsLowBarSquat() passed after 0.436 seconds.
+✔ Test barCharacterFoldsBothWays() passed after 0.436 seconds.
+◇ Test "native plural interpolation selects English variants at runtime" started.
+◇ Test "native interpolation preserves byte-exact Chinese rendering" started.
+✔ Test projectionSortsDaysChronologicallyByDayOfWeek() passed after 0.438 seconds.
+◇ Test detailOverviewRosterAndReminderShareCompletion() started.
+◇ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() started.
+◇ Test crossWeekOwnershipFallsBackToCalendarDate() started.
+◇ Test sameWeekJumpDoesNotCompleteEarlierDay() started.
+◇ Test unfinishedTrainingSettlementAndLegacyFallback() started.
+◇ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() started.
+✔ Test perSetWeightList() passed after 0.537 seconds.
+◇ Test adhocOwnershipUsesTheSameWeekRule() started.
+✔ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() passed after 0.537 seconds.
+◇ Test "formats the mockup month-day and weekday with an explicit calendar" started.
+◇ Test case passing 1 argument displayName → nil to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test case passing 1 argument displayName → "" to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test case passing 1 argument displayName → "   " to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+✔ Test sharedRPE() passed after 0.540 seconds.
+✔ Test padDigitsAppendWithTwoDecimalPlaces() passed after 0.539 seconds.
+◇ Test case passing 1 argument mode → .weight to legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test case passing 1 argument mode → .rpe to legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test unchangedPlannedOnlyDetailHasNoAddedCaption() started.
+◇ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() started.
+◇ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() started.
+◇ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() started.
+◇ Test case passing 1 argument urlCancellation → true to bindQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to bindQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to videoQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to videoQueueCancellation(urlCancellation:) started.
+✔ Test profileSummaryReturnsNilForEmptyFields() passed after 0.563 seconds.
+◇ Test case passing 1 argument urlCancellation → true to detailCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to detailCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to workspaceCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to workspaceCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to inviteCodesCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to inviteCodesCancellation(urlCancellation:) started.
+◇ Test "active and in-evaluation students read as 活跃" started.
+◇ Test "abnormal students read as 待关注, not 活跃" started.
+◇ Test "unknown status shows no subtitle instead of claiming active" started.
+✔ Test accessoryFiltersAreEquatableAndHashable() passed after 0.569 seconds.
+◇ Test case passing 1 argument urlCancellation → true to growthCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to growthCancellation(urlCancellation:) started.
+✔ Test trainingDayTokensMapToWeekdayInts() passed after 0.569 seconds.
+✔ Test weekDerivationAppliesWeightIncrease() passed after 0.569 seconds.
+✔ Test weightInputFieldRoundTripStableAtCommonBenchmark() passed after 0.573 seconds.
+✔ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() passed after 0.573 seconds.
+✔ Test publishesThroughRepository() passed after 0.574 seconds.
+✔ Test trailingAndRepeatedOperatorsAreForgiving() passed after 0.573 seconds.
+◇ Test case passing 2 arguments query → "臥推", canonical → "杠铃卧推" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test case passing 2 arguments query → "硬舉", canonical → "传统硬拉" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test case passing 2 arguments query → "相撲硬舉", canonical → "相扑硬拉" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test case passing 2 arguments query → "二頭彎舉", canonical → "二头弯举" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴", canonical → "杠铃卧推" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test workspaceChildCancellationKeepsRows(urlCancellation:) started.
+◇ Test videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesLocalizedFallback(language:) started.
+✔ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() passed after 0.581 seconds.
+✔ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() passed after 0.581 seconds.
+✔ Test inMemoryRevokeIsIdempotent() passed after 0.582 seconds.
+✔ Test assemblesPerSetTargetsAndRenumbersWeeks() passed after 0.581 seconds.
+✔ Test draftProgressionRulePreservesExerciseIDSet() passed after 0.582 seconds.
+✔ Test draftProgressionRuleEncodesDecimalAsString() passed after 0.581 seconds.
+✔ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() passed after 0.582 seconds.
+◇ Test case passing 1 argument note → "自重" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test case passing 1 argument note → "自重 慢下放" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test case passing 1 argument note → "BODYWEIGHT" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+✔ Test aliasBindsWhenNoExactMatch() passed after 0.583 seconds.
+✔ Test weightInputFieldNegativeOneRMReturnsZero() passed after 0.583 seconds.
+✔ Test projectionWeightModeSetHasWeightAndNilRPE() passed after 0.584 seconds.
+✔ Test messageBadgeIncludesVideosAndChatUnread() passed after 0.583 seconds.
+✔ Test ageDerivesFromBirthDateClientSide() passed after 0.584 seconds.
+✔ Test tempoFloatBecomesCoachNote() passed after 0.584 seconds.
+✔ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() passed after 0.584 seconds.
+✔ Test endDateSpansSelectedWeeks() passed after 0.584 seconds.
+◇ Test cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+◇ Test realRefreshFailureStillFails() started.
+◇ Test cancelledInitialLoadReturnsToIdle() started.
+◇ Test loadedRosterStaysVisibleUntilRefreshIsCancelled() started.
+✔ Test plannedCoachProjectionKeepsActualRIR(_:) with 2 test cases passed after 0.584 seconds.
+✔ Test aggregatorLinkedClipDropsAfterSendAndRefetch() passed after 0.585 seconds.
+✔ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() passed after 0.588 seconds.
+✔ Test previewCatalogCoversAllLiftFamilies() passed after 0.588 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() passed after 0.586 seconds.
+✔ Test percentStyleMathViaMultiply() passed after 0.585 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetSingleValue() passed after 0.585 seconds.
+✔ Test previewCatalogCompetitionStancesMatchBackendMetadata() passed after 0.588 seconds.
+◇ Test "count strings provide an English singular variation" started.
+◇ Test "logout message does not prescribe a login identity" started.
+◇ Test "every string has complete Chinese and English translations" started.
+◇ Test "exercise display uses catalog English without changing the canonical name" started.
+◇ Test "critical Chinese source strings stay byte-exact" started.
+◇ Test "every countable English value is plural-aware" started.
+◇ Test "English catalog does not contain generated placeholder labels" started.
+✔ Test notTrainedSignalIgnoresTodayAndCompletedDays() passed after 0.586 seconds.
+✔ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() passed after 0.588 seconds.
+✔ Test weekDerivationUsesHigherDisplayOrderForSameDimension() passed after 0.588 seconds.
+✔ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() passed after 0.588 seconds.
+◇ Test "returns no rows when every source is empty or non-actionable" started.
+◇ Test "orders videos, unread, missed training, then applications" started.
+✔ Test previewCatalogHasNoDuplicateIDs() passed after 0.589 seconds.
+✔ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() passed after 0.588 seconds.
+✔ Test expiringSoonOnlyWithin24Hours() passed after 0.589 seconds.
+✔ Test exerciseMustBeBoundAndAllSetsComplete() passed after 0.589 seconds.
+✔ Test planNeedReasonDetectsEndedCycle() passed after 0.589 seconds.
+✔ Test muscleGroupTextCoversAllEightAllowedGroups() passed after 0.589 seconds.
+✔ Test demoSeedPendingVideosAreWellFormed() passed after 0.589 seconds.
+✔ Test readinessFatigueTextHandlesNoFatigue() passed after 0.589 seconds.
+✔ Test unmatchedNameDoesNotBind() passed after 0.589 seconds.
+✔ Test backoffKeepsCueAndType() passed after 0.589 seconds.
+✔ Test previewCatalogContainsFourSyntheticCompetitionLifts() passed after 0.592 seconds.
+✔ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() passed after 0.589 seconds.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 0.591 seconds.
+✔ Test newCatalogExercisesBindExactly(name:) with 5 test cases passed after 0.590 seconds.
+✔ Test singleLegDeadliftAndSingleLegRDLStayDistinct() passed after 0.590 seconds.
+✔ Test previewCatalogHasNoDuplicateChineseNames() passed after 0.589 seconds.
+✔ Test aliasSeedRowsBindToCanonical(rawName:canonical:) with 24 test cases passed after 0.589 seconds.
+✔ Test unmatchedNameFallsThroughToCandidates() passed after 0.593 seconds.
+✔ Test inMemoryListIsNewestFirst() passed after 0.589 seconds.
+✔ Test draftSetSpecPreservesNonNilRepsMax() passed after 0.589 seconds.
+✔ Test coachInboxCountAddsPendingVideosAndUnreadMessages() passed after 0.589 seconds.
+✔ Test weightInputFieldPercentToKgBasicConversion() passed after 0.589 seconds.
+✔ Test planNeedReasonDetectsMissingCurrentPlan() passed after 0.589 seconds.
+✔ Test waitingTextScalesWithElapsedTime() passed after 0.589 seconds.
+✔ Test draftSetSpecRoundTripsRestFields() passed after 0.589 seconds.
+✔ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() passed after 0.589 seconds.
+✔ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() passed after 0.589 seconds.
+✔ Test percentPresetStoreRoundTripsNormalized() passed after 0.589 seconds.
+✔ Test inMemoryRepositoryStoresPublishedPlans() passed after 0.589 seconds.
+✔ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() passed after 0.589 seconds.
+✔ Test planNeedReasonDetectsCycleEndingThisWeek() passed after 0.589 seconds.
+✔ Test draftStartsEmptyForZeroAndFormattedOtherwise() passed after 0.589 seconds.
+✔ Test bundledAliasSeedIncludesTaiwanVocabulary() passed after 0.589 seconds.
+✔ Test accessorySearchFoldsBarCharacterAcrossSpellings() passed after 0.589 seconds.
+✔ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() passed after 0.589 seconds.
+✔ Test weightInputFieldKgToPercentBasicConversion() passed after 0.589 seconds.
+✔ Test parsesSetsAndRepsForms() passed after 0.589 seconds.
+✔ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() passed after 0.590 seconds.
+✔ Test previewCatalogAllExercisesHaveValidEnums() passed after 0.590 seconds.
+✔ Test notTrainedSignalFiresAtThreshold() passed after 0.589 seconds.
+✔ Test accessoryFiltersEmptyStaticHasNoFacetSelections() passed after 0.589 seconds.
+✔ Test singleWeightAppliesToEverySet() passed after 0.589 seconds.
+✔ Test noSignalWhenRecentLogAlreadyHasFeedback() passed after 0.589 seconds.
+✔ Test accessorySearchMatchesEnglishNameCaseInsensitively() passed after 0.589 seconds.
+✔ Test readinessScalesTextShowsRawValuesWithoutInversion() passed after 0.589 seconds.
+✔ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() passed after 0.589 seconds.
+✔ Test "an empty current week never falls back to whole-plan totals" passed after 0.589 seconds.
+✔ Test "current-week training days produce the expected progress and cells" passed after 0.589 seconds.
+✔ Test draftProgressSummaryMapsStepNameAndWeeks() passed after 0.589 seconds.
+✔ Test "aggregates real plan dates into Monday through Sunday cells" passed after 0.589 seconds.
+✔ Test statusIsActiveForUnusedSingleUse() passed after 0.589 seconds.
+✔ Test "ISO week and columns stay correct across a calendar-year boundary" passed after 0.589 seconds.
+✔ Test "the same retained dates remap when Sunday rolls into Monday" passed after 0.589 seconds.
+✔ Test trainingYearsNotchLabels() passed after 0.589 seconds.
+✔ Test weekDerivationAppliesRPEDecreaseAndClamps() passed after 0.588 seconds.
+✔ Test aggregatorSkipsStudentsWithNoVideos() passed after 0.588 seconds.
+✔ Test multiLineCellSplitsIntoAccessories() passed after 0.588 seconds.
+✔ Test "column mapping uses the supplied positive or negative time zone" passed after 0.588 seconds.
+✔ Test insertingBaseReplacesCurrentOperand() passed after 0.588 seconds.
+✔ Test incompleteSelectionThrows() passed after 0.587 seconds.
+✔ Test weightInputFieldRoundsRawInputBeforeConverting() passed after 0.587 seconds.
+✔ Test draftSetSpecRoundTripsRPEMode() passed after 0.583 seconds.
+✔ Test traditionalSetInputMatchesSimplifiedParsing() passed after 0.583 seconds.
+✔ Test statusIsUsedWhenSingleUseBudgetExhausted() passed after 0.583 seconds.
+✔ Test weekDerivationAppliesRPEIncrease() passed after 0.589 seconds.
+✔ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() passed after 0.585 seconds.
+✔ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() passed after 0.585 seconds.
+✔ Test previewRepositoryStudentIDsAreStableAcrossLaunches() passed after 0.592 seconds.
+✔ Test ladderHandlesFractionalStep() passed after 0.585 seconds.
+✔ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() passed after 0.585 seconds.
+✔ Test profileSummaryFormatsKeyFields() passed after 0.585 seconds.
+✔ Test corruptDateRowStillOpensABlock() passed after 0.585 seconds.
+✔ Test legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) with 2 test cases passed after 0.585 seconds.
+✔ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() passed after 0.585 seconds.
+✔ Test percentOfBaseLandsOnPlateGrid() passed after 0.585 seconds.
+✔ Test oneRMsMapPerFamilyDroppingMissing() passed after 0.585 seconds.
+✔ Test weightInputFieldZeroOneRMReturnsZero() passed after 0.585 seconds.
+✔ Test inMemoryPlaybackURLHitAndMiss() passed after 0.585 seconds.
+✔ Test planNeedReasonSkipsRunningCycle() passed after 0.585 seconds.
+✔ Test notTrainedSignalStaysSilentBelowThreshold() passed after 0.585 seconds.
+✔ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() passed after 0.599 seconds.
+✔ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() passed after 0.585 seconds.
+✔ Test weekDerivationAppliesWeightDecrease() passed after 0.585 seconds.
+✔ Test weightInputFieldPercentToKgRoundsResultToHalfKg() passed after 0.585 seconds.
+✔ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() passed after 0.585 seconds.
+✔ Test weekDerivationCombinesDifferentDimensions() passed after 0.585 seconds.
+✔ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() passed after 0.585 seconds.
+✔ Test aggregatorCarriesStudentVideoSetLogID() passed after 0.585 seconds.
+✔ Test revokedWinsOverEverything() passed after 0.585 seconds.
+✔ Test equipmentFilterFollowsGymTierTable() passed after 0.585 seconds.
+✔ Test weekDerivationDispatchesCustomRuleToEachDimension() passed after 0.584 seconds.
+✔ Test restDayHasNoExercises() passed after 0.584 seconds.
+✔ Test draftMappingExpandsSetSpecToPlanSets() passed after 0.599 seconds.
+✔ Test planningNumberFieldFormattedDisplayFormatsValue() passed after 0.599 seconds.
+✔ Test coachCompleteRequiresRealLoad() passed after 0.584 seconds.
+✔ Test notTrainedSignalDoesNotCountShiftedOriginalDates() passed after 0.584 seconds.
+✔ Test parsesTwoWeekFixtureStructure() passed after 0.584 seconds.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 0.583 seconds.
+✔ Test operationsEvaluateWithMultiplicationPrecedence() passed after 0.583 seconds.
+◇ Test case passing 1 argument urlCancellation → true to detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to workspaceChildCancellationKeepsRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to workspaceChildCancellationKeepsRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+✔ Test tempoSuffixStrippedFromName() passed after 0.584 seconds.
+✔ Test statusFlipsToExpiredAtBoundary() passed after 0.585 seconds.
+◇ Test case passing 1 argument urlCancellation → false to detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+✔ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() passed after 0.583 seconds.
+✔ Test defaultStartDateIsNextMonday() passed after 0.583 seconds.
+✔ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() passed after 0.583 seconds.
+✔ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() passed after 0.583 seconds.
+✔ Test inMemoryRepositoryFetchesAllStudents() passed after 0.583 seconds.
+✔ Test steppersClampAtZeroAndStayOnHalfGrid() passed after 0.583 seconds.
+✔ Test dayColumnsUseFiveColumnStride() passed after 0.583 seconds.
+✔ Test localDayStringMatchesCheckinDateWireShape() passed after 0.583 seconds.
+✔ Test aggregatorResolvesExerciseNameFromPlan() passed after 0.582 seconds.
+✔ Test inviteShareTitleUsesLocalizedFallback(language:) with 2 test cases passed after 0.583 seconds.
+✔ Test ladderClampsAtCap() passed after 0.583 seconds.
+✔ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() passed after 0.582 seconds.
+✔ Test percentPresetsNormalizeClampDedupeSortCap() passed after 0.582 seconds.
+✔ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() passed after 0.582 seconds.
+✔ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() passed after 0.582 seconds.
+✔ Test legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) with 3 test cases passed after 0.582 seconds.
+✔ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() passed after 0.581 seconds.
+✔ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() passed after 0.581 seconds.
+✔ Test exactMatchWinsOverAlias() passed after 0.581 seconds.
+✔ Test weekDerivationReturnsW1Baseline() passed after 0.581 seconds.
+✔ Test percentTopLeftEmptyWithCue() passed after 0.581 seconds.
+✔ Test setNeedsRepsAndAValidTarget() passed after 0.581 seconds.
+✔ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() passed after 0.580 seconds.
+✔ Test planningCountPickerClampsExternalValueAboveUpperBound() passed after 0.600 seconds.
+✔ Test exerciseUsageTrackerStartsAtZero() passed after 0.600 seconds.
+✔ Test planningNumberFieldEditingValueCanPersistBeforeBlur() passed after 0.600 seconds.
+✔ Test inMemoryRepositoryFiltersMainLiftCatalog() passed after 0.583 seconds.
+◇ Test case passing 1 argument urlCancellation → true to cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+✔ Test weekDerivationCarriesRestFieldsUnchanged() passed after 0.572 seconds.
+◇ Test case passing 1 argument urlCancellation → false to cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+✔ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() passed after 0.572 seconds.
+✔ Test amrapDefersRepsAndKeepsCue() passed after 0.572 seconds.
+✔ Test perSetRPEFromFloatDigits() passed after 0.571 seconds.
+✔ Test chinaInvitationActionsPutShareBeforeCopy() passed after 0.601 seconds.
+✔ Test inMemoryRevokeUnknownIdThrowsNotFound() passed after 0.571 seconds.
+✔ Test notTrainedSignalCountsMissesAboveThreshold() passed after 0.539 seconds.
+✔ Test inviteURLUsesBackendBaseAndUngroupedCode() passed after 0.607 seconds.
+✔ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() passed after 0.541 seconds.
+✔ Test readinessFatigueTextOrdersByAllowedChipOrder() passed after 0.541 seconds.
+✔ Test triageSignalsCanCoexistForOneStudent() passed after 0.541 seconds.
+✔ Test corruptDateRowSecondWeekStillParses() passed after 0.541 seconds.
+✔ Test weightInputFieldExplainsMissingOneRM() passed after 0.621 seconds.
+✔ Test inMemoryReturnsSeedNewestFirst() passed after 0.540 seconds.
+✔ Test assembledTreeIsInternallyLinked() passed after 0.540 seconds.
+✔ Test detectsDateRowsAndSplitsBlocks() passed after 0.540 seconds.
+✔ Test projectionSkipsExerciseMissingFromCatalog() passed after 0.539 seconds.
+✔ Test deselectingFirstWeekRenumbersRemainingToOne() passed after 0.539 seconds.
+✔ Test progressionRuleTypeRawValuesStaySnakeCase() passed after 0.539 seconds.
+✔ Test projectionExpandsMultipleSetsSortedBySetNumber() passed after 0.539 seconds.
+✔ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() passed after 0.621 seconds.
+✔ Test accessoryMatchListSectionAddButtonTriggersCallback() passed after 0.620 seconds.
+✔ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() passed after 0.620 seconds.
+✔ Test planningNumberFieldDecrementButtonSubtractsStep() passed after 0.620 seconds.
+✔ Test "receiving inbox never renders empty before its initial load finishes" passed after 0.620 seconds.
+✔ Test daySectionsGroupByTrainingDayNewestFirst() passed after 0.620 seconds.
+✔ Test planningCountPickerDecrementButtonSubtractsStep() passed after 0.619 seconds.
+✔ Test coachRootViewInitializes() passed after 0.619 seconds.
+✔ Test draftDaysMapToDomainDays() passed after 0.619 seconds.
+✔ Test "student detail replaces the zero-progress plan shell with guidance" passed after 0.619 seconds.
+✔ Test assemblerMaterializesEveryWeekFromTheW1Draft() passed after 0.619 seconds.
+✔ Test planningCountPickerEnumeratesTagsByStepWithinRange() passed after 0.619 seconds.
+✔ Test chinaInviteCopyIncludesLinkGroupedCodeAndCoachWhileGlobalCopiesCode() passed after 0.542 seconds.
+✔ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() passed after 0.619 seconds.
+✔ Test draftMappingEncodesRulesEmptyAndNonEmpty() passed after 0.619 seconds.
+✔ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() passed after 0.605 seconds.
+✔ Test "completion is re-decided per calendar, not frozen at fetch time" passed after 0.311 seconds.
+✔ Test "a log outside the pairing window never counts as completion" passed after 0.311 seconds.
+✔ Test planningCountPickerIncrementDisabledAtUpperBound() passed after 0.619 seconds.
+✔ Test "missing RPE stays absent instead of becoming zero" passed after 0.288 seconds.
+✔ Test customProgressionRuleRoundTripsSequenceAndDimension() passed after 0.543 seconds.
+✔ Test "global queue advances across students and wraps after its final item" passed after 0.236 seconds.
+✔ Test "empty queue has no position or post-send next item" passed after 0.236 seconds.
+✔ Test "post-send navigation resolves from the latest remaining queue" passed after 0.236 seconds.
+✔ Test "unlinked video resolves no set-info card" passed after 0.235 seconds.
+✔ Test "RPE formats whole and half values without decimal noise" passed after 0.235 seconds.
+✔ Test "zero-based set index displays as one-based" passed after 0.213 seconds.
+✔ Test acceptSheetSealsEvaluationChoice() passed after 0.618 seconds.
+✔ Test "pending video badge reuses resolved set data and display-ready ordinal" passed after 0.236 seconds.
+✔ Test crossWeekOwnershipFallsBackToCalendarDate() passed after 0.182 seconds.
+✔ Test unfinishedTrainingSettlementAndLegacyFallback() passed after 0.182 seconds.
+✔ Test planningNumberFieldEmptyInputResetsToZero() passed after 0.618 seconds.
+✔ Test adhocOwnershipUsesTheSameWeekRule() passed after 0.084 seconds.
+✔ Test sameWeekJumpDoesNotCompleteEarlierDay() passed after 0.182 seconds.
+✔ Test "formats the mockup month-day and weekday with an explicit calendar" passed after 0.084 seconds.
+✔ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() passed after 0.618 seconds.
+✔ Test "active and in-evaluation students read as 活跃" passed after 0.053 seconds.
+✔ Test "abnormal students read as 待关注, not 活跃" passed after 0.053 seconds.
+✔ Test "unknown status shows no subtitle instead of claiming active" passed after 0.053 seconds.
+✔ Test draftTrainingPlanMapsToDomainPlan() passed after 0.618 seconds.
+✔ Test "native plural interpolation selects English variants at runtime" passed after 0.183 seconds.
+✔ Test traditionalTaiwanAliasesResolveAndSearch(query:canonical:) with 9 test cases passed after 0.617 seconds.
+✔ Test planningNumberFieldIncrementDisabledAtUpperBound() passed after 0.618 seconds.
+✔ Test "native interpolation preserves byte-exact Chinese rendering" passed after 0.183 seconds.
+✔ Test "exercise display uses catalog English without changing the canonical name" passed after 0.034 seconds.
+✔ Test previewCatalogCoversAllExerciseTypes() passed after 0.610 seconds.
+✔ Test "every countable English value is plural-aware" passed after 0.034 seconds.
+✔ Test "returns no rows when every source is empty or non-actionable" passed after 0.030 seconds.
+✔ Test "orders videos, unread, missed training, then applications" passed after 0.030 seconds.
+✔ Suite "Coach week overview" passed after 0.623 seconds.
+✔ Suite "Coach week overview · completion" passed after 0.622 seconds.
+✔ Suite "Coach today formatting" passed after 0.622 seconds.
+✔ Suite "Coach chat status subtitle" passed after 0.622 seconds.
+✔ Suite "CoachKit localization runtime" passed after 0.622 seconds.
+✔ Suite "Coach today todo ordering" passed after 0.619 seconds.
+✔ Test "logout message does not prescribe a login identity" passed after 0.035 seconds.
+✔ Test "critical Chinese source strings stay byte-exact" passed after 0.035 seconds.
+✔ Test "count strings provide an English singular variation" passed after 0.042 seconds.
+✔ Test "every string has complete Chinese and English translations" passed after 0.043 seconds.
+✔ Test previewCatalogTotalCountIsTwelveSixteen() passed after 0.618 seconds.
+✔ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() passed after 0.620 seconds.
+✔ Test traditionalAmbiguousNamesRemainUnbound() passed after 0.630 seconds.
+✔ Test "English catalog does not contain generated placeholder labels" passed after 0.054 seconds.
+✔ Suite "CoachKit localization" passed after 0.640 seconds.
+✔ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() passed after 0.650 seconds.
+✔ Test draftStoreDeleteDraftRemovesMatchingTrainee() passed after 0.659 seconds.
+✔ Test exerciseUsageTrackerResetClearsCounts() passed after 0.661 seconds.
+✔ Test "roster shows loading before empty and distinguishes search misses" passed after 0.665 seconds.
+✔ Test exerciseUsageTrackerIncrementsCount() passed after 0.667 seconds.
+✔ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() passed after 0.671 seconds.
+✔ Test draftExercisesMapToDomainExercises() passed after 0.671 seconds.
+✔ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() passed after 0.672 seconds.
+✔ Test composerClearsExerciseWhenLinkedDayChanges() passed after 0.672 seconds.
+✔ Test draftMappingEncodesAndDecodesSetSpec() passed after 0.673 seconds.
+✔ Test weekStartAnchorsToPlanWeekContainingToday() passed after 0.673 seconds.
+✔ Test "single-student video list renders loading, failure, and empty distinctly" passed after 0.673 seconds.
+✔ Test coachProfileUsesBackendNameWhenPresent() passed after 0.673 seconds.
+✔ Test intensityModeToggleRendersBothModes() passed after 0.677 seconds.
+✔ Test "dashboard with zero students shows invitation guidance" passed after 0.683 seconds.
+✔ Test dayChipBarRendersAssignedDayChips() passed after 0.689 seconds.
+✔ Test weightInputFieldShowsPercentConversionWhenOneRMExists() passed after 0.694 seconds.
+✔ Test draftMappingDecodeSetSpecReturnsNilForNilData() passed after 0.690 seconds.
+✔ Test detailDefinesFiveSectionsInSpecOrder() passed after 0.691 seconds.
+✔ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) with 3 test cases passed after 0.691 seconds.
+✔ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() passed after 0.694 seconds.
+✔ Test planningCountPickerSnapsValueOutsideGrid() passed after 0.699 seconds.
+✔ Test studentGroupsAreOnePerStudentNewestUploadFirst() passed after 0.715 seconds.
+✔ Test draftStoreSavesAndLoadsDraft() passed after 0.704 seconds.
+✔ Test planningNumberFieldTextFieldClampsAboveRange() passed after 0.709 seconds.
+✔ Test planningNumberFieldIncrementButtonAddsStep() passed after 0.713 seconds.
+✔ Test "planning step zero replaces empty student sections with guidance" passed after 0.715 seconds.
+✔ Test planningCountPickerDecrementDisabledAtLowerBound() passed after 0.717 seconds.
+✔ Test weekStartClampsToCycleBounds() passed after 0.717 seconds.
+✔ Test draftStoreDeleteAllRemovesEveryDraft() passed after 0.729 seconds.
+✔ Test exerciseUsageTrackerTracksMultipleIDsIndependently() passed after 0.744 seconds.
+✔ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() passed after 0.745 seconds.
+✔ Test draftStoreLoadDraftKeepsOtherStudents() passed after 0.751 seconds.
+✔ Test sealedStudentDetailDoesNotRenderEvaluationBanner() passed after 0.790 seconds.
+✔ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() passed after 0.792 seconds.
+✔ Test coachProfileLogoutRunsInjectedAction() passed after 0.793 seconds.
+✔ Test planningNumberFieldTextFieldClampsBelowRange() passed after 0.792 seconds.
+✔ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() passed after 0.792 seconds.
+✔ Test planningNumberFieldDecrementDisabledAtLowerBound() passed after 0.796 seconds.
+✔ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() passed after 0.796 seconds.
+✔ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() passed after 0.903 seconds.
+✔ Test executionDaysShowCurrentPlanWeekRows() passed after 0.896 seconds.
+✔ Test growthMissingSeriesLoadsAsExistingEmptyState() passed after 0.930 seconds.
+✔ Test planningCountPickerIncrementButtonAddsStep() passed after 0.859 seconds.
+✔ Test planningCountPickerTagValueRoundTrips() passed after 0.858 seconds.
+✔ Test domainPlanDaysAndExercisesRebuildDraft() passed after 0.858 seconds.
+✔ Test videoQueueLoadsItemsNewestFirst() passed after 0.941 seconds.
+✔ Test videoQueueLoadFailureMovesToFailed() passed after 0.941 seconds.
+✔ Test composerRejectsEmptyText() passed after 0.941 seconds.
+✔ Test emptyStateHasNoPersonalCode() passed after 0.941 seconds.
+✔ Test demoSeedHasPersonalPlusTwoSecondaryCodes() passed after 0.940 seconds.
+✔ Test "empty student list stays alive while the global workbench advances" passed after 0.595 seconds.
+✔ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() passed after 0.940 seconds.
+✔ Test "missing RPE card renders the localized em dash" passed after 0.573 seconds.
+✔ Suite "Coach video feedback workbench presentation" passed after 0.958 seconds.
+✔ Test detailOverviewRosterAndReminderShareCompletion() passed after 0.519 seconds.
+✔ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() passed after 0.519 seconds.
+✔ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() passed after 0.421 seconds.
+✔ Suite "Coach day ownership" passed after 0.958 seconds.
+✔ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() passed after 0.957 seconds.
+✔ Test loadEntersFirstSaveModeWithoutExistingSummary() passed after 0.957 seconds.
+✔ Test rosterMovesToFailedStateWhenStudentsCannotLoad() passed after 0.957 seconds.
+✔ Test composerSurfacesSendFailure() passed after 0.955 seconds.
+✔ Test profileSharesOnlyOnChinaTrack() passed after 0.990 seconds.
+✔ Test videoGridPlayExchangesIDForPresignedURL() passed after 0.989 seconds.
+✔ Test queueLoadsPendingItemsAndExposesCount() passed after 0.988 seconds.
+✔ Test videoQueueRejectsBlankFeedbackWithoutDropping() passed after 0.988 seconds.
+✔ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() passed after 0.987 seconds.
+✔ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() passed after 0.988 seconds.
+✔ Test loadPrefillsEditModeFromExistingSummary() passed after 0.978 seconds.
+✔ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() passed after 0.926 seconds.
+✔ Test requiredFieldsGateSaving() passed after 0.988 seconds.
+✔ Test composerSendsTrimmedTextWithOptionalLinks() passed after 1.007 seconds.
+✔ Test videoQueueSendFailureKeepsRowAndBanners() passed after 1.026 seconds.
+✔ Test everyAliasCanonicalResolvesUniquely() passed after 1.062 seconds.
+✔ Test statusTextCountsDownFromExpectedEnd() passed after 1.138 seconds.
+✔ Test cancelledInitialLoadReturnsToIdle() passed after 0.554 seconds.
+✔ Test statusTextFlipsToOverdueCopyPastExpectedEnd() passed after 1.136 seconds.
+✔ Test prefillProfileMissReturnsNilWithNotice() passed after 1.129 seconds.
+✔ Test videoQueueSendFeedbackDropsRowAndToasts() passed after 1.130 seconds.
+✔ Test noEvaluationIsNotALoadFailure() passed after 1.128 seconds.
+✔ Test bannerVisibleOnlyForLiveEvaluation() passed after 1.127 seconds.
+✔ Test editorCompletionChainNotifiesCompletionCallback() passed after 1.127 seconds.
+✔ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() passed after 1.128 seconds.
+✔ Test transportFailureOnCompleteKeepsBannerWithError() passed after 1.147 seconds.
+✔ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() passed after 1.149 seconds.
+✔ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() passed after 1.149 seconds.
+✔ Test step3RendersPerDayMainLiftPickers() passed after 1.192 seconds.
+✔ Test bootstrapLoadsStudentsAndCatalog() passed after 1.198 seconds.
+✔ Test timeLimitedCreationCarriesExpiry() passed after 1.198 seconds.
+✔ Test rejectRemovesItemSilently() passed after 1.200 seconds.
+✔ Test evaluationStudentCannotSelectFourWeeks() passed after 1.200 seconds.
+✔ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() passed after 1.201 seconds.
+✔ Test step1ShowsOnlyFourWeekCardForRegularStudent() passed after 1.226 seconds.
+✔ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() passed after 1.225 seconds.
+✔ Test blankFlowWithEvaluationStudentForcesAdaptationKind() passed after 1.225 seconds.
+✔ Test navigationMovesForwardAndBackWithoutDroppingFields() passed after 1.230 seconds.
+✔ Test finishWritesDraftAndMarksFlowFinished() passed after 1.230 seconds.
+✔ Test "free first set log renders hash one" passed after 0.926 seconds.
+✔ Test "planned first set log renders hash one" passed after 0.926 seconds.
+✔ Suite "Coach day detail set numbers" passed after 1.233 seconds.
+✔ Test prefilledOneRMFeedsOneRMLookupForMainLifts() passed after 1.233 seconds.
+✔ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() passed after 1.234 seconds.
+✔ Test unchangedPlannedOnlyDetailHasNoAddedCaption() passed after 0.679 seconds.
+✔ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() passed after 0.678 seconds.
+✔ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() passed after 0.678 seconds.
+✔ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() passed after 0.678 seconds.
+✔ Suite "Coach self-added detail" passed after 1.240 seconds.
+✔ Test skipEvaluationStudentChainSkipsCompleteStep() passed after 1.239 seconds.
+✔ Test generatePersonalCodeShowsUpAfterReload() passed after 1.242 seconds.
+✔ Test adaptationDraftNameUsesAdaptationTemplate() passed after 1.244 seconds.
+✔ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() passed after 1.249 seconds.
+✔ Test failedCompleteDoesNotNotifyCompletionCallback() passed after 1.247 seconds.
+✔ Test legacyFillW1IntensityDraftRestoresToSingleStep4() passed after 1.244 seconds.
+✔ Test adaptationIntentPresetsStudentDurationAndKind() passed after 1.244 seconds.
+✔ Test bootstrapRestoresSavedDraftStepAndAssignments() passed after 1.245 seconds.
+✔ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() passed after 1.262 seconds.
+✔ Test step4ProceedAllowsEmptyAccessoryDays() passed after 1.285 seconds.
+✔ Test workspaceViewModelEmptyCoachFallsBackToNoSections() passed after 1.271 seconds.
+✔ Test step2RendersDisabledTemplateEntrypoints() passed after 1.333 seconds.
+✔ Test editModeSaveUsesNotifyCheckbox() passed after 1.335 seconds.
+✔ Test blankFlowOneRMStaysNil() passed after 1.340 seconds.
+✔ Test saveDraftNeverNotifiesInFirstSaveMode() passed after 1.339 seconds.
+✔ Test restoredConfigureRulesPathDoesNotDuplicateStep4() passed after 1.341 seconds.
+✔ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() passed after 1.342 seconds.
+✔ Test step5ToggleIntensityModePreservesPreviousValues() passed after 1.362 seconds.
+✔ Test step0RendersThreeStudentSections() passed after 1.378 seconds.
+✔ Test blankSkipReasonIsDroppedNotSentEmpty() passed after 1.379 seconds.
+✔ Test completeNotifiesCompletionCallback() passed after 1.377 seconds.
+✔ Test step6UpdateRuleMutatesByID() passed after 1.401 seconds.
+✔ Test step5TargetRepsIsClampedToAtLeastOne() passed after 1.403 seconds.
+✔ Test blankFlowKeepsAllSevenSlots() passed after 1.326 seconds.
+✔ Test rejectExpiredBannerAndRefresh() passed after 1.325 seconds.
+✔ Test staleAssignmentOutsidePreferredSlotsStaysVisible() passed after 1.326 seconds.
+✔ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() passed after 1.407 seconds.
+✔ Test blankFlowLoadsSlotsFromSelectedStudentProfile() passed after 1.409 seconds.
+✔ Test step5WeightValueRoundsToHalfKilogramIncrement() passed after 1.414 seconds.
+✔ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() passed after 1.417 seconds.
+✔ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() passed after 1.421 seconds.
+✔ Test step6RuleRequiresExerciseBeforeShowingValues() passed after 1.489 seconds.
+✔ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() passed after 1.494 seconds.
+✔ Test bannerHiddenWhenNoEvaluationOrCompleted() passed after 1.494 seconds.
+✔ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() passed after 1.494 seconds.
+✔ Test step6ToggleAppliedWeekNeverAddsW1() passed after 1.498 seconds.
+✔ Test step7CurrentPreviewWeekDefaultsToOne() passed after 1.502 seconds.
+✔ Test completeHidesBannerOnSuccess() passed after 1.502 seconds.
+✔ Test completionChainIgnoresConcurrentCompleteConflict() passed after 1.502 seconds.
+✔ Test step5SetCountIsClampedToAtLeastOne() passed after 1.503 seconds.
+✔ Test step6CustomSequenceLengthTracksAppliedWeeks() passed after 1.506 seconds.
+✔ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() passed after 1.510 seconds.
+✔ Test prefilledEquipmentSeedsDefaultAccessoryFilters() passed after 1.510 seconds.
+✔ Test step6ViewRendersEmptyRulesState() passed after 1.537 seconds.
+✔ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() passed after 1.542 seconds.
+✔ Test step6ViewRendersSingleRuleChips() passed after 1.695 seconds.
+✔ Test videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) with 2 test cases passed after 1.123 seconds.
+✔ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() passed after 1.696 seconds.
+✔ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() passed after 1.698 seconds.
+✔ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() passed after 1.700 seconds.
+✔ Test step6ProceedAllowsEmptyRules() passed after 1.703 seconds.
+✔ Test step7DerivedPreviewReflectsWeightRule() passed after 1.707 seconds.
+✔ Test weekCardRendersDerivedWeekFooter() passed after 1.718 seconds.
+✔ Test directMessageEntryReopensTheSameConversation() passed after 1.717 seconds.
+✔ Test adaptationIntentLoadsSlotsOnBootstrap() passed after 1.711 seconds.
+✔ Test step5RestSecondsPerSetClampsToSetCount() passed after 1.713 seconds.
+✔ Test step5ProceedRoutesFourWeekPlanToRules() passed after 1.717 seconds.
+✔ Test weekCardRendersDaySectionsAndRows() passed after 1.763 seconds.
+✔ Test retryAfterTransportFailureRecoversBanner() passed after 1.768 seconds.
+✔ Test step4ViewRendersMainLiftAndAccessoryCards() passed after 1.768 seconds.
+✔ Test weekCardRendersOneWeekTitle() passed after 1.777 seconds.
+✔ Test accessoryLibrarySheetRendersFilterAndMatchSections() passed after 1.790 seconds.
+✔ Test step6RuleIncrementRoundsToPlanningIncrement() passed after 1.795 seconds.
+✔ Test step4ScreenRendersSelectedSectionAndLibraryButton() passed after 1.943 seconds.
+✔ Test step7SetCurrentPreviewWeekClampsToPlanBounds() passed after 1.953 seconds.
+✔ Test step5OneRMOnlyAvailableForMainLiftFamily() passed after 1.954 seconds.
+✔ Test step6AddRuleAppendsWithDisplayOrder() passed after 1.958 seconds.
+✔ Test step5UpdateW1SetSpecWritesDraftData() passed after 1.959 seconds.
+✔ Test step6ViewRendersUncoveredSummary() passed after 1.982 seconds.
+✔ Test blankFlowLoadsOneRMAndEquipmentFromProfile() passed after 1.982 seconds.
+✔ Test completionChainDegradesWhenCompleteFailsButSummarySaved() passed after 1.978 seconds.
+✔ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() passed after 1.985 seconds.
+✔ Test step6DeleteRuleRemovesAndReorders() passed after 1.981 seconds.
+✔ Test step5RPEValueIsClampedIntoRange() passed after 1.933 seconds.
+✔ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() passed after 1.935 seconds.
+✔ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() passed after 1.937 seconds.
+✔ Test step7ViewRendersFourWeekTabTitles() passed after 1.971 seconds.
+✔ Test step5ZeroOneRMIsTreatedAsUnavailable() passed after 1.973 seconds.
+✔ Test growthFailureRendersRetryAndRetrySuccessShowsData() passed after 2.039 seconds.
+✔ Test revokeMovesCodeToDefunctSection() passed after 2.052 seconds.
+✔ Test step7PublishOfCompletePlanFinishesWithoutIssues() passed after 2.054 seconds.
+✔ Test step4UpdateFiltersReloadsMatchesForDay() passed after 2.053 seconds.
+✔ Test repickingAnotherStudentDropsPreviousStudentSlots() passed after 2.052 seconds.
+✔ Test completionChainRunsPutThenCompleteThenSoftRecommendation() passed after 2.045 seconds.
+✔ Test growthCancellation(urlCancellation:) with 2 test cases passed after 2.045 seconds.
+✔ Test regenerateRevokesOldPersonalCode() passed after 2.043 seconds.
+✔ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() passed after 2.060 seconds.
+✔ Test intentResumesExistingDraftInsteadOfOverwriting() passed after 2.059 seconds.
+✔ Test detailLoadsVideoWallAndTodayReadiness() passed after 2.059 seconds.
+✔ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() passed after 2.057 seconds.
+✔ Test step4KeepsFiltersAndSelectionsIndependentPerDay() passed after 2.057 seconds.
+✔ Test detailAppendPostedFeedbackRefreshesLatestOverview() passed after 2.056 seconds.
+✔ Test detailLoadsExecutionAndFeedbackSummaries() passed after 2.054 seconds.
+✔ Test bindQueueCancellation(urlCancellation:) with 2 test cases passed after 2.047 seconds.
+✔ Test videoQueueCancellation(urlCancellation:) with 2 test cases passed after 2.047 seconds.
+✔ Test inviteCodesCancellation(urlCancellation:) with 2 test cases passed after 2.047 seconds.
+✔ Test step5W1SetSpecRestoresFromDraftStore() passed after 2.060 seconds.
+✔ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() passed after 2.060 seconds.
+✔ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() passed after 2.059 seconds.
+✔ Test rosterLoadsStudentsAndComputesAttentionBadge() passed after 2.069 seconds.
+✔ Test rosterTriageSignalsStayScopedPerStudent() passed after 2.068 seconds.
+✔ Test markStudentActiveDropsInEvaluationBadgeInPlace() passed after 2.065 seconds.
+✔ Test "marker write failures surface instead of silently dropping the action" passed after 2.056 seconds.
+✔ Test workspaceCancellation(urlCancellation:) with 2 test cases passed after 2.058 seconds.
+✔ Test workspaceChildCancellationKeepsRows(urlCancellation:) with 2 test cases passed after 1.495 seconds.
+✔ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() passed after 2.065 seconds.
+✔ Test cancelledRefreshKeepsLoadedRows(urlCancellation:) with 2 test cases passed after 1.484 seconds.
+✔ Test realRefreshFailureStillFails() passed after 1.484 seconds.
+✔ Test detailCancellation(urlCancellation:) with 2 test cases passed after 2.058 seconds.
+✔ Suite CoachRefreshCancellationTests passed after 2.072 seconds.
+✔ Test "video set information distinguishes unlinked videos from load failures" passed after 2.059 seconds.
+✔ Test "marker actions update the current item and marker load failures stay hidden" passed after 2.069 seconds.
+✔ Test detailReadinessDistinguishesNotFiledFromFetchFailure() passed after 2.060 seconds.
+✔ Test loadedRosterStaysVisibleUntilRefreshIsCancelled() passed after 1.486 seconds.
+✔ Test rosterChildCancellationKeepsCompleteRows(urlCancellation:) with 2 test cases passed after 1.498 seconds.
+✔ Test detailSecondaryCancellationKeepsSections(urlCancellation:) with 2 test cases passed after 1.498 seconds.
+✔ Suite StudentRosterCancellationTests passed after 2.071 seconds.
+✔ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() passed after 2.069 seconds.
+✔ Test detailCatalogCancellationKeepsServerNames(urlCancellation:) with 2 test cases passed after 1.497 seconds.
+✔ Suite CoachSecondaryCancellationTests passed after 2.072 seconds.
+✔ Test acceptMachineCodeErrorsBannerAndForceRefresh() passed after 1.994 seconds.
+✔ Test "rapid item changes reject stale playback and set-log results" passed after 2.063 seconds.
+✔ Test growthLoadingRendersProgressWithoutFlashingEmptyState() passed after 2.059 seconds.
+✔ Test "markers resolved for a previous video never render under a newer one" passed after 2.062 seconds.
+✔ Test run with 489 tests in 14 suites passed after 2.083 seconds.

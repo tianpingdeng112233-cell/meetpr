@@ -233,16 +233,14 @@ struct AccessoryLogCard: View {
       WorkoutKeypadCell.cells(
         row: row(for: presentationRow), name: exercise.name,
         number: presentationRow.record.index,
-        includesEffort: presentationRow.draft.prescribed.loadMode != .freeWeight || allowsRIR)
+        includesEffort: presentationRow.draft.prescribed.loadMode != .freeWeight || allowsRIR,
+        effortMode: effortMode)
     }
     let address = WorkoutKeypadCell.Address(rowID: rowID, field: field)
-    keypad?.open(cells: cells, at: address) { cell, value in
-      guard let presentationRow = exercise.rows.first(where: { $0.id == cell.rowID }) else {
-        return
-      }
-      var updated = row(for: presentationRow)
-      updated.setKeypadValue(value, field: cell.field)
-      edits[cell.rowID] = updated
+    keypad?.edit(
+      cells: cells, rows: exercise.rows.map { row(for: $0) }, at: address
+    ) { updated in
+      edits[updated.id] = updated
     }
   }
 

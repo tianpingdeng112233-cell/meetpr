@@ -1,0 +1,128 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKit AccessoryLogCard.swift
+[4/5] Emitting module StudentKit
+[5/62] Compiling StudentKitTests TodayWorkoutPresentationTests.swift
+[6/62] Compiling StudentKitTests TodayWorkoutQuickLogDateRangeTests.swift
+[7/62] Compiling StudentKitTests TodayWorkoutQuickLogRetryTests.swift
+[8/62] Compiling StudentKitTests TodayWorkoutQuickLogTestSupport.swift
+[9/62] Compiling StudentKitTests TodayWorkoutQuickLogTests.swift
+[10/62] Compiling StudentKitTests TodayWorkoutRefreshTests.swift
+[11/62] Compiling StudentKitTests CameraPersistenceFixture.swift
+[12/62] Compiling StudentKitTests CameraReturnDuringPersistenceTests.swift
+[13/62] Compiling StudentKitTests CompletedDayPresentationTests.swift
+[14/62] Compiling StudentKitTests CompletedVideoReplayTests.swift
+[15/62] Compiling StudentKitTests HeroCameraUploadTests.swift
+[16/62] Compiling StudentKitTests IntensityWeightSuggestionTests.swift
+[17/68] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[18/68] Compiling StudentKitTests VideoDeliveryPresentationTests.swift
+[19/68] Compiling StudentKitTests VideoDeliveryRetryTests.swift
+[20/68] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[21/68] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[22/68] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[23/68] Compiling StudentKitTests TodaySetRefSharingSourceTests.swift
+[24/68] Compiling StudentKitTests TodayWorkoutAssumedWriteBackTests.swift
+[25/68] Compiling StudentKitTests TodayWorkoutCompletionInFlightTests.swift
+[26/68] Compiling StudentKitTests TodayWorkoutExerciseSectionTests.swift
+[27/68] Compiling StudentKitTests TodayWorkoutPRHookTests.swift
+[28/68] Compiling StudentKitTests TodayWorkoutPersistOrderingTests.swift
+[29/68] Compiling StudentKitTests SetWeightSuggestionTests.swift
+[30/68] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[31/68] Compiling StudentKitTests StudentAddedErrorTests.swift
+[32/68] Compiling StudentKitTests StudentAddedFailureTests.swift
+[33/68] Compiling StudentKitTests StudentAddedRowsTests.swift
+[34/68] Compiling StudentKitTests StudentAddedWriteTests.swift
+[35/68] Compiling StudentKitTests VideoCompletionIntegrationTests.swift
+[36/68] Compiling StudentKitTests VideoCompletionReviewRegressionTests.swift
+[37/68] Compiling StudentKitTests VideoCompletionRewardRouteTests.swift
+[38/68] Compiling StudentKitTests WorkoutCompletionPresentationTests.swift
+[39/68] Compiling StudentKitTests WorkoutDatePolicyTests.swift
+[40/68] Compiling StudentKitTests WorkoutKeypadAccessibilityTests.swift
+[41/68] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[42/68] Compiling StudentKitTests LoadTypePresentationTests.swift
+[43/68] Compiling StudentKitTests OfflineAccessoryTests.swift
+[44/68] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[45/68] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[46/68] Compiling StudentKitTests QuickLogPlanTests.swift
+[47/68] Compiling StudentKitTests E1RMCoachRPEReconcilerTests.swift
+[48/68] Compiling StudentKitTests SetNumberSurfaceTests.swift
+[49/68] Compiling StudentKitTests AccessoryColumnsTests.swift
+[50/68] Compiling StudentKitTests AccessoryPresentationTests.swift
+[51/68] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[52/68] Compiling StudentKitTests AccessoryRowTests.swift
+[53/68] Compiling StudentKitTests AccessorySaveTests.swift
+[54/68] Compiling StudentKitTests TodayWorkoutRestTimerTests.swift
+[55/68] Compiling StudentKitTests TodayWorkoutSetRefEntryLayoutTests.swift
+[56/68] Compiling StudentKitTests TodayWorkoutSuggestionBaselineTests.swift
+[57/68] Compiling StudentKitTests TodayWorkoutViewModelTests.swift
+[58/68] Compiling StudentKitTests TrainingFlowTests.swift
+[59/68] Compiling StudentKitTests VideoCompletionBoundaryTests.swift
+[60/68] Compiling StudentKitTests SetSyncDraftTests.swift
+[61/68] Compiling StudentKitTests SetSyncReceiptTests.swift
+[62/68] Compiling StudentKitTests SetSyncRegressionTests.swift
+[63/68] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[64/68] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[65/68] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[66/68] Emitting module StudentKitTests
+[66/68] Write Objects.LinkFileList
+[67/68] Linking StudentKitPackageTests
+Build complete! (16.13s)
+Test Suite 'Selected tests' started at 2026-11-08 07:13:41.997.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 07:13:41.998.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 07:13:41.998.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 07:13:41.998.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetEntryNumberPadEditTests started.
+◇ Suite WorkoutKeypadAccessibilityTests started.
+◇ Suite AccessoryRIRKeypadTests started.
+◇ Suite WorkoutKeypadSessionTests started.
+◇ Test panelCancelRemainsAvailableWithoutCommitting() started.
+◇ Test numberKeysRemainIndividuallyLabeledButtons() started.
+◇ Test scrimIsHiddenFromAccessibilityButStillCancelsWithoutCommitting() started.
+◇ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() started.
+◇ Test incompleteNewRowCanAdvanceThenSaveWhenRequiredFieldsAreFilled() started.
+◇ Test advancesAcrossRowsAndSkipsUnavailableFields() started.
+◇ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() started.
+◇ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() started.
+◇ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() started.
+◇ Test invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test invalidValueDoesNotAdvanceOrCommit() started.
+◇ Test dismissRetainsInputAndOpenCloseDoesNotWrite() started.
+◇ Test typingImmediatelyUpdatesTheRow() started.
+◇ Test onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test case passing 1 argument text → "" to invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test nextAndConfirmKeepTheirLabelsAndCommitInsteadOfCancelling() started.
+◇ Test case passing 1 argument hasSavedRecord → false to minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test dismissRetainsLocallyAndExplicitSubmissionSaves() started.
+◇ Test case passing 1 argument text → "12" to invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test case passing 1 argument saved → true to onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test case passing 1 argument saved → false to onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test case passing 1 argument hasSavedRecord → true to minimalRIRHeaderInput(hasSavedRecord:) started.
+✔ Test numberKeysRemainIndividuallyLabeledButtons() passed after 0.137 seconds.
+✔ Test panelCancelRemainsAvailableWithoutCommitting() passed after 0.147 seconds.
+✔ Test scrimIsHiddenFromAccessibilityButStillCancelsWithoutCommitting() passed after 0.148 seconds.
+✔ Test advancesAcrossRowsAndSkipsUnavailableFields() passed after 0.148 seconds.
+✔ Test invalidValueDoesNotAdvanceOrCommit() passed after 0.152 seconds.
+✔ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() passed after 0.152 seconds.
+✔ Test nextAndConfirmKeepTheirLabelsAndCommitInsteadOfCancelling() passed after 0.186 seconds.
+✔ Suite WorkoutKeypadAccessibilityTests passed after 0.186 seconds.
+✔ Test minimalRIRHeaderInput(hasSavedRecord:) with 2 test cases passed after 0.191 seconds.
+✔ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() passed after 0.193 seconds.
+✔ Suite SetEntryNumberPadEditTests passed after 0.193 seconds.
+✔ Test typingImmediatelyUpdatesTheRow() passed after 0.194 seconds.
+✔ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() passed after 0.194 seconds.
+✔ Test dismissRetainsInputAndOpenCloseDoesNotWrite() passed after 0.194 seconds.
+✔ Suite WorkoutKeypadSessionTests passed after 0.194 seconds.
+✔ Test invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) with 2 test cases passed after 0.195 seconds.
+✔ Test onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) with 2 test cases passed after 0.195 seconds.
+✔ Test incompleteNewRowCanAdvanceThenSaveWhenRequiredFieldsAreFilled() passed after 0.195 seconds.
+✔ Test dismissRetainsLocallyAndExplicitSubmissionSaves() passed after 0.195 seconds.
+✔ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() passed after 0.199 seconds.
+✔ Suite AccessoryRIRKeypadTests passed after 0.199 seconds.
+✔ Test run with 17 tests in 4 suites passed after 0.199 seconds.
