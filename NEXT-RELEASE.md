@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (34)
 - 基底：`beta/1.0-33` @ `171a810a`；1.0(33) 已于 2026-11-07 上传，内容（104 / 105 + #423 / #425 + #427 / #424 / 103）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：工程内为 33，切 34 时再 `agvtool new-version 34`；marketing version 保持 1.0。
+- build 号：工程内已 bump 为 34（`agvtool new-version 34`，2026-11-08 切包），tag `beta/1.0-34`；marketing version 保持 1.0。
 
 ## 本版将包含
 
