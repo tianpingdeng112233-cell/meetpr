@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (35)（34 已打 tag 未上传，2026-11-08 加入 106 与问教练后改切 35，不改既有 tag）
 - 基底：`beta/1.0-33` @ `171a810a`；1.0(33) 已于 2026-11-07 上传，内容（104 / 105 + #423 / #425 + #427 / #424 / 103）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：工程内已 bump 为 34（`agvtool new-version 34`，2026-11-08 切包），tag `beta/1.0-34`；marketing version 保持 1.0。
+- build 号：工程内已 bump 为 35（`agvtool new-version 35`，2026-11-08 改切），tag `beta/1.0-35`；`beta/1.0-34` @ `67c5dde0` 保留不动（本机无 34 的 archive，未上传）。marketing version 保持 1.0。
 
 ## 本版将包含
 
