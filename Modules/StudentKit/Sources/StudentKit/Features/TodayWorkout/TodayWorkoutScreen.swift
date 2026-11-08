@@ -576,7 +576,8 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
-private struct TodayWorkoutHero: View {
+// swiftlint:disable:next type_body_length
+struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
   let onStart: () -> Void
@@ -639,8 +640,11 @@ private struct TodayWorkoutHero: View {
 
   private var listHero: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-      TodayWorkoutActionSummary(presentation: presentation)
-        .padding(.bottom, MeetPRSpacing.point14)
+      TodayWorkoutActionSummary(
+        presentation: presentation, showsAskCoach: showsAskCoach,
+        isPreparingAskCoach: isPreparingAskCoach, onAskCoach: onAskCoach
+      )
+      .padding(.bottom, MeetPRSpacing.point14)
 
       if isEditable {
         GoldCTA(
@@ -859,10 +863,15 @@ private struct TodayWorkoutHero: View {
 // (David 2026-08-07: the active set card and the summary must not coexist).
 private struct TodayWorkoutActionSummary: View {
   let presentation: TodayWorkoutPresentation
+  let showsAskCoach: Bool
+  let isPreparingAskCoach: Bool
+  let onAskCoach: () -> Void
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
-      TodayWorkoutActionSummaryHeader(presentation: presentation)
+      TodayWorkoutActionSummaryHeader(
+        presentation: presentation, showsAskCoach: showsAskCoach,
+        isPreparingAskCoach: isPreparingAskCoach, onAskCoach: onAskCoach)
 
       VStack(spacing: MeetPRSpacing.space2) {
         ForEach(presentation.exercises) { exercise in
@@ -875,6 +884,9 @@ private struct TodayWorkoutActionSummary: View {
 
 private struct TodayWorkoutActionSummaryHeader: View {
   let presentation: TodayWorkoutPresentation
+  let showsAskCoach: Bool
+  let isPreparingAskCoach: Bool
+  let onAskCoach: () -> Void
 
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
@@ -894,6 +906,10 @@ private struct TodayWorkoutActionSummaryHeader: View {
       }
 
       Spacer()
+      if showsAskCoach {
+        TodayWorkoutAskCoachCornerButton(
+          isPreparing: isPreparingAskCoach, action: onAskCoach)
+      }
     }
   }
 }
