@@ -24,6 +24,8 @@ public struct MeetPRNumberPad: View {
 
   private var onTextCommit: (@MainActor (String) -> Void)?
   private var unitOverride: String?
+  private var onTextChange: (@MainActor (String) -> Void)?
+  private var dismissTitle: String?
   @State private var textInput: NumberPadTextInput?
   @State private var text = ""
   @State private var feedbackTrigger = 0
@@ -39,7 +41,9 @@ public struct MeetPRNumberPad: View {
     onCommit: @escaping @MainActor (Double) -> Void,
     onSync: (@MainActor (Double) -> Void)? = nil,
     onNext: (@MainActor (Double) -> Void)? = nil,
-    onCancel: @escaping @MainActor () -> Void
+    onCancel: @escaping @MainActor () -> Void,
+    onTextChange: (@MainActor (String) -> Void)? = nil,
+    dismissTitle: String? = nil
   ) {
     self.field = field
     self.inputValue = MeetPRNumberPadInputValue(
@@ -53,6 +57,8 @@ public struct MeetPRNumberPad: View {
     self.onSync = onSync
     self.onNext = onNext
     self.onCancel = onCancel
+    self.onTextChange = onTextChange
+    self.dismissTitle = dismissTitle
   }
 
   /// Inline cells preserve empty text and validate without barbell snapping.
@@ -60,7 +66,9 @@ public struct MeetPRNumberPad: View {
     field: Field, text: String, contextText: String, unit: String?,
     commitTitle: String? = nil,
     onTextCommit: @escaping @MainActor (String) -> Void,
-    onCancel: @escaping @MainActor () -> Void
+    onCancel: @escaping @MainActor () -> Void,
+    onTextChange: (@MainActor (String) -> Void)? = nil,
+    dismissTitle: String? = nil
   ) {
     self.init(
       field: field, value: 0, contextText: contextText,
@@ -68,6 +76,8 @@ public struct MeetPRNumberPad: View {
     self._textInput = State(initialValue: NumberPadTextInput(value: text, field: field))
     self.onTextCommit = onTextCommit
     self.unitOverride = unit
+    self.onTextChange = onTextChange
+    self.dismissTitle = dismissTitle
   }
 
   /// Weight floor is caller-supplied: 20 fits barbell lifts (empty bar), but
@@ -114,7 +124,7 @@ public struct MeetPRNumberPad: View {
 
       HStack(spacing: MeetPRSpacing.space2) {
         Button(action: cancel) {
-          Text(DesignSystemStrings.cancel)
+          Text(dismissTitle ?? DesignSystemStrings.cancel)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textSecondary)
             .frame(maxWidth: .infinity)
@@ -256,11 +266,13 @@ extension MeetPRNumberPad {
     Button {
       if textInput != nil {
         textInput?.deleteLast()
+        onTextChange?(textInput?.text ?? "")
         feedbackTrigger += 1
         return
       }
       guard !text.isEmpty else { return }
       text.removeLast()
+      onTextChange?(text)
       feedbackTrigger += 1
     } label: {
       Text("⌫")
@@ -278,6 +290,7 @@ extension MeetPRNumberPad {
   private func append(_ character: String) {
     if textInput != nil {
       textInput?.append(character)
+      onTextChange?(textInput?.text ?? "")
       feedbackTrigger += 1
       return
     }
@@ -294,6 +307,7 @@ extension MeetPRNumberPad {
       }
       text = text == "0" ? character : text + character
     }
+    onTextChange?(text)
     feedbackTrigger += 1
   }
 

@@ -29,6 +29,7 @@ struct SetEntrySheet: View {
   @State private var rpeText: String
   @State private var effortMode: ActualEffortMode
   @State private var activeNumberPad: MeetPRNumberPad.Field?
+  @State private var numberPadEdit: SetEntryNumberPadEdit?
   @State private var focusedField: SetEntryNumberField?
   @State var collarOn: Bool
   @State var isAutomaticWeight: Bool
@@ -536,38 +537,53 @@ struct SetEntrySheet: View {
     case .rpe, .rir: return
     }
     activeNumberPad = field
+    numberPadEdit = SetEntryNumberPadEdit(
+      field: field, original: field == .weight ? weightText : repsText,
+      minimumWeight: draft.isAccessory ? 0 : 20)
   }
 
   private func closeNumberPad() {
     focusedField = nil
     activeNumberPad = nil
+    numberPadEdit = nil
+  }
+
+  private func previewNumberPad(_ text: String) {
+    numberPadEdit?.update(text)
+    if activeNumberPad == .weight { weightText = text } else { repsText = text }
+  }
+
+  private func finishNumberPad() {
+    guard let edit = numberPadEdit else { return }
+    guard let value = edit.valueToSave else {
+      if edit.field == .weight { weightText = edit.original } else { repsText = edit.original }
+      closeNumberPad()
+      return
+    }
+    if edit.field == .weight {
+      updateWeight(Decimal(value))
+    } else {
+      repsText = Int(value).formatted()
+    }
+    closeNumberPad()
   }
 
   private func numberPadOverlay(field: MeetPRNumberPad.Field) -> some View {
     ZStack(alignment: .bottom) {
-      Button(action: closeNumberPad) {
+      Button(action: finishNumberPad) {
         Color.black.opacity(0.55)
           .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .ignoresSafeArea()
-      .accessibilityLabel(StudentStrings.localized(.setEntrySheet008))
+      .accessibilityHidden(true)
 
       MeetPRNumberPad(
         field: field,
         value: field == .weight ? totalWeight : Double(repsValue),
         minimumWeight: draft.isAccessory ? 0 : 20,
-        onCommit: { value in
-          switch field {
-          case .weight:
-            updateWeight(Decimal(value))
-          case .reps:
-            repsText = Int(value).formatted()
-          case .rpe, .rir:
-            break
-          }
-          closeNumberPad()
-        },
-        onCancel: closeNumberPad
+        onCommit: { _ in finishNumberPad() },
+        onCancel: finishNumberPad,
+        onTextChange: previewNumberPad, dismissTitle: DesignSystemStrings.done
       )
     }
   }

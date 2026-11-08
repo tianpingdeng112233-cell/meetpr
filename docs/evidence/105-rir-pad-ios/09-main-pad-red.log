@@ -1,0 +1,48 @@
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Emitting module StudentKit
+[4/6] Compiling StudentKit SetEntryNumberPadEdit.swift
+[5/28] Compiling StudentKitTests SetSyncReceiptTests.swift
+[6/28] Compiling StudentKitTests SetSyncRegressionTests.swift
+[7/28] Compiling StudentKitTests SetDisplayNumberTests.swift
+[8/28] Compiling StudentKitTests SetEntryNumberPadEditTests.swift
+[9/28] Compiling StudentKitTests SetEntryPlateMathTests.swift
+[10/28] Compiling StudentKitTests SetWeightSuggestionTests.swift
+[11/28] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[12/28] Compiling StudentKitTests SetEntryRPEScaleTests.swift
+[13/28] Compiling StudentKitTests SetEntryValueTests.swift
+[14/28] Compiling StudentKitTests SetSyncCompletionTests.swift
+[15/28] Compiling StudentKitTests StudentAddedErrorTests.swift
+[16/28] Compiling StudentKitTests StudentAddedFailureTests.swift
+[17/28] Emitting module StudentKitTests
+[18/28] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[19/28] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[20/28] Compiling StudentKitTests SetSyncControlTests.swift
+[21/28] Compiling StudentKitTests SetSyncDraftTests.swift
+[22/28] Compiling StudentKitTests SetSyncLogoutTests.swift
+[23/28] Compiling StudentKitTests SetSyncNetworkTests.swift
+[24/28] Compiling StudentKitTests SetSyncQueueTests.swift
+[25/28] Compiling StudentKitTests SetVideoUploadIndicatorStyleTests.swift
+[26/28] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[27/30] Compiling StudentKitTests StudentAddedRowsTests.swift
+[28/30] Compiling StudentKitTests StudentAddedTestSupport.swift
+[28/30] Write Objects.LinkFileList
+[29/30] Linking StudentKitPackageTests
+Build complete! (15.43s)
+Test Suite 'Selected tests' started at 2026-11-08 07:01:28.658.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 07:01:28.659.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 07:01:28.659.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 07:01:28.659.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetEntryNumberPadEditTests started.
+◇ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() started.
+✘ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() recorded an issue at SetEntryNumberPadEditTests.swift:13:5: Expectation failed: (edit.valueToSave → nil) == (20 → 20.0)
+✘ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() recorded an issue at SetEntryNumberPadEditTests.swift:15:5: Expectation failed: (edit.valueToSave → nil) == 22.25
+✘ Test mainPadRetainsInputOnDismissWithoutChangingBarbellRules() failed after 0.001 seconds with 2 issues.
+✘ Suite SetEntryNumberPadEditTests failed after 0.001 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.001 seconds with 2 issues.

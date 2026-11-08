@@ -1,0 +1,29 @@
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Compiling StudentKit WorkoutKeypadSession.swift
+[5/7] Emitting module StudentKit
+[6/9] Compiling StudentKitTests WorkoutKeypadProbeTests.swift
+[7/9] Emitting module StudentKitTests
+[7/9] Write Objects.LinkFileList
+[8/9] Linking StudentKitPackageTests
+Build complete! (13.29s)
+Test Suite 'Selected tests' started at 2026-11-08 06:50:39.056.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 06:50:39.057.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 06:50:39.057.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 06:50:39.057.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite WorkoutKeypadProbeTests started.
+◇ Test dismissWithoutInput() started.
+[DEBUG-105r] session.cancel field=Optional(DesignSystem.MeetPRNumberPad.Field.rir); callback not invoked
+[DEBUG-105r] open/dismiss RIR: before=0, after=0, commits=0, saved=false
+[DEBUG-105r] session.cancel field=nil; callback not invoked
+[DEBUG-105r] reopen RIR and commit 2: commits=1
+✔ Test dismissWithoutInput() passed after 0.007 seconds.
+✔ Suite WorkoutKeypadProbeTests passed after 0.007 seconds.
+✔ Test run with 1 test in 1 suite passed after 0.007 seconds.

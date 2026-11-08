@@ -1,0 +1,34 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module StudentKitTests
+[4/5] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (10.09s)
+Test Suite 'Selected tests' started at 2026-11-08 06:31:23.221.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 06:31:23.222.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 06:31:23.222.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 06:31:23.222.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryRIRKeypadTests started.
+◇ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() started.
+◇ Test minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test case passing 1 argument hasSavedRecord → false to minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test case passing 1 argument hasSavedRecord → true to minimalRIRHeaderInput(hasSavedRecord:) started.
+✘ Test minimalRIRHeaderInput(hasSavedRecord:) recorded an issue with 1 argument hasSavedRecord → true at AccessoryRIRKeypadTests.swift:112:5: Expectation failed: (input → NumberPadTextInput(text: "2", field: DesignSystem.MeetPRNumberPad.Field.rpe, replacesInitialValue: false)).isValid → false
+✘ Test minimalRIRHeaderInput(hasSavedRecord:) recorded an issue with 1 argument hasSavedRecord → true at AccessoryRIRKeypadTests.swift:114:5: Expectation failed: didCommit
+✘ Test minimalRIRHeaderInput(hasSavedRecord:) recorded an issue with 1 argument hasSavedRecord → true at AccessoryRIRKeypadTests.swift:115:5: Expectation failed: (edited.rir → nil) == 2
+✘ Test minimalRIRHeaderInput(hasSavedRecord:) with 2 test cases failed after 0.038 seconds with 3 issues.
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:56:5: Expectation failed: (cell.field → .rpe) == .rir
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:57:5: Expectation failed: (cell.context → "Row · 第 1 组 · RPE").hasSuffix("RIR")
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:62:5: Expectation failed: (input → NumberPadTextInput(text: "2", field: DesignSystem.MeetPRNumberPad.Field.rpe, replacesInitialValue: false)).isValid → false
+↳ // MeetPRNumberPad disables its primary button exactly when this is false.
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:64:5: Expectation failed: didCommit
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() failed after 0.043 seconds with 4 issues.
+✘ Suite AccessoryRIRKeypadTests failed after 0.043 seconds with 7 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.043 seconds with 7 issues.

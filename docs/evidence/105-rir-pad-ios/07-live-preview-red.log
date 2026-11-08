@@ -1,0 +1,39 @@
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Emitting module StudentKit
+[5/6] Compiling StudentKit WorkoutKeypadSession.swift
+[6/17] Compiling StudentKit StudentAddedInlineRows.swift
+[7/17] Compiling StudentKit AccessoryLogCard.swift
+[8/17] Compiling StudentKit AccessoryWorkoutHero.swift
+[9/17] Compiling StudentKit TodayWorkoutScreen.swift
+[10/17] Compiling StudentKit TodayWorkoutV3Previews.swift
+[11/17] Compiling StudentKit TodayWorkoutView.swift
+[12/17] Compiling StudentKit CompletedTrainingExercise.swift
+[13/17] Compiling StudentKit StudentAddedExerciseSection.swift
+[14/17] Compiling StudentKit StudentRootView.swift
+[15/17] Compiling StudentKit WorkoutKeypadOverlay.swift
+[16/17] Compiling StudentKit WorkoutKeypadScrollAvoidance.swift
+[17/22] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[18/22] Emitting module StudentKitTests
+[19/22] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[20/22] Compiling StudentKitTests WorkoutKeypadAccessibilityTests.swift
+[20/22] Write Objects.LinkFileList
+[21/22] Linking StudentKitPackageTests
+Build complete! (28.55s)
+Test Suite 'Selected tests' started at 2026-11-08 06:53:42.643.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 06:53:42.644.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 06:53:42.644.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 06:53:42.644.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryRIRKeypadTests started.
+◇ Test typingImmediatelyUpdatesTheRow() started.
+✘ Test typingImmediatelyUpdatesTheRow() recorded an issue at AccessoryRIRKeypadTests.swift:24:5: Expectation failed: (row.input.rpe → "") == "2"
+✘ Test typingImmediatelyUpdatesTheRow() recorded an issue at AccessoryRIRKeypadTests.swift:25:5: Expectation failed: (row.input.effortMode → .rpe) == .rir
+✘ Test typingImmediatelyUpdatesTheRow() failed after 0.007 seconds with 2 issues.
+✘ Suite AccessoryRIRKeypadTests failed after 0.007 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.007 seconds with 2 issues.

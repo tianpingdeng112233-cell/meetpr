@@ -29,17 +29,19 @@ struct WorkoutKeypadCell: Identifiable, Sendable {
   }
 
   static func cells(
-    row: AccessoryRow, name: String, number: Int, includesEffort: Bool
+    row: AccessoryRow, name: String, number: Int, includesEffort: Bool,
+    effortMode: ActualEffortMode? = nil
   ) -> [Self] {
+    let mode = effortMode ?? row.input.effortMode
     let fields: [MeetPRNumberPad.Field] =
       includesEffort
-      ? [.weight, .reps, row.input.effortMode == .rir ? .rir : .rpe] : [.weight, .reps]
+      ? [.weight, .reps, mode == .rir ? .rir : .rpe] : [.weight, .reps]
     return fields.map { field in
       let value: String
       switch field {
       case .weight: value = row.input.weight
       case .reps: value = row.input.reps
-      case .rpe, .rir: value = row.input.rpe
+      case .rpe, .rir: value = mode == row.input.effortMode ? row.input.rpe : ""
       }
       return Self(
         rowID: row.id, field: field, value: value, name: name, number: number,
@@ -53,7 +55,9 @@ extension AccessoryRow {
     switch field {
     case .weight: input.weight = value
     case .reps: input.reps = value
-    case .rpe, .rir: input.rpe = value
+    case .rpe, .rir:
+      input.effortMode = field == .rir ? .rir : .rpe
+      input.rpe = value
     }
   }
 }

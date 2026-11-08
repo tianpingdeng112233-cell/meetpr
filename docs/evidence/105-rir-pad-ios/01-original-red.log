@@ -1,0 +1,27 @@
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Emitting module StudentKitTests
+[4/6] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (9.53s)
+Test Suite 'Selected tests' started at 2026-11-08 06:26:36.825.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 06:26:36.826.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 06:26:36.826.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 06:26:36.826.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryRIRKeypadTests started.
+◇ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() started.
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:49:5: Expectation failed: (cell.field → .rpe) == .rir
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:50:5: Expectation failed: (cell.context → "Row · 第 1 组 · RPE").hasSuffix("RIR")
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:55:5: Expectation failed: (input → NumberPadTextInput(text: "2", field: DesignSystem.MeetPRNumberPad.Field.rpe, replacesInitialValue: false)).isValid → false
+↳ // MeetPRNumberPad disables its primary button exactly when this is false.
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() recorded an issue at AccessoryRIRKeypadTests.swift:57:5: Expectation failed: didCommit
+✘ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() failed after 0.053 seconds with 4 issues.
+✘ Suite AccessoryRIRKeypadTests failed after 0.054 seconds with 4 issues.
+✘ Test run with 1 test in 1 suite failed after 0.054 seconds with 4 issues.

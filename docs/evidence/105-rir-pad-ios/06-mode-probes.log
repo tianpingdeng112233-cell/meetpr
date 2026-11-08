@@ -1,0 +1,32 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKitTests WorkoutKeypadProbeTests.swift
+[4/5] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (10.10s)
+Test Suite 'Selected tests' started at 2026-11-08 06:51:12.578.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 06:51:12.579.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 06:51:12.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 06:51:12.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite WorkoutKeypadProbeTests started.
+◇ Test effortModeBoundaries() started.
+◇ Test dismissWithoutInput() started.
+[DEBUG-105r] only row mode changed: before=Optional(DesignSystem.MeetPRNumberPad.Field.rpe), rebuilt=Optional(DesignSystem.MeetPRNumberPad.Field.rir)
+[DEBUG-105r] session.cancel field=nil; callback not invoked
+[DEBUG-105r] rebuilt RIR cell fresh session commit 2=true
+[DEBUG-105r] RIR callback into saved RPE row: mode=rpe, rir=nil, writable=false
+[DEBUG-105r] session.cancel field=Optional(DesignSystem.MeetPRNumberPad.Field.rir); callback not invoked
+[DEBUG-105r] open/dismiss RIR: before=0, after=0, commits=0, saved=false
+[DEBUG-105r] session.cancel field=nil; callback not invoked
+[DEBUG-105r] reopen RIR and commit 2: commits=1
+✔ Test effortModeBoundaries() passed after 0.008 seconds.
+✔ Test dismissWithoutInput() passed after 0.008 seconds.
+✔ Suite WorkoutKeypadProbeTests passed after 0.009 seconds.
+✔ Test run with 2 tests in 1 suite passed after 0.009 seconds.

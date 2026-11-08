@@ -1,0 +1,63 @@
+Building for debugging...
+[0/4] Write sources
+[2/6] Copying Localizable.xcstrings
+[4/6] Write swift-version--58304C5D6DBC2206.txt
+[6/9] Emitting module DesignSystem
+[7/9] Compiling DesignSystem MeetPRNumberPad.swift
+[8/9] Compiling DesignSystem DesignSystemStrings.swift
+[9/19] Compiling StudentKit WorkoutKeypadSession.swift
+[10/19] Compiling StudentKit TodayWorkoutViewModel.swift
+[11/19] Emitting module StudentKit
+[12/19] Compiling StudentKit SetEntrySheet.swift
+[13/19] Compiling StudentKit WorkoutKeypadEditing.swift
+[14/19] Compiling StudentKit WorkoutKeypadOverlay.swift
+[15/19] Compiling StudentKit AccessoryLogCard.swift
+[16/19] Compiling StudentKit WorkoutKeypadCell.swift
+[17/19] Compiling StudentKit AccessoryLogRow.swift
+[18/19] Compiling StudentKit StudentAddedInlineRows.swift
+[19/24] Emitting module StudentKitTests
+[20/24] Compiling StudentKitTests WorkoutKeypadAccessibilityTests.swift
+[21/24] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[22/24] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[22/24] Write Objects.LinkFileList
+[23/24] Linking StudentKitPackageTests
+Build complete! (14.41s)
+Test Suite 'Selected tests' started at 2026-11-08 07:11:41.383.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-08 07:11:41.384.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-08 07:11:41.384.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-08 07:11:41.384.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryRIRKeypadTests started.
+◇ Test invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test dismissRetainsInputAndOpenCloseDoesNotWrite() started.
+◇ Test minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test dismissRetainsLocallyAndExplicitSubmissionSaves() started.
+◇ Test case passing 1 argument text → "12" to invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() started.
+◇ Test case passing 1 argument text → "" to invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) started.
+◇ Test incompleteNewRowCanAdvanceThenSaveWhenRequiredFieldsAreFilled() started.
+◇ Test typingImmediatelyUpdatesTheRow() started.
+◇ Test case passing 1 argument saved → false to onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test case passing 1 argument saved → true to onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) started.
+◇ Test case passing 1 argument hasSavedRecord → true to minimalRIRHeaderInput(hasSavedRecord:) started.
+◇ Test case passing 1 argument hasSavedRecord → false to minimalRIRHeaderInput(hasSavedRecord:) started.
+✔ Test minimalRIRHeaderInput(hasSavedRecord:) with 2 test cases passed after 0.047 seconds.
+✔ Test typingImmediatelyUpdatesTheRow() passed after 0.049 seconds.
+✔ Test dismissRetainsInputAndOpenCloseDoesNotWrite() passed after 0.049 seconds.
+✘ Test dismissRetainsLocallyAndExplicitSubmissionSaves() recorded an issue at AccessoryRIRKeypadTests.swift:85:7: Expectation failed: (beforeSubmit.first?.actualRIR → 2) == ((value == "2" ? nil : 2) → nil)
+✘ Test incompleteNewRowCanAdvanceThenSaveWhenRequiredFieldsAreFilled() recorded an issue at AccessoryRIRKeypadTests.swift:33:5: Expectation failed: try await logs.fetchLogsForExercise(
+      studentID: StudentDemoSeed.studentID, planExerciseID: row.draft.planExerciseID).isEmpty
+✔ Test invalidDismissRestoresTheAcceptedRowWithoutSaving(text:) with 2 test cases passed after 0.050 seconds.
+✔ Test onlyOpeningAndDismissingDoesNotCreateOrRewrite(saved:) with 2 test cases passed after 0.050 seconds.
+✘ Test incompleteNewRowCanAdvanceThenSaveWhenRequiredFieldsAreFilled() failed after 0.050 seconds with 1 issue.
+✘ Test dismissRetainsLocallyAndExplicitSubmissionSaves() recorded an issue at AccessoryRIRKeypadTests.swift:85:7: Expectation failed: (beforeSubmit.first?.actualRIR → 3) == ((value == "2" ? nil : 2) → 2)
+✔ Test recordedRPERowUnderRIRHeaderAcceptsAndSavesTwo() passed after 0.054 seconds.
+✘ Test dismissRetainsLocallyAndExplicitSubmissionSaves() recorded an issue at AccessoryRIRKeypadTests.swift:92:7: Expectation failed: (records.first?.completed → false) == true
+✘ Test dismissRetainsLocallyAndExplicitSubmissionSaves() failed after 0.055 seconds with 3 issues.
+✘ Suite AccessoryRIRKeypadTests failed after 0.055 seconds with 4 issues.
+✘ Test run with 8 tests in 1 suite failed after 0.055 seconds with 4 issues.
