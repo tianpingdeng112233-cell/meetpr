@@ -1,8 +1,9 @@
 import CoreModels
+import Foundation
 
 enum StudentTab: CaseIterable, Hashable {
-  case today
   case training
+  case coach
   case growth
   case profile
 }
@@ -17,10 +18,22 @@ struct StudentTabShellPresentation: Equatable {
     let zIndex: Double
   }
 
+  static let defaultTab: StudentTab = .training
+
+  static func initialTrainingDay(in days: [StudentPlanDay], now: Date = Date()) -> UUID? {
+    TrainingDayPresentation.completedToday(in: days, now: now)?.id
+      ?? StudentPlanSequence(days: days).cursorDay?.id
+      ?? StudentPlanSequence(days: days).orderedDays.last?.id
+  }
   let selection: StudentTab
+  var allowsCoach = true
+
+  var tabs: [StudentTab] {
+    StudentTab.allCases.filter { allowsCoach || $0 != .coach }
+  }
 
   var layers: [Layer] {
-    StudentTab.allCases.map(layer(for:))
+    tabs.map(layer(for:))
   }
 
   func layer(for tab: StudentTab) -> Layer {
@@ -37,15 +50,16 @@ struct StudentTabShellPresentation: Equatable {
 }
 
 enum StudentNotificationRoute: Hashable {
-  // The merged chat timeline (2026-07-27) absorbed the feedback/evaluation/
-  // coach-message routes; plan is the only notification that still deep-links.
   case plan
+  case coach
 
   static func route(for intent: PushRouteIntent) -> Self? {
     switch intent {
     case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
       .plan
-    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted,
+    case .chatMessage:
+      .coach
+    case .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted,
       .planShift:
       nil
     }
@@ -54,6 +68,7 @@ enum StudentNotificationRoute: Hashable {
   func targetTab(from currentTab: StudentTab) -> StudentTab {
     switch self {
     case .plan: .training
+    case .coach: .coach
     }
   }
 }

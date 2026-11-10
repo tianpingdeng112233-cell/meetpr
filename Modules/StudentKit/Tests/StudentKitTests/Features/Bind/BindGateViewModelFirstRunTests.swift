@@ -58,7 +58,7 @@ import Testing
   #expect(gate.state == .welcome(accepted))
   #expect(gate.acceptanceRevision == 1)
   gate.continueFromWelcome()
-  #expect(DashboardTodayPresentation.firstPlan(in: gate.firstRun) == accepted.firstRun?.firstPlan)
+  #expect(gate.firstRun.request?.firstRun?.firstPlan == accepted.firstRun?.firstPlan)
 }
 
 @MainActor
@@ -75,7 +75,7 @@ func firstRunMissingOrNullDoesNotOpenWelcome(explicitNull: Bool) async throws {
     stash: StashSpy(), isOnboardingComplete: { true })
   await gate.load()
   #expect(gate.state == .bound(decoded))
-  #expect(DashboardTodayPresentation.firstPlan(in: gate.firstRun) == nil)
+  #expect(gate.firstRun.request?.firstRun?.firstPlan == nil)
 }
 
 @MainActor

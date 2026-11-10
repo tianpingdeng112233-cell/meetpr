@@ -7,6 +7,7 @@ import SwiftUI
 /// account, export, and logout flows remain the only mutation paths.
 @available(iOS 17.0, macOS 14.0, *)
 public struct MyProfileView: View {
+  @Environment(ProfileNavigation.self) private var navigation: ProfileNavigation?
   private let identity: ProfileIdentity
   private let onNavigationChanged: (Bool) -> Void
   private let studentID: UUID
@@ -93,20 +94,21 @@ public struct MyProfileView: View {
       .navigationDestination(for: ProfileMenuDestination.self) { destination in
         destinationView(destination)
       }
-      .modifier(
-        OptionalStudentNotificationHostModifier(
-          coordinator: notifications,
-          showsNotifications: $showingNotifications,
-          conversationID: $conversationID,
-          onOpenPlan: onOpenPlanNotification
-        )
-      )
+
       .refreshable {
         await viewModel.reload()
         await readinessViewModel.load(studentId: studentID)
       }
     }
     .background(Color.MeetPR.bgBase)
+    .onReceive(BodyWeightChanges.publisher) { notification in
+      if notification.object as? UUID == studentID { Task { await viewModel.reload() } }
+    }
+    .onChange(of: navigation?.destination, initial: true) { _, destination in
+      guard let destination else { return }
+      path = [destination]
+      navigation?.destination = nil
+    }
     .onChange(of: path) { _, newPath in onNavigationChanged(!newPath.isEmpty) }
     .alert(StudentStrings.localized(.myProfileView019), isPresented: $showsOneRMInfo) {
       Button(StudentStrings.acknowledge, role: .cancel) {}
@@ -167,13 +169,7 @@ private struct MyProfileHeader: View {
         MeetPRMark.header
           .frame(width: 97, height: 24, alignment: .leading)
         Spacer()
-        if showsChat {
-          HeaderChatButton(
-            unreadCount: unreadCount,
-            accessibilityLabel: StudentStrings.localized(.myProfileView015),
-            action: onOpenChat
-          )
-        }
+
       }
       Text(StudentStrings.localized(.myProfileView016))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))

@@ -169,10 +169,12 @@ struct ProfileCardEditView: View {
   @State private var showsValidation = false
   @State private var confirmsRemoval = false
   private let hasMeet: Bool
+  @State private var originalWeight: Decimal?
   @Environment(\.dismiss) private var dismiss
 
   init(kind: ProfileCardKind, profile: OnboardingProfile, viewModel: MyProfileViewModel) {
     self.kind = kind
+    self._originalWeight = State(initialValue: profile.weightKg)
     self.viewModel = viewModel
     self.hasMeet = profile.isCompeting == true && profile.competitionDate != nil
     var initial = OnboardingDraft.from(profile)
@@ -278,7 +280,9 @@ struct ProfileCardEditView: View {
     defer { isSaving = false }
     // patchStep is never 3 → 1RM fields physically absent from every
     // card-edit PUT (spec 032 risk 6 + grep acceptance).
-    if await viewModel.save(draft.profilePatch(for: kind)) {
+    if await viewModel.saveCard(
+      draft.profilePatch(for: kind), kind: kind, originalWeight: originalWeight)
+    {
       dismiss()
     }
   }

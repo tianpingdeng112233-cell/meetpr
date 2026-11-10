@@ -331,7 +331,7 @@ extension ConversationViewModel {
   }
 
   private func markReadIfNeeded(from incoming: [ChatMessage]) async {
-    guard
+    guard isReadingActive, !Task.isCancelled,
       let target =
         incoming
         .filter({ $0.senderID != currentUserID })

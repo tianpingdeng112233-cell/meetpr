@@ -13,13 +13,7 @@ struct GrowthScreenHeader: View {
         MeetPRMark.header
           .frame(width: 97, height: 24, alignment: .leading)
         Spacer()
-        if showsChat {
-          HeaderChatButton(
-            unreadCount: unreadCount,
-            accessibilityLabel: StudentStrings.localized(.trainingHistoryView012),
-            action: onOpenChat
-          )
-        }
+
       }
       Text(StudentStrings.localized(.trainingHistoryView013))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))

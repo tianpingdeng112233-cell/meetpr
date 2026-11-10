@@ -85,34 +85,6 @@ struct SetNumberSurfaceTests {
     #expect(try inspected.find(text: "深蹲 · 第 1 组").string() == "深蹲 · 第 1 组")
   }
 
-  @Test("dashboard feedback label renders source index zero as set one")
-  func dashboardFeedbackLabelRendersSourceIndexZeroAsSetOne() {
-    let video = CoachFeedbackVideo(
-      id: UUID(),
-      exerciseName: "深蹲",
-      exerciseNameEn: "Competition Squat",
-      setIndex: 0
-    )
-    let feedback = CoachFeedback(
-      id: UUID(),
-      coachID: UUID(),
-      studentID: UUID(),
-      videoID: video.id,
-      video: video,
-      text: "保持节奏",
-      postedAt: Date(timeIntervalSince1970: 1_777_248_000)
-    )
-
-    #expect(
-      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "zh-Hans"))
-        == "深蹲 · 第 1 组"
-    )
-    #expect(
-      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "en"))
-        == "Competition Squat · Set 1"
-    )
-  }
-
   @Test("day detail renders source index zero as set one")
   func dayDetailRendersSourceIndexZeroAsSetOne() throws {
     let fixture = makeSurfaceFixture()

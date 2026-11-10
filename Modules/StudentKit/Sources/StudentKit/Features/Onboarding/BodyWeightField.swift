@@ -9,10 +9,10 @@ struct BodyWeightField: View {
   var isHighlighted = false
   var showsHelp = false
   @Environment(\.locale) private var locale
-  @State private var text = ""
+  @State private var showsNumberPad = false
 
   private var isInvalid: Bool {
-    isHighlighted || (!text.isEmpty && kilograms == nil)
+    isHighlighted
   }
 
   var body: some View {
@@ -20,20 +20,27 @@ struct BodyWeightField: View {
       OnboardingFieldLabel(
         title: StudentStrings.localized(labelKey), isHighlighted: isInvalid)
       HStack(spacing: MeetPRSpacing.sm) {
-        TextField("", text: input)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size17))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .padding(MeetPRSpacing.md)
-          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-          .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.control))
-          .overlay {
-            RoundedRectangle(cornerRadius: MeetPRRadius.control)
-              .stroke(isInvalid ? Color.MeetPR.danger : Color.MeetPR.borderDefault, lineWidth: 1)
-          }
-          .accessibilityLabel(StudentStrings.localized(labelKey))
-          #if os(iOS)
-            .keyboardType(.decimalPad)
-          #endif
+        Button {
+          showsNumberPad = true
+        } label: {
+          Text(BodyWeightInput.text(kg: kilograms, unit: unit, locale: locale))
+            .frame(
+              maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget, alignment: .leading
+            )
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size17))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .padding(MeetPRSpacing.md)
+        .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+        .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.control))
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.control)
+            .stroke(isInvalid ? Color.MeetPR.danger : Color.MeetPR.borderDefault, lineWidth: 1)
+        }
+        .accessibilityLabel(StudentStrings.localized(labelKey))
+
         Text(UnitDisplay.weightUnitSuffix(unit))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textMuted)
@@ -44,26 +51,18 @@ struct BodyWeightField: View {
           .foregroundStyle(Color.MeetPR.textMuted)
       }
     }
-    .onAppear(perform: syncText)
-    .onChange(of: unit) { _, _ in syncText() }
-    .onChange(of: text) { _, value in
-      let filtered = BodyWeightInput.filtered(value, locale: locale)
-      if value != filtered { text = filtered }
+    .sheet(isPresented: $showsNumberPad) {
+      BodyWeightNumberPad(
+        initialText: BodyWeightEntryModel.inputText(kilograms),
+        onChange: { _ in },
+        onSave: { text in
+          guard let value = BodyWeightEntryModel.kilograms(text) else { return }
+          kilograms = value
+          showsNumberPad = false
+        },
+        onCancel: { showsNumberPad = false }
+      )
+      .presentationDetents([.height(450)])
     }
-  }
-
-  private var input: Binding<String> {
-    Binding(
-      get: { text },
-      set: {
-        text = $0
-        kilograms = BodyWeightInput.kilograms(
-          BodyWeightInput.filtered($0, locale: locale), unit: unit, locale: locale)
-      }
-    )
-  }
-
-  private func syncText() {
-    text = BodyWeightInput.text(kg: kilograms, unit: unit, locale: locale)
   }
 }

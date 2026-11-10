@@ -12,6 +12,8 @@ public struct StudentRootView: View {
   @Environment(StudentSetSyncSession.self) private var setSyncSession: StudentSetSyncSession?
   private let loginIdentifier: String
   private let profileCoach: ActiveCoachContext?
+  @State private var profileNavigation = ProfileNavigation()
+  @State private var weightEntry: BodyWeightEntryModel
   @State private var workoutKeypad = WorkoutKeypadSession()
   @State private var profileNavigationActive = false
   private let studentID: UUID
@@ -31,15 +33,8 @@ public struct StudentRootView: View {
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var notifications: StudentNotificationsCoordinator?
   @State private var exerciseNavigation = ExerciseNoteNavigation()
-  @State private var selectedTab: StudentTab = .today
-  /// Bumped whenever 今日 becomes active so the home screen reloads data logged
-  /// in other tabs (see DashboardView.todayReloadToken).
-  @State private var todayReloadToken = 0
-  @State private var todayVolatileReloadToken = 0
-  @State private var todayRefreshThrottle = StudentTodayRefreshThrottle()
+  @State private var selectedTab = StudentTabShellPresentation.defaultTab
   @State private var trainingPlanRefreshTrigger = StudentTrainingPlanRefreshTrigger()
-  /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
-  /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
   @State private var uploadFailureDestination: UploadFailureDestination?
   @State private var uploadFailureNavigationToken = 0
@@ -144,6 +139,8 @@ public struct StudentRootView: View {
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
     self.onboarding = resolvedOnboarding
+    self._weightEntry = State(
+      initialValue: BodyWeightEntryModel(studentID: studentID, onboarding: resolvedOnboarding))
     let resolvedImportedHistoryReviews: any ImportedHistoryReviewStoring
     if let importedHistoryReviews {
       resolvedImportedHistoryReviews = importedHistoryReviews
@@ -219,30 +216,16 @@ public struct StudentRootView: View {
 
 extension StudentRootView {
   private var studentTabs: some View {
-    let shell = StudentTabShellPresentation(selection: selectedTab)
+    let shell = StudentTabShellPresentation(
+      selection: selectedTab, allowsCoach: notifications != nil)
     return ZStack {
-      DashboardView(
-        studentID: studentID,
-        plans: plans,
-        logs: logs,
-        onboarding: onboarding,
-        e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel,
-        notifications: notifications,
-        onStartWorkout: startWorkoutFromDashboard,
-        onOpenPlanNotification: openPlanNotification,
-        todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
-        todayVolatileReloadToken: todayVolatileReloadToken,
-        planProjectionUpdate: planProjectionUpdate,
-        onFullReload: {
-          todayRefreshThrottle.recordFullRefresh(at: Date())
-        },
-        onPlanChanged: propagatePlanProjection,
-        pushedConversationID: pushedConversationIDBinding,
-        onOpenProfile: { selectedTab = .profile },
-        isVisible: selectedTab == .today
-      )
-      .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
+      if let notifications {
+        StudentCoachTab(
+          coordinator: notifications, isVisible: selectedTab == .coach,
+          onOpenTraining: openPlanNotification
+        )
+        .studentTabLayer(shell.layer(for: .coach), store: tabHostStore)
+      }
 
       TodayWorkoutView(
         studentID: studentID, isVisible: selectedTab == .training,
@@ -263,9 +246,11 @@ extension StudentRootView {
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
         onPlanChanged: propagatePlanProjection,
-        onReturnToToday: { selectedTab = .today }
+        onOpenCoach: { if notifications != nil { selectedTab = .coach } }
       )
       .environment(workoutKeypad)
+      .environment(weightEntry)
+      .environment(profileNavigation)
       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
 
       TrainingHistoryView(
@@ -277,8 +262,9 @@ extension StudentRootView {
         onImportedHistoryRefresh: { await runImportedHistoryBackfill() },
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
-        onOpenToday: { selectedTab = .today }
+        onOpenTraining: { selectedTab = .training }
       )
+      .environment(weightEntry)
       .studentTabLayer(shell.layer(for: .growth), store: tabHostStore)
 
       MyProfileView(
@@ -295,6 +281,7 @@ extension StudentRootView {
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification
       )
+      .environment(profileNavigation)
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
 
     }
@@ -310,26 +297,39 @@ extension StudentRootView {
               selectedTab = tab
             }
           ),
-          items: [
-            MeetPRTabBarItem(
-              id: .today, title: StudentStrings.localized(.studentRootView001), icon: .today),
-            MeetPRTabBarItem(
-              id: .training, title: StudentStrings.localized(.studentRootView002), icon: .training),
-            MeetPRTabBarItem(
-              id: .growth, title: StudentStrings.localized(.studentRootView003), icon: .growth),
-            MeetPRTabBarItem(
-              id: .profile,
-              title: StudentStrings.localized(.studentRootView004),
-              icon: .profile,
-              badge: 0
-            ),
-          ]
+          items: shell.tabs.map { tab in
+            switch tab {
+            case .training:
+              MeetPRTabBarItem(
+                id: tab, title: StudentStrings.localized(.studentRootView002), icon: .training)
+            case .coach:
+              MeetPRTabBarItem(
+                id: tab, title: StudentStrings.localized(.coachTabTitle), icon: .message,
+                badge: selectedTab == .coach ? 0 : notifications?.totalUnreadCount ?? 0)
+            case .growth:
+              MeetPRTabBarItem(
+                id: tab, title: StudentStrings.localized(.studentRootView003), icon: .growth)
+            case .profile:
+              MeetPRTabBarItem(
+                id: tab, title: StudentStrings.localized(.studentRootView004), icon: .profile)
+            }
+          },
+          selectedColor: Color.MeetPR.goldText,
+          iconSize: 20, selectedWeight: .semibold, badgeFontSize: 10,
+          badgeBorder: Color.MeetPR.surfaceCard
         )
       }
     }
-    .accessibilityHidden(workoutKeypad.current != nil)
+    .accessibilityHidden(workoutKeypad.current != nil || weightEntry.isPresented)
     .overlay(alignment: .bottom) {
       WorkoutKeypadOverlay(session: workoutKeypad)
+      BodyWeightEntryOverlay(model: weightEntry)
+    }
+    .onChange(of: profileNavigation.destination) { _, destination in
+      if destination != nil { selectedTab = .profile }
+    }
+    .onReceive(BodyWeightChanges.publisher) { notification in
+      if notification.object as? UUID == studentID { Task { await weightEntry.load() } }
     }
     .environment(exerciseNavigation)
     .onChange(of: exerciseNavigation.reference) { _, reference in
@@ -337,8 +337,9 @@ extension StudentRootView {
     }
     .onChange(of: selectedTab) { _, _ in workoutKeypad.cancel() }
     .task {
+      await weightEntry.load()
       handlePushRoute(pushRoute)
-      Analytics.shared.screen(.dashboard)
+      Analytics.shared.screen(.todayWorkout)
       await TrainingReminderBootstrap.reconcile(
         studentID: studentID,
         services: .live
@@ -363,20 +364,20 @@ extension StudentRootView {
         selectedTab = .training
       }
     }
+    .task(id: selectedTab == .coach && scenePhase == .active) {
+      guard selectedTab == .coach, scenePhase == .active, let notifications else { return }
+      while !Task.isCancelled {
+        await notifications.reload(studentID: studentID)
+        do { try await Task.sleep(for: .seconds(15)) } catch { return }
+      }
+    }
     .onChange(of: selectedTab) { _, newTab in
       trainingPlanRefreshTrigger.handleTabSelection(newTab)
-      if newTab == .today {
-        switch todayRefreshThrottle.refreshWhenReturning(at: Date()) {
-        case .full:
-          todayReloadToken += 1
-        case .volatileOnly:
-          todayVolatileReloadToken += 1
-        }
-      }
       switch newTab {
-      case .today:
-        Analytics.shared.screen(.dashboard)
+      case .coach:
+        break
       case .training:
+        Task { await weightEntry.load() }
         workoutStartedAt = Date()
         Analytics.shared.screen(.todayWorkout)
         Analytics.shared.workoutLogStarted(source: nextWorkoutSource ?? .calendar)
@@ -437,7 +438,6 @@ extension StudentRootView {
     planProjectionUpdate = nil
     workoutPlanHandoff = nil
     planRevision += 1
-    todayReloadToken += 1
   }
 
   private func propagatePlanProjection(_ plan: StudentPlanView) {
@@ -448,9 +448,8 @@ extension StudentRootView {
     guard let route else { return }
     switch route {
     case .chatMessage:
-      // The current student shell has no standalone messages tab; its existing
-      // inbox path presents the coach conversation from the 今日 tab.
-      selectedTab = .today
+      pushRoute = nil
+      if notifications != nil { selectedTab = .coach }
     case .planShifted(let routeStudentID, _), .planShiftUndone(let routeStudentID, _),
       .planUpdated(let routeStudentID, _), .planPublished(let routeStudentID, _):
       pushRoute = nil
@@ -464,30 +463,6 @@ extension StudentRootView {
     case .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted, .planShift:
       pushRoute = nil
     }
-  }
-
-  private var pushedConversationIDBinding: Binding<UUID?> {
-    Binding(
-      get: {
-        guard case .chatMessage(let conversationID) = pushRoute else { return nil }
-        return conversationID
-      },
-      set: { conversationID in
-        guard conversationID == nil else { return }
-        pushRoute = nil
-      }
-    )
-  }
-
-  private func startWorkoutFromDashboard(handoff: TodayWorkoutPlanHandoff?) {
-    nextWorkoutSource = .dashboard
-    if let handoff {
-      workoutPlanHandoff = handoff
-    } else {
-      workoutPlanHandoff = nil
-      trainingJumpToken += 1
-    }
-    selectedTab = .training
   }
 
   @MainActor

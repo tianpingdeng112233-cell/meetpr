@@ -179,7 +179,7 @@ enum TrainingSequenceText {
   static func unlockMessage(after day: StudentPlanDay) -> String {
     StudentStrings.replacing(
       .trainingCalendarLogic012,
-      values: ["\(day.weekNumber)", "\(DashboardTodayPresentation.dayName(day))"])
+      values: ["\(day.weekNumber)", "\(TrainingDayPresentation.dayName(day))"])
   }
 
   static func exerciseSummary(_ day: StudentPlanDay) -> String {
