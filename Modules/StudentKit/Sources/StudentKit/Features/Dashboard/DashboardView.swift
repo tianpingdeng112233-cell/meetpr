@@ -173,6 +173,11 @@ public struct DashboardView: View {
         Analytics.shared.planViewed(planID: planID)
       }
     }
+    .onReceive(BodyWeightChanges.publisher) { notification in
+      if notification.object as? UUID == studentID {
+        Task { await profileMetricsViewModel.load(studentID: studentID) }
+      }
+    }
     .onChange(of: todayReloadToken) { _, _ in
       Task { await reload() }
     }

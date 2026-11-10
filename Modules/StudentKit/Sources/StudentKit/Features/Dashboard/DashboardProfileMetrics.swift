@@ -93,6 +93,7 @@ final class DashboardProfileMetricsViewModel {
   }
 
   private(set) var state: State = .idle
+  private var loadRevision = 0
 
   @ObservationIgnored private let onboarding: any OnboardingProfileReading
   @ObservationIgnored private let now: @Sendable () -> Date
@@ -116,10 +117,13 @@ final class DashboardProfileMetricsViewModel {
   }
 
   func load(studentID: UUID) async {
+    loadRevision += 1
+    let revision = loadRevision
     let isInitialLoad = state == .idle
     if isInitialLoad { state = .loading }
     do {
       let profile = try await onboarding.fetchProfile(studentId: studentID)
+      guard revision == loadRevision else { return }
       state = .loaded(
         CompetitionCountdownPresenter.metrics(
           from: profile,
@@ -128,6 +132,7 @@ final class DashboardProfileMetricsViewModel {
         )
       )
     } catch {
+      guard revision == loadRevision else { return }
       if error.isTaskCancellation {
         if isInitialLoad { state = .idle }
         return

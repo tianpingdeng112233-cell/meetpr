@@ -107,6 +107,9 @@ public struct MyProfileView: View {
       }
     }
     .background(Color.MeetPR.bgBase)
+    .onReceive(BodyWeightChanges.publisher) { notification in
+      if notification.object as? UUID == studentID { Task { await viewModel.reload() } }
+    }
     .onChange(of: path) { _, newPath in onNavigationChanged(!newPath.isEmpty) }
     .alert(StudentStrings.localized(.myProfileView019), isPresented: $showsOneRMInfo) {
       Button(StudentStrings.acknowledge, role: .cancel) {}

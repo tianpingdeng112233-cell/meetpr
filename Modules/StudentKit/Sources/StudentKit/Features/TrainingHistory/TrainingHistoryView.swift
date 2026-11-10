@@ -9,6 +9,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct TrainingHistoryView: View {
   private let studentID: UUID
+  private let onboarding: (any OnboardingRepository)?
   private let importedHistoryRefreshToken: Int
   private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   private let notifications: StudentNotificationsCoordinator?
@@ -17,6 +18,7 @@ public struct TrainingHistoryView: View {
   @State private var replay: CompletedVideoReplayModel
   @State private var uploads: VideoAttachmentViewModel
   @State private var model: ProgressDataModel
+  @State private var weights: BodyWeightViewModel
   @State private var path: [ProgressMenuDestination] = []
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
@@ -36,6 +38,10 @@ public struct TrainingHistoryView: View {
     onOpenToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
+    self.onboarding = onboarding as? any OnboardingRepository
+    self._weights = State(
+      initialValue: BodyWeightViewModel(
+        studentID: studentID, repository: onboarding as? any BodyWeightRepository))
     self.importedHistoryRefreshToken = importedHistoryRefreshToken
     self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self.notifications = notifications
@@ -60,7 +66,7 @@ public struct TrainingHistoryView: View {
             unreadCount: notifications?.totalUnreadCount ?? 0,
             onOpenChat: { showsNotifications = true })
           ProgressMenuContent(
-            values: model.menuValues, isFailed: model.isFailed,
+            values: model.menuValues, bodyWeightValue: weights.menuValue, isFailed: model.isFailed,
             onOpen: { path.append($0) }, onRetry: { Task { await reload() } })
         }
         .padding(.horizontal, MeetPRSpacing.pageHorizontal)
@@ -78,6 +84,8 @@ public struct TrainingHistoryView: View {
           AllHistoryScreen(viewModel: model.history, studentID: studentID)
         case .feedback:
           FeedbackInboxView(studentID: studentID, viewModel: model.feedback)
+        case .bodyWeight:
+          BodyWeightPage(model: weights, studentID: studentID, onboarding: onboarding)
         case .intensity:
           ProgressIntensityPage(model: model)
         }
@@ -88,6 +96,12 @@ public struct TrainingHistoryView: View {
           conversationID: $conversationID, onOpenPlan: onOpenPlanNotification)
       )
       .refreshable { await reload() }
+    }
+    .task { await weights.load() }
+    .onReceive(BodyWeightChanges.publisher) { notification in
+      if notification.object as? UUID == studentID, weights.deletingDate == nil {
+        Task { await weights.load() }
+      }
     }
     .environment(replay)
     .environment(uploads)
@@ -126,8 +140,10 @@ public struct TrainingHistoryView: View {
   }
 
   private func reload() async {
+    async let weightLoad: Void = weights.load()
     await onImportedHistoryRefresh?()
     await model.load()
+    await weightLoad
   }
 
   static func completedSessionCount(logs: [StudentSetLog], calendar: Calendar) -> Int {

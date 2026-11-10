@@ -33,6 +33,19 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let bodyWeightTitle = Key("student.bodyWeight.title")
+    static let bodyWeightLatest = Key("student.bodyWeight.latest")
+    static let bodyWeightEmpty = Key("student.bodyWeight.empty")
+    static let bodyWeightSingle = Key("student.bodyWeight.single")
+    static let bodyWeightLog = Key("student.bodyWeight.log")
+    static let bodyWeightUpdate = Key("student.bodyWeight.update")
+    static let bodyWeightRecords = Key("student.bodyWeight.records")
+    static let bodyWeightDeleteConfirm = Key("student.bodyWeight.deleteConfirm")
+    static let bodyWeightDelete = Key("student.bodyWeight.delete")
+    static let bodyWeightDeleteLabel = Key("student.bodyWeight.deleteLabel")
+    static let bodyWeightDeleteFailed = Key("student.bodyWeight.deleteFailed")
+    static let bodyWeightRangeEmpty = Key("student.bodyWeight.rangeEmpty")
+    static let bodyWeightRangeLabel = Key("student.bodyWeight.rangeLabel")
     static let keypadOptionalWeight = Key("student.keypadOptionalWeight")
     static let keypadRequiredWeight = Key("student.keypadRequiredWeight")
     static let keypadWeight = Key("student.keypadWeight")
