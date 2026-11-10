@@ -84,18 +84,9 @@ private struct AllDayExerciseHeader: View {
     HStack(spacing: MeetPRSpacing.space2) {
       Button(action: onExpand) {
         HStack(spacing: MeetPRSpacing.space2) {
-          Text(hidesName ? "" : name)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
-            .foregroundStyle(
-              group.node == .completed
-                ? Color.MeetPR.textSecondary : Color.MeetPR.textPrimary
-            )
-            .lineLimit(2)
-            .frame(
-              minWidth: MeetPRFontMetrics.size15 * 4,
-              maxWidth: .infinity, alignment: .leading)
-          AllDaySummaryValues(summary: AllDayExerciseSummary.build(rows: group.rows, unit: unit))
-            .layoutPriority(1)
+          AllDayExerciseLabel(
+            name: hidesName ? "" : name, completed: group.node == .completed,
+            summary: AllDayExerciseSummary.build(rows: group.rows, unit: unit))
           Image(systemName: expanded ? "chevron.up" : "chevron.down")
             .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textSecondary)
@@ -131,11 +122,11 @@ private struct AllDayExerciseHeader: View {
     }
     .padding(.horizontal, MeetPRSpacing.space1)
     .background(
-      expanded ? Color.MeetPR.goldRGB.opacity(0.10) : .clear,
+      (expanded || group.node == .current) ? Color.MeetPR.goldRGB.opacity(0.10) : .clear,
       in: .rect(cornerRadius: 12)
     )
     .overlay {
-      if expanded {
+      if expanded || group.node == .current {
         RoundedRectangle(cornerRadius: 12).strokeBorder(Color.MeetPR.gold500, lineWidth: 1)
       }
     }
@@ -149,32 +140,83 @@ private struct AllDayExerciseHeader: View {
   }
 }
 
-private struct AllDaySummaryValues: View {
+private struct AllDayExerciseLabel: View {
+  let name: String
+  let completed: Bool
   let summary: AllDayExerciseSummary
+
+  var body: some View {
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        AllDayExerciseName(name: name, completed: completed)
+        AllDaySummaryValues(summary: summary)
+          .fixedSize(horizontal: true, vertical: true)
+      }
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+        HStack(spacing: MeetPRSpacing.space2) {
+          AllDayExerciseName(name: name, completed: completed)
+          if summary.segments.count == 1 {
+            AllDaySummaryValues(summary: summary, part: .reps)
+              .fixedSize(horizontal: true, vertical: true)
+          }
+        }
+        AllDaySummaryValues(
+          summary: summary, part: summary.segments.count == 1 ? .load : .all)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.vertical, MeetPRSpacing.space1)
+  }
+}
+
+private struct AllDayExerciseName: View {
+  let name: String
+  let completed: Bool
+
+  var body: some View {
+    Text(name)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+      .foregroundStyle(completed ? Color.MeetPR.textSecondary : Color.MeetPR.textPrimary)
+      .lineLimit(2)
+      .frame(minWidth: MeetPRFontMetrics.size15 * 4, maxWidth: .infinity, alignment: .leading)
+  }
+}
+
+private struct AllDaySummaryValues: View {
+  enum Part { case all, reps, load }
+  let summary: AllDayExerciseSummary
+  var part: Part = .all
 
   var body: some View {
     let text = summary.segments.enumerated().reduce(Text("")) { result, pair in
       let segment = pair.element
-      return result
-        + Text(pair.offset > 0 ? " · " : "").foregroundStyle(Color.MeetPR.textSecondary)
-        + Text(segment.reps + "  ")
+      let reps = Text(segment.reps + (part == .all ? "  " : ""))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
         .foregroundStyle(
           segment.shortReps
             ? Color.MeetPR.danger
             : segment.repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
-        + Text(segment.load)
-        .font(
-          .MeetPR.body(
-            size: segment.intensityOnly
-              ? MeetPRFontMetrics.size13 : MeetPRFontMetrics.size15, weight: .bold)
-        )
-        .foregroundStyle(
-          segment.intensityOnly || segment.loadChanged
-            ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+      // Keep a load and its percentage/effort together; only list separators may wrap.
+      let load = Text(
+        segment.load.replacing(" ", with: "\u{00a0}")
+          .replacing("\u{00a0}/\u{00a0}", with: " / ")
+          .replacing("\u{00a0}·\u{00a0}", with: " · ")
+      )
+      .font(
+        .MeetPR.body(
+          size: segment.intensityOnly
+            ? MeetPRFontMetrics.size13 : MeetPRFontMetrics.size15, weight: .bold)
+      )
+      .foregroundStyle(
+        segment.intensityOnly || segment.loadChanged
+          ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+      return result
+        + Text(pair.offset > 0 ? " · " : "").foregroundStyle(Color.MeetPR.textSecondary)
+        + (part == .load ? Text("") : reps)
+        + (part == .reps ? Text("") : load)
     }
     text.monospacedDigit()
-      .multilineTextAlignment(.trailing)
+      .multilineTextAlignment(.leading)
       .fixedSize(horizontal: false, vertical: true)
   }
 }

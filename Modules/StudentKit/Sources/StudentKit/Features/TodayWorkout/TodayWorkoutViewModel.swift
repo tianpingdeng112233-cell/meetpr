@@ -53,7 +53,6 @@ public final class TodayWorkoutViewModel {
 
   var allDayCollapsed: [UUID: Set<UUID>] = [:]
   var allDayExpansion: [UUID: UUID] = [:]
-  var allDayManuallyCollapsed: Set<UUID> = []
   var allDayWriting = false
 
   public private(set) var state: State = .idle
@@ -2196,18 +2195,15 @@ extension TodayWorkoutViewModel {
 
   var expandedAllDayExerciseID: UUID? {
     guard let day = currentDay else { return nil }
-    if allDayManuallyCollapsed.contains(day.id) { return nil }
-    return allDayExpansion[day.id] ?? allDaySheet.first { $0.node != .completed }?.id
+    return allDayExpansion[day.id]
   }
 
   func toggleAllDayExpansion(_ exerciseID: UUID) {
     guard let day = currentDay else { return }
     if expandedAllDayExerciseID == exerciseID {
       allDayExpansion.removeValue(forKey: day.id)
-      allDayManuallyCollapsed.insert(day.id)
     } else {
       allDayExpansion[day.id] = exerciseID
-      allDayManuallyCollapsed.remove(day.id)
     }
   }
 
@@ -2234,7 +2230,6 @@ extension TodayWorkoutViewModel {
     if allDayCollapsed[day.id, default: []].contains(exerciseID) {
       allDayCollapsed[day.id]?.remove(exerciseID)
       allDayExpansion[day.id] = exerciseID
-      allDayManuallyCollapsed.remove(day.id)
       return true
     }
     allDayWriting = true
@@ -2252,7 +2247,6 @@ extension TodayWorkoutViewModel {
     guard currentDay?.id == day.id else { return false }
     allDayCollapsed[day.id, default: []].insert(exerciseID)
     allDayExpansion.removeValue(forKey: day.id)
-    allDayManuallyCollapsed.remove(day.id)
     return true
   }
 

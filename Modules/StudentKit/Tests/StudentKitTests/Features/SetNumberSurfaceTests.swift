@@ -50,6 +50,12 @@ struct SetNumberSurfaceTests {
   @Test("today workout table offset path renders source index zero as set one")
   func todayWorkoutTableRendersSourceIndexZeroAsSetOne() async throws {
     let fixture = try await makeTodayWorkoutFixture()
+    try fixture.view.inspect().find(
+      ViewType.Button.self,
+      where: {
+        try $0.accessibilityIdentifier().hasPrefix("allDay.expand.")
+      }
+    ).tap()
 
     let setNumber = try fixture.view.inspect().find(
       viewWithAccessibilityIdentifier:
@@ -62,6 +68,12 @@ struct SetNumberSurfaceTests {
   @Test("today workout hero stored-index path renders source index zero as set one")
   func todayWorkoutHeroRendersSourceIndexZeroAsSetOne() async throws {
     let fixture = try await makeTodayWorkoutFixture()
+    try fixture.view.inspect().find(
+      ViewType.Button.self,
+      where: {
+        try $0.accessibilityIdentifier().hasPrefix("allDay.expand.")
+      }
+    ).tap()
 
     let position = try fixture.view.inspect().find(
       viewWithAccessibilityIdentifier: "allDay.row.\(fixture.firstSetID.uuidString)")

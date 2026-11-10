@@ -6,6 +6,14 @@ struct MeetWeightStripPresentation: Equatable, Sendable {
   let todayWeightKg: Decimal?
   let isVisible: Bool
 
+  func competitionText(locale: Locale = .current) -> String? {
+    guard let competitionDays else { return nil }
+    return competitionDays == 0
+      ? StudentStrings.localized(.meetToday, locale: locale)
+      : StudentStrings.replacing(
+        .meetCountdownDays, values: [String(competitionDays)], locale: locale)
+  }
+
   init(
     profile: OnboardingProfile?, records: [BodyWeightRecord], settingOn: Bool,
     now: Date = Date(), calendar: Calendar = .current

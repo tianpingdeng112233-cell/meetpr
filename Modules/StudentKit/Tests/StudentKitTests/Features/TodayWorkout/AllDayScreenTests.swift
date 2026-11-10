@@ -7,7 +7,7 @@ import ViewInspector
 @testable import StudentKit
 
 @MainActor
-@Test func allDayScreenExposesEverySetBeforeStartingAndNoRetiredEntries() throws {
+@Test func allDayScreenStartsWithCollapsedExercisesAndNoRetiredEntries() throws {
   let day = StudentAddedTestPlan.unsettledDemo().days[0]
   let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
   let presentation = TodayWorkoutPresentation(
@@ -26,7 +26,7 @@ import ViewInspector
   let rowIDs = inspected.findAll {
     (try? $0.accessibilityIdentifier().hasPrefix("allDay.row.")) == true
   }
-  #expect(rowIDs.count == drafts.count)
+  #expect(rowIDs.isEmpty)
   #expect(inspected.findAll { try $0.accessibilityIdentifier() == "todayWorkout.quickLog" }.isEmpty)
   #expect(inspected.findAll { try $0.accessibilityIdentifier() == "todayWorkout.history" }.isEmpty)
 }
@@ -55,7 +55,7 @@ import ViewInspector
   #expect(
     try sheet.inspect().findAll {
       (try? $0.accessibilityIdentifier().hasPrefix("allDay.row.")) == true
-    }.count == first.prescribedSets.count)
+    }.isEmpty)
   try sheet.inspect().find(viewWithAccessibilityIdentifier: "allDay.expand.\(second.id)").button()
     .tap()
   #expect(model.expandedAllDayExerciseID == second.id)

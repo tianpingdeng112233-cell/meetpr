@@ -43,7 +43,7 @@ struct AllDaySetRow: View {
       }
       if editable {
         Button(action: onVideo) {
-          Image(systemName: "camera")
+          Image(systemName: "video")
             .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
             .foregroundStyle(cameraColor)
             .frame(width: 40, height: MeetPRSpacing.minimumHitTarget)
@@ -160,7 +160,9 @@ private struct AllDaySetValues: View {
   }
   private var effortText: String {
     if let rir = draft.actualRIR { return "RIR \(rir)" }
-    return draft.actualRPE.map { "RPE \(StudentFormatting.decimal($0))" } ?? "—"
+    if let rpe = draft.actualRPE { return "RPE \(StudentFormatting.decimal(rpe))" }
+    if case .rir = draft.prescribed.intensity { return "RIR —" }
+    return "RPE —"
   }
 }
 

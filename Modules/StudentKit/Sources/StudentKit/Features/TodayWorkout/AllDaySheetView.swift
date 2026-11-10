@@ -12,7 +12,6 @@ struct AllDaySheetView: View {
   @State private var showsPicker = false
   @State private var removal: UUID?
   @State private var previewExpanded: UUID?
-  @State private var previewManuallySelected = false
 
   private var groups: [AllDayExercise] {
     viewModel?.allDaySheet
@@ -32,17 +31,14 @@ struct AllDaySheetView: View {
             group: group,
             note: presentation.exercises.first { $0.id == group.id }?.note ?? "",
             expanded: viewModel.map { $0.expandedAllDayExerciseID == group.id }
-              ?? (previewManuallySelected
-                ? previewExpanded == group.id : group.id == groups.first?.id),
+              ?? (previewExpanded == group.id),
             hidesName: group.hidesName,
             viewModel: viewModel, editable: editable,
             onExpand: {
               if let viewModel {
                 viewModel.toggleAllDayExpansion(group.id)
               } else {
-                let current = previewManuallySelected ? previewExpanded : groups.first?.id
-                previewExpanded = current == group.id ? nil : group.id
-                previewManuallySelected = true
+                previewExpanded = previewExpanded == group.id ? nil : group.id
               }
             },
             onVideo: { draft in
@@ -118,60 +114,5 @@ private struct AllDaySummary: View {
       .foregroundStyle(Color.MeetPR.textSecondary)
     }
     .foregroundStyle(Color.MeetPR.textPrimary)
-  }
-}
-
-private struct AllDayTimelineNode: View {
-  let node: AllDayExercise.Node
-  let last: Bool
-
-  var body: some View {
-    VStack(spacing: MeetPRSpacing.space1) {
-      Circle()
-        .fill(
-          node == .completed
-            ? Color.MeetPR.success
-            : node == .pending
-              ? Color.MeetPR.textDim : Color.MeetPR.gold500
-        )
-        .overlay {
-          if node == .current {
-            Circle().fill(
-              LinearGradient(
-                colors: [Color.MeetPR.goldGradientStart, Color.MeetPR.goldGradientEnd],
-                startPoint: .top, endPoint: .bottom))
-          }
-          if node == .completed {
-            Image(systemName: "checkmark")
-              .font(.MeetPR.system(size: MeetPRFontMetrics.size12, weight: .bold))
-              .foregroundStyle(Color.MeetPR.inkOnCTAFill)
-          }
-        }
-        .frame(width: 22, height: 22)
-        .background {
-          if node == .current { Circle().fill(Color.MeetPR.goldRGB.opacity(0.16)).padding(-4) }
-        }
-      if !last {
-        Rectangle()
-          .fill(
-            node == .completed
-              ? Color.MeetPR.success
-              : node == .current
-                ? Color.MeetPR.gold500 : Color.MeetPR.borderStrong
-          )
-          .overlay {
-            if node == .current {
-              LinearGradient(
-                colors: [Color.MeetPR.goldGradientStart, Color.MeetPR.goldGradientEnd],
-                startPoint: .top, endPoint: .bottom)
-            }
-          }
-          .frame(width: 3)
-          .frame(maxHeight: .infinity)
-      }
-    }
-    .padding(.top, MeetPRSpacing.space2)
-    .frame(width: 22)
-    .accessibilityHidden(true)
   }
 }

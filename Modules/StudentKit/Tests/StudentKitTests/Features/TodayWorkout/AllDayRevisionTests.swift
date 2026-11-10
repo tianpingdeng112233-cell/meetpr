@@ -5,7 +5,7 @@ import Testing
 @testable import StudentKit
 
 @MainActor
-@Test func allDayExpansionIsExclusiveAndCompletionReturnsToFirstUnfinished() async throws {
+@Test func allDayStartsCollapsedAndOnlyExplicitTapsExpandExercises() async throws {
   let plan = StudentAddedTestPlan.unsettledDemo()
   let original = plan.days[0]
   let exercise = try #require(original.exercises.first)
@@ -25,13 +25,18 @@ import Testing
   await model.load(dayID: day.id, studentID: StudentDemoSeed.studentID)
   let first = try #require(model.allDaySheet.first?.id)
   let second = try #require(model.allDaySheet.dropFirst().first?.id)
+  #expect(model.expandedAllDayExerciseID == nil)
+  #expect(model.allDaySheet.first?.node == .current)
+  model.toggleAllDayExpansion(first)
   #expect(model.expandedAllDayExerciseID == first)
   model.toggleAllDayExpansion(second)
   #expect(model.expandedAllDayExerciseID == second)
   model.toggleAllDayExpansion(second)
   #expect(model.expandedAllDayExerciseID == nil)
+  model.toggleAllDayExpansion(first)
   #expect(await model.toggleAllDayExercise(first))
-  #expect(model.expandedAllDayExerciseID == second)
+  #expect(model.expandedAllDayExerciseID == nil)
+  #expect(model.allDaySheet[1].node == .current)
   model.toggleAllDayExpansion(first)
   #expect(model.expandedAllDayExerciseID == first)
   #expect(model.allDaySheet.first?.node == .completed)
@@ -102,7 +107,7 @@ import Testing
 }
 
 @MainActor
-@Test func allDayLoadedCompletedExerciseIsSkippedByAutomaticExpansion() async throws {
+@Test func allDayLoadedCompletedExerciseStaysCollapsedUntilExplicitlyReopened() async throws {
   let plan = StudentAddedTestPlan.unsettledDemo()
   let day = plan.days[0]
   let first = try #require(day.exercises.first)

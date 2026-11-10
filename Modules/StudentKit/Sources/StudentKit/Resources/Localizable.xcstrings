@@ -28370,19 +28370,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} days"
+            "value": "{0} days until meet"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} 天"
+            "value": "距比赛 {0} 天"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} 天"
+            "value": "距比賽 {0} 天"
           }
         }
       }

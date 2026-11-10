@@ -33,3 +33,23 @@ import Testing
       profile: nil, records: [], settingOn: false, now: now, calendar: calendar
     ).isVisible)
 }
+
+@Test func meetStripCopyUsesGenericMeetAndTodayInAllLanguages() throws {
+  let now = try Date("2026-11-10T12:00:00Z", strategy: .iso8601)
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+  let cases = [
+    ("zh-Hans", "距比赛 3 天", "今天比赛"),
+    ("zh-Hant", "距比賽 3 天", "今天比賽"), ("en", "3 days until meet", "Meet day"),
+  ]
+  for (language, countdown, today) in cases {
+    for (date, expected) in [("2026-11-13", countdown), ("2026-11-10", today)] {
+      let profile = OnboardingProfile(
+        userId: UUID(), isCompeting: true, competitionDate: date,
+        createdAt: now, updatedAt: now)
+      let model = MeetWeightStripPresentation(
+        profile: profile, records: [], settingOn: false, now: now, calendar: calendar)
+      #expect(model.competitionText(locale: Locale(identifier: language)) == expected)
+    }
+  }
+}

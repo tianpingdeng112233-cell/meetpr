@@ -4,6 +4,7 @@ import SwiftUI
 struct MeetWeightStrip: View {
   let model: BodyWeightEntryModel
   let onEditMeet: () -> Void
+  @Environment(\.locale) private var locale
   @AppStorage private var settingOn: Bool
 
   init(studentID: UUID, model: BodyWeightEntryModel, onEditMeet: @escaping () -> Void) {
@@ -18,23 +19,13 @@ struct MeetWeightStrip: View {
       profile: model.profile, records: model.records, settingOn: settingOn)
     if presentation.isVisible {
       HStack(spacing: 0) {
-        if let days = presentation.competitionDays {
+        if let competitionText = presentation.competitionText(locale: locale) {
           Button(action: onEditMeet) {
             HStack(spacing: MeetPRSpacing.space2) {
               Image(systemName: "flag").font(.body)
-              VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-                if days > 0 {
-                  Text(StudentStrings.localized(.meetCountdownLabel))
-                    .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-                }
-                Text(
-                  days == 0
-                    ? StudentStrings.localized(.meetToday)
-                    : StudentStrings.replacing(.meetCountdownDays, values: [String(days)])
-                )
+              Text(competitionText)
                 .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
                 .monospacedDigit()
-              }
             }
             .frame(maxWidth: .infinity, minHeight: 48)
             .contentShape(.rect)
