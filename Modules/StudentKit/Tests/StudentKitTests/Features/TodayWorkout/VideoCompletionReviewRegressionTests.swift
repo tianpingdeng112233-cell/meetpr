@@ -42,6 +42,7 @@ import Testing
       plans: plans, logs: InMemoryStudentTrainingLogRepository(),
       setSyncQueue: fixture.queue)
     await workout.load(dayID: fixture.day.id, studentID: fixture.student)
+    fixture.queue.start()
     var holdFinished = false
     let hold = Task {
       let result = await workout.completeCurrentDay()

@@ -64,7 +64,9 @@ private struct ChatMessageBubble: View {
     Group {
       switch message.kind {
       case .text:
-        if let presentation = ChatSetCardPresentation(message: message) {
+        if message.exerciseRef?.version == 1 {
+          ExerciseNoteCard(message: message)
+        } else if let presentation = ChatSetCardPresentation(message: message) {
           ChatSetCardView(
             presentation: presentation,
             isCurrentUser: isCurrentUser,
@@ -217,7 +219,7 @@ struct PendingChatMessageRow: View {
       VStack(alignment: .trailing, spacing: MeetPRSpacing.xs) {
         Group {
           switch item.draft {
-          case .text(let text):
+          case .text(let text), .exerciseNote(let text, _):
             Text(text)
               .font(.body)
           case .image:

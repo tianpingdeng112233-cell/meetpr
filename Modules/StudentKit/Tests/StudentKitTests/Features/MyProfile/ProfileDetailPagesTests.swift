@@ -117,13 +117,11 @@ import ViewInspector
   let rows = try inspected.findAll(MyProfileValueRow.self)
   #expect(
     try rows.map { try $0.actualView().label } == [
-      StudentStrings.localized(.restTimerPreferenceRow001),
-      StudentStrings.localized(.trainingReminderPreferenceRow001),
+      StudentStrings.localized(.trainingReminderPreferenceRow001)
     ])
   #expect(
     try rows.map { try $0.actualView().value } == [
-      StudentRestTimerCopy.summary(for: .automatic),
-      TrainingReminderCopy.summary(for: .defaultValue),
+      TrainingReminderCopy.summary(for: .defaultValue)
     ])
   let account = try inspected.find(AccountSecuritySection.self)
   let buttons = try account.findAll(ViewType.Button.self)

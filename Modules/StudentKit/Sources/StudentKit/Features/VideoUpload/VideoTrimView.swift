@@ -6,6 +6,7 @@
 
   struct VideoTrimView: View {
     let session: VideoTrimSession
+    let uploadsOnSave: Bool
 
     @State private var player = AVPlayer()
     @State private var selection: VideoTrimSelection
@@ -16,7 +17,8 @@
     @State private var playbackTask: Task<Void, Never>?
     @State private var exportTask: Task<Void, Never>?
 
-    init(session: VideoTrimSession) {
+    init(session: VideoTrimSession, uploadsOnSave: Bool = false) {
+      self.uploadsOnSave = uploadsOnSave
       self.session = session
       _selection = State(
         initialValue: VideoTrimSelection(
@@ -32,6 +34,7 @@
       // drag the toolbar up under the status bar with it (the #315 trap).
       VStack(spacing: 0) {
         VideoTrimToolbar(
+          uploadsOnSave: uploadsOnSave,
           canSave: isReady && selection.isValid && !isExporting,
           canCancel: !isExporting,
           isExporting: isExporting,
@@ -225,6 +228,7 @@
   }
 
   private struct VideoTrimToolbar: View {
+    let uploadsOnSave: Bool
     let canSave: Bool
     let canCancel: Bool
     let isExporting: Bool
@@ -250,7 +254,7 @@
               .tint(Color.MeetPR.gold500)
               .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
           } else {
-            Text(StudentStrings.localized(.videoTrimView003))
+            Text(StudentStrings.localized(uploadsOnSave ? .allDayUpload : .videoTrimView003))
               .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
               .frame(
                 minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)

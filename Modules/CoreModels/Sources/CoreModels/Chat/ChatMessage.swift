@@ -10,6 +10,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
   public let attachmentID: UUID?
   public let imageURL: URL?
   public let imageExpiresIn: Int?
+  public let exerciseRef: ExerciseRefV1?
   public let setRef: SetRefV1?
   public let videoURL: URL?
   public let videoExpiresIn: Int?
@@ -28,6 +29,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     attachmentID: UUID?,
     imageURL: URL?,
     imageExpiresIn: Int?,
+    exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
     videoURL: URL? = nil,
     videoExpiresIn: Int? = nil,
@@ -45,6 +47,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     self.attachmentID = attachmentID
     self.imageURL = imageURL
     self.imageExpiresIn = imageExpiresIn
+    self.exerciseRef = exerciseRef
     self.setRef = setRef
     self.videoURL = videoURL
     self.videoExpiresIn = videoExpiresIn
@@ -65,6 +68,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     attachmentID = try container.decodeIfPresent(UUID.self, forKey: .attachmentID)
     imageURL = try container.decodeIfPresent(URL.self, forKey: .imageURL)
     imageExpiresIn = try container.decodeIfPresent(Int.self, forKey: .imageExpiresIn)
+    exerciseRef = try? container.decode(ExerciseRefV1.self, forKey: .exerciseRef)
     setRef = try? container.decode(SetRefV1ReadValue.self, forKey: .setRef).value
     videoURL = try container.decodeIfPresent(URL.self, forKey: .videoURL)
     videoExpiresIn = try container.decodeIfPresent(Int.self, forKey: .videoExpiresIn)
@@ -84,6 +88,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     case attachmentID = "attachmentId"
     case imageURL = "imageUrl"
     case imageExpiresIn
+    case exerciseRef
     case setRef
     case videoURL = "videoUrl"
     case videoExpiresIn

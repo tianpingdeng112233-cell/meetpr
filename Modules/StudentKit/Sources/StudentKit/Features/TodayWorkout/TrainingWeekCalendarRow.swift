@@ -51,7 +51,7 @@ private struct TrainingWeekCalendarCells: View {
   let onSelect: (UUID) -> Void
 
   var body: some View {
-    TrainingWeekCalendarLayout(weights: cells.map { $0.trainingDay == nil ? 0.7 : 1 }) {
+    TrainingWeekCalendarLayout(weights: cells.map { _ in 1 }) {
       ForEach(cells) { cell in
         switch cell {
         case .training(let item):
@@ -101,72 +101,48 @@ private struct TrainingWeekDayCell: View {
   let today: Date
   let onSelect: () -> Void
   @Environment(\.locale) private var locale
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let display = TrainingWeekCellPresentation(cell: .training(item), today: today, locale: locale)
     Button(action: onSelect) {
-      VStack(spacing: MeetPRSpacing.space1) {
+      VStack(spacing: MeetPRSpacing.space2) {
         Text(display.weekday)
-          .font(
-            .MeetPR.mono(
-              size: MeetPRFontMetrics.size11,
-              weight: item.state == .current ? .bold : .regular)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+          .tracking(1)
+          .foregroundStyle(item.isSelected ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
+        Text(String(Calendar.current.component(.day, from: item.day.date)))
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
+          .foregroundStyle(colorScheme == .dark ? Color.MeetPR.bgBase : Color.MeetPR.gold900)
+          .frame(width: 36, height: 36)
+          .background(
+            colorScheme == .dark ? Color.MeetPR.textPrimary : Color.MeetPR.gold200, in: .circle
           )
-          .foregroundStyle(item.state == .current ? Color.MeetPR.goldText : Color.MeetPR.textMuted)
-        Image(
-          systemName: item.state == .completed
-            ? "checkmark"
-            : item.state == .current ? "circle.fill" : "circle"
-        )
-        .font(
-          .MeetPR.system(
-            size: item.state == .completed
-              ? MeetPRFontMetrics.size12 : MeetPRFontMetrics.size8)
-        )
-        .frame(height: MeetPRSpacing.space4)
-        .foregroundStyle(statusColor)
-        Text(display.caption)
-          .font(
-            .MeetPR.mono(
-              size: display.isBehind ? MeetPRFontMetrics.size10 : MeetPRFontMetrics.size11,
-              weight: item.state == .current ? .bold : .regular)
-          )
-          .foregroundStyle(
-            item.state == .current || display.isBehind
-              ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+          .overlay {
+            if item.isSelected {
+              Circle().stroke(Color.MeetPR.gold500, lineWidth: 2).padding(-3)
+            }
+          }
+          .overlay(alignment: .bottomTrailing) {
+            if item.state == .completed {
+              Image(systemName: "checkmark")
+                .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .bold))
+                .foregroundStyle(Color.MeetPR.inkOnCTAFill)
+                .frame(width: 16, height: 16)
+                .background(Color.MeetPR.success, in: .circle)
+                .overlay { Circle().stroke(Color.MeetPR.bgBase, lineWidth: 2) }
+                .offset(x: 3, y: 2)
+            }
+          }
       }
-      .lineLimit(1)
-      .fixedSize(horizontal: true, vertical: true)
-      .padding(.horizontal, MeetPRSpacing.point2)
-      .padding(.vertical, MeetPRSpacing.space1)
-      .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point64, maxHeight: .infinity)
-      .background(
-        item.state == .current ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard
-      )
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .strokeBorder(
-            item.isSelected ? Color.MeetPR.textPrimary : .clear,
-            lineWidth: MeetPRSpacing.point2)
-      }
+      .frame(minWidth: 36, minHeight: 64)
+      .frame(maxWidth: .infinity)
       .contentShape(.rect)
     }
     .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(display.accessibilityLabel)
     .accessibilityAddTraits(item.isSelected ? .isSelected : [])
-    .accessibilityValue(
-      item.state == .current ? StudentStrings.localized(.trainingWeekCurrentDay) : ""
-    )
     .accessibilityIdentifier("training.day.\(item.id)")
-  }
-
-  private var statusColor: Color {
-    switch item.state {
-    case .completed: Color.MeetPR.success
-    case .current: Color.MeetPR.goldText
-    case .upcoming: Color.MeetPR.textDim
-    }
   }
 }
 
@@ -179,16 +155,14 @@ private struct TrainingWeekRestCell: View {
     let display = TrainingWeekCellPresentation(cell: .rest(date), today: today, locale: locale)
     VStack(spacing: MeetPRSpacing.space2) {
       Text(display.weekday)
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-      Text(display.caption)
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11)).tracking(1)
+      Text(String(Calendar.current.component(.day, from: date)))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size15))
+        .frame(width: 36, height: 36)
     }
-    .lineLimit(1)
-    .fixedSize(horizontal: true, vertical: false)
-    .padding(.vertical, MeetPRSpacing.space1)
-    .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point64, maxHeight: .infinity)
+    .frame(minWidth: 36, minHeight: 64)
+    .frame(maxWidth: .infinity)
     .foregroundStyle(Color.MeetPR.textMuted)
-    .background(Color.MeetPR.bgStack, in: .rect(cornerRadius: MeetPRRadius.control))
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(display.accessibilityLabel)
   }

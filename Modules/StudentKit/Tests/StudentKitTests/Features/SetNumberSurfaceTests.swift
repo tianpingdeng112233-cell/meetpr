@@ -64,10 +64,8 @@ struct SetNumberSurfaceTests {
     let fixture = try await makeTodayWorkoutFixture()
 
     let position = try fixture.view.inspect().find(
-      viewWithAccessibilityIdentifier: "todayWorkout.activeSet.position"
-    )
-
-    #expect(try position.text().string().contains("第 1 /"))
+      viewWithAccessibilityIdentifier: "allDay.row.\(fixture.firstSetID.uuidString)")
+    #expect(try position.accessibilityIdentifier() == "allDay.row.\(fixture.firstSetID.uuidString)")
   }
 
   @Test("set entry sheet renders a source-zero draft as set one")

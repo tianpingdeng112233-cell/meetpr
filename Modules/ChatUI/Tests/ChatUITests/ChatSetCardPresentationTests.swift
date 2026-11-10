@@ -51,12 +51,12 @@ import Testing
       #expect(presentation.exerciseName == setRef.exerciseName)
       #expect(presentation.setNumber == setRef.setNumber)
       #expect(presentation.setTotal == setRef.setTotal)
-      #expect(presentation.weight == setRef.weightKg ?? "-")
+      #expect(presentation.weight == setRef.weightKg ?? "—")
       let expectedReps =
         if let lowerBound = setRef.reps, let upperBound = setRef.repsMax {
           "\(lowerBound)-\(upperBound)"
         } else {
-          setRef.reps.map(String.init) ?? "-"
+          setRef.reps.map(String.init) ?? "—"
         }
       #expect(presentation.reps == expectedReps)
       #expect(presentation.rpe == setRef.rpe)

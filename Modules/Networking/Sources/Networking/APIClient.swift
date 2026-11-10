@@ -284,6 +284,7 @@ public final class APIClient: Sendable {
     var request = request
     let language = preferredLocalization.map { InterfaceLanguage(localization: $0) } ?? .current
     request.setValue(language.rawValue, forHTTPHeaderField: "X-MeetPR-Locale")
+    request.setValue("set-weight-nullable", forHTTPHeaderField: "X-MeetPR-Caps")
     var response = try await transport(request)
 
     if response.statusCode == 401,

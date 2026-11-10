@@ -2,7 +2,7 @@ import CoreModels
 import Foundation
 
 struct VideoSetInfo: Equatable, Sendable {
-  let weightKg: Double
+  let weightKg: Double?
   let weightText: String
   let reps: Int
   let rpe: Double?
@@ -10,8 +10,8 @@ struct VideoSetInfo: Equatable, Sendable {
   let displaySetNumber: Int
 
   init(log: StudentSetLog) {
-    weightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
-    weightText = Self.decimalText(log.weightKg)
+    weightKg = log.weightKg.map { NSDecimalNumber(decimal: $0).doubleValue }
+    weightText = log.weightKg.map(Self.decimalText) ?? "—"
     reps = log.reps
     rpe = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
     rpeText = log.rpe.map(Self.decimalText)

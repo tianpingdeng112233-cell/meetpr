@@ -69,7 +69,7 @@ enum StudentFormatting {
 
   static func decimal(_ value: Decimal?) -> String {
     guard let value else {
-      return "-"
+      return "—"
     }
     return NSDecimalNumber(decimal: value).doubleValue.formatted(
       .number.precision(.fractionLength(0...1))
@@ -284,6 +284,8 @@ extension StudentFormatting {
     var line = ""
     if let weightKg {
       line += "\(decimal(weightKg))kg × "
+    } else {
+      line += "— × "
     }
     line += "\(reps)"
     if let actualRIR {

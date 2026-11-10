@@ -30,6 +30,7 @@ public struct StudentRootView: View {
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var notifications: StudentNotificationsCoordinator?
+  @State private var exerciseNavigation = ExerciseNoteNavigation()
   @State private var selectedTab: StudentTab = .today
   /// Bumped whenever 今日 becomes active so the home screen reloads data logged
   /// in other tabs (see DashboardView.todayReloadToken).
@@ -329,6 +330,10 @@ extension StudentRootView {
     .accessibilityHidden(workoutKeypad.current != nil)
     .overlay(alignment: .bottom) {
       WorkoutKeypadOverlay(session: workoutKeypad)
+    }
+    .environment(exerciseNavigation)
+    .onChange(of: exerciseNavigation.reference) { _, reference in
+      if reference != nil { selectedTab = .training }
     }
     .onChange(of: selectedTab) { _, _ in workoutKeypad.cancel() }
     .task {

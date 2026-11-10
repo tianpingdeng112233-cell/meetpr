@@ -252,20 +252,7 @@ public final class ChatSendCoordinator {
           clientID: item.clientID
         )
       } else {
-        switch item.draft {
-        case .text(let text):
-          message = try await repository.sendText(
-            in: item.conversationID,
-            text: text,
-            clientID: item.clientID
-          )
-        case .image(let imageData):
-          message = try await repository.sendImage(
-            in: item.conversationID,
-            imageData: imageData,
-            clientID: item.clientID
-          )
-        }
+        message = try await sendDraft(item)
       }
       unregister(key)
       guard canApplyResult(for: key, generation: capturedGeneration) else {
@@ -284,6 +271,26 @@ public final class ChatSendCoordinator {
       if error as? ChatRepositoryError == .bindRequired {
         reportBindingInvalidation()
       }
+    }
+  }
+
+  private func sendDraft(_ item: ChatOutboxItem) async throws -> ChatMessage {
+    switch item.draft {
+    case .text(let text):
+      return try await repository.sendText(
+        in: item.conversationID,
+        text: text,
+        clientID: item.clientID
+      )
+    case .exerciseNote(let body, let reference):
+      return try await repository.sendExerciseNote(
+        in: item.conversationID, body: body, exerciseRef: reference, clientID: item.clientID)
+    case .image(let imageData):
+      return try await repository.sendImage(
+        in: item.conversationID,
+        imageData: imageData,
+        clientID: item.clientID
+      )
     }
   }
 
@@ -362,5 +369,16 @@ extension ChatSendCoordinator {
 
   static func makeClientID() -> String {
     "ios-\(UUID().uuidString.lowercased())"
+  }
+}
+
+extension ChatSendCoordinator {
+  @discardableResult
+  public func sendExerciseNote(
+    in conversationID: UUID, reference: ExerciseRefV1, note: String, english: Bool
+  ) -> String {
+    enqueue(
+      .exerciseNote(body: reference.body(note: note, english: english), reference: reference),
+      in: conversationID, clientID: Self.makeClientID())
   }
 }

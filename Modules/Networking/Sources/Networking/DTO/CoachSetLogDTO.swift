@@ -10,7 +10,7 @@ public struct CoachSetLogDTO: Codable, Hashable, Sendable, Identifiable {
   public let adhoc: Bool
   public let exerciseID: UUID?
   public let setIndex: Int
-  public let weightKg: Decimal
+  public let weightKg: Decimal?
   public let reps: Int
   public let actualRIR: Int?
   public let rpe: Decimal?
@@ -30,7 +30,7 @@ public struct CoachSetLogDTO: Codable, Hashable, Sendable, Identifiable {
     adhoc: Bool = false,
     exerciseID: UUID? = nil,
     setIndex: Int,
-    weightKg: Decimal,
+    weightKg: Decimal?,
     reps: Int,
     rpe: Decimal? = nil,
     actualRIR: Int? = nil,
@@ -69,7 +69,7 @@ public struct CoachSetLogDTO: Codable, Hashable, Sendable, Identifiable {
     adhoc = try container.decodeIfPresent(Bool.self, forKey: .adhoc) ?? false
     exerciseID = try container.decodeIfPresent(UUID.self, forKey: .exerciseID)
     setIndex = try container.decode(Int.self, forKey: .setIndex)
-    weightKg = try container.decodeDecimal(forKey: .weightKg)
+    weightKg = try container.decodeDecimalIfPresent(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     actualRIR = try container.decodeIfPresent(Int.self, forKey: .actualRIR)
@@ -90,7 +90,11 @@ public struct CoachSetLogDTO: Codable, Hashable, Sendable, Identifiable {
     try container.encode(adhoc, forKey: .adhoc)
     try container.encodeIfPresent(exerciseID, forKey: .exerciseID)
     try container.encode(setIndex, forKey: .setIndex)
-    try container.encodeDecimalString(weightKg, forKey: .weightKg)
+    if let weightKg {
+      try container.encodeDecimalString(weightKg, forKey: .weightKg)
+    } else {
+      try container.encodeNil(forKey: .weightKg)
+    }
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(actualRIR, forKey: .actualRIR)

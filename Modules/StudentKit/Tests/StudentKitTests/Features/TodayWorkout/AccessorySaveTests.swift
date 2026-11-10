@@ -16,7 +16,7 @@ import Testing
   let saved = try #require(model.currentDrafts?.first)
   #expect(saved.completed)
   #expect(saved.actualRPE == nil)
-  #expect(model.restTimer?.totalSeconds == 60)
+  #expect(model.restTimer == nil)
   #expect(!model.showsRestTimerExplanation)
   let stored = try #require(
     try await logs.fetchLogsForExercise(
@@ -124,7 +124,7 @@ func accessoryFixture(
     logs: InMemoryStudentTrainingLogRepository(), accessoryRest: 90)
   let first = try #require(custom.model.currentDrafts?.first)
   #expect(await custom.model.saveAccessoryRow(AccessoryRow(draft: first, previous: nil, unit: .kg)))
-  #expect(custom.model.restTimer?.totalSeconds == 90)
+  #expect(custom.model.restTimer == nil)
   let coach = try await accessoryFixture(
     logs: InMemoryStudentTrainingLogRepository(), coachRest: 75,
     accessoryRest: 90, includeFollowingMainLift: true)
@@ -132,7 +132,7 @@ func accessoryFixture(
     let draft = try #require(coach.model.currentDrafts?[index])
     #expect(
       await coach.model.saveAccessoryRow(AccessoryRow(draft: draft, previous: nil, unit: .kg)))
-    if index != 1 { #expect(coach.model.restTimer?.totalSeconds == 75) }
+    if index != 1 { #expect(coach.model.restTimer == nil) }
   }
   #expect(coach.model.restTimer == nil)
   #expect(coach.model.currentDrafts?.contains { !$0.completed } == true)
@@ -168,13 +168,13 @@ func accessoryFixture(
   #expect(await model.saveAccessoryRow(AccessoryRow(draft: first, previous: nil, unit: .kg)))
   #expect(activity.seconds == model.restTimer?.totalSeconds)
   #expect(activity.endsAt == model.restTimer?.endsAt)
-  #expect(activity.seconds == 75)
+  #expect(activity.seconds == nil)
   model.skipRestTimer()
   var edited = AccessoryRow(
     draft: try #require(model.currentDrafts?.first), previous: nil, unit: .kg)
   edited.input.reps = "11"
   #expect(await model.saveAccessoryRow(edited))
-  #expect(model.restTimer?.totalSeconds == 75)
+  #expect(model.restTimer == nil)
   #expect(activity.seconds == model.restTimer?.totalSeconds)
   #expect(activity.endsAt == model.restTimer?.endsAt)
   let pending = try #require(model.currentDrafts).map {

@@ -11,7 +11,11 @@ public struct CreateStudentAddedSetRequestDTO: Encodable, Sendable {
     try container.encodeIfPresent(log.planDayID, forKey: .planDayID)
     try container.encode(log.exerciseID, forKey: .exerciseID)
     try container.encode(log.setIndex, forKey: .setIndex)
-    try container.encodeDecimalString(log.weightKg, forKey: .weightKg)
+    if let weightKg = log.weightKg {
+      try container.encodeDecimalString(weightKg, forKey: .weightKg)
+    } else {
+      try container.encodeNil(forKey: .weightKg)
+    }
     try container.encode(log.reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(log.rpe, forKey: .rpe)
     try container.encode(log.actualRIR, forKey: .actualRIR)

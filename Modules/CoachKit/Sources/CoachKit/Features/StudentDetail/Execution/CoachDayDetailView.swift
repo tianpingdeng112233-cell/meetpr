@@ -69,7 +69,7 @@ private struct CoachPlannedExerciseCard: View {
         )
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
-        CoachReadOnlySets(logs: group.prescribed)
+        CoachReadOnlySets(logs: group.prescribed, prescriptions: group.exercise.prescribedSets)
         if !group.extra.isEmpty {
           Text(CoachLocalization.localized("coach.execution.addedByStudent"))
             .font(Font.MeetPR.footnote)
@@ -115,10 +115,13 @@ private struct CoachAddedExerciseCard: View {
 private struct CoachReadOnlySets: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   let logs: [CoachSetLogDTO]
+  var prescriptions: [PrescribedSet] = []
 
   var body: some View {
     ForEach(logs) { log in
-      CoachSetReadOnlyRow(log: log, isAccessibilitySize: dynamicTypeSize.isAccessibilitySize)
+      CoachSetReadOnlyRow(
+        log: log, isAccessibilitySize: dynamicTypeSize.isAccessibilitySize,
+        prescribed: prescriptions.first { $0.setIndex == log.setIndex })
     }
   }
 }

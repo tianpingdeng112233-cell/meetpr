@@ -11,11 +11,11 @@ import ViewInspector
 @MainActor
 @Suite("Today workout set-ref entry layout")
 struct TodayWorkoutSetRefEntryLayoutTests {
-  @Test("in-progress hero owns the only ask-coach entry")
+  @Test("retired set-reference entry is absent in progress")
   func inProgressHeroOwnsAskCoachEntry() async throws {
     let view = try await makeView(completedSetIndexes: [1])
 
-    #expect(askCoachEntryCount(in: view) == 1)
+    #expect(askCoachEntryCount(in: view) == 0)
   }
 
   @Test("all recorded hides the hero and its ask-coach entry (spec 090)")

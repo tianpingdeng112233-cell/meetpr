@@ -13,7 +13,7 @@ private actor GatedTrainingLogRepository: StudentTrainingLogRepository {
   private var gateWaiters: [CheckedContinuation<Void, Never>] = []
   private var inFlightWaiters: [CheckedContinuation<Void, Never>] = []
   private(set) var recordedCompletedFlags: [Bool] = []
-  private(set) var recordedWeights: [Decimal] = []
+  private(set) var recordedWeights: [Decimal?] = []
 
   init(seed: [StudentSetLog] = []) {
     storedLogs = seed

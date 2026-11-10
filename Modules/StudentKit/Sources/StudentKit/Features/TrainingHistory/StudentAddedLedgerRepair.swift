@@ -81,14 +81,14 @@ enum StudentAddedLedgerRepair {
   }
 
   private struct Source {
-    let weight: Decimal
+    let weight: Decimal?
     let reps: Int
     let rpe: Decimal?
     let coachRPE: Decimal?
     let valid: Bool
 
     func matches(_ point: E1RMHistoryPoint) -> Bool {
-      valid && point.sourceWeightKg == NSDecimalNumber(decimal: weight).doubleValue
+      valid && point.sourceWeightKg == weight.map { NSDecimalNumber(decimal: $0).doubleValue }
         && point.sourceReps == reps
         && point.sourceRPE == rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
         && point.sourceCoachRPE == coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }

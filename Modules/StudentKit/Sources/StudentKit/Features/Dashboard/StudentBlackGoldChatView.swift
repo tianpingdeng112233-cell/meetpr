@@ -218,7 +218,9 @@ struct StudentBlackGoldChatView: View {
       StudentPendingMessageRow(
         item: pending, retry: { viewModel.retry(clientID: pending.clientID) })
     case .chat(.message(let message, _)):
-      if let presentation = ChatSetCardPresentation(message: message) {
+      if message.exerciseRef?.version == 1 {
+        ExerciseNoteCard(message: message)
+      } else if let presentation = ChatSetCardPresentation(message: message) {
         ChatSetCardView(
           presentation: presentation,
           isCurrentUser: message.senderID == viewModel.currentUserID,
@@ -295,18 +297,6 @@ struct StudentBlackGoldChatView: View {
       }
 
       HStack(spacing: MeetPRSpacing.point10) {
-        if setRefSharing != nil {
-          Button {
-            showsSetRefPicker = true
-          } label: {
-            Image(systemName: "plus")
-              .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
-              .foregroundStyle(Color.MeetPR.textSecondary)
-              .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
-              .background(Color.MeetPR.surfaceCard, in: .circle)
-          }
-          .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView006))
-        }
 
         HStack(spacing: MeetPRSpacing.space2) {
           TextField(composerPlaceholder, text: $draft, axis: .vertical)
@@ -920,7 +910,7 @@ private struct StudentPendingMessageRow: View {
   @ViewBuilder
   private var pendingContent: some View {
     switch item.draft {
-    case .text(let text):
+    case .text(let text), .exerciseNote(let text, _):
       Text(text)
     case .image:
       Label(StudentStrings.localized(.studentBlackGoldChatView018), systemImage: "photo")

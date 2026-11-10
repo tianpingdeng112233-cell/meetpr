@@ -35,7 +35,8 @@ struct StudentAddedHistoryRows: View {
               exerciseName: catalog.first(where: { $0.id == id }).map {
                 StudentExerciseName.display($0)
               },
-              weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
+              weightKg: log.weightKg.map { NSDecimalNumber(decimal: $0).doubleValue },
+              reps: log.reps,
               rpe: log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
               setOrdinal: log.setIndex + 1)
           )

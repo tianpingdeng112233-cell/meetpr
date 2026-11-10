@@ -20,7 +20,7 @@ public enum TrainingLogCSVExporter {
         resolved?.name ?? log.planExerciseID.uuidString,
         resolved?.nameEn ?? "",
         String(log.setIndex),
-        "\(log.weightKg)",
+        log.weightKg.map { "\($0)" } ?? "",
         String(log.reps),
         log.rpe.map { "\($0)" } ?? "",
         log.completed ? "true" : "false",
@@ -34,7 +34,7 @@ public enum TrainingLogCSVExporter {
       return [
         log.loggedDate ?? dayString(log.loggedAt, calendar: calendar),
         exercise?.name ?? log.exerciseID.uuidString, exercise?.nameEn ?? "",
-        String(log.setIndex), "\(log.weightKg)", String(log.reps),
+        String(log.setIndex), log.weightKg.map { "\($0)" } ?? "", String(log.reps),
         log.rpe.map { "\($0)" } ?? "", log.completed ? "true" : "false",
         log.failed ? "true" : "false", "true",
       ].map(escape).joined(separator: ",")

@@ -20,7 +20,7 @@ import Testing
     model.updateWeight(rowIndex: 0, weight: 105)
     #expect(await model.commitSet(rowIndex: 0))
     #expect(model.currentDrafts?.first?.completed == true)
-    #expect(model.restTimer != nil)
+    #expect(model.restTimer == nil)
     #expect(model.actionErrorMessage == nil)
     #expect(queue.pendingCount == 1)
     await model.load(dayID: plan.days[0].id, studentID: student)

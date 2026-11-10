@@ -95,7 +95,8 @@ extension TodayWorkoutSetRowDraft {
     studentAddedDayID = dayID
     let old = prescribed
     prescribed = PrescribedSet(
-      id: old.id, setIndex: index, weightKg: old.weightKg, intensity: old.intensity,
+      id: old.id, setIndex: index, setType: old.setType, weightKg: old.weightKg,
+      intensity: old.intensity,
       percentageAnchor: old.percentageAnchor, loadMode: old.loadMode, reps: old.reps,
       repsMax: old.repsMax, restSeconds: old.restSeconds, coachNote: old.coachNote)
   }

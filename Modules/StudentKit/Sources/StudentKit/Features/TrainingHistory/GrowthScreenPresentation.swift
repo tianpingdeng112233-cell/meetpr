@@ -260,8 +260,8 @@ enum GrowthScreenPresentation {
         return GrowthWeekID(year: parts.yearForWeekOfYear ?? 0, week: parts.weekOfYear ?? 0)
       })
     let volume =
-      completed.reduce(Decimal.zero) { $0 + $1.weightKg * Decimal($1.reps) }
-      + addedCompleted.reduce(Decimal.zero) { $0 + $1.weightKg * Decimal($1.reps) }
+      completed.reduce(Decimal.zero) { $0 + ($1.weightKg ?? 0) * Decimal($1.reps) }
+      + addedCompleted.reduce(Decimal.zero) { $0 + ($1.weightKg ?? 0) * Decimal($1.reps) }
     return GrowthHistoryStats(
       trainingSessionCount: sessionDays.count,
       trainingWeekCount: weekIDs.count,

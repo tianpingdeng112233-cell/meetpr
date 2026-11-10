@@ -435,3 +435,27 @@ private actor CountingPlanRepository: StudentPlanRepository {
     []
   }
 }
+
+@MainActor
+@Test func exerciseNoteUsesCachedConversationWhenNetworkIsUnavailable() async throws {
+  let student = StudentDemoSeed.studentID
+  let coach = StudentDemoSeed.coachID
+  let online = InMemoryChatRepository(
+    currentUserID: student,
+    seed: ChatDemoSeed(conversations: [], messagesByConversationID: [:], otherPartyNames: [:]))
+  let conversation = try await online.openConversation(withOtherParty: coach)
+  let inbox = ChatInboxViewModel(repository: online, currentUserID: student)
+  await inbox.refresh()
+  let offline = FailingOpenChatRepository(error: DashboardChatTestError.network)
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore())
+  let coordinator = StudentNotificationsCoordinator(
+    plans: plans,
+    feedback: FeedbackInboxViewModel(repository: InMemoryStudentFeedbackRepository()),
+    evaluation: makeEvaluationViewModel(plans: plans),
+    activeCoach: ActiveCoachContext(coachID: coach, coachDisplayName: "Coach"),
+    chatContext: StudentChatContext(
+      repository: offline, currentUserID: student, inbox: inbox,
+      sendCoordinator: ChatSendCoordinator(repository: offline, currentUserID: student)))
+  #expect(await coordinator.openExerciseNoteConversation() == .opened(conversation.id))
+  #expect(await coordinator.openCoachConversation() == .failed)
+}

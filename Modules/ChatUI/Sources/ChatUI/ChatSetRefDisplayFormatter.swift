@@ -22,12 +22,12 @@ public enum ChatSetRefDisplayFormatter {
     let prefix = setRef.source == .logged ? copy.loggedTag : copy.plannedTag
     let setDescription = copy.setPosition(setRef.setNumber, setRef.setTotal)
     let plannedMarker = setRef.source == .planned ? copy.plannedMarker : ""
-    let weight = setRef.weightKg.map { "\($0)kg" } ?? "-kg"
+    let weight = setRef.weightKg.map { "\($0)kg" } ?? "—"
     let reps: String
     if let lowerBound = setRef.reps, let upperBound = setRef.repsMax {
       reps = "\(lowerBound)-\(upperBound)"
     } else {
-      reps = setRef.reps.map(String.init) ?? "-"
+      reps = setRef.reps.map(String.init) ?? "—"
     }
     let rpe = setRef.rpe.map { " @RPE\($0)" } ?? ""
     return

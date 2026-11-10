@@ -191,7 +191,8 @@ actor E1RMCoachRPEReconciler {
         family: family
       )
     else { return false }
-    let weightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
+    guard let weight = log.weightKg else { return false }
+    let weightKg = NSDecimalNumber(decimal: weight).doubleValue
     return E1RMCalculator.calculate(weightKg: weightKg, reps: log.reps, rpe: effectiveRPE) != nil
   }
 

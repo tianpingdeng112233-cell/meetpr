@@ -58,11 +58,11 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
     exerciseName = setRef.exerciseName
     setNumber = setRef.setNumber
     setTotal = setRef.setTotal
-    weight = setRef.weightKg ?? "-"
+    weight = setRef.weightKg ?? "—"
     if let lowerBound = setRef.reps, let upperBound = setRef.repsMax {
       reps = "\(lowerBound)-\(upperBound)"
     } else {
-      reps = setRef.reps.map(String.init) ?? "-"
+      reps = setRef.reps.map(String.init) ?? "—"
     }
     rpe = setRef.rpe
     createdAt = message.createdAt

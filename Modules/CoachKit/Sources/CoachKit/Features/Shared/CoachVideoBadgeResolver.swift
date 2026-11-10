@@ -19,7 +19,7 @@ enum CoachVideoBadgeResolver {
     }
     return VideoBadgeInfo(
       exerciseName: exercise.map { CoachLocalization.exerciseName($0.exercise) },
-      weightKg: log.map { NSDecimalNumber(decimal: $0.weightKg).doubleValue },
+      weightKg: log?.weightKg.map { NSDecimalNumber(decimal: $0).doubleValue },
       reps: log?.reps,
       rpe: log?.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
       setOrdinal: log.map {

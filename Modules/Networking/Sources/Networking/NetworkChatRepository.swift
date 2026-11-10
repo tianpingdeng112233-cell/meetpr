@@ -335,3 +335,22 @@ private func cleanupChatAttachment(
     }
   }.value
 }
+
+extension NetworkChatRepository {
+  public func sendExerciseNote(
+    in conversationID: UUID, body: String, exerciseRef: ExerciseRefV1, clientID: String
+  ) async throws -> ChatMessage {
+    let token = try await session.accessToken()
+    do {
+      let response: ChatMessageResponseDTO = try await apiClient.post(
+        path: "/conversations/\(conversationID.uuidString)/messages",
+        body: ChatSendMessageRequestDTO(
+          kind: .text, body: body, clientID: clientID, exerciseRef: exerciseRef),
+        accessToken: token)
+      return response.message.toDomain()
+    } catch {
+      throw Self.mapped(error)
+    }
+  }
+
+}

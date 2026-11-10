@@ -268,7 +268,7 @@ func loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode: PlanLoad
   #expect(scheduled == utcDate(year: 2026, month: 8, day: 26))
 }
 
-private func intensityProjectionFixture() -> (
+func intensityProjectionFixture() -> (
   tree: TrainingPlanTree, catalogExercise: Exercise
 ) {
   let timestamp = utcDate(year: 2026, month: 8, day: 12)

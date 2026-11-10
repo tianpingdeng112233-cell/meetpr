@@ -45,6 +45,10 @@ public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiabl
   public var studentAddedDayID: UUID?
   public var isStudentAdded: Bool { studentAddedDayID != nil }
   var hasSavedRecord: Bool { loggedSetID != nil || recordedAt != nil }
+  var isBlankAddedRow: Bool {
+    (isExtra || isStudentAdded) && !hasSavedRecord && actualWeight == nil
+      && actualReps == nil && actualRPE == nil && actualRIR == nil
+  }
 
   public init(
     id: UUID,

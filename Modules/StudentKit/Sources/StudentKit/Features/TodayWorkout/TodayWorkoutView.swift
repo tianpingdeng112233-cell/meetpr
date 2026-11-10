@@ -51,6 +51,10 @@ public struct TodayWorkoutView: View {
   @State private var showingRestSettings = false
   @State private var accessoryRestSeconds = 60
   @State private var restPreference: StudentRestTimerPreference = .automatic
+  @State private var showingExerciseNote = false
+  @State private var exerciseNoteSent = false
+  @State private var exerciseNote: ExerciseRefV1?
+  @Environment(ExerciseNoteNavigation.self) private var exerciseNavigation: ExerciseNoteNavigation?
   @State private var showingHistory = false
   @State private var historyViewModel: TrainingHistoryViewModel
   @State private var showingNotifications = false
@@ -167,6 +171,52 @@ public struct TodayWorkoutView: View {
   }
 
   public var body: some View {
+    workoutContent
+      .sheet(isPresented: $showingExerciseNote) {
+        if let reference = exerciseNote {
+          ExerciseNoteSheet(reference: reference) { note in
+            guard let notifications, let chat = notifications.chatContext else { return false }
+            let result = await notifications.openExerciseNoteConversation()
+            guard case .opened(let id) = result else { return false }
+            chat.sendCoordinator.sendExerciseNote(
+              in: id, reference: reference, note: note,
+              english: Locale.current.language.languageCode?.identifier == "en")
+            exerciseNoteSent = true
+            return true
+          }
+        }
+      }
+      .overlay(alignment: .top) {
+        if exerciseNoteSent {
+          Text(StudentStrings.localized(.allDaySent))
+            .padding().background(Color.MeetPR.surfaceCard, in: .capsule)
+            .task {
+              try? await Task.sleep(for: .seconds(3))
+              exerciseNoteSent = false
+            }
+        }
+      }
+      .onChange(of: exerciseNavigation?.reference) { _, reference in
+        guard let reference else { return }
+        Task {
+          defer { exerciseNavigation?.reference = nil }
+          do {
+            guard let plan = try await plans.fetchCurrentPlan(studentID: studentID),
+              let day = ExerciseNoteDayResolver.resolve(reference, days: plan.days)
+            else {
+              setRefEntryErrorMessage = StudentStrings.localized(.allDayUnavailable)
+              return
+            }
+            selectedDayID = day.id
+            await loadWorkout(for: day.id, preloadedPlan: plan)
+          } catch {
+            setRefEntryErrorMessage = StudentStrings.localized(.allDayUnavailable)
+          }
+        }
+      }
+  }
+
+  private var workoutContent: some View {
     NavigationStack {
       TodayWorkoutScreen(
         content: screenContent,
@@ -220,7 +270,9 @@ public struct TodayWorkoutView: View {
         restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
         videoFailureCount: videoFailurePresentation.failureCount,
         onRetryVideos: retryDayVideos,
-        videoCompletion: videoCompletionPresentation
+        videoCompletion: videoCompletionPresentation,
+        onExerciseNote: openExerciseNote,
+        onRefreshAsync: { await reloadCurrentDay() }
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -263,19 +315,7 @@ public struct TodayWorkoutView: View {
             onComplete: completeTraining, coordinator: viewModel.setSyncCompletion,
             videoCompletion: videoCompletionPresentation, onRetryVideos: retryDayVideos)
         }
-        if let timer = viewModel.restTimer {
-          RestTimerOverlay(
-            timer: timer,
-            now: { Date() },
-            onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
-            onSkip: { viewModel.skipRestTimer() }
-          )
-          .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.height
-          } action: { height in
-            restTimerHeight = height
-          }
-        }
+
       }
     }
     #if os(iOS)
@@ -435,7 +475,8 @@ public struct TodayWorkoutView: View {
               },
               onFailure: {
                 videoViewModel.reportVideoProcessingFailure()
-              }
+              },
+              allDayFlow: true
             )
           }
         }
@@ -773,24 +814,17 @@ public struct TodayWorkoutView: View {
   }
 
   private func setEntry(for target: EditingTarget) -> some View {
-    SetEntrySheet(
-      rowIndex: target.rowIndex,
-      draft: target.draft,
-      setNumber: target.setNumber,
-      viewModel: viewModel,
-      studentID: studentID,
-      trainingDate: selectedTrainingDate,
-      videoViewModel: videoViewModel,
-      scrollToVideo: target.scrollToVideo,
-      coachName: notifications?.activeCoach?.coachDisplayName
-    )
+    AllDayVideoSheet(
+      draft: target.draft, viewModel: viewModel, studentID: studentID,
+      trainingDate: selectedTrainingDate, videoViewModel: videoViewModel)
+
   }
 
   private func openVideoAction(_ row: TodayWorkoutPresentation.Row) {
     guard isEditable else { return }
     switch SetVideoButtonDestination.resolve(
       for: videoIndicatorStatus(for: row.draft),
-      cameraAvailable: cameraAvailable
+      cameraAvailable: true
     ) {
     case .camera:
       beginDirectCamera(for: row.draft)
@@ -991,6 +1025,17 @@ public struct TodayWorkoutView: View {
       hasActiveCoach: notifications?.activeCoach != nil,
       hasSharingContext: notifications?.chatContext?.setRefSharing != nil
     )
+  }
+
+  private func openExerciseNote(_ draft: TodayWorkoutSetRowDraft) {
+    guard let day = currentDay else { return }
+    exerciseNote = ExerciseRefV1(
+      exerciseName: draft.displayExerciseName,
+      dayDate: day.date.formatted(.iso8601.year().month().day().dateSeparator(.dash)),
+      planDayID: day.id,
+      planExerciseID: !draft.isStudentAdded ? draft.planExerciseID : nil,
+      exerciseID: draft.exerciseID)
+    showingExerciseNote = true
   }
 
   private func openSetRefPicker() {

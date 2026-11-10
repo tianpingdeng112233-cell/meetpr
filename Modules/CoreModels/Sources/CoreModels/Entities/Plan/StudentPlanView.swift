@@ -248,6 +248,7 @@ public struct StudentPlanExercise: Codable, Hashable, Sendable, Identifiable {
 public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
   public let setIndex: Int
+  public let setType: SetType
   public let weightKg: Decimal?
   public let intensity: PrescribedIntensity?
   /// Percentage reference. Missing cached values retain the backend contract's
@@ -268,6 +269,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public init(
     id: UUID,
     setIndex: Int,
+    setType: SetType = .working,
     weightKg: Decimal? = nil,
     intensity: PrescribedIntensity? = nil,
     percentageAnchor: PercentageAnchor? = nil,
@@ -280,6 +282,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   ) {
     self.id = id
     self.setIndex = setIndex
+    self.setType = setType
     self.weightKg = weightKg
     self.intensity = intensity ?? rpe.map(PrescribedIntensity.rpe)
     if case .some(.percentage) = self.intensity {
@@ -298,6 +301,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     id = try container.decode(UUID.self, forKey: .id)
     setIndex = try container.decode(Int.self, forKey: .setIndex)
+    setType = try container.decodeIfPresent(SetType.self, forKey: .setType) ?? .working
     weightKg = try container.decodeDecimalIfPresent(forKey: .weightKg)
     reps = try container.decodeIfPresent(Int.self, forKey: .reps)
     repsMax = try container.decodeIfPresent(Int.self, forKey: .repsMax)
@@ -323,6 +327,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(id, forKey: .id)
     try container.encode(setIndex, forKey: .setIndex)
+    try container.encode(setType, forKey: .setType)
     try container.encodeDecimalStringIfPresent(weightKg, forKey: .weightKg)
     try container.encodeIfPresent(reps, forKey: .reps)
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
@@ -337,6 +342,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   private enum CodingKeys: String, CodingKey {
     case id
     case setIndex
+    case setType
     case weightKg
     case intensity
     case percentageAnchor

@@ -33,6 +33,30 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let allDayDone = Key("student.allDay.done")
+    static let allDayUpload = Key("student.allDay.upload")
+    static let allDayNotePlaceholder = Key("student.allDayNotePlaceholder")
+    static let allDayAskCoach = Key("student.allDayAskCoach")
+    static let allDaySend = Key("student.allDaySend")
+    static let allDaySent = Key("student.allDaySent")
+    static let allDayAlbum = Key("student.allDayAlbum")
+    static let allDayUnavailable = Key("student.allDayUnavailable")
+    static let allDayExpanded = Key("student.allDay.expanded")
+    static let allDayCollapsed = Key("student.allDay.collapsed")
+    static let allDayUnrecorded = Key("student.allDay.unrecorded")
+    static let allDayFreeWeight = Key("student.allDay.freeWeight")
+    static let allDayTopSet = Key("student.allDay.topSet")
+    static let allDaySummary = Key(
+      "student.allDaySummary", one: "student.allDaySummary.one", countIndex: 1)
+    static let allDayToday = Key("student.allDayToday")
+    static let allDayEditHint = Key("student.allDayEditHint")
+    static let allDaySetCount = Key("student.allDaySetCount")
+    static let allDayLastSet = Key("student.allDayLastSet")
+    static let allDayOriginal = Key("student.allDayOriginal")
+    static let allDayCoachNote = Key("student.allDayCoachNote")
+    static let allDayFinishExercise = Key("student.allDayFinishExercise")
+    static let allDayUndoExercise = Key("student.allDayUndoExercise")
+
     static let keypadOptionalWeight = Key("student.keypadOptionalWeight")
     static let keypadRequiredWeight = Key("student.keypadRequiredWeight")
     static let keypadWeight = Key("student.keypadWeight")

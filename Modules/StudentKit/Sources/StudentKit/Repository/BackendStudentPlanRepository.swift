@@ -28,6 +28,13 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     _ = now
   }
 
+  public func weightSuggestions(studentID: UUID, dayID: UUID) async throws
+    -> [SetWeightSuggestionRecord]
+  {
+    let token = try await session.accessToken()
+    return try await api.weightSuggestions(studentID: studentID, dayID: dayID, accessToken: token)
+  }
+
   public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
     let tree = try await api.plan(id: id, accessToken: token).toDomain()

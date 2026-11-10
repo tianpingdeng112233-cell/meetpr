@@ -325,7 +325,7 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
 @Test func replayPreservesExistingImportedPointConfidence() async throws {
   let squat = backfillSlot(family: .squat)
   let log = backfillLog(slot: squat, weightKg: 160, daysAgo: 70)
-  let sourceWeightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
+  let sourceWeightKg = NSDecimalNumber(decimal: try #require(log.weightKg)).doubleValue
   let sourceRPE = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
   let estimated = try #require(
     E1RMCalculator.calculate(weightKg: sourceWeightKg, reps: log.reps, rpe: sourceRPE)

@@ -188,14 +188,15 @@ struct VideoAttachmentSection: View {
           onFailure: {
             videoViewModel.reportVideoProcessingFailure()
             isPreparing = false
-          }
+          },
+          allDayFlow: true
         )
       }
       .fullScreenCover(
         item: $libraryVideoToTrim,
         onDismiss: finishLibraryTrimPresentation
       ) { session in
-        VideoTrimView(session: session)
+        VideoTrimView(session: session, uploadsOnSave: true)
       }
     #endif
   }

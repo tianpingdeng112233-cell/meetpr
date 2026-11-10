@@ -142,7 +142,7 @@ struct HistoryEntriesView: View {
           reservesVideoSpace: reservesVideoSpace,
           badge: VideoBadgeInfo(
             exerciseName: StudentExerciseName.display(exercise.exercise),
-            weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
+            weightKg: log.weightKg.map { NSDecimalNumber(decimal: $0).doubleValue }, reps: log.reps,
             rpe: log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
             setOrdinal: log.setIndex + 1)
         )

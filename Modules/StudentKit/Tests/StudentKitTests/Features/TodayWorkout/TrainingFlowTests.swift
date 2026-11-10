@@ -58,14 +58,14 @@ import Testing
     #expect(TrainingSetProgress.segments(drafts) == [.current, .failed, .complete])
   }
 
-  @Test func completionDocksOnlyWhenEveryRealResultExists() {
+  @Test func completionAlwaysDocksForEditableDay() {
     var fixture = makeFixture()
     for index in fixture.drafts.indices { fixture.drafts[index].completed = true }
     let done = fixture.presentation().completionAvailability(isEditable: true)
     #expect(done.button && done.sticky && !done.pill)
     fixture.drafts[5].completed = false
     let partial = fixture.presentation().completionAvailability(isEditable: true)
-    #expect(partial.button && !partial.sticky && partial.pill)
+    #expect(partial.button && partial.sticky && !partial.pill)
     #expect(!fixture.presentation().completionAvailability(isEditable: false).button)
   }
 
@@ -84,7 +84,7 @@ import Testing
     fixture.drafts[0].completed = false
     let undone = fixture.presentation().trainingFlow(isEditable: true)
     #expect(undone?.hero?.stableIndex == 0)
-    #expect(undone?.completion.sticky == false)
+    #expect(undone?.completion.sticky == true)
     #expect(fixture.presentation().trainingFlow(isEditable: false) == nil)
     fixture.day = fixture.day.replacingCompletion(completedAt: Date(), source: "manual")
     #expect(fixture.presentation().trainingFlow(isEditable: true) == nil)

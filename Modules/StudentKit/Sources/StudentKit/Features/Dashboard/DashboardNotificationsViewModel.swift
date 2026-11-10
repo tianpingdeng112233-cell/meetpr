@@ -256,6 +256,11 @@ public final class StudentNotificationsCoordinator {
     chatContext?.inbox.stopPolling()
   }
 
+  func openExerciseNoteConversation() async -> StudentConversationOpenResult {
+    if let cached = coachConversation { return .opened(cached.id) }
+    return await openCoachConversation()
+  }
+
   func openCoachConversation() async -> StudentConversationOpenResult {
     guard let activeCoach else {
       return .noActiveCoach

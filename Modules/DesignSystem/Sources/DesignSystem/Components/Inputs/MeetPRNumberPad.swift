@@ -108,57 +108,61 @@ public struct MeetPRNumberPad: View {
           onNext: onNext.map { onNext in { onNext(resolvedValue) } }
         )
       }
-      header
+      if textInput != nil {
+        allDayPad
+      } else {
+        header
 
-      LazyVGrid(
-        columns: Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.space2), count: 3),
-        spacing: MeetPRSpacing.space2
-      ) {
-        ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9"], id: \.self) {
-          keypadButton($0)
+        LazyVGrid(
+          columns: Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.space2), count: 3),
+          spacing: MeetPRSpacing.space2
+        ) {
+          ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9"], id: \.self) {
+            keypadButton($0)
+          }
+          keypadButton(".", isDisabled: field == .reps || field == .rir)
+          keypadButton("0")
+          deleteButton
         }
-        keypadButton(".", isDisabled: field == .reps || field == .rir)
-        keypadButton("0")
-        deleteButton
-      }
 
-      HStack(spacing: MeetPRSpacing.space2) {
-        Button(action: cancel) {
-          Text(dismissTitle ?? DesignSystemStrings.cancel)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textSecondary)
-            .frame(maxWidth: .infinity)
-            .frame(height: 46)
-            .overlay {
-              Capsule()
-                .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-            }
-        }
-        .buttonStyle(PressScaleButtonStyle())
+        HStack(spacing: MeetPRSpacing.space2) {
+          Button(action: cancel) {
+            Text(dismissTitle ?? DesignSystemStrings.cancel)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textSecondary)
+              .frame(maxWidth: .infinity)
+              .frame(height: 46)
+              .overlay {
+                Capsule()
+                  .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+              }
+          }
+          .buttonStyle(PressScaleButtonStyle())
 
-        Button(action: commit) {
-          Text(commitTitle)
-            .font(.MeetPR.display(size: MeetPRFontMetrics.size15, weight: .extraBold))
-            .foregroundStyle(Color.MeetPR.ctaText)
-            .frame(maxWidth: .infinity)
-            .frame(height: 46)
-            .background(
-              // `linear-gradient(180deg, var(--gold-400), var(--gold-500))`
-              LinearGradient(
-                colors: [Color.MeetPR.gold400, Color.MeetPR.gold500],
-                startPoint: .top,
-                endPoint: .bottom
+          Button(action: commit) {
+            Text(commitTitle)
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size15, weight: .extraBold))
+              .foregroundStyle(Color.MeetPR.ctaText)
+              .frame(maxWidth: .infinity)
+              .frame(height: 46)
+              .background(
+                // `linear-gradient(180deg, var(--gold-400), var(--gold-500))`
+                LinearGradient(
+                  colors: [Color.MeetPR.gold400, Color.MeetPR.gold500],
+                  startPoint: .top,
+                  endPoint: .bottom
+                )
               )
-            )
-            .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+              .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+          }
+          .buttonStyle(PressScaleButtonStyle())
+          .disabled(textInput?.isValid == false)
+          .opacity(textInput?.isValid == false ? 0.4 : 1)
+          .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: MeetPRSpacing.space2)
         }
-        .buttonStyle(PressScaleButtonStyle())
-        .disabled(textInput?.isValid == false)
-        .opacity(textInput?.isValid == false ? 0.4 : 1)
-        .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: MeetPRSpacing.space2)
+        // dc: `margin-top:8px` on the cancel/confirm row.
+        .padding(.top, MeetPRSpacing.space2)
       }
-      // dc: `margin-top:8px` on the cancel/confirm row.
-      .padding(.top, MeetPRSpacing.space2)
     }
     .padding(.horizontal, MeetPRSpacing.space4)
     .padding(.top, MeetPRSpacing.point14)
@@ -183,6 +187,60 @@ public struct MeetPRNumberPad: View {
 }
 
 extension MeetPRNumberPad {
+  private var allDayPad: some View {
+    VStack(spacing: MeetPRSpacing.space3) {
+      HStack {
+        Text(contextText ?? fieldTitle)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+          .lineLimit(2)
+        Spacer(minLength: MeetPRSpacing.space2)
+        Button(action: commit) {
+          Text(commitTitle)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.goldText)
+        }
+        .disabled(textInput?.isValid == false)
+      }
+      GeometryReader { proxy in
+        let gap = MeetPRSpacing.space2
+        let column = (proxy.size.width - gap * 3) / 4
+        HStack(alignment: .top, spacing: gap) {
+          VStack(spacing: gap) {
+            ForEach(0..<3) { row in
+              HStack(spacing: gap) {
+                ForEach(1..<4) { number in keypadButton(String(row * 3 + number)) }
+              }
+            }
+            HStack(spacing: gap) {
+              keypadButton("0").frame(width: column * 2 + gap)
+              keypadButton(".", isDisabled: field == .reps || field == .rir)
+            }
+          }
+          .frame(width: column * 3 + gap * 2)
+          VStack(spacing: gap) {
+            deleteButton
+            Button(action: onCancel) {
+              Text(dismissTitle ?? DesignSystemStrings.done)
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+                .foregroundStyle(Color.MeetPR.ctaFill)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(
+                  LinearGradient(
+                    colors: [Color.MeetPR.goldGradientStart, Color.MeetPR.goldGradientEnd],
+                    startPoint: .top, endPoint: .bottom)
+                )
+                .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+            }
+            .buttonStyle(PressScaleButtonStyle())
+          }
+          .frame(width: column)
+        }
+      }
+      .frame(height: 232)
+    }
+  }
+
   private var header: some View {
     // dc: `padding:2px 4px 12px`; the unit hangs off the value at exactly 5pt.
     HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.zero) {
@@ -334,51 +392,4 @@ extension MeetPRNumberPad {
   private var resolvedValue: Double {
     inputValue.resolve(text)
   }
-}
-
-/// A localized placeholder is display-only; shortcuts preserve the original number.
-@MainActor
-struct MeetPRNumberPadInputValue {
-  let placeholder: String
-  private let initialValue: Double
-  private let field: MeetPRNumberPad.Field
-  private let minimumWeight: Double
-
-  init(
-    value: Double,
-    field: MeetPRNumberPad.Field,
-    minimumWeight: Double = 20,
-    locale: Locale = .current
-  ) {
-    self.initialValue = value
-    self.field = field
-    self.minimumWeight = minimumWeight
-    self.placeholder =
-      field == .reps
-      ? value.rounded().formatted(.number.precision(.fractionLength(0)).locale(locale))
-      : value.formatted(.number.precision(.fractionLength(0...2)).locale(locale))
-  }
-
-  func resolve(_ text: String) -> Double {
-    let rawValue = Double(text) ?? initialValue
-    return MeetPRNumberPad.snapped(rawValue, field: field, minimumWeight: minimumWeight)
-  }
-}
-
-#Preview("NumberPad · Weight + Reps · Dark") {
-  VStack(spacing: MeetPRSpacing.space4) {
-    MeetPRNumberPad(field: .weight, value: 175, onCommit: { _ in }, onCancel: {})
-    MeetPRNumberPad(field: .reps, value: 3, onCommit: { _ in }, onCancel: {})
-  }
-  .background(Color.MeetPR.bgInset)
-  .preferredColorScheme(.dark)
-}
-
-#Preview("NumberPad · Weight + Reps · Light") {
-  VStack(spacing: MeetPRSpacing.space4) {
-    MeetPRNumberPad(field: .weight, value: 175, onCommit: { _ in }, onCancel: {})
-    MeetPRNumberPad(field: .reps, value: 3, onCommit: { _ in }, onCancel: {})
-  }
-  .background(Color.MeetPR.bgBase)
-  .preferredColorScheme(.light)
 }

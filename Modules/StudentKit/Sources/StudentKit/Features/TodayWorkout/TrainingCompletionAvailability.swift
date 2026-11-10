@@ -6,11 +6,8 @@ struct TrainingCompletionAvailability: Equatable, Sendable {
 
 extension TodayWorkoutPresentation {
   func completionAvailability(isEditable: Bool) -> TrainingCompletionAvailability {
-    let button = isEditable && day.completedAt == nil && allowsManualCompletion
-    let remaining = exercises.flatMap(\.rows).contains {
-      $0.draft.needsTrainingResult && !$0.draft.isExtra
-    }
+    let button = isEditable && day.completedAt == nil
     return TrainingCompletionAvailability(
-      button: button, pill: button && remaining, sticky: button && !remaining)
+      button: button, pill: false, sticky: button)
   }
 }

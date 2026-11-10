@@ -10,9 +10,11 @@ final class WorkoutKeypadSession {
   private var onCommit: ((WorkoutKeypadCell, String) -> Void)?
   private var onChange: ((WorkoutKeypadCell, String?) -> Void)?
   private var editedText: String?
+  private var allowsEmptyWeight = false
   var panelTop: CGFloat = 0
 
   var current: WorkoutKeypadCell? { cells.indices.contains(index) ? cells[index] : nil }
+  var previewText: String? { editedText ?? current?.value }
   var next: WorkoutKeypadCell? { cells.indices.contains(index + 1) ? cells[index + 1] : nil }
 
   func field(for rowID: UUID) -> MeetPRNumberPad.Field? {
@@ -22,6 +24,7 @@ final class WorkoutKeypadSession {
   func open(
     cells: [WorkoutKeypadCell], at id: WorkoutKeypadCell.Address,
     onChange: ((WorkoutKeypadCell, String?) -> Void)? = nil,
+    allowsEmptyWeight: Bool = false,
     onCommit: @escaping (WorkoutKeypadCell, String) -> Void
   ) {
     guard let index = cells.firstIndex(where: { $0.id == id }) else { return }
@@ -29,6 +32,7 @@ final class WorkoutKeypadSession {
     self.index = index
     self.onCommit = onCommit
     self.onChange = onChange
+    self.allowsEmptyWeight = allowsEmptyWeight
     editedText = nil
   }
 
@@ -45,7 +49,7 @@ final class WorkoutKeypadSession {
     // An untouched cell only advances; it must not create a record.
     if editedText != nil || text != current.value {
       let value =
-        text.isEmpty && (current.field == .weight || current.field == .reps)
+        text.isEmpty && (current.field == .reps || (current.field == .weight && !allowsEmptyWeight))
         ? current.value : input.committedText
       onCommit?(current, value)
     }
@@ -80,5 +84,6 @@ final class WorkoutKeypadSession {
     onChange = nil
     editedText = nil
     panelTop = 0
+    allowsEmptyWeight = false
   }
 }

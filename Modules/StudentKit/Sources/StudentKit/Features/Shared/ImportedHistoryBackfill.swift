@@ -298,7 +298,7 @@ extension ImportedHistoryBackfill {
   ) async throws -> [Candidate] {
     let allLogs = try await fetchWindow(studentID: studentID)
     return allLogs.compactMap { log in
-      guard log.assumed, log.completed, !log.failed,
+      guard log.assumed, log.completed, !log.failed, let weight = log.weightKg,
         let exerciseID =
           log.exerciseID ?? exerciseContext.exerciseIDByPlanExerciseID[log.planExerciseID]
       else { return nil }
@@ -310,7 +310,7 @@ extension ImportedHistoryBackfill {
           resolveCompetitionFamily(exercise: $0, onboarding: onboardingProfile)
         })
       else { return nil }
-      let sourceWeightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
+      let sourceWeightKg = NSDecimalNumber(decimal: weight).doubleValue
       let sourceRPE = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
       let sourceCoachRPE = log.coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
       let effectiveRPE = sourceCoachRPE ?? sourceRPE

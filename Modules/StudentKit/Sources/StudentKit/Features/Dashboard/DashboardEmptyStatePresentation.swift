@@ -176,7 +176,7 @@ extension DashboardTodayPresentation {
       logs
       .filter(\.completed)
       .reduce(Decimal.zero) { partial, log in
-        partial + log.weightKg * Decimal(log.reps)
+        partial + (log.weightKg ?? 0) * Decimal(log.reps)
       }
     return DashboardWeekSummary(
       completedTrainingDays: completedTrainingDays,

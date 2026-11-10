@@ -19,7 +19,7 @@ import Testing
   model.updateWeight(rowIndex: 0, weight: 80)
   model.updateReps(rowIndex: 0, reps: 3)
   #expect(await model.commitSet(rowIndex: 0))
-  #expect(model.restTimer != nil)
+  #expect(model.restTimer == nil)
   await model.load(dayID: first.id, studentID: StudentDemoSeed.studentID)
   #expect(model.restTimer == nil)
   await model.load(dayID: other.id, studentID: StudentDemoSeed.studentID)

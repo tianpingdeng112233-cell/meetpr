@@ -30,6 +30,14 @@ import Observation
       phase = .failed
       return false
     }
+    if queue.hasRejected(dayID: dayID) {
+      queue.retryNow(dayID: dayID)
+      guard !queue.hasRejected(dayID: dayID) else { return false }
+    }
+    if queue.isOffline, queue.videoCompletion != nil {
+      phase = .idle
+      return true
+    }
     self.dayID = dayID
     return await withCheckedContinuation { continuation in
       self.continuation = continuation
@@ -51,7 +59,9 @@ import Observation
     guard let dayID, continuation != nil else { return }
     if queue.hasRejected(dayID: dayID) {
       finish(success: false, phase: .failed)
-    } else if queue.pendingCount(dayID: dayID) == 0 {
+    } else if queue.pendingCount(dayID: dayID) == 0
+      || (queue.isOffline && queue.videoCompletion != nil)
+    {
       finish(success: true, phase: .idle)
     }
   }

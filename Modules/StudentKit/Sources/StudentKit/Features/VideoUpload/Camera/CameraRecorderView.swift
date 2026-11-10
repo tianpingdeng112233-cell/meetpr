@@ -1,4 +1,5 @@
 #if os(iOS)
+  import PhotosUI
   import SwiftUI
   import UIKit
 
@@ -9,6 +10,8 @@
     @Binding var isPresented: Bool
     let onPicked: (URL) -> Void
     let onFailure: () -> Void
+    let allDayFlow: Bool
+    @State private var pickedAlbumVideo: PhotosPickerItem?
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var controller: RecorderSessionController
@@ -25,12 +28,14 @@
       maxDurationSeconds: TimeInterval,
       isPresented: Binding<Bool>,
       onPicked: @escaping (URL) -> Void,
-      onFailure: @escaping () -> Void
+      onFailure: @escaping () -> Void,
+      allDayFlow: Bool = false
     ) {
       self.maxDurationSeconds = maxDurationSeconds
       _isPresented = isPresented
       self.onPicked = onPicked
       self.onFailure = onFailure
+      self.allDayFlow = allDayFlow
       _controller = State(
         initialValue: RecorderSessionController(maximumDuration: maxDurationSeconds)
       )
@@ -123,11 +128,32 @@
           RecorderToastView(message: toastMessage)
         }
       }
+      .overlay(alignment: .bottomLeading) {
+        if allDayFlow, controller.phase != .recording, controller.phase != .review {
+          PhotosPicker(selection: $pickedAlbumVideo, matching: .videos) {
+            Label(StudentStrings.localized(.allDayAlbum), systemImage: "photo")
+              .padding().foregroundStyle(.white)
+          }
+          .padding(.bottom, 32)
+        }
+      }
+      .onChange(of: pickedAlbumVideo) { _, item in
+        guard let item else { return }
+        pickedAlbumVideo = nil
+        Task { await importAlbumVideo(item) }
+      }
+      .onChange(of: controller.phase) { _, phase in
+        if allDayFlow, phase == .review, let url = controller.reviewURL,
+          activeRecordingTrimSession == nil
+        {
+          prepareTrim(of: url)
+        }
+      }
       .fullScreenCover(
         item: $recordingToTrim,
         onDismiss: finishRecordingTrimPresentation
       ) { session in
-        VideoTrimView(session: session)
+        VideoTrimView(session: session, uploadsOnSave: allDayFlow)
       }
       .task {
         // Students frame the shot, walk to the bar, and never touch the
@@ -198,6 +224,30 @@
       }
     }
 
+    private func importAlbumVideo(_ item: PhotosPickerItem) async {
+      do {
+        guard let movie = try await item.loadTransferable(type: PickedVideo.self) else {
+          onFailure()
+          return
+        }
+        let session = VideoTrimSession(
+          sourceURL: movie.url, maxDurationSeconds: maxDurationSeconds,
+          onSave: { url in
+            activeRecordingTrimSession = nil
+            recordingToTrim = nil
+            onPicked(url)
+            isPresented = false
+          },
+          onCancel: { recordingToTrim = nil },
+          onFailure: {
+            recordingToTrim = nil
+            onFailure()
+          })
+        activeRecordingTrimSession = session
+        recordingToTrim = session
+      } catch { onFailure() }
+    }
+
     private func prepareTrim(of sourceURL: URL) {
       guard recordingToTrim == nil, !isUsingRecording, !isApplyingTrim else { return }
       do {
@@ -226,6 +276,7 @@
       Task {
         await controller.replaceReviewFile(with: editedURL)
         isApplyingTrim = false
+        if allDayFlow { await useRecording(editedURL) }
       }
     }
 

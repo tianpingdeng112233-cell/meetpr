@@ -18,8 +18,6 @@ struct MyProfileFallbackRows: View {
     MyProfileGroupCard {
       AppearancePreferenceRow()
       MyProfileDivider()
-      RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
-      MyProfileDivider()
       TrainingReminderPreferenceRow(
         studentID: studentID, services: trainingReminderServices, plans: plans,
         recommendedWeekdays: recommendedWeekdays)
