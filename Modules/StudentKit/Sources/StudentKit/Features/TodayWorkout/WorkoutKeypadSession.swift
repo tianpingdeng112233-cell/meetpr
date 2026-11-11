@@ -12,10 +12,15 @@ final class WorkoutKeypadSession {
   private var editedText: String?
   private var allowsEmptyWeight = false
   var panelTop: CGFloat = 0
+  private(set) var allowsBackgroundInteraction = false
 
   var current: WorkoutKeypadCell? { cells.indices.contains(index) ? cells[index] : nil }
   var previewText: String? { editedText ?? current?.value }
   var next: WorkoutKeypadCell? { cells.indices.contains(index + 1) ? cells[index + 1] : nil }
+
+  func effortField(for rowID: UUID) -> MeetPRNumberPad.Field? {
+    cells.first { $0.rowID == rowID && ($0.field == .rpe || $0.field == .rir) }?.field
+  }
 
   func field(for rowID: UUID) -> MeetPRNumberPad.Field? {
     current?.rowID == rowID ? current?.field : nil
@@ -25,6 +30,7 @@ final class WorkoutKeypadSession {
     cells: [WorkoutKeypadCell], at id: WorkoutKeypadCell.Address,
     onChange: ((WorkoutKeypadCell, String?) -> Void)? = nil,
     allowsEmptyWeight: Bool = false,
+    allowsBackgroundInteraction: Bool = false,
     onCommit: @escaping (WorkoutKeypadCell, String) -> Void
   ) {
     guard let index = cells.firstIndex(where: { $0.id == id }) else { return }
@@ -33,6 +39,7 @@ final class WorkoutKeypadSession {
     self.onCommit = onCommit
     self.onChange = onChange
     self.allowsEmptyWeight = allowsEmptyWeight
+    self.allowsBackgroundInteraction = allowsBackgroundInteraction
     editedText = nil
   }
 
@@ -85,5 +92,6 @@ final class WorkoutKeypadSession {
     editedText = nil
     panelTop = 0
     allowsEmptyWeight = false
+    allowsBackgroundInteraction = false
   }
 }

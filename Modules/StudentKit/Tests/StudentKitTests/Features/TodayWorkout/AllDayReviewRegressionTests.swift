@@ -27,14 +27,16 @@ import Testing
     })
   for index in rows.indices { rows[index].loggedSetID = UUID() }
   let summary = AllDayExerciseSummary.build(rows: rows)
-  #expect(summary.segments.map(\.load) == ["RPE 6/7/8/8"])
+  #expect(summary.segments.map(\.effort) == ["RPE 6/7/8/8"])
   #expect(summary.segments[0].intensityOnly)
   rows = AllDaySummaryTests.rows(AllDaySummaryTests.sets(1, reps: 10, intensity: .rir(2)))
   rows[0].actualRIR = 3
   rows[0].loggedSetID = UUID()
   let changed = AllDayExerciseSummary.build(rows: rows)
-  #expect(changed.segments.map(\.load) == ["RIR 3"])
-  #expect(changed.segments[0].loadChanged)
+  #expect(changed.segments.map(\.effort) == ["RIR 3"])
+  #expect(changed.segments[0].effortChanged)
+  #expect(!changed.segments[0].weightChanged)
+  #expect(changed.segments[0].load == "—")
 }
 
 @MainActor

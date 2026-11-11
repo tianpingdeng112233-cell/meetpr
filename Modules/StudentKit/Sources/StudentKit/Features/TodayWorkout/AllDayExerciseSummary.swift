@@ -7,9 +7,12 @@ struct AllDayExerciseSummary: Equatable, Sendable {
   struct Segment: Equatable, Sendable {
     var reps: String
     var load: String
+    var effort = "—"
     var intensityOnly = false
     var repsChanged = false
     var loadChanged = false
+    var weightChanged = false
+    var effortChanged = false
     var shortReps = false
   }
   let segments: [Segment]
@@ -31,9 +34,7 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     let values = rows.map { segment($0, commonEffort: commonEffort, unit: unit, locale: locale) }
     var groups: [[Segment]] = []
     for value in values {
-      if let last = groups.last?.first, last.reps == value.reps,
-        last.repsChanged == value.repsChanged, last.loadChanged == value.loadChanged
-      {
+      if let last = groups.last?.first, last.reps == value.reps {
         groups[groups.count - 1].append(value)
       } else {
         groups.append([value])
@@ -43,15 +44,21 @@ struct AllDayExerciseSummary: Equatable, Sendable {
       segments: groups.compactMap { group in
         guard var result = group.first else { return nil }
         result.reps = "\(group.count)×" + result.reps
-        if group.allSatisfy(\.intensityOnly) {
-          let loads = group.map(\.load)
-          if loads.allSatisfy({ $0.hasPrefix("RPE ") }), Set(loads).count > 1 {
-            result.load = "RPE " + loads.map { String($0.dropFirst(4)) }.joined(separator: "/")
-          } else {
-            result.load = compressed(loads)
-          }
+        result.repsChanged = group.contains(where: \.repsChanged)
+        result.loadChanged = group.contains(where: \.loadChanged)
+        result.intensityOnly = group.allSatisfy(\.intensityOnly)
+        result.weightChanged = group.contains(where: \.weightChanged)
+        result.effortChanged = group.contains(where: \.effortChanged)
+        result.load = compressed(group.map(\.load))
+        let efforts = group.map(\.effort)
+        if let prefix = ["RPE ", "RIR "].first(where: { prefix in
+          efforts.contains(where: { $0.hasPrefix(prefix) })
+            && efforts.allSatisfy { $0 == "—" || $0.hasPrefix(prefix) }
+        }), Set(efforts).count > 1 {
+          result.effort =
+            prefix + efforts.map { $0 == "—" ? $0 : String($0.dropFirst(4)) }.joined(separator: "/")
         } else {
-          result.load = compressed(group.map(\.load))
+          result.effort = compressed(efforts)
         }
         return result
       })
@@ -73,15 +80,19 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     }
     if !recorded, row.prescribed.setType == .amrap { reps += "+" }
     let load = load(row, recorded: recorded, unit: unit, locale: locale)
-    var text = load.text
-    if !load.intensityOnly, let commonEffort { text += " · " + commonEffort }
+    let rowEffort = recorded ? actualEffort(row) : effort(row.prescribed)
+    let text = load.intensityOnly && load.text == rowEffort ? "—" : load.text
+    let displayedEffort = load.intensityOnly ? rowEffort : commonEffort
     return Segment(
-      reps: reps, load: text, intensityOnly: load.intensityOnly,
+      reps: reps, load: text, effort: displayedEffort ?? "—", intensityOnly: load.intensityOnly,
       repsChanged: recorded && count != row.prescribed.reps,
       loadChanged: recorded
         && (row.actualWeight != row.prescribed.weightKg
           || row.actualRPE != row.prescribed.rpe
           || actualEffort(row) != effort(row.prescribed)),
+      weightChanged: recorded && row.actualWeight != row.prescribed.weightKg,
+      effortChanged: recorded && displayedEffort != nil
+        && actualEffort(row) != effort(row.prescribed),
       shortReps: short)
   }
 

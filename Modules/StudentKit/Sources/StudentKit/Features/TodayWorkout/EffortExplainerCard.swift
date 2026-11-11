@@ -5,6 +5,7 @@ import SwiftUI
 struct EffortExplainerButton: View {
   let kind: ActualEffortMode
   var isAccessoryHeader = false
+  var isInlineHeader = false
   @Environment(\.colorScheme) private var colorScheme
   @State private var isPresented = false
 
@@ -12,13 +13,18 @@ struct EffortExplainerButton: View {
     Button {
       isPresented = true
     } label: {
-      EffortHelpIcon(isAccessoryHeader: isAccessoryHeader)
-        .offset(y: isAccessoryHeader ? -MeetPRSpacing.space2 : 0)
+      EffortHelpIcon(isAccessoryHeader: isAccessoryHeader || isInlineHeader)
+        .offset(y: isAccessoryHeader && !isInlineHeader ? -MeetPRSpacing.space2 : 0)
         .frame(
-          width: isAccessoryHeader ? AccessoryEffortHeaderLayout.badgeWidth : 44, height: 44
+          width: isAccessoryHeader || isInlineHeader ? AccessoryEffortHeaderLayout.badgeWidth : 44,
+          height: isInlineHeader ? AccessoryEffortHeaderLayout.badgeWidth : 44
         )
+        .padding(.horizontal, isInlineHeader ? 5 : 0)
+        .padding(.vertical, isInlineHeader ? 4 : 0)
         .contentShape(.rect)
     }
+    .padding(.horizontal, isInlineHeader ? -5 : 0)
+    .padding(.vertical, isInlineHeader ? -4 : 0)
     .buttonStyle(.plain)
     .accessibilityLabel(EffortExplainer.content(for: kind).helpLabel)
     .accessibilityIdentifier("effortExplainer.help.\(kind.rawValue)")

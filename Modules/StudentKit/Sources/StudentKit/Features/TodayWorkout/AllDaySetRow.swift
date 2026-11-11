@@ -27,19 +27,11 @@ struct AllDaySetRow: View {
       if editing {
         AllDayInlineEditor(draft: draft, viewModel: viewModel, keypad: keypad)
       } else {
-        Button {
-          openEditor()
-        } label: {
-          AllDaySetValues(
-            draft: draft, shortReps: shortReps,
-            unit: viewModel?.onboardingProfile?.unitPreference ?? .kg
-          )
-          .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
-          .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .disabled(!editable)
-        .accessibilityIdentifier("allDay.row.\(draft.id)")
+        AllDaySetValues(
+          draft: draft, shortReps: shortReps,
+          unit: viewModel?.onboardingProfile?.unitPreference ?? .kg,
+          editable: editable, onEdit: openEditor
+        )
       }
       if editable {
         Button(action: onVideo) {
@@ -91,9 +83,9 @@ struct AllDaySetRow: View {
     }
   }
 
-  private func openEditor() {
+  private func openEditor(_ field: MeetPRNumberPad.Field) {
     guard editable, let viewModel, let keypad else { return }
-    keypad.openAllDay(draft: draft, viewModel: viewModel, field: .weight)
+    keypad.openAllDay(draft: draft, viewModel: viewModel, field: field)
   }
 }
 
@@ -101,47 +93,76 @@ private struct AllDaySetValues: View {
   let draft: TodayWorkoutSetRowDraft
   let shortReps: Bool
   let unit: UnitPreference
+  let editable: Bool
+  let onEdit: (MeetPRNumberPad.Field) -> Void
 
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space1) {
-      Text(draft.actualWeight.map { UnitDisplay.weightText(kg: $0, unit: unit) } ?? "—")
-        .foregroundStyle(weightChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
-      if draft.actualWeight != nil {
-        Text(UnitDisplay.weightUnitSuffix(unit)).font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textSecondary)
-      }
-      if weightChanged, let original = draft.prescribed.weightKg {
-        Text(
-          StudentStrings.replacing(
-            .allDayOriginal, values: [UnitDisplay.weightText(kg: original, unit: unit)])
-        )
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-        .foregroundStyle(Color.MeetPR.textSecondary)
-      }
-      Text("×").foregroundStyle(Color.MeetPR.textSecondary)
-      VStack(alignment: .leading, spacing: 2) {
-        Text(repsText)
-          .foregroundStyle(
-            shortReps
-              ? Color.MeetPR.danger
-              : repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
-        if repsChanged, let original = draft.prescribed.reps {
-          AllDayOriginalValue(value: String(original))
+      Button {
+        onEdit(.weight)
+      } label: {
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space1) {
+          Text(draft.actualWeight.map { UnitDisplay.weightText(kg: $0, unit: unit) } ?? "—")
+            .foregroundStyle(weightChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+          if draft.actualWeight != nil {
+            Text(UnitDisplay.weightUnitSuffix(unit)).font(
+              .MeetPR.body(size: MeetPRFontMetrics.size12)
+            )
+            .foregroundStyle(Color.MeetPR.textSecondary)
+          }
+          if weightChanged, let original = draft.prescribed.weightKg {
+            Text(
+              StudentStrings.replacing(
+                .allDayOriginal, values: [UnitDisplay.weightText(kg: original, unit: unit)])
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.textSecondary)
+          }
+          Text("×").foregroundStyle(Color.MeetPR.textSecondary)
+          VStack(alignment: .leading, spacing: 2) {
+            Text(repsText)
+              .foregroundStyle(
+                shortReps
+                  ? Color.MeetPR.danger
+                  : repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+            if repsChanged, let original = draft.prescribed.reps {
+              AllDayOriginalValue(value: String(original))
+            }
+          }
         }
+        .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
+        .contentShape(.rect)
       }
-      Spacer(minLength: MeetPRSpacing.space1)
-      VStack(alignment: .leading, spacing: 2) {
-        Text(effortText)
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-          .foregroundStyle(
-            effortChanged ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
-        if effortChanged {
-          AllDayOriginalValue(value: originalEffort)
+      .buttonStyle(.plain)
+      .disabled(!editable)
+      .accessibilityIdentifier("allDay.row.\(draft.id)")
+      Button {
+        onEdit(effortField)
+      } label: {
+        VStack(alignment: .leading, spacing: 2) {
+          Text(effortText)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+            .foregroundStyle(
+              effortChanged ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
+          if effortChanged, let originalEffort {
+            AllDayOriginalValue(value: originalEffort)
+          }
         }
+        .frame(minHeight: 38)
+        .contentShape(.rect)
       }
+      .buttonStyle(.plain)
+      .disabled(!editable)
+      .accessibilityIdentifier("allDay.effort.\(draft.id)")
     }
     .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
     .monospacedDigit()
+  }
+
+  private var effortField: MeetPRNumberPad.Field {
+    if draft.actualRIR != nil { return .rir }
+    if case .rir = draft.prescribed.intensity, draft.actualRPE == nil { return .rir }
+    return .rpe
   }
 
   private var weightChanged: Bool {
@@ -155,14 +176,24 @@ private struct AllDaySetValues: View {
     return shortReps ? actual + "/" + String(draft.prescribed.reps ?? 0) : actual
   }
   private var effortChanged: Bool {
-    if case .rir(let target) = draft.prescribed.intensity {
+    switch draft.prescribed.intensity {
+    case .rir(let target):
       return draft.actualRIR != target || draft.actualRPE != nil
+    case .rpeRange(let low, let high):
+      guard let actual = draft.actualRPE, draft.actualRIR == nil else { return true }
+      return actual < low || actual > high
+    default:
+      return draft.actualRPE != draft.prescribed.rpe || draft.actualRIR != nil
     }
-    return draft.actualRPE != draft.prescribed.rpe || draft.actualRIR != nil
   }
-  private var originalEffort: String {
-    if case .rir(let target) = draft.prescribed.intensity { return "RIR \(target)" }
-    return StudentFormatting.decimal(draft.prescribed.rpe)
+  private var originalEffort: String? {
+    switch draft.prescribed.intensity {
+    case .rpe(let target): return "RPE \(StudentFormatting.decimal(target))"
+    case .rir(let target): return "RIR \(target)"
+    case .rpeRange(let low, let high):
+      return "RPE \(StudentFormatting.decimal(low))–\(StudentFormatting.decimal(high))"
+    default: return nil
+    }
   }
   private var effortText: String {
     if let rir = draft.actualRIR { return "RIR \(rir)" }
@@ -182,27 +213,34 @@ private struct AllDayInlineEditor: View {
       ForEach(
         WorkoutKeypadCell.allDayCells(
           draft: draft, unit: viewModel?.onboardingProfile?.unitPreference ?? .kg,
-          effortOverride: keypad?.current?.field == .rir ? .rir : nil)
+          effortOverride: keypad?.effortField(for: draft.id))
       ) { cell in
-        Button {
-          if let viewModel {
-            keypad?.openAllDay(draft: draft, viewModel: viewModel, field: cell.field)
-          }
-        } label: {
-          VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
-            HStack(spacing: 0) {
-              Text(cell.fieldTitle + (cell.field == .weight ? " " + (cell.unit ?? "kg") : ""))
-              if draft.isAccessory, cell.field == .rpe || cell.field == .rir {
-                Menu {
-                  Button("RPE") { switchEffort(.rpe) }
-                  Button("RIR") { switchEffort(.rir) }
-                } label: {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+          HStack(spacing: MeetPRSpacing.space2) {
+            Button {
+              switchEffort(cell.field == .rir ? .rpe : .rir)
+            } label: {
+              HStack(spacing: 0) {
+                Text(cell.fieldTitle + (cell.field == .weight ? " " + (cell.unit ?? "kg") : ""))
+                if draft.isAccessory, cell.field == .rpe || cell.field == .rir {
                   Image(systemName: "chevron.down")
                 }
               }
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+              .foregroundStyle(Color.MeetPR.textSecondary)
             }
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-            .foregroundStyle(Color.MeetPR.textSecondary)
+            .buttonStyle(.plain)
+            .disabled(!draft.isAccessory || (cell.field != .rpe && cell.field != .rir))
+            .accessibilityIdentifier("allDay.label.\(draft.id).\(cell.field)")
+            if cell.field == .rpe || cell.field == .rir {
+              EffortExplainerButton(kind: cell.field == .rir ? .rir : .rpe, isInlineHeader: true)
+            }
+          }
+          Button {
+            if let viewModel {
+              keypad?.openAllDay(draft: draft, viewModel: viewModel, field: cell.field)
+            }
+          } label: {
             Text(
               (keypad?.current?.id == cell.id ? keypad?.previewText : cell.value).flatMap {
                 $0.isEmpty ? nil : $0
@@ -225,8 +263,15 @@ private struct AllDayInlineEditor: View {
               }
             }
           }
+          .buttonStyle(.plain)
+          .accessibilityLabel(
+            cell.fieldTitle + (cell.field == .weight ? " " + (cell.unit ?? "kg") : "")
+          )
+          .accessibilityValue(
+            (keypad?.current?.id == cell.id ? keypad?.previewText : cell.value) ?? "—"
+          )
+          .accessibilityIdentifier("allDay.cell.\(draft.id).\(cell.field)")
         }
-        .buttonStyle(.plain)
         .frame(maxWidth: cell.field == .weight ? .infinity : 62)
       }
     }
@@ -242,7 +287,7 @@ private struct AllDayOriginalValue: View {
   let value: String
   var body: some View {
     Text(StudentStrings.replacing(.allDayOriginal, values: [value]))
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
       .foregroundStyle(Color.MeetPR.textSecondary)
   }
 }

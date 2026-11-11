@@ -122,6 +122,17 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
     .padding(.bottom, MeetPRSpacing.point28 + inlineCompletionBottomInset)
+    .background {
+      if keypad?.allowsBackgroundInteraction == true {
+        Button {
+          keypad?.dismiss()
+        } label: {
+          Color.clear.contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHidden(true)
+      }
+    }
   }
 
   // The enclosing NavigationStack does not forward the rest bar's inset to

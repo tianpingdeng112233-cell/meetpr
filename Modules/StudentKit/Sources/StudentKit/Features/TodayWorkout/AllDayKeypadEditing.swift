@@ -31,6 +31,7 @@ extension WorkoutKeypadSession {
   func openAllDay(
     draft: TodayWorkoutSetRowDraft, viewModel: TodayWorkoutViewModel, field: MeetPRNumberPad.Field
   ) {
+    let previousEffort = effortField(for: draft.id)
     if current != nil { dismiss() }
     let dayID = viewModel.currentDay?.id
     let unit = viewModel.onboardingProfile?.unitPreference ?? .kg
@@ -70,9 +71,10 @@ extension WorkoutKeypadSession {
     }
     open(
       cells: WorkoutKeypadCell.allDayCells(
-        draft: draft, unit: unit, effortOverride: field == .rir || field == .rpe ? field : nil),
+        draft: draft, unit: unit,
+        effortOverride: field == .rir || field == .rpe ? field : previousEffort),
       at: .init(rowID: draft.id, field: field),
       onChange: { cell, text in if let text { save(cell, text) } },
-      allowsEmptyWeight: true, onCommit: save)
+      allowsEmptyWeight: true, allowsBackgroundInteraction: true, onCommit: save)
   }
 }

@@ -17,7 +17,7 @@ import ViewInspector
       editable: false, onExpand: {}, onVideo: { _ in }, onNote: { _ in }, onRemove: {})
     let header = try block.inspect().find(
       viewWithAccessibilityIdentifier: "allDay.expand.\(group.id)"
-    ).parent().hStack()
+    ).parent().zStack()
     let fill = try header.background().shape().fillShapeStyle(Color.self)
     #expect(fill == (node == .current ? Color.MeetPR.goldRGB.opacity(0.10) : .clear))
     #expect(try header.overlay().findAll(ViewType.Shape.self).count == 1)

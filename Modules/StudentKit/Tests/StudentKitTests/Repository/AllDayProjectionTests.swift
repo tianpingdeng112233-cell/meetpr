@@ -46,5 +46,6 @@ func allDayProjectionKeepsExplicitWeightAndEffort(mode: PlanLoadMode) throws {
   let day = try #require(plan.days.first)
   let rows = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
   let text = AllDayExerciseSummary.build(rows: rows, locale: Locale(identifier: "zh-Hans"))
-  #expect(text.segments.map(\.load) == [mode == .bodyweight ? "自重+10 · RPE 7" : "100 · RPE 7"])
+  #expect(text.segments.map(\.effort) == ["RPE 7"])
+  #expect(text.segments.map(\.load) == [mode == .bodyweight ? "自重+10" : "100"])
 }

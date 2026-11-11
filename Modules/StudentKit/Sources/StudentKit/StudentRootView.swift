@@ -321,7 +321,10 @@ extension StudentRootView {
         )
       }
     }
-    .accessibilityHidden(workoutKeypad.current != nil || weightEntry.isPresented)
+    .accessibilityHidden(
+      (workoutKeypad.current != nil && !workoutKeypad.allowsBackgroundInteraction)
+        || weightEntry.isPresented
+    )
     .overlay(alignment: .bottom) {
       WorkoutKeypadOverlay(session: workoutKeypad)
       BodyWeightEntryOverlay(model: weightEntry)

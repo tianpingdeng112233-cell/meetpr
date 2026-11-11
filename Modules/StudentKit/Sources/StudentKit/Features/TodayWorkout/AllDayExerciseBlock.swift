@@ -89,16 +89,13 @@ private struct AllDayExerciseHeader: View {
   let onComplete: () -> Void
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.space2) {
+    ZStack(alignment: .topTrailing) {
       Button(action: onExpand) {
-        HStack(spacing: MeetPRSpacing.space2) {
-          AllDayExerciseLabel(
-            name: hidesName ? "" : name, completed: group.node == .completed,
-            summary: AllDayExerciseSummary.build(rows: group.rows, unit: unit))
-          Image(systemName: expanded ? "chevron.up" : "chevron.down")
-            .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.textSecondary)
-        }
+        AllDayExerciseLabel(
+          name: hidesName ? "" : name, completed: group.node == .completed,
+          expanded: expanded, editable: editable,
+          summary: AllDayExerciseSummary.build(rows: group.rows, unit: unit)
+        )
         .frame(minHeight: 48)
         .contentShape(.rect)
       }
@@ -151,12 +148,22 @@ private struct AllDayExerciseHeader: View {
 private struct AllDayExerciseLabel: View {
   let name: String
   let completed: Bool
+  let expanded: Bool
+  let editable: Bool
   let summary: AllDayExerciseSummary
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
-      AllDayExerciseName(name: name, completed: completed)
+      HStack(spacing: MeetPRSpacing.space2) {
+        AllDayExerciseName(name: name, completed: completed)
+        Image(systemName: expanded ? "chevron.up" : "chevron.down")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+        if editable { Color.clear.frame(width: 30, height: 1) }
+      }
+      .frame(minHeight: 30)
       AllDaySummaryValues(summary: summary)
+        .padding(.trailing, 44)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.vertical, MeetPRSpacing.space1)
@@ -180,34 +187,67 @@ private struct AllDaySummaryValues: View {
   let summary: AllDayExerciseSummary
 
   var body: some View {
-    let text = summary.segments.enumerated().reduce(Text("")) { result, pair in
-      let segment = pair.element
-      let reps = Text(segment.reps + "  ")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
-        .foregroundStyle(
-          segment.shortReps
-            ? Color.MeetPR.danger
-            : segment.repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
-      // Keep a load and its effort together; only list separators may wrap.
-      let load = Text(
-        segment.load.replacing(" ", with: "\u{00a0}")
-          .replacing("\u{00a0}/\u{00a0}", with: " / ")
-          .replacing("\u{00a0}·\u{00a0}", with: " · ")
-      )
-      .font(
-        .MeetPR.body(
-          size: segment.intensityOnly
-            ? MeetPRFontMetrics.size13 : MeetPRFontMetrics.size15, weight: .bold)
-      )
-      .foregroundStyle(
-        segment.intensityOnly || segment.loadChanged
-          ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
-      return result
-        + Text(pair.offset > 0 ? " · " : "").foregroundStyle(Color.MeetPR.textSecondary)
-        + reps + load
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      ForEach(summary.segments.indices, id: \.self) { index in
+        let segment = summary.segments[index]
+        AllDaySummaryColumns {
+          Text(segment.reps.isEmpty ? "—" : segment.reps)
+            .foregroundStyle(
+              segment.shortReps
+                ? Color.MeetPR.danger
+                : segment.repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary
+            )
+            .accessibilityIdentifier("allDay.summary.reps.\(index)")
+          Text(segment.load.replacing(" / ", with: "/"))
+            .foregroundStyle(
+              segment.weightChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary
+            )
+            .accessibilityIdentifier("allDay.summary.load.\(index)")
+          Text(
+            (segment.effort == "—" ? "RPE —" : segment.effort).replacing(" / ", with: "/")
+              .replacing("RPE ", with: "RPE\u{00a0}")
+              .replacing("RIR ", with: "RIR\u{00a0}")
+          )
+          .foregroundStyle(segment.effortChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+          .accessibilityIdentifier("allDay.summary.effort.\(index)")
+        }
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .monospacedDigit()
+        .multilineTextAlignment(.leading)
+      }
     }
-    text.monospacedDigit()
-      .multilineTextAlignment(.leading)
-      .fixedSize(horizontal: false, vertical: true)
+  }
+}
+
+/// Every exercise receives the same column proportions, independent of its values.
+private struct AllDaySummaryColumns: Layout {
+  private let proportions: [CGFloat] = [0.87, 1.79, 1.34]
+  private let spacing: CGFloat = MeetPRSpacing.space1
+
+  func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    let width = proposal.width ?? 300
+    let widths = columnWidths(width)
+    let height =
+      zip(subviews, widths).map { view, width in
+        view.sizeThatFits(ProposedViewSize(width: width, height: nil)).height
+      }.max() ?? 0
+    return CGSize(width: width, height: height)
+  }
+
+  func placeSubviews(
+    in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
+  ) {
+    var x = bounds.minX
+    for (view, width) in zip(subviews, columnWidths(bounds.width)) {
+      view.place(
+        at: CGPoint(x: x, y: bounds.minY), anchor: .topLeading,
+        proposal: ProposedViewSize(width: width, height: nil))
+      x += width + spacing
+    }
+  }
+
+  private func columnWidths(_ width: CGFloat) -> [CGFloat] {
+    let available = max(0, width - spacing * 2)
+    return proportions.map { available * $0 / proportions.reduce(0, +) }
   }
 }

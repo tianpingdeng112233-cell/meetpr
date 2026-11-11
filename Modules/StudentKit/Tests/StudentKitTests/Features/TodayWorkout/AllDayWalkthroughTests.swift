@@ -38,7 +38,7 @@ import ViewInspector
   try button.tap()
   #expect(captured)
   let readOnly = AllDaySetRow(draft: draft, viewModel: nil, editable: false, onVideo: {})
-  #expect(try readOnly.inspect().findAll(ViewType.Button.self).count == 1)
+  #expect(try readOnly.inspect().findAll(ViewType.Button.self).allSatisfy { $0.isDisabled() })
 }
 
 @MainActor
@@ -51,7 +51,7 @@ import ViewInspector
     editable: false, onExpand: {}, onVideo: { _ in }, onNote: { _ in }, onRemove: {})
   let header = try block.inspect().find(
     viewWithAccessibilityIdentifier: "allDay.expand.\(group.id)"
-  ).parent().hStack()
+  ).parent().zStack()
   #expect(try header.overlay().findAll(ViewType.Shape.self).count == 1)
 }
 
@@ -66,7 +66,7 @@ import ViewInspector
   let block = AllDayExerciseBlock(
     group: group, note: "", expanded: false, hidesName: false, viewModel: nil,
     editable: true, onExpand: {}, onVideo: { _ in }, onNote: { _ in }, onRemove: {})
-  let load = try block.inspect().find(text: "1×1  150")
+  let load = try block.inspect().find(text: "150")
   #expect(try load.multilineTextAlignment() == .leading)
   #expect(try !load.string().contains("%"))
 }

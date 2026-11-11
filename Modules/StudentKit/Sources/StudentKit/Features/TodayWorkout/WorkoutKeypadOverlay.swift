@@ -9,13 +9,15 @@ struct WorkoutKeypadOverlay: View {
   var body: some View {
     if let cell = session.current {
       ZStack(alignment: .bottom) {
-        Button(action: session.dismiss) {
-          Color.black.opacity(0.2).contentShape(.rect)
+        if !session.allowsBackgroundInteraction {
+          Button(action: session.dismiss) {
+            Color.black.opacity(0.2).contentShape(.rect)
+          }
+          .buttonStyle(.plain)
+          .accessibilityHidden(true)
+          .accessibilityIdentifier("workout.keypad.dismiss")
+          .ignoresSafeArea()
         }
-        .buttonStyle(.plain)
-        .accessibilityHidden(true)
-        .accessibilityIdentifier("workout.keypad.dismiss")
-        .ignoresSafeArea()
 
         MeetPRNumberPad(
           field: cell.field, text: cell.value, contextText: cell.context, unit: cell.unit,
@@ -28,7 +30,7 @@ struct WorkoutKeypadOverlay: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(cell.context)
-        .accessibilityAddTraits(.isModal)
+        .accessibilityAddTraits(session.allowsBackgroundInteraction ? [] : .isModal)
         .accessibilityAction(.escape) { session.dismiss() }
         .accessibilityFocused($focusedCell, equals: cell.id)
         .onAppear { focusedCell = cell.id }

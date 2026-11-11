@@ -70,10 +70,12 @@ extension AllDaySummaryTests {
     let sets: [PrescribedSet]
     let reps: String
     let load: String
-    init(_ sets: [PrescribedSet], _ reps: String, _ load: String) {
+    let effort: String
+    init(_ sets: [PrescribedSet], _ reps: String, _ load: String, _ effort: String = "—") {
       self.sets = sets
       self.reps = reps
       self.load = load
+      self.effort = effort
     }
   }
   static let prescriptionCases: [PrescriptionCase] = [
@@ -81,11 +83,11 @@ extension AllDaySummaryTests {
     .init(Self.sets(3, reps: 8, weight: 60, repsMax: 10), "3×8–10", "60"),
     .init(Self.sets(3, reps: 10, load: .bodyweight), "3×10", "自重"),
     .init(Self.sets(3, reps: 8, weight: 10, load: .bodyweight), "3×8", "自重+10"),
-    .init(Self.sets(4, reps: 12, intensity: .rpe(8), load: .freeWeight), "4×12", "自选 · RPE 8"),
-    .init(Self.sets(3, intensity: .rpe(8)), "3×5", "RPE 8"),
-    .init(Self.sets(3, intensity: .rpeRange(7, 8)), "3×5", "RPE 7–8"),
-    .init(Self.sets(3, reps: 10, intensity: .rir(2)), "3×10", "RIR 2"),
-    .init(Self.sets(4, weight: 100, intensity: .rpe(7)), "4×5", "100 · RPE 7"),
+    .init(Self.sets(4, reps: 12, intensity: .rpe(8), load: .freeWeight), "4×12", "自选", "RPE 8"),
+    .init(Self.sets(3, intensity: .rpe(8)), "3×5", "—", "RPE 8"),
+    .init(Self.sets(3, intensity: .rpeRange(7, 8)), "3×5", "—", "RPE 7–8"),
+    .init(Self.sets(3, reps: 10, intensity: .rir(2)), "3×10", "—", "RIR 2"),
+    .init(Self.sets(4, weight: 100, intensity: .rpe(7)), "4×5", "100", "RPE 7"),
     .init(Self.sets(5, intensity: .percentage(75)), "5×5", "75%"),
     .init(Self.sets(3, intensity: .percentage(60), anchor: .topSet), "3×5", "60% 顶组"),
   ]
@@ -95,6 +97,7 @@ extension AllDaySummaryTests {
       rows: Self.rows(sample.sets), locale: Locale(identifier: "zh-Hans"))
     #expect(result.segments.map(\.reps) == [sample.reps])
     #expect(result.segments.map(\.load) == [sample.load])
+    #expect(result.segments.map(\.effort) == [sample.effort])
   }
 
   @Test func varyingRPEKeepsCoachWordsAndHidesSuggestedWeightsUntilRecorded() {
@@ -102,7 +105,8 @@ extension AllDaySummaryTests {
     var rows = Self.rows(sets)
     for index in rows.indices { rows[index].actualWeight = 60 }
     let result = AllDayExerciseSummary.build(rows: rows)
-    #expect(result.segments.map(\.load) == ["RPE 6/7/8/8"])
+    #expect(result.segments.map(\.load) == ["—"])
+    #expect(result.segments.map(\.effort) == ["RPE 6/7/8/8"])
     #expect(result.segments[0].intensityOnly)
     let weighted = [6, 7, 8, 8].flatMap {
       Self.sets(1, reps: 12, weight: 100, intensity: .rpe(Decimal($0)))
@@ -151,5 +155,24 @@ extension AllDaySummaryTests {
     #expect(restored.setType == .working)
     #expect(restored.weightKg == 100)
     #expect(restored.id == set.id)
+  }
+}
+
+@Test func fixedColumnsReserveMissingWeightForRPE() {
+  let result = AllDayExerciseSummary.build(
+    rows: AllDaySummaryTests.rows(AllDaySummaryTests.sets(3, intensity: .rpe(8))))
+  #expect(result.segments.map(\.load) == ["—"])
+  #expect(result.segments.map(\.effort) == ["RPE 8"])
+}
+
+extension AllDaySummaryTests {
+  @Test func sameRepsStayInOneSegmentAfterRecordingOneWeight() {
+    var rows = Self.rows(Self.sets(4, reps: 5, weight: 100))
+    rows[0].actualWeight = 90
+    rows[0].loggedSetID = UUID()
+    let result = AllDayExerciseSummary.build(rows: rows)
+    #expect(result.segments.map(\.reps) == ["4×5"])
+    #expect(result.segments.map(\.load) == ["90 / 100×3"])
+    #expect(result.segments.first?.weightChanged == true)
   }
 }
