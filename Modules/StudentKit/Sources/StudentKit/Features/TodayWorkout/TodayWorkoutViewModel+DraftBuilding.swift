@@ -323,6 +323,7 @@ extension TodayWorkoutViewModel {
     for day: StudentPlanDay,
     existingLogs: [StudentSetLog],
     suggestions: [SetWeightSuggestionRecord] = [],
+    historyWeightPrefillEnabled: Bool = historyWeightPrefillEnabledByDefault,
     onboardingProfile: OnboardingProfile? = nil
   ) -> [SetRowDraft] {
     day.exercises.flatMap { exercise in
@@ -331,7 +332,7 @@ extension TodayWorkoutViewModel {
           exercise: exercise,
           set: set,
           existingLogs: existingLogs,
-          suggestions: suggestions,
+          suggestions: historyWeightPrefillEnabled ? suggestions : [],
           onboardingProfile: onboardingProfile
         )
       } + StudentAddedRows.restoredExtras(exercise: exercise, logs: existingLogs)

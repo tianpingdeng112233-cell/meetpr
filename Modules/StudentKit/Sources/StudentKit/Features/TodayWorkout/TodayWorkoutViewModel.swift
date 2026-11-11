@@ -19,6 +19,9 @@ public final class TodayWorkoutViewModel {
   public typealias SetRowDraft = TodayWorkoutSetRowDraft
   public typealias RestTimerState = TodayWorkoutRestTimerState
 
+  /// Spec 107 walkthrough round 4: keep historical weight prefill paused.
+  public static let historyWeightPrefillEnabledByDefault = false
+
   private struct LoadedDaySnapshot {
     let day: StudentPlanDay
     let drafts: [SetRowDraft]
@@ -93,6 +96,7 @@ public final class TodayWorkoutViewModel {
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let restTimerActivityController: any RestTimerActivityControlling
+  private let historyWeightPrefillEnabled: Bool
   private let calendar: Calendar
   private let now: @Sendable () -> Date
   private let completionSleep: @MainActor @Sendable () async -> Void
@@ -124,6 +128,7 @@ public final class TodayWorkoutViewModel {
       UserDefaultsRestTimerSettingsStore(),
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
+    historyWeightPrefillEnabled: Bool = TodayWorkoutViewModel.historyWeightPrefillEnabledByDefault,
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() },
     completionSleep: @escaping @MainActor @Sendable () async -> Void = {
@@ -140,6 +145,7 @@ public final class TodayWorkoutViewModel {
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
     self.restTimerActivityController = restTimerActivityController
+    self.historyWeightPrefillEnabled = historyWeightPrefillEnabled
     restTimerActivityController.end()
     self.calendar = calendar
     self.now = now
@@ -609,17 +615,18 @@ public final class TodayWorkoutViewModel {
       studentID: studentID,
       before: day.scheduledDate
     )
-    async let suggestions = try? plans.weightSuggestions(studentID: studentID, dayID: day.id)
+    async let suggestions = historyWeightSuggestions(studentID: studentID, dayID: day.id)
     async let historyRefresh: Void = refreshAddedHistory(plan: plan, studentID: studentID)
     let (referenceSnapshot, historyLogs) = try await (referenceSnapshotTask, historyLogsTask)
     await historyRefresh
-    let matchingSuggestions = await suggestions ?? []
+    let matchingSuggestions = await suggestions
     return LoadedDaySnapshot(
       day: day,
       drafts: restoredStudentDrafts(
         day: day,
         planned: Self.makeDrafts(
           for: day, existingLogs: existingLogs, suggestions: matchingSuggestions,
+          historyWeightPrefillEnabled: historyWeightPrefillEnabled,
           onboardingProfile: onboardingProfile)),
       accessoryPreviousLogs: Dictionary(
         uniqueKeysWithValues: day.exercises.map { exercise in
@@ -638,6 +645,13 @@ public final class TodayWorkoutViewModel {
         planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)
       )
     )
+  }
+
+  private func historyWeightSuggestions(studentID: UUID, dayID: UUID) async
+    -> [SetWeightSuggestionRecord]
+  {
+    guard historyWeightPrefillEnabled else { return [] }
+    return (try? await plans.weightSuggestions(studentID: studentID, dayID: dayID)) ?? []
   }
 
   private func refreshAddedHistory(plan: StudentPlanView, studentID: UUID) async {

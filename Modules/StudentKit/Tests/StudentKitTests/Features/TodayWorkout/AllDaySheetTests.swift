@@ -109,7 +109,10 @@ import Testing
 }
 
 @MainActor
-@Test func allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion() throws {
+@Test(arguments: [false, true])
+func allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion(
+  historyPrefillEnabled: Bool
+) throws {
   let now = Date(timeIntervalSince1970: 1_768_262_400)
   let exercise = Exercise(
     id: UUID(), name: "Squat", exerciseType: .mainLift, isCompetitionLift: true,
@@ -132,8 +135,9 @@ import Testing
       sourceLoggedDate: "2026-01-01")
   }
   let rows = TodayWorkoutViewModel.makeDrafts(
-    for: day, existingLogs: [old], suggestions: suggestions)
-  #expect(rows.map(\.actualWeight) == [nil, 102.5, nil, 120])
+    for: day, existingLogs: [old], suggestions: suggestions,
+    historyWeightPrefillEnabled: historyPrefillEnabled)
+  #expect(rows.map(\.actualWeight) == [nil, historyPrefillEnabled ? 102.5 : nil, nil, 120])
   #expect(rows[0].actualReps == 4)
   #expect(rows[0].actualRPE == nil)
   #expect(rows[1].actualRPE == 8)
