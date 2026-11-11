@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (37)
 - 基底：`beta/1.0-35` @ `cfbbad09`；1.0(35) 已于 2026-11-08 上传（跳过 34，见 RELEASES），内容（106 / 103 §3 竖框 / 105 §6 RIR / 问教练）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：37（2026-11-11，agvtool new-version 37）；marketing version保持1.0。David确认ASC最新35、36未上传；旧 beta/1.0-36 @ b427a65e 保留，本次加入 #459 后切37。待37 tag CI和两台demo实际安装号核对后再由David Archive/Upload。证据见 `docs/journal/2026-11-11-107-release-cut.md`。
+- build 号：37，marketing version1.0。`beta/1.0-37` @ `fb1c46e0` 的CI run42968380551全绿；iPhone17教练/iPhone17Pro学员实际安装号均37，首页已核，CLI依赖预拉成功。David确认ASC最新35、36未上传；36 tag保留，本次可手动Archive/Upload 37。准确取包树与四基线见 `docs/journal/2026-11-11-107-release-cut.md`。
 
 ## 本版将包含
 
