@@ -159,3 +159,33 @@ import Testing
   keypad.dismiss()
   #expect(model.currentDrafts?.first?.actualWeight == nil)
 }
+
+@MainActor
+@Test func allDayEffortChoiceSurvivesReloadAndIsolatesAccountsAndExercises() async throws {
+  let suite = "effort-test-" + UUID().uuidString
+  let defaults = try #require(UserDefaults(suiteName: suite))
+  defer { defaults.removePersistentDomain(forName: suite) }
+  let student = UUID()
+  let otherStudent = UUID()
+  let plan = StudentAddedTestPlan.unsettledDemo()
+  let repository = InMemoryStudentPlanRepository(
+    store: TestStudentPlanStore(seed: [student: plan, otherStudent: plan]))
+  let model = TodayWorkoutViewModel(
+    plans: repository, logs: InMemoryStudentTrainingLogRepository(), effortDefaults: defaults)
+  await model.load(dayID: plan.days[0].id, studentID: student)
+  let row = try #require(AllDaySummaryTests.rows(AllDaySummaryTests.sets(1, weight: 100)).first)
+  #expect(model.previousAllDayEffort(for: row) == nil)
+  model.rememberAllDayEffort(.rir, for: row)
+  let restored = TodayWorkoutViewModel(
+    plans: repository, logs: InMemoryStudentTrainingLogRepository(), effortDefaults: defaults)
+  await restored.load(dayID: plan.days[0].id, studentID: student)
+  #expect(restored.previousAllDayEffort(for: row) == .rir)
+  #expect(row.allDayEffortMode(previous: restored.previousAllDayEffort(for: row)) == .rir)
+  let otherRow = try #require(
+    AllDaySummaryTests.rows(AllDaySummaryTests.sets(1, weight: 100)).first)
+  #expect(restored.previousAllDayEffort(for: otherRow) == nil)
+  await restored.load(dayID: plan.days[0].id, studentID: otherStudent)
+  #expect(restored.previousAllDayEffort(for: row) == nil)
+  await restored.load(dayID: plan.days[0].id, studentID: student)
+  #expect(restored.previousAllDayEffort(for: row) == .rir)
+}

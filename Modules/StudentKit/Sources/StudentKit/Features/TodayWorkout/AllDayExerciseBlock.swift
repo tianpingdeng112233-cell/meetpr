@@ -19,6 +19,7 @@ struct AllDayExerciseBlock: View {
       AllDayExerciseHeader(
         group: group, expanded: expanded, hidesName: hidesName,
         unit: viewModel?.onboardingProfile?.unitPreference ?? .kg,
+        previousEffort: group.rows.first.flatMap { viewModel?.previousAllDayEffort(for: $0) },
         editable: editable, writing: viewModel?.allDayWriting == true,
         onExpand: onExpand,
         onComplete: { Task { _ = await viewModel?.toggleAllDayExercise(group.id) } })
@@ -83,6 +84,7 @@ private struct AllDayExerciseHeader: View {
   let expanded: Bool
   let hidesName: Bool
   let unit: UnitPreference
+  let previousEffort: ActualEffortMode?
   let editable: Bool
   let writing: Bool
   let onExpand: () -> Void
@@ -94,7 +96,8 @@ private struct AllDayExerciseHeader: View {
         AllDayExerciseLabel(
           name: hidesName ? "" : name, completed: group.node == .completed,
           expanded: expanded, editable: editable,
-          summary: AllDayExerciseSummary.build(rows: group.rows, unit: unit)
+          summary: AllDayExerciseSummary.build(
+            rows: group.rows, unit: unit, previousEffort: previousEffort)
         )
         .frame(minHeight: 48)
         .contentShape(.rect)

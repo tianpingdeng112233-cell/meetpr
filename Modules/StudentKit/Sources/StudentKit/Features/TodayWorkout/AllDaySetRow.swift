@@ -29,6 +29,7 @@ struct AllDaySetRow: View {
       } else {
         AllDaySetValues(
           draft: draft, shortReps: shortReps,
+          previousEffort: viewModel?.previousAllDayEffort(for: draft),
           unit: viewModel?.onboardingProfile?.unitPreference ?? .kg,
           editable: editable, onEdit: openEditor
         )
@@ -92,6 +93,7 @@ struct AllDaySetRow: View {
 private struct AllDaySetValues: View {
   let draft: TodayWorkoutSetRowDraft
   let shortReps: Bool
+  let previousEffort: ActualEffortMode?
   let unit: UnitPreference
   let editable: Bool
   let onEdit: (MeetPRNumberPad.Field) -> Void
@@ -160,9 +162,7 @@ private struct AllDaySetValues: View {
   }
 
   private var effortField: MeetPRNumberPad.Field {
-    if draft.actualRIR != nil { return .rir }
-    if case .rir = draft.prescribed.intensity, draft.actualRPE == nil { return .rir }
-    return .rpe
+    draft.allDayEffortMode(previous: previousEffort) == .rir ? .rir : .rpe
   }
 
   private var weightChanged: Bool {
@@ -198,8 +198,7 @@ private struct AllDaySetValues: View {
   private var effortText: String {
     if let rir = draft.actualRIR { return "RIR \(rir)" }
     if let rpe = draft.actualRPE { return "RPE \(StudentFormatting.decimal(rpe))" }
-    if case .rir = draft.prescribed.intensity { return "RIR —" }
-    return "RPE —"
+    return draft.emptyEffortMode(previous: previousEffort).label + " —"
   }
 }
 
@@ -213,7 +212,10 @@ private struct AllDayInlineEditor: View {
       ForEach(
         WorkoutKeypadCell.allDayCells(
           draft: draft, unit: viewModel?.onboardingProfile?.unitPreference ?? .kg,
-          effortOverride: keypad?.effortField(for: draft.id))
+          effortOverride: keypad?.effortField(for: draft.id)
+            ?? (draft.allDayEffortMode(previous: viewModel?.previousAllDayEffort(for: draft))
+              == .rir
+              ? .rir : .rpe))
       ) { cell in
         VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           HStack(spacing: MeetPRSpacing.space2) {
@@ -279,6 +281,7 @@ private struct AllDayInlineEditor: View {
   private func switchEffort(_ field: MeetPRNumberPad.Field) {
     guard let viewModel else { return }
     keypad?.openAllDay(draft: draft, viewModel: viewModel, field: field)
+    viewModel.rememberAllDayEffort(field == .rir ? .rir : .rpe, for: draft)
   }
 
 }

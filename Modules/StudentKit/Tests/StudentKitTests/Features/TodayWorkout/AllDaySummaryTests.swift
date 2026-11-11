@@ -71,7 +71,7 @@ extension AllDaySummaryTests {
     let reps: String
     let load: String
     let effort: String
-    init(_ sets: [PrescribedSet], _ reps: String, _ load: String, _ effort: String = "—") {
+    init(_ sets: [PrescribedSet], _ reps: String, _ load: String, _ effort: String = "RPE —") {
       self.sets = sets
       self.reps = reps
       self.load = load
@@ -196,5 +196,33 @@ extension AllDaySummaryTests {
       rows[index].actualRIR = value
     }
     #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.effort) == ["RIR 3/2/1/1"])
+  }
+}
+
+extension AllDaySummaryTests {
+  @Test func emptyRecordedEffortKeepsCoachTypeWithoutRestoringTarget() {
+    var rows = Self.rows(Self.sets(2, weight: 100, intensity: .rir(2)))
+    for index in rows.indices { rows[index].loggedSetID = UUID() }
+    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.effort) == ["RIR —"])
+    rows[0].actualRPE = 8
+    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.effort) == ["RPE 8 / RIR —"])
+  }
+}
+
+extension AllDaySummaryTests {
+  @Test func emptyEffortUsesRememberedTypeAfterCoachAndNeverRelabelsActuals() {
+    var rows = Self.rows(Self.sets(2, weight: 100))
+    #expect(
+      AllDayExerciseSummary.build(rows: rows, previousEffort: .rir).segments[0].effort == "RIR —")
+    rows[0].prescribed = PrescribedSet(
+      id: rows[0].id, setIndex: 0, weightKg: 100, intensity: .rpe(7), reps: 5)
+    rows[0].loggedSetID = UUID()
+    #expect(
+      AllDayExerciseSummary.build(rows: rows, previousEffort: .rir).segments[0].effort
+        == "RPE — / RIR —")
+    rows[0].actualRPE = 8
+    #expect(
+      AllDayExerciseSummary.build(rows: rows, previousEffort: .rir).segments[0].effort
+        == "RPE 8 / RIR —")
   }
 }

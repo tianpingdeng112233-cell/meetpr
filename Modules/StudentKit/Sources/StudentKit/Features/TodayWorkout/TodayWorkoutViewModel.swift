@@ -57,6 +57,8 @@ public final class TodayWorkoutViewModel {
   var allDayCollapsed: [UUID: Set<UUID>] = [:]
   var allDayExpansion: [UUID: UUID] = [:]
   var allDayWriting = false
+  var allDayEffortChoices: [UUID: ActualEffortMode] = [:]
+  private let effortDefaults: UserDefaults
 
   public private(set) var state: State = .idle
   var accessoryVideosLoaded = false
@@ -129,6 +131,7 @@ public final class TodayWorkoutViewModel {
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
     historyWeightPrefillEnabled: Bool = TodayWorkoutViewModel.historyWeightPrefillEnabledByDefault,
+    effortDefaults: UserDefaults = .standard,
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() },
     completionSleep: @escaping @MainActor @Sendable () async -> Void = {
@@ -139,6 +142,7 @@ public final class TodayWorkoutViewModel {
     self.setSyncCompletion = setSyncQueue.map {
       SetSyncCompletionCoordinator(queue: $0, sleep: setSyncSleep)
     }
+    self.effortDefaults = effortDefaults
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
@@ -158,6 +162,14 @@ public final class TodayWorkoutViewModel {
     preloadedPlan: StudentPlanView? = nil
   ) async {
     if currentStudentID != studentID {
+      allDayEffortChoices = (effortDefaults.dictionary(forKey: "meetpr.effort.\(studentID)") ?? [:])
+        .reduce(into: [:]) { result, pair in
+          if let id = UUID(uuidString: pair.key), let raw = pair.value as? String,
+            let mode = ActualEffortMode(rawValue: raw)
+          {
+            result[id] = mode
+          }
+        }
       studentDraftCache = [:]
       addedDatePins = [:]
       addedLogs = []
@@ -2223,6 +2235,24 @@ extension TodayWorkoutViewModel {
       Dictionary(grouping: currentDrafts ?? [], by: \.planExerciseID)
         .filter { !$0.value.isEmpty && $0.value.allSatisfy { $0.completed && $0.hasSavedRecord } }
         .map(\.key))
+  }
+
+  func previousAllDayEffort(for draft: SetRowDraft) -> ActualEffortMode? {
+    if let mode = allDayEffortChoices[draft.exerciseID] { return mode }
+    let previous = accessoryPreviousLogs[draft.planExerciseID]?.values
+      .filter { $0.actualRIR != nil || $0.rpe != nil }
+      .max { $0.loggedAt < $1.loggedAt }
+    if let previous { return previous.actualRIR == nil ? .rpe : .rir }
+    return nil
+  }
+
+  func rememberAllDayEffort(_ mode: ActualEffortMode, for draft: SetRowDraft) {
+    guard let studentID = currentStudentID else { return }
+    allDayEffortChoices[draft.exerciseID] = mode
+    effortDefaults.set(
+      Dictionary(
+        uniqueKeysWithValues: allDayEffortChoices.map { ($0.key.uuidString, $0.value.rawValue) }),
+      forKey: "meetpr.effort.\(studentID)")
   }
 
   var allDaySheet: [AllDayExercise] {

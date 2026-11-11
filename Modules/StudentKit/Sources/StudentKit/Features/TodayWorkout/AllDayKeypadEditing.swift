@@ -7,7 +7,7 @@ extension WorkoutKeypadCell {
     draft: TodayWorkoutSetRowDraft, unit: UnitPreference = .kg,
     effortOverride: MeetPRNumberPad.Field? = nil
   ) -> [Self] {
-    let effort = effortOverride ?? (draft.actualRIR == nil ? .rpe : .rir)
+    let effort = effortOverride ?? (draft.allDayEffortMode() == .rir ? .rir : .rpe)
     return [
       Self(
         rowID: draft.id, field: .weight,
@@ -31,7 +31,10 @@ extension WorkoutKeypadSession {
   func openAllDay(
     draft: TodayWorkoutSetRowDraft, viewModel: TodayWorkoutViewModel, field: MeetPRNumberPad.Field
   ) {
-    let previousEffort = effortField(for: draft.id)
+    let previousEffort =
+      effortField(for: draft.id)
+      ?? (draft.allDayEffortMode(previous: viewModel.previousAllDayEffort(for: draft)) == .rir
+        ? .rir : .rpe)
     if current != nil { dismiss() }
     let dayID = viewModel.currentDay?.id
     let unit = viewModel.onboardingProfile?.unitPreference ?? .kg
@@ -57,6 +60,7 @@ extension WorkoutKeypadSession {
         guard reps != current.actualReps else { return }
         viewModel.updateReps(rowIndex: index, reps: reps)
       case .rpe, .rir:
+        viewModel.rememberAllDayEffort(cell.field == .rir ? .rir : .rpe, for: current)
         let rpe = cell.field == .rpe ? Decimal(string: input.committedText) : nil
         let rir = cell.field == .rir ? Int(input.committedText) : nil
         guard rpe != current.actualRPE || rir != current.actualRIR else { return }

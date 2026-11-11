@@ -54,3 +54,13 @@ David 拒收仅上下排布，要求如 Excel 同类数据固定位置，并统�
 - iOS全量1273项通过；RN摘要+页面79项通过；SwiftLint/ESLint/tsc通过。定向独立审查CLEAN。
 - 原生已看到两端6/7/8/8与展开行一致，证据 outputs/fixed-columns/ios-effort-summary-fixed.png、android-effort-summary-fixed.png。iOS保留用户已录入的演示记录；后续临时改值试验因当前页面已切换，未执行成功，不计入验证。Android画廊增加仅内存草稿用于录入演示，不进提交。
 - David“等等”撤回本轮放行，发版继续暂停。上轮收货后的发版准备只有口头说明，未执行合并/bump/tag/上传操作。本次修复待重新确认。
+
+
+## 空强度类型优先级与同动作选择记忆（David 2026-11-11 追加）
+
+- David 明确拍板：未填时按教练指定类型 → 自己上次同动作选择 → RPE；冲突澄清：教练 RIR、本次填 RPE 8 时仍显示 RPE 8，不换算、不换标签。已有实际值永远保留实际类型和值。
+- 实现：摘要、展开行、编辑入口统一空值类型；教练 RIR 的已记录空值显示 RIR —，不补回目标值。用户切换或输入时记住类型，按账号和动作库 ID 隔离，重开仍保留；iOS 用 UserDefaults、RN 用既有 AsyncStorage。已有可用训练历史作为升级后的回退来源，不复制历史数值。没有后端 schema 或日志迁移。
+- 测试 seam 沿用 AllDaySummary/buildAllDaySheet/真实训练页编辑与 VM：先红后绿覆盖空 RIR、已填实际优先、混合 RPE/RIR、记忆恢复与账号/动作隔离。RN 独立 Spec 审查发现空自加摘要及偏好 ID 查询漏接，已补两条先红后绿回归并定向复审 CLEAN。Standards 独立审查 CLEAN。
+- 验证：iOS StudentKit 全量 1276 tests / 90 suites；RN 94 tests / 4 suites；TypeScript、ESLint、swift-format strict、SwiftLint 通过。日志在当前 Codex workspace 的 work/fixed-columns/effort-priority-*；仅格式修正发生在测试/原生构建后，没有语义变化。
+- 原生：iPhone 17e 构建运行成功（11:22 build_run_sim，83.9s）；高位下拉无值时从 RPE 切 RIR，摘要和两组均为 RIR —，既有深蹲 RPE 6/7/8/8 保留。Android 5570 独立 QA 包同样显示 RIR —；重开验证沿用相同包/数据。截图 outputs/fixed-columns/ios-effort-priority-empty.jpg、android-effort-priority-empty.png；AX/UI 重开证据 effort-priority-ios-restart.json、effort-priority-android-restart.txt。iOS 首次 launch 使用错误参数名 args 导致进入普通 demo，未写数据，随后用正确 launchArgs 重开 QA。
+- QA 入口与 fixture 不提交；正式 Android 包和登录态未动，5556 未动。发布仍暂停，未合并、未 bump/tag、未 Archive/OSS；等 David 再次收货。

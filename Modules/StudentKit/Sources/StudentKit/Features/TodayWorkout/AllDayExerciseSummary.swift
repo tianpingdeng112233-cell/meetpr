@@ -19,9 +19,11 @@ struct AllDayExerciseSummary: Equatable, Sendable {
 
   static func build(
     rows: [TodayWorkoutSetRowDraft], unit: UnitPreference = .kg,
-    locale: Locale = .current
+    locale: Locale = .current, previousEffort: ActualEffortMode? = nil
   ) -> Self {
-    let values = rows.map { segment($0, unit: unit, locale: locale) }
+    let values = rows.map {
+      segment($0, unit: unit, locale: locale, previousEffort: previousEffort)
+    }
     var groups: [[Segment]] = []
     for value in values {
       if let last = groups.last?.first, last.reps == value.reps {
@@ -55,7 +57,8 @@ struct AllDayExerciseSummary: Equatable, Sendable {
   }
 
   private static func segment(
-    _ row: TodayWorkoutSetRowDraft, unit: UnitPreference, locale: Locale
+    _ row: TodayWorkoutSetRowDraft, unit: UnitPreference, locale: Locale,
+    previousEffort: ActualEffortMode?
   ) -> Segment {
     let recorded = row.hasSavedRecord || row.completed || row.isStudentAdded || row.isExtra
     let count = recorded ? row.actualReps : row.prescribed.reps
@@ -73,7 +76,9 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     let rowEffort = recorded ? actualEffort(row) : effort(row.prescribed)
     let text = load.intensityOnly && load.text == rowEffort ? "—" : load.text
     return Segment(
-      reps: reps, load: text, effort: rowEffort ?? "—", intensityOnly: load.intensityOnly,
+      reps: reps, load: text,
+      effort: rowEffort ?? (row.emptyEffortMode(previous: previousEffort).label + " —"),
+      intensityOnly: load.intensityOnly,
       repsChanged: recorded && count != row.prescribed.reps,
       loadChanged: recorded
         && (row.actualWeight != row.prescribed.weightKg
