@@ -64,3 +64,11 @@ David 拒收仅上下排布，要求如 Excel 同类数据固定位置，并统�
 - 验证：iOS StudentKit 全量 1276 tests / 90 suites；RN 94 tests / 4 suites；TypeScript、ESLint、swift-format strict、SwiftLint 通过。日志在当前 Codex workspace 的 work/fixed-columns/effort-priority-*；仅格式修正发生在测试/原生构建后，没有语义变化。
 - 原生：iPhone 17e 构建运行成功（11:22 build_run_sim，83.9s）；高位下拉无值时从 RPE 切 RIR，摘要和两组均为 RIR —，既有深蹲 RPE 6/7/8/8 保留。Android 5570 独立 QA 包同样显示 RIR —；重开验证沿用相同包/数据。截图 outputs/fixed-columns/ios-effort-priority-empty.jpg、android-effort-priority-empty.png；AX/UI 重开证据 effort-priority-ios-restart.json、effort-priority-android-restart.txt。iOS 首次 launch 使用错误参数名 args 导致进入普通 demo，未写数据，随后用正确 launchArgs 重开 QA。
 - QA 入口与 fixture 不提交；正式 Android 包和登录态未动，5556 未动。发布仍暂停，未合并、未 bump/tag、未 Archive/OSS；等 David 再次收货。
+
+## 2026-11-11 定稿与新包准备
+
+- David 明确「定稿 切包发新版本」，恢复本卡全部已验收改动的合入与发布授权；不包含延期候选或其他分支。
+- David 确认 iOS38 已上传、39 未用；Android12 未上传、13 未用。目标 iOS1.0(39)/AndroidCN0.1.0(13)。线上 latest.json 实读仍为11。
+- 本卡源码和临时QA入口已分离；发布只使用正式入口。iOS既有Archive树的用户改动保留，不清理。
+- 本次改动、测试、独立审查和原生证据见上文。实际值保留真实类型；未填按教练、同动作偏好、默认RPE。
+- 正典 RELEASES/NEXT-RELEASE/PARITY 仍待 Opus 按已核实发布事实定稿；此处记录执行证据，不宣称已上传或已上线。Archive/ASC上传及Android签名密码、OSS上传仍由David手动。
