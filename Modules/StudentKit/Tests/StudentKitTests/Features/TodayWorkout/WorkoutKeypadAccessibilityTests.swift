@@ -72,7 +72,7 @@ struct WorkoutKeypadAccessibilityTests {
       values.append(value)
     }
     let cancel = try WorkoutKeypadOverlay(session: session).inspect()
-      .find(MeetPRNumberPad.self).find(button: DesignSystemStrings.done)
+      .find(MeetPRNumberPad.self).find(button: StudentStrings.localized(.allDayDone))
 
     try cancel.tap()
     #expect(session.current == nil)

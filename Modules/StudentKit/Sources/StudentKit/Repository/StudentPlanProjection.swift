@@ -91,6 +91,7 @@ enum StudentPlanProjection {
     return PrescribedSet(
       id: planSet.id,
       setIndex: planSet.setNumber - 1,
+      setType: planSet.setType,
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
       percentageAnchor: prescription.percentageAnchor,
@@ -146,12 +147,14 @@ enum StudentPlanProjection {
           PrescribedIntensity.rpeRange($0.0, $0.1)
         }
     case .fixedWeight:
-      intensity = nil
+      intensity =
+        planSet.targetRPE.map(PrescribedIntensity.rpe)
+        ?? planSet.rirTarget.map(PrescribedIntensity.rir)
     }
     let percentageAnchor =
       planSet.targetPct != nil ? planSet.percentageAnchor ?? .registeredOneRM : nil
     return Prescription(
-      weightKg: loadMode == .freeWeight || loadMode == .bodyweight ? nil : planSet.targetWeight,
+      weightKg: loadMode == .freeWeight ? nil : planSet.targetWeight,
       intensity: intensity,
       percentageAnchor: percentageAnchor
     )

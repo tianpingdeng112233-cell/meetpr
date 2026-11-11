@@ -127,6 +127,14 @@ public actor InMemoryChatRepository: ChatRepository {
     )
   }
 
+  public func sendExerciseNote(
+    in conversationID: UUID, body: String, exerciseRef: ExerciseRefV1, clientID: String
+  ) async throws -> ChatMessage {
+    try appendMessage(
+      in: conversationID, kind: .text, text: body, attachmentID: nil,
+      exerciseRef: exerciseRef, clientID: clientID)
+  }
+
   public func markRead(
     in conversationID: UUID,
     upTo messageID: UUID
@@ -162,6 +170,7 @@ public actor InMemoryChatRepository: ChatRepository {
     kind: ChatMessageKind,
     text: String?,
     attachmentID: UUID?,
+    exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
     clientID: String
   ) throws -> ChatMessage {
@@ -188,6 +197,7 @@ public actor InMemoryChatRepository: ChatRepository {
       attachmentID: attachmentID,
       imageURL: nil,
       imageExpiresIn: nil,
+      exerciseRef: exerciseRef,
       setRef: setRef,
       clientID: clientID,
       createdAt: createdAt

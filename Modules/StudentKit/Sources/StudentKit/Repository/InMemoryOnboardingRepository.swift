@@ -6,18 +6,41 @@ import RepositoryContracts
 /// semantics the UI depends on: three-state patch merge, the 18+1 completion
 /// gate (snake_case field names verbatim), the post-completion 1RM lock, and
 /// idempotent complete.
-public actor InMemoryOnboardingRepository: OnboardingRepository {
+public actor InMemoryOnboardingRepository: OnboardingRepository, BodyWeightRepository {
   private let studentId: UUID
   private var profile: OnboardingProfile?
+  private var bodyWeights: [BodyWeightRecord]
   private let now: @Sendable () -> Date
 
   public init(
     studentId: UUID,
     seed: OnboardingProfile? = nil,
+    seedRecentBodyWeights: Bool = false,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.studentId = studentId
     self.profile = seed
+    self.bodyWeights =
+      seed.flatMap { profile in
+        profile.weightKg.map {
+          [
+            BodyWeightRecord(
+              recordedOn: BodyWeightDay.string(from: profile.updatedAt), weightKg: $0)
+          ]
+        }
+      } ?? []
+    if seedRecentBodyWeights, let weight = seed?.weightKg {
+      let today = now()
+      let calendar = Calendar(identifier: .gregorian)
+      self.bodyWeights = [29, 24, 19, 14, 9, 4, 0].compactMap { daysAgo in
+        guard let date = calendar.date(byAdding: .day, value: -daysAgo, to: today) else {
+          return nil
+        }
+        return BodyWeightRecord(
+          recordedOn: BodyWeightDay.string(from: date),
+          weightKg: weight + Decimal(daysAgo) / 20)
+      }
+    }
     self.now = now
   }
 
@@ -38,7 +61,45 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
 
     let updated = Self.applied(patch, to: current, updatedAt: timestamp)
     profile = updated
+    if case .value(let weight) = patch.weightKg,
+      current.weightKg != weight || bodyWeights.isEmpty
+    {
+      let day = BodyWeightDay.string(from: timestamp)
+      bodyWeights.removeAll { $0.recordedOn == day }
+      bodyWeights.append(BodyWeightRecord(recordedOn: day, weightKg: weight))
+    }
     return updated
+  }
+
+  func fetchBodyWeights() async throws -> [BodyWeightRecord] {
+    bodyWeights.sorted { $0.recordedOn < $1.recordedOn }
+  }
+
+  func saveTodaysWeight(_ kilograms: Decimal) async throws -> Decimal? {
+    let day = BodyWeightDay.string(from: now())
+    bodyWeights.removeAll { $0.recordedOn == day }
+    bodyWeights.append(BodyWeightRecord(recordedOn: day, weightKg: kilograms))
+    return syncCurrentWeight()
+  }
+
+  func deleteBodyWeight(on date: String) async throws -> Decimal? {
+    guard bodyWeights.contains(where: { $0.recordedOn == date }) else {
+      throw BodyWeightError.notFound
+    }
+    bodyWeights.removeAll { $0.recordedOn == date }
+    return syncCurrentWeight()
+  }
+
+  private func syncCurrentWeight() -> Decimal? {
+    let latest = bodyWeights.max { $0.recordedOn < $1.recordedOn }?.weightKg
+    var patch = OnboardingPatch()
+    patch.weightKg = latest.map { .value($0) } ?? .null
+    let current =
+      profile
+      ?? OnboardingProfile(
+        userId: studentId, createdAt: now(), updatedAt: now())
+    profile = Self.applied(patch, to: current, updatedAt: now())
+    return latest
   }
 
   public func complete() async throws -> OnboardingProfile {

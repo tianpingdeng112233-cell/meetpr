@@ -12,7 +12,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
   public let setIndex: Int
   public let loggedAt: Date
   public let loggedDate: String?
-  public let weightKg: Decimal
+  public let weightKg: Decimal?
   public let reps: Int
   public let actualRIR: Int?
   public let rpe: Decimal?
@@ -29,7 +29,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     setIndex: Int,
     loggedAt: Date,
     loggedDate: String? = nil,
-    weightKg: Decimal,
+    weightKg: Decimal?,
     reps: Int,
     rpe: Decimal? = nil,
     actualRIR: Int? = nil,
@@ -64,7 +64,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     setIndex = try container.decode(Int.self, forKey: .setIndex)
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
     loggedDate = try container.decodeIfPresent(String.self, forKey: .loggedDate)
-    weightKg = try container.decodeDecimal(forKey: .weightKg)
+    weightKg = try container.decodeDecimalIfPresent(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     actualRIR = try container.decodeIfPresent(Int.self, forKey: .actualRIR)
@@ -83,7 +83,11 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encode(setIndex, forKey: .setIndex)
     try container.encode(loggedAt, forKey: .loggedAt)
     try container.encodeIfPresent(loggedDate, forKey: .loggedDate)
-    try container.encodeDecimalString(weightKg, forKey: .weightKg)
+    if let weightKg {
+      try container.encodeDecimalString(weightKg, forKey: .weightKg)
+    } else {
+      try container.encodeNil(forKey: .weightKg)
+    }
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(actualRIR, forKey: .actualRIR)

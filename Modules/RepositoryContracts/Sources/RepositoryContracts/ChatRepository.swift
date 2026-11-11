@@ -101,6 +101,9 @@ public protocol ChatRepository: Sendable {
     videoID: UUID?,
     clientID: String
   ) async throws -> ChatMessage
+  func sendExerciseNote(
+    in conversationID: UUID, body: String, exerciseRef: ExerciseRefV1, clientID: String
+  ) async throws -> ChatMessage
   func markRead(in conversationID: UUID, upTo messageID: UUID) async throws -> ChatReadState
 }
 
@@ -114,6 +117,14 @@ extension ChatRepository {
     setRef: SetRefV1,
     videoID: UUID?,
     clientID: String
+  ) async throws -> ChatMessage {
+    try await sendText(in: conversationID, text: body, clientID: clientID)
+  }
+}
+
+extension ChatRepository {
+  public func sendExerciseNote(
+    in conversationID: UUID, body: String, exerciseRef: ExerciseRefV1, clientID: String
   ) async throws -> ChatMessage {
     try await sendText(in: conversationID, text: body, clientID: clientID)
   }

@@ -130,6 +130,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
   public let attachmentID: UUID?
   public let imageURL: URL?
   public let imageExpiresIn: Int?
+  public let exerciseRef: ExerciseRefV1?
   public let setRef: SetRefV1?
   public let videoURL: URL?
   public let videoExpiresIn: Int?
@@ -148,6 +149,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     attachmentID: UUID?,
     imageURL: URL?,
     imageExpiresIn: Int?,
+    exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
     videoURL: URL? = nil,
     videoExpiresIn: Int? = nil,
@@ -165,6 +167,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     self.attachmentID = attachmentID
     self.imageURL = imageURL
     self.imageExpiresIn = imageExpiresIn
+    self.exerciseRef = exerciseRef
     self.setRef = setRef
     self.videoURL = videoURL
     self.videoExpiresIn = videoExpiresIn
@@ -185,6 +188,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     attachmentID = try container.decodeIfPresent(UUID.self, forKey: .attachmentID)
     imageURL = try container.decodeIfPresent(URL.self, forKey: .imageURL)
     imageExpiresIn = try container.decodeIfPresent(Int.self, forKey: .imageExpiresIn)
+    exerciseRef = try? container.decode(ExerciseRefV1.self, forKey: .exerciseRef)
     setRef = try? container.decode(SetRefV1ReadValue.self, forKey: .setRef).value
     videoURL = try container.decodeIfPresent(URL.self, forKey: .videoURL)
     videoExpiresIn = try container.decodeIfPresent(Int.self, forKey: .videoExpiresIn)
@@ -205,6 +209,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
       attachmentID: attachmentID,
       imageURL: imageURL,
       imageExpiresIn: imageExpiresIn,
+      exerciseRef: exerciseRef,
       setRef: setRef,
       videoURL: videoURL,
       videoExpiresIn: videoExpiresIn,
@@ -225,6 +230,7 @@ public struct ChatMessageDTO: Codable, Equatable, Sendable {
     case attachmentID = "attachmentId"
     case imageURL = "imageUrl"
     case imageExpiresIn
+    case exerciseRef
     case setRef
     case videoURL = "videoUrl"
     case videoExpiresIn
@@ -306,6 +312,7 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
   public let body: String?
   public let attachmentID: UUID?
   public let clientID: String
+  public let exerciseRef: ExerciseRefV1?
   public let setRef: SetRefV1?
   public let videoID: UUID?
 
@@ -314,6 +321,7 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
     body: String? = nil,
     attachmentID: UUID? = nil,
     clientID: String,
+    exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
     videoID: UUID? = nil
   ) {
@@ -321,6 +329,7 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
     self.body = body
     self.attachmentID = attachmentID
     self.clientID = clientID
+    self.exerciseRef = exerciseRef
     self.setRef = setRef
     self.videoID = videoID
   }
@@ -330,6 +339,7 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
     case body
     case attachmentID = "attachmentId"
     case clientID = "clientId"
+    case exerciseRef
     case setRef
     case videoID
   }

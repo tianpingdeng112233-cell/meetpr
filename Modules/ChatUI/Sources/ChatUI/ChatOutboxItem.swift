@@ -3,6 +3,7 @@ import Foundation
 
 public enum PendingChatMessage: Hashable, Sendable {
   case text(String)
+  case exerciseNote(body: String, reference: ExerciseRefV1)
   case image(Data)
 }
 

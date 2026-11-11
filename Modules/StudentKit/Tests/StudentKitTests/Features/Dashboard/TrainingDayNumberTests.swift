@@ -9,10 +9,8 @@ import Testing
     let days = makeDays(slots: [2, 4, 6, 7])
     let numbers = StudentPlanSequence.dayNumbers(inWeek: days.reversed())
     #expect(days.compactMap { numbers[$0.id] } == [1, 2, 3, 4])
-    #expect(DashboardTodayPresentation.code(for: days[2], in: days) == "W2D3")
+    #expect(TrainingSequenceText.code(for: days[2], in: days) == "W2D3")
     #expect(TrainingSequenceText.code(for: days[3], in: days) == "W2D4")
-    #expect(
-      DashboardTodayPresentation.progressSegments(days: days).map(\.dayNumber) == [1, 2, 3, 4])
   }
 
   @Test func insertedEarlierDayRenumbersAndSortOrderBreaksTies() {

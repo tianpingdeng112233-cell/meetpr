@@ -234,3 +234,35 @@ private actor ChatRequestCountingRepository: ChatRepository {
     throw ChatRepositoryError.conversationNotFound
   }
 }
+
+@Test func studentTabsStartWithTrainingAndReplaceTodayWithCoach() {
+  #expect(
+    StudentTab.allCases.map { String(describing: $0) } == [
+      "training", "coach", "growth", "profile",
+    ])
+}
+
+@Test func chatPushOpensCoachFromEveryTab() {
+  let route = StudentNotificationRoute.route(for: .chatMessage(conversationID: UUID()))
+  for tab in StudentTab.allCases {
+    #expect(route.map { String(describing: $0.targetTab(from: tab)) } == "coach")
+  }
+}
+
+@Test func studentShellDefaultsToTrainingAndHidesCoachForSelfTraining() {
+  #expect(StudentTabShellPresentation.defaultTab == .training)
+  #expect(
+    StudentTabShellPresentation(selection: .training, allowsCoach: false).tabs == [
+      .training, .growth, .profile,
+    ])
+}
+
+@Test func upgradedStudentOpensCompletedTodayBeforeTheNextCursorDay() throws {
+  let now = Date()
+  let completed = StudentPlanDay(id: UUID(), date: now, completedAt: now, exercises: [])
+  let next = StudentPlanDay(
+    id: UUID(), sortOrder: 1, date: now.addingTimeInterval(86400), exercises: [])
+  #expect(
+    StudentTabShellPresentation.initialTrainingDay(in: [completed, next], now: now) == completed.id)
+  #expect(StudentTabShellPresentation.initialTrainingDay(in: [next], now: now) == next.id)
+}

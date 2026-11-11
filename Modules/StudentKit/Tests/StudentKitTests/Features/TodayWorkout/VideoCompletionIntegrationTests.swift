@@ -24,6 +24,7 @@ import Testing
     let workout = TodayWorkoutViewModel(
       plans: plans, logs: InMemoryStudentTrainingLogRepository(), setSyncQueue: queue)
     await workout.load(dayID: day.id, studentID: student)
+    queue.start()
     #expect(await workout.completeCurrentDay())
     #expect(workout.completionPhase == .celebration)
     #expect(try await plans.fetchDay(studentID: student, dayID: day.id)?.completedAt == nil)

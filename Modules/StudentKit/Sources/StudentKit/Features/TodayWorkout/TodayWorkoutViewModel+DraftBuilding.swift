@@ -8,7 +8,6 @@ extension TodayWorkoutViewModel {
   func weightSuggestion(forSetID setID: UUID) -> SetWeightSuggestion? {
     weightSuggestionOutcome(forSetID: setID).suggestion
   }
-
   func weightSuggestionOutcome(forSetID setID: UUID) -> SetWeightSuggestionOutcome {
     guard let drafts = currentDrafts,
       let draft = drafts.first(where: { $0.id == setID })
@@ -23,7 +22,6 @@ extension TodayWorkoutViewModel {
       registeredOneRMKg: registeredOneRMKg(for: draft.liftFamily)
     )
   }
-
   nonisolated static func weightSuggestion(
     forSetID setID: UUID,
     in drafts: [SetRowDraft],
@@ -39,7 +37,6 @@ extension TodayWorkoutViewModel {
       registeredOneRMKg: registeredOneRMKg
     ).suggestion
   }
-
   nonisolated static func weightSuggestionOutcome(
     forSetID setID: UUID,
     in drafts: [SetRowDraft],
@@ -56,7 +53,6 @@ extension TodayWorkoutViewModel {
     else {
       return .unavailableWithoutReason
     }
-
     switch target.prescribed.intensity {
     case .percentage(let percentage):
       return percentageSuggestionOutcome(
@@ -71,7 +67,6 @@ extension TodayWorkoutViewModel {
     case .rpe, nil:
       break
     }
-
     let baseOutcome: SetWeightSuggestionOutcome
     if target.isMainLift {
       baseOutcome = mainLiftSuggestionOutcome(
@@ -87,7 +82,6 @@ extension TodayWorkoutViewModel {
     guard let suggestion = baseOutcome.suggestion else { return baseOutcome }
     return suggestionOutcome(suggestion, for: target)
   }
-
   private nonisolated static func suggestionOutcome(
     _ suggestion: SetWeightSuggestion,
     for target: SetRowDraft
@@ -105,7 +99,6 @@ extension TodayWorkoutViewModel {
     }
     return .unavailableWithoutReason
   }
-
   private nonisolated static func mainLiftSuggestionOutcome(
     target: SetRowDraft,
     priorDrafts: ArraySlice<SetRowDraft>,
@@ -311,7 +304,7 @@ extension TodayWorkoutViewModel {
     planExerciseToExercise: [UUID: UUID]
   ) -> [UUID: Decimal] {
     var latest: [UUID: StudentSetLog] = [:]
-    for log in logs where log.completed && !log.failed && log.weightKg > 0 {
+    for log in logs where log.completed && !log.failed && log.weightKg.map({ $0 > 0 }) == true {
       guard let exerciseID = log.exerciseID ?? planExerciseToExercise[log.planExerciseID] else {
         continue
       }
@@ -323,12 +316,14 @@ extension TodayWorkoutViewModel {
       }
       latest[exerciseID] = log
     }
-    return latest.mapValues(\.weightKg)
+    return latest.compactMapValues(\.weightKg)
   }
 
   static func makeDrafts(
     for day: StudentPlanDay,
     existingLogs: [StudentSetLog],
+    suggestions: [SetWeightSuggestionRecord] = [],
+    historyWeightPrefillEnabled: Bool = historyWeightPrefillEnabledByDefault,
     onboardingProfile: OnboardingProfile? = nil
   ) -> [SetRowDraft] {
     day.exercises.flatMap { exercise in
@@ -337,6 +332,7 @@ extension TodayWorkoutViewModel {
           exercise: exercise,
           set: set,
           existingLogs: existingLogs,
+          suggestions: historyWeightPrefillEnabled ? suggestions : [],
           onboardingProfile: onboardingProfile
         )
       } + StudentAddedRows.restoredExtras(exercise: exercise, logs: existingLogs)
@@ -347,11 +343,20 @@ extension TodayWorkoutViewModel {
     exercise: StudentPlanExercise,
     set: PrescribedSet,
     existingLogs: [StudentSetLog],
+    suggestions: [SetWeightSuggestionRecord] = [],
     onboardingProfile: OnboardingProfile? = nil
   ) -> SetRowDraft {
     let existingLog = existingLogs.first {
       $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
     }
+    let suggestedWeight: Decimal?
+    if case .rpe = set.intensity {
+      suggestedWeight = suggestions.first { $0.planSetID == set.id }?.weightKg
+    } else {
+      suggestedWeight = nil
+    }
+    let prescribedRIR: Int?
+    if case .rir(let value) = set.intensity { prescribedRIR = value } else { prescribedRIR = nil }
     return SetRowDraft(
       id: set.id,
       planExerciseID: exercise.id,
@@ -368,13 +373,10 @@ extension TodayWorkoutViewModel {
       ),
       planExerciseSortOrder: exercise.sequenceIndex,
       prescribed: set,
-      actualWeight: existingLog?.weightKg ?? set.weightKg,
-      actualReps: existingLog?.reps ?? set.reps,
-      actualRPE: set.loadMode == .bodyweight || set.loadMode == .freeWeight
-        ? (existingLog == nil ? set.rpe : existingLog?.rpe)
-        : exercise.exercise.isAccessory && existingLog != nil
-          ? existingLog?.rpe : existingLog?.rpe ?? set.rpe ?? 8,
-      actualRIR: existingLog?.actualRIR,
+      actualWeight: existingLog == nil ? (set.weightKg ?? suggestedWeight) : existingLog?.weightKg,
+      actualReps: existingLog?.reps ?? set.reps ?? set.repsMax,
+      actualRPE: existingLog == nil ? set.rpe : existingLog?.rpe,
+      actualRIR: existingLog == nil ? prescribedRIR : existingLog?.actualRIR,
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
       assumed: existingLog?.assumed ?? false,

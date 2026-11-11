@@ -58,8 +58,8 @@ private struct ProgressMetricAccumulator {
     add(weight: log.weightKg, reps: log.reps, rpe: log.rpe)
   }
 
-  mutating func add(weight: Decimal, reps: Int, rpe: Decimal?) {
-    volumeKg += weight * Decimal(reps)
+  mutating func add(weight: Decimal?, reps: Int, rpe: Decimal?) {
+    if let weight { volumeKg += weight * Decimal(reps) }
     if let rpe {
       rpeTotal += rpe
       rpeCount += 1

@@ -30,7 +30,7 @@ func everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family: LiftFamily) thr
   for empty in [true, false] {
     let card = GrowthE1RMCard(
       snapshot: .empty(family: family), range: .thirtyDays, isGlobalTrainingEmpty: empty,
-      onOpenToday: {}, onCycleRange: {}, onSelectPoint: { _ in })
+      onOpenTraining: {}, onCycleRange: {}, onSelectPoint: { _ in })
     let state = try card.inspect().find(GrowthZeroTrainingState.self).actualView()
     #expect(state.showsAction == empty)
   }

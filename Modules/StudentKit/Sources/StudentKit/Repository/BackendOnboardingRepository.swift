@@ -6,13 +6,22 @@ import RepositoryContracts
 /// No cache by design (spec 032 §9): archive edits must read back
 /// consistently; the wizard's offline resilience is LocalOnboardingDraftStore,
 /// not a stale profile copy.
-public actor BackendOnboardingRepository: OnboardingRepository {
+public actor BackendOnboardingRepository: OnboardingRepository, BodyWeightRepository {
   private let api: APIClient
   private let session: any SessionStateReader
 
-  public init(api: APIClient, session: any SessionStateReader) {
+  private let now: @Sendable () -> Date
+  private let timeZone: @Sendable () -> TimeZone
+
+  public init(
+    api: APIClient, session: any SessionStateReader,
+    now: @escaping @Sendable () -> Date = { Date() },
+    timeZone: @escaping @Sendable () -> TimeZone = { .current }
+  ) {
     self.api = api
     self.session = session
+    self.now = now
+    self.timeZone = timeZone
   }
 
   public func fetchProfile(studentId: UUID) async throws -> OnboardingProfile? {
@@ -36,6 +45,32 @@ public actor BackendOnboardingRepository: OnboardingRepository {
         .toDomain()
     } catch {
       throw Self.mappedOnboardingError(error) ?? error
+    }
+  }
+
+  func fetchBodyWeights() async throws -> [BodyWeightRecord] {
+    let token = try await session.accessToken()
+    return try await api.bodyWeights(accessToken: token).records.map {
+      BodyWeightRecord(recordedOn: $0.recordedOn, weightKg: $0.weightKg)
+    }
+  }
+
+  func deleteBodyWeight(on date: String) async throws -> Decimal? {
+    let token = try await session.accessToken()
+    return try await api.deleteBodyWeight(on: date, accessToken: token).currentWeightKg
+  }
+
+  /// The compatibility fallback applies only to a missing new endpoint.
+  func saveTodaysWeight(_ kilograms: Decimal) async throws -> Decimal? {
+    let date = BodyWeightDay.string(from: now(), timeZone: timeZone())
+    let token = try await session.accessToken()
+    do {
+      return try await api.saveBodyWeight(on: date, kilograms: kilograms, accessToken: token)
+        .currentWeightKg
+    } catch APIError.httpStatus(404, _) {
+      var patch = OnboardingPatch()
+      patch.weightKg = .value(kilograms)
+      return try await upsert(patch).weightKg
     }
   }
 

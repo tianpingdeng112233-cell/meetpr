@@ -57,6 +57,14 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var videoFailureCount = 0
   var onRetryVideos: () -> Void = {}
   var videoCompletion: VideoCompletionPresentation?
+  var onExerciseNote: (TodayWorkoutSetRowDraft) -> Void = { _ in }
+  var onRefreshAsync: (() async -> Void)?
+  var weightEntry: BodyWeightEntryModel?
+  var studentID: UUID?
+  var onEditMeet: () -> Void = {}
+  var emptyState: TrainingEmptyStatePresentation?
+  var showsCoach = true
+  var onEditProfile: () -> Void = {}
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -80,34 +88,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     .modifier(
       TrainingScrollInteraction(isScrolling: $isManualScrolling)
     )
-    .onChange(of: flowSnapshot) { old, new in
-      pendingScrollTarget = nil
-      guard old.dayID == new.dayID, new.dayID != nil else {
-        scrollTarget = nil
-        pendingScrollTarget = nil
-        feedbackExercises = []
-        return
-      }
-      let added = new.completed.filter { !old.completed.contains($0) }
-      feedbackExercises = added
-      for id in added { collapsedExercises[id] = true }
-      guard let target = added.last, !isManualScrolling, keypad?.current == nil else { return }
-      pendingScrollTarget = target
-    }
-    .task(id: pendingScrollTarget) {
-      guard let target = pendingScrollTarget else { return }
-      // A set may finish while its editor is dismissing. Let that presentation
-      // transaction settle before resolving the newly inserted scroll target.
-      do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
-      guard !isManualScrolling, keypad?.current == nil, flowSnapshot.completed.contains(target)
-      else {
-        if pendingScrollTarget == target { pendingScrollTarget = nil }
-        return
-      }
-      var transaction = Transaction(animation: nil)
-      transaction.disablesAnimations = true
-      withTransaction(transaction) { scrollTarget = target }
-      pendingScrollTarget = nil
+    .refreshable {
+      if let onRefreshAsync { await onRefreshAsync() } else { onRefresh() }
     }
     .background(Color.MeetPR.bgBase)
   }
@@ -115,7 +97,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   private var trainingScrollContent: some View {
     TrainingContentStack(recording: flowSnapshot.dayID != nil) {
       TodayWorkoutHeader(
-        weekCode: weekCode,
+        weekCode: emptyState?.heading ?? String(weekCode.prefix { $0 != "D" }),
         unreadCount: unreadCount,
         showsNotifications: showsNotifications,
         onRefresh: onRefresh,
@@ -125,30 +107,17 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onBackToToday: onBackToToday
       )
 
-      TrainingWeekHeaderLayout(alignsTrailingItem: true) {
-        if let week = sequencePage?.visibleWeek {
-          TrainingWeekHeading(week: week, today: gymDayToday)
-        }
-        Button(action: onHistory) {
-          HStack(spacing: MeetPRSpacing.space1) {
-            Text(StudentStrings.localized(.trainingHistoryView024))
-              .lineLimit(1)
-              .minimumScaleFactor(0.5)
-            Image(systemName: "chevron.right")
-              .font(.system(size: MeetPRFontMetrics.size10, weight: .semibold))
-          }
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.goldText)
-          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-          .contentShape(Rectangle())
-        }
-        .buttonStyle(PressScaleButtonStyle())
-        .accessibilityIdentifier("todayWorkout.history")
+      if let weightEntry, let studentID {
+        MeetWeightStrip(studentID: studentID, model: weightEntry, onEditMeet: onEditMeet)
       }
-      .padding(.vertical, -MeetPRSpacing.space2)
-
-      sequenceContent
-      screenContent
+      if let emptyState {
+        TrainingEmptyStateView(
+          presentation: emptyState, coachName: coachName, showsCoach: showsCoach,
+          onCoach: onMessageCoach, onProfile: onEditProfile, onMeet: onEditMeet)
+      } else {
+        sequenceContent
+        screenContent
+      }
     }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
@@ -174,75 +143,14 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         VideoFailureBanner(
           count: videoFailureCount, historical: !dayState.isEditable, retry: onRetryVideos)
       }
-      if case .upcoming(let cursorDay) = dayState {
-        TrainingDayPreview(presentation: presentation, cursorDay: cursorDay, today: gymDayToday)
-      } else if case .completed(let canUndo) = dayState {
-        CompletedDayOverviewCard(
-          presentation: presentation, drafts: accessoryViewModel?.currentDrafts ?? [],
-          unit: accessoryViewModel?.onboardingProfile?.unitPreference ?? .kg,
-          canUndo: canUndo, onUndo: onUndoCompletion
-        )
-        .id(presentation.day.id)
-      } else {
-        let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
-        if let flow, !flow.completed.isEmpty {
-          VStack(spacing: MeetPRSpacing.point6) {
-            ForEach(flow.completed) { exercise in
-              CompletedTrainingExercise(
-                exercise: exercise,
-                collapsed: Binding(
-                  get: { collapsedExercises[exercise.id] ?? true },
-                  set: { collapsedExercises[exercise.id] = $0 }),
-                viewModel: accessoryViewModel,
-                previousLogs: accessoryPreviousLogs[exercise.id] ?? [:],
-                onEdit: onEdit, onVideoAction: onVideoAction
-              )
-              .modifier(
-                TrainingFlowFeedback(
-                  trigger: feedbackExercises.contains(exercise.id) ? exercise.id : nil)
-              )
-              .id(exercise.id)
-            }
-          }
-          // Keep target registration local to the stable completed-row identities.
-          .scrollTargetLayout()
-        }
-        if flow == nil || flow?.hero != nil {
-          TodayWorkoutHero(
-            presentation: presentation,
-            isEditable: dayState.isEditable,
-            onStart: onStart,
-            onQuickLog: onQuickLog,
-            onEdit: onEdit,
-            onVideoAction: onVideoAction,
-            showsAskCoach: showsAskCoach,
-            isPreparingAskCoach: isPreparingAskCoach,
-            onAskCoach: onAskCoach,
-            accessoryViewModel: accessoryViewModel,
-            accessoryPreviousLogs: accessoryPreviousLogs
-          )
-          .modifier(TrainingFlowFeedback(trigger: feedbackExercises.last))
-          .accessibilityIdentifier("training.hero")
-        }
-
-        if presentation.heroMode == .recording {
-          TodayWorkoutExerciseList(
-            exercises: flow?.belowHero ?? presentation.exercises,
-            collapsedExercises: $collapsedExercises,
-            viewModel: accessoryViewModel,
-            editable: dayState.isEditable,
-            onEdit: onEdit,
-            onVideoAction: onVideoAction
-          )
-        }
-      }
-
-      if presentation.heroMode == .recording, dayState.isEditable,
-        let accessoryViewModel
-      {
-        StudentAddedExerciseSection(
-          viewModel: accessoryViewModel, day: presentation.day,
-          editable: dayState.isEditable)
+      AllDaySheetView(
+        presentation: presentation, viewModel: accessoryViewModel,
+        editable: dayState.isEditable, today: gymDayToday,
+        onVideo: onVideoAction, onNote: onExerciseNote)
+      if case .completed(let canUndo) = dayState, canUndo {
+        Button(StudentStrings.localized(.todayWorkoutScreen023), action: onUndoCompletion)
+          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+          .accessibilityIdentifier("training.completedDay.undo")
       }
       completionContent(presentation)
     case .noPlan:
@@ -472,74 +380,13 @@ private struct TodayWorkoutHeader: View {
   let onBackToToday: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.point1) {
-      MeetPRMark.header
-        .frame(width: 97, height: 24, alignment: .leading)
+    HStack {
+      Text(weekCode)
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Spacer()
 
-      HStack {
-        Text(weekCode)
-          .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-
-        Spacer()
-
-        if showsBackToToday {
-          Button(StudentStrings.localized(.trainingWeekBackToToday), action: onBackToToday)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
-            .foregroundStyle(Color.MeetPR.goldText)
-            .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-            .buttonStyle(PressScaleButtonStyle())
-            .accessibilityIdentifier("training.backToToday")
-        } else {
-          HStack(spacing: MeetPRSpacing.point9) {
-            TrainingHeaderButton(
-              accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen005),
-              action: onRefresh
-            ) {
-              Image(systemName: "arrow.clockwise")
-                .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
-                .foregroundStyle(Color.MeetPR.textSecondary)
-            }
-
-            TrainingHeaderButton(
-              accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen006),
-              action: onReadiness
-            ) {
-              ReadinessIcon()
-                .stroke(
-                  Color.MeetPR.textSecondary,
-                  style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-                )
-            }
-
-            if showsNotifications {
-              TrainingHeaderButton(
-                accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen007),
-                action: onNotifications
-              ) {
-                MessageIcon()
-                  .stroke(
-                    Color.MeetPR.textPrimary,
-                    style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-                  )
-              }
-              .overlay(alignment: .topTrailing) {
-                if unreadCount > 0 {
-                  Text(unreadCount > 99 ? "99+" : unreadCount.formatted())
-                    .font(.MeetPR.mono(size: MeetPRFontMetrics.size9, weight: .bold))
-                    .foregroundStyle(Color.white)
-                    .padding(.horizontal, MeetPRSpacing.point3)
-                    .frame(minWidth: 16, minHeight: 16)
-                    .background(Color.MeetPR.dangerFill, in: .capsule)
-                    .offset(x: 2, y: -2)
-                }
-              }
-            }
-          }
-        }
-      }
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
 
@@ -648,7 +495,7 @@ struct TodayWorkoutHero: View {
 
       if isEditable {
         GoldCTA(
-          StudentStrings.localized(.dashboardPrimaryAction001),
+          StudentStrings.localized(.evaluationPeriodView012),
           sub: nil,
           icon: .none,
           action: onStart

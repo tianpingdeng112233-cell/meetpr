@@ -1,4 +1,3 @@
-// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import SwiftUI
@@ -7,7 +6,6 @@ import ViewInspector
 
 @testable import StudentKit
 
-// swiftlint:disable:next type_body_length
 @Suite struct SetWeightSuggestionOutcomeTests {
   @Test func failedMatchingMainLiftSetFallsBackToE1RM() throws {
     let exerciseID = UUID()
@@ -194,54 +192,25 @@ import ViewInspector
   }
 
   @MainActor
-  @Test func sheetPrefillsResolvedPercentageAndFixedWeight() async throws {
-    let pctFixture = try await makeSuggestionSheetFixture(
+  @Test func allDayPrefillsResolvedPercentageAndFixedWeight() async throws {
+    let pct = try await makeSuggestionSheetFixture(
       seedHistory: true,
       prescribed: PrescribedSet(
-        id: UUID(), setIndex: 0, intensity: .percentage(75), percentageAnchor: .e1RM,
-        loadMode: .percentage, reps: 5)
-    )
-    let pctSheet = SetEntrySheet(
-      rowIndex: 0,
-      draft: pctFixture.draft,
-      setNumber: 1,
-      viewModel: pctFixture.viewModel
-    )
-    let fixedFixture = try await makeSuggestionSheetFixture(
+        id: UUID(), setIndex: 0, intensity: .percentage(75),
+        percentageAnchor: .e1RM, loadMode: .percentage, reps: 5))
+    let fixed = try await makeSuggestionSheetFixture(
       seedHistory: false,
       prescribed: PrescribedSet(
-        id: UUID(), setIndex: 0, weightKg: 150, loadMode: .fixedWeight, reps: 5)
-    )
-    let fixedSheet = SetEntrySheet(
-      rowIndex: 0,
-      draft: fixedFixture.draft,
-      setNumber: 1,
-      viewModel: fixedFixture.viewModel
-    )
-
-    #expect(pctSheet.weightValue == 90)
+        id: UUID(), setIndex: 0, weightKg: 150,
+        loadMode: .fixedWeight, reps: 5))
+    #expect(pct.viewModel.currentDrafts?.first?.actualWeight == 90)
+    #expect(fixed.viewModel.currentDrafts?.first?.actualWeight == 150)
     #expect(
-      pctSheet.suggestionOutcomeSnapshot.suggestion?.basis
-        == .percentage(.e1RM(anchorKg: 120))
-    )
-    #expect(pctSheet.isAutomaticWeight)
-    #expect(!fixedSheet.isAutomaticWeight)
-    #expect(fixedSheet.weightValue == 150)
-
-    let inspected = try pctSheet.inspect()
+      AllDayExerciseSummary.build(rows: pct.viewModel.currentDrafts ?? [])
+        .segments.map(\.load) == ["90"])
     #expect(
-      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes027)).string()
-        == StudentStrings.localized(.todayWorkoutTypes027)
-    )
-    #expect(
-      try inspected.find(
-        text: StudentStrings.replacing(.todayWorkoutTypes012, values: ["120"])
-      ).string() == StudentStrings.replacing(.todayWorkoutTypes012, values: ["120"])
-    )
-    #expect(
-      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes028)).string()
-        == StudentStrings.localized(.todayWorkoutTypes028)
-    )
+      AllDayExerciseSummary.build(rows: fixed.viewModel.currentDrafts ?? [])
+        .segments.map(\.load) == ["150"])
   }
 
   @MainActor

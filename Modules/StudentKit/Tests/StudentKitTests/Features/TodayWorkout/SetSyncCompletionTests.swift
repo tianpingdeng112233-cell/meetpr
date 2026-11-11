@@ -116,3 +116,38 @@ import Testing
   }
   Issue.record("Set sync condition did not finish")
 }
+
+@MainActor
+@Test func offlineRejectedRowsRequireExplicitRetryBeforeDeferredCompletion() async throws {
+  var rejects = true
+  var offline = false
+  let student = StudentDemoSeed.studentID
+  let plan = StudentAddedTestPlan.unsettledDemo()
+  let day = plan.days[0]
+  let queue = try SetSyncQueue(studentID: student, storage: MemorySetSyncStorage()) { record in
+    if rejects { throw SetSyncFailure.rejected }
+    if offline { throw URLError(.notConnectedToInternet) }
+    return .planned(record.plannedLog)
+  }
+  let harness = VideoUploadHarness()
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [student: plan]))
+  let session = StudentSetSyncSession(
+    queue: queue, plans: plans, videos: harness.manager, onLogout: {})
+  defer { session.stop() }
+  try queue.enqueue(dayID: day.id, trainingDate: day.date, draft: SetSyncQueueTests.draft())
+  await queue.drain()
+  rejects = false
+  offline = true
+  try queue.enqueue(dayID: day.id, trainingDate: day.date, draft: SetSyncQueueTests.draft())
+  await queue.drain()
+  #expect(queue.isOffline)
+  #expect(queue.hasRejected(dayID: day.id))
+  let coordinator = SetSyncCompletionCoordinator(queue: queue)
+  #expect(!(await coordinator.prepare(dayID: day.id)))
+  #expect(await coordinator.prepare(dayID: day.id, retry: true))
+  #expect(coordinator.phase == .idle)
+  #expect(!queue.hasRejected(dayID: day.id))
+  offline = false
+  await queue.drain()
+  #expect(queue.pendingCount == 0)
+}

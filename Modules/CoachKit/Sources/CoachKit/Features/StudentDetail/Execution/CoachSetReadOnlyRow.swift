@@ -1,3 +1,4 @@
+import CoreModels
 import DesignSystem
 import Networking
 import SwiftUI
@@ -7,9 +8,13 @@ import SwiftUI
 struct CoachSetReadOnlyRow: View {
   let log: CoachSetLogDTO
   let isAccessibilitySize: Bool
+  var prescribed: PrescribedSet?
 
   var body: some View {
-    if isAccessibilitySize {
+    if prescribed != nil || log.actualRIR != nil {
+      CoachActualSetValues(
+        log: log, prescribed: prescribed, isAccessibilitySize: isAccessibilitySize)
+    } else if isAccessibilitySize {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         HStack {
           Text("#\(log.setIndex + 1)")
@@ -19,7 +24,9 @@ struct CoachSetReadOnlyRow: View {
             .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary)
         }
         LabeledContent(CoachLocalization.localized("coach.videoFeedback.weight")) {
-          Text("\(log.weightKg.formatted(.number.precision(.fractionLength(0...2)))) kg")
+          Text(
+            log.weightKg.map { "\($0.formatted(.number.precision(.fractionLength(0...2)))) kg" }
+              ?? "—")
         }
         LabeledContent(CoachLocalization.localized("coach.videoFeedback.reps")) {
           Text(log.reps.formatted())
@@ -41,7 +48,9 @@ struct CoachSetReadOnlyRow: View {
     } else {
       SetReadOnlyCell(
         setIndex: log.setIndex, weightKg: log.weightKg, reps: log.reps,
-        rpe: log.rpe, isCompleted: log.completed)
+        rpe: log.rpe, isCompleted: log.completed
+      )
+
     }
   }
 }

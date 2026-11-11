@@ -123,9 +123,9 @@ func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
   #expect(summary.averageRPE == 8.5)  // (8 + 9) / 2
 }
 
-@Test func studentFormattingResultOmitsMissingWeightAndRPE() {
+@Test func studentFormattingResultShowsMissingWeightAndOmitsMissingRPE() {
   #expect(StudentFormatting.result(weightKg: 142.5, reps: 5, rpe: 7.5) == "142.5kg × 5 @ RPE 7.5")
-  #expect(StudentFormatting.result(weightKg: nil, reps: 5, rpe: 8) == "5 @ RPE 8")
+  #expect(StudentFormatting.result(weightKg: nil, reps: 5, rpe: 8) == "— × 5 @ RPE 8")
   #expect(StudentFormatting.result(weightKg: 100, reps: 5, rpe: nil) == "100kg × 5")
 }
 

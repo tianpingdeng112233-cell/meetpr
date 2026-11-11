@@ -47,21 +47,23 @@ enum StudentAddedDerivedHistory {
     let planned = records.planned.compactMap { log -> E1RMWeightBaseline? in
       let exercise =
         log.exerciseID.flatMap { id in catalog.first { $0.id == id } } ?? slots[log.planExerciseID]
-      guard log.completed, !log.failed, !log.assumed, log.weightKg > 0, log.reps > 0,
+      guard log.completed, !log.failed, !log.assumed, let weight = log.weightKg, weight > 0,
+        log.reps > 0,
         let exercise, let family = resolveCompetitionFamily(exercise: exercise, onboarding: profile)
       else { return nil }
       return E1RMWeightBaseline(
         studentId: log.studentID, family: family,
-        maxWeightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue,
+        maxWeightKg: NSDecimalNumber(decimal: weight).doubleValue,
         setLogId: log.id, achievedAt: log.loggedAt)
     }
     let added = records.added.compactMap { log -> E1RMWeightBaseline? in
-      guard log.completed, !log.failed, !log.assumed, log.weightKg > 0, log.reps > 0,
+      guard log.completed, !log.failed, !log.assumed, let weight = log.weightKg, weight > 0,
+        log.reps > 0,
         let family = StudentAddedHistory.family(log, catalog: catalog)
       else { return nil }
       return E1RMWeightBaseline(
         studentId: log.studentID, family: family,
-        maxWeightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue,
+        maxWeightKg: NSDecimalNumber(decimal: weight).doubleValue,
         setLogId: log.id, achievedAt: log.loggedAt)
     }
     return planned + added

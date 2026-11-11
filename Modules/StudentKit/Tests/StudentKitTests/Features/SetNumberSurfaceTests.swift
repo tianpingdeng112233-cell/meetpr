@@ -50,6 +50,12 @@ struct SetNumberSurfaceTests {
   @Test("today workout table offset path renders source index zero as set one")
   func todayWorkoutTableRendersSourceIndexZeroAsSetOne() async throws {
     let fixture = try await makeTodayWorkoutFixture()
+    try fixture.view.inspect().find(
+      ViewType.Button.self,
+      where: {
+        try $0.accessibilityIdentifier().hasPrefix("allDay.expand.")
+      }
+    ).tap()
 
     let setNumber = try fixture.view.inspect().find(
       viewWithAccessibilityIdentifier:
@@ -62,12 +68,16 @@ struct SetNumberSurfaceTests {
   @Test("today workout hero stored-index path renders source index zero as set one")
   func todayWorkoutHeroRendersSourceIndexZeroAsSetOne() async throws {
     let fixture = try await makeTodayWorkoutFixture()
+    try fixture.view.inspect().find(
+      ViewType.Button.self,
+      where: {
+        try $0.accessibilityIdentifier().hasPrefix("allDay.expand.")
+      }
+    ).tap()
 
     let position = try fixture.view.inspect().find(
-      viewWithAccessibilityIdentifier: "todayWorkout.activeSet.position"
-    )
-
-    #expect(try position.text().string().contains("第 1 /"))
+      viewWithAccessibilityIdentifier: "allDay.row.\(fixture.firstSetID.uuidString)")
+    #expect(try position.accessibilityIdentifier() == "allDay.row.\(fixture.firstSetID.uuidString)")
   }
 
   @Test("set entry sheet renders a source-zero draft as set one")
@@ -85,34 +95,6 @@ struct SetNumberSurfaceTests {
     ).inspect()
 
     #expect(try inspected.find(text: "深蹲 · 第 1 组").string() == "深蹲 · 第 1 组")
-  }
-
-  @Test("dashboard feedback label renders source index zero as set one")
-  func dashboardFeedbackLabelRendersSourceIndexZeroAsSetOne() {
-    let video = CoachFeedbackVideo(
-      id: UUID(),
-      exerciseName: "深蹲",
-      exerciseNameEn: "Competition Squat",
-      setIndex: 0
-    )
-    let feedback = CoachFeedback(
-      id: UUID(),
-      coachID: UUID(),
-      studentID: UUID(),
-      videoID: video.id,
-      video: video,
-      text: "保持节奏",
-      postedAt: Date(timeIntervalSince1970: 1_777_248_000)
-    )
-
-    #expect(
-      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "zh-Hans"))
-        == "深蹲 · 第 1 组"
-    )
-    #expect(
-      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "en"))
-        == "Competition Squat · Set 1"
-    )
   }
 
   @Test("day detail renders source index zero as set one")

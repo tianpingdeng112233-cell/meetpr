@@ -41,11 +41,11 @@ private func labelDay(_ families: [LiftFamily]) -> StudentPlanDay {
     ("zh-Hans", "硬拉日", "深蹲、卧推日", "蹲·推·拉"),
   ] {
     let locale = Locale(identifier: language)
-    #expect(DashboardTodayPresentation.liftSubtitle([.deadlift], locale: locale) == single)
-    #expect(DashboardTodayPresentation.liftSubtitle([.squat, .bench], locale: locale) == pair)
-    #expect(DashboardTodayPresentation.liftSubtitle([], locale: locale) == "")
+    #expect(TrainingDayPresentation.liftSubtitle([.deadlift], locale: locale) == single)
+    #expect(TrainingDayPresentation.liftSubtitle([.squat, .bench], locale: locale) == pair)
+    #expect(TrainingDayPresentation.liftSubtitle([], locale: locale) == "")
     #expect(
-      DashboardTodayPresentation.liftSubtitle([.squat, .bench, .deadlift], locale: locale) == triple
+      TrainingDayPresentation.liftSubtitle([.squat, .bench, .deadlift], locale: locale) == triple
     )
   }
 }

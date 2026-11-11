@@ -286,16 +286,16 @@ struct GrowthFormingTrendChart: View {
 struct GrowthZeroTrainingState: View {
   let showsAction: Bool
   let isCompact: Bool
-  let onOpenToday: () -> Void
+  let onOpenTraining: () -> Void
 
   init(
     showsAction: Bool,
     isCompact: Bool = false,
-    onOpenToday: @escaping () -> Void
+    onOpenTraining: @escaping () -> Void
   ) {
     self.showsAction = showsAction
     self.isCompact = isCompact
-    self.onOpenToday = onOpenToday
+    self.onOpenTraining = onOpenTraining
   }
 
   var body: some View {
@@ -315,7 +315,7 @@ struct GrowthZeroTrainingState: View {
         .multilineTextAlignment(.center)
         .lineSpacing(3)
       if showsAction {
-        Button(action: onOpenToday) {
+        Button(action: onOpenTraining) {
           HStack(spacing: MeetPRSpacing.space2) {
             Text(StudentStrings.localized(.growthEmptyStates009))
             Image(systemName: "chevron.right")

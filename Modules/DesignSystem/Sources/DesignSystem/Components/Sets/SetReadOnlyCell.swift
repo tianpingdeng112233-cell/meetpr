@@ -16,9 +16,9 @@ public struct SetReadOnlyCell: View {
     isCompleted: Bool
   ) {
     self.setIndex = setIndex
-    weightText = weightKg.map { "\(Self.decimalString($0)) kg" } ?? "-"
-    repsText = reps.map(String.init) ?? "-"
-    rpeText = rpe.map(Self.decimalString) ?? "-"
+    weightText = weightKg.map { "\(Self.decimalString($0)) kg" } ?? "—"
+    repsText = reps.map(String.init) ?? "—"
+    rpeText = rpe.map(Self.decimalString) ?? "—"
     self.isCompleted = isCompleted
   }
 

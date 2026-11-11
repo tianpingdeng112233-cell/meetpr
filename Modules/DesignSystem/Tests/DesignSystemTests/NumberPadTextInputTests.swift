@@ -47,9 +47,12 @@ struct NumberPadTextInputTests {
     try pad.inspect().find(button: "Next · Weight").tap()
     #expect(received == "")
     let weight = MeetPRNumberPad(
-      field: .weight, text: "7.5", contextText: "Row", unit: "LB",
+      field: .weight, text: "7.5", contextText: "Row · Weight lb", unit: "LB",
       onTextCommit: { _ in }, onCancel: {})
-    #expect(try weight.inspect().find(text: "LB").string() == "LB")
-    #expect(try weight.inspect().find(text: "7.5").string() == "7.5")
+    #expect(try weight.inspect().find(text: "Row · Weight lb").string() == "Row · Weight lb")
+    #expect(
+      try weight.inspect().findAll(ViewType.Text.self).allSatisfy {
+        try !$0.string().contains("2.5")
+      })
   }
 }

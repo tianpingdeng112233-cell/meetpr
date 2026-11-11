@@ -8,6 +8,7 @@ import Observation
   let studentID: UUID
   private(set) var records: [PendingSetRecord]
   private(set) var revision = 0
+  private(set) var isOffline = false
   var onAcknowledged: (@MainActor (PendingSetRecord, SetSyncReceipt) async -> Void)?
   private var observers: [UUID: @MainActor () -> Void] = [:]
   private var active = true
@@ -138,6 +139,8 @@ import Observation
       networkTask = Task { [weak self] in
         for await available in network.updates {
           guard !Task.isCancelled else { return }
+          self?.isOffline = !available
+          self?.changed()
           if available { self?.networkRestored() }
         }
       }
@@ -191,6 +194,7 @@ import Observation
       do {
         let receipt = try await send(record)
         guard active, generation == sendingGeneration, !Task.isCancelled else { return }
+        isOffline = false
         try acknowledge(record, receipt: receipt)
         retryAttempt = 0
         await onAcknowledged?(record, receipt)
@@ -201,10 +205,18 @@ import Observation
         guard active, generation == sendingGeneration, !Task.isCancelled else { return }
         do { try reject(record) } catch { return }
       } catch {
-        retryAttempt += 1
+        recordTransportFailure(error)
         return
       }
     }
+  }
+
+  private func recordTransportFailure(_ error: any Error) {
+    if TodayWorkoutViewModel.isConnectivityFailure(error) {
+      isOffline = true
+      changed()
+    }
+    retryAttempt += 1
   }
 
   private func nextRecord() -> PendingSetRecord? {

@@ -32,9 +32,11 @@ public struct CoachRootView: View {
   /// 教练端唯一时钟。日切 / 显著时间(时区)变化 / 回到前台时推进——
   /// 否则 app 停留过夜后,周概况仍停在昨天那一周(review-loop 2026-07-30)。
   @State private var now = Date()
+  @State private var exerciseNavigation = ExerciseNoteNavigation()
+  @State private var exerciseNoteDay: StudentExecutionDay?
+  @State private var exerciseNoteError: String?
   @State private var dashboardLoadTask: Task<Void, Never>?
   @State private var fullScreenDestinationIDs: Set<UUID> = []
-
   @MainActor
   // swiftlint:disable:next function_body_length
   public init(
@@ -151,6 +153,23 @@ public struct CoachRootView: View {
     coachTabs
       .buttonStyle(PressScaleButtonStyle())
       .environment(\.coachVideoBadgeName, coachDisplayName)
+      .environment(exerciseNavigation)
+      .onChange(of: exerciseNavigation.reference) { _, reference in
+        guard let reference, let studentID = exerciseNavigation.studentID else { return }
+        Task { await openExerciseNote(reference, studentID: studentID) }
+      }
+      .sheet(item: $exerciseNoteDay) { day in
+        NavigationStack { CoachDayDetailView(day: day) }
+      }
+      .alert(
+        CoachLocalization.localized("coach.common.error"),
+        isPresented: Binding(
+          get: { exerciseNoteError != nil }, set: { if !$0 { exerciseNoteError = nil } }
+        )
+      ) {
+      } message: {
+        Text(exerciseNoteError ?? "")
+      }
   }
 
   private var coachTabs: some View {
@@ -363,5 +382,19 @@ extension CoachRootView {
 enum CoachMessageBadge {
   static func total(videos: Int, chatUnread: Int) -> Int {
     videos + chatUnread
+  }
+}
+
+extension CoachRootView {
+  private func openExerciseNote(_ reference: ExerciseRefV1, studentID: UUID) async {
+    defer { exerciseNavigation.reference = nil }
+    do {
+      exerciseNoteDay = try await CoachExerciseNoteLoader.load(
+        reference, studentID: studentID, plans: studentPlans, logs: studentLogs,
+        planning: repository)
+
+    } catch {
+      exerciseNoteError = error.localizedDescription
+    }
   }
 }

@@ -24,7 +24,7 @@ struct WorkoutKeypadOverlay: View {
           },
           onTextCommit: session.commit,
           onCancel: session.dismiss,
-          onTextChange: session.update, dismissTitle: DesignSystemStrings.done
+          onTextChange: session.update, dismissTitle: StudentStrings.localized(.allDayDone)
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(cell.context)

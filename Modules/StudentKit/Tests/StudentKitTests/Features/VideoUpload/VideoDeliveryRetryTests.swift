@@ -101,7 +101,9 @@ import Testing
 
   await videos.retryFailures(studentID: student, workout: workout, trainingDate: day.scheduledDate)
 
-  try await waitForSetSync { queue.pendingCount == 0 }
+  try await waitForSetSync {
+    queue.pendingCount == 0 && workout.currentDrafts?.first?.loggedSetID != nil
+  }
   let delivered = try await waitForStatus(harness.repository, id: pending.id, oneOf: [.uploaded])
   #expect(attempts == 2)
   #expect(delivered.pendingDraftID == nil)

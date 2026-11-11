@@ -52,7 +52,7 @@ func prescribedIntensityFormattingIsFaithful(set: PrescribedSet, expected: Strin
 // (spec 072 §1.4), including the dash placeholder and ASCII "x".
 @Test(arguments: [
   (PrescribedSet(id: UUID(), setIndex: 0, weightKg: 140, reps: 5), "140kg x 5"),
-  (PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8), "-kg x 5"),
+  (PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8), "—kg x 5"),
   (PrescribedSet(id: UUID(), setIndex: 0, weightKg: 142.5, reps: 3, repsMax: 5), "142.5kg x 3-5"),
 ])
 func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: String) {

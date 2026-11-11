@@ -56,15 +56,15 @@ private func loadTypeRow(mode: PlanLoadMode?, note: String? = nil, rpe: Decimal 
 }
 
 @MainActor
-@Test func loadTypeCompletionCannotPersistMissingFreeWeight() async throws {
+@Test func loadTypeCompletionPersistsNullableFreeWeight() async throws {
   let fixture = await loadTypeFixture(mode: .freeWeight)
-  #expect(!(await fixture.model.commitSet(rowIndex: 0)))
-  #expect(fixture.model.currentDrafts?.first?.completed == false)
-  #expect(fixture.model.actionErrorMessage != nil)
+  #expect(await fixture.model.commitSet(rowIndex: 0))
+  #expect(fixture.model.currentDrafts?.first?.completed == true)
+  #expect(fixture.model.actionErrorMessage == nil)
   #expect(
     try await fixture.logs.fetchLogsForExercise(
       studentID: StudentDemoSeed.studentID, planExerciseID: fixture.exerciseID
-    ).isEmpty)
+    ).count == 1)
   fixture.model.updateWeight(rowIndex: 0, weight: 25)
   #expect(await fixture.model.commitSet(rowIndex: 0))
   #expect(fixture.model.currentDrafts?.first?.actualWeight == 25)

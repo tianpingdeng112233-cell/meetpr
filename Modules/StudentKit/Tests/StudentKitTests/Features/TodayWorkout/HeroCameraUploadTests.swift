@@ -40,7 +40,7 @@ func heroCameraFirstUploadDoesNotRequireEntryPrefill(editsArriveDuringCapture: B
     try await logs.fetchLogsForExercise(studentID: studentID, planExerciseID: planExercise.id).first
   )
   #expect(saved.id == setLogID && !saved.completed)
-  #expect(saved.weightKg == (editsArriveDuringCapture ? 82.5 : 0))
+  #expect(saved.weightKg == (editsArriveDuringCapture ? 82.5 : nil))
   #expect(saved.reps == (editsArriveDuringCapture ? 5 : 0))
 
   let harness = VideoUploadHarness()

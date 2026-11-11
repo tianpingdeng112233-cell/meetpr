@@ -206,7 +206,7 @@ struct MeetPRApp: App {
         ),
         studentOnboarding: InMemoryOnboardingRepository(
           studentId: StudentDemoSeed.studentID,
-          seed: studentState.profile
+          seed: studentState.profile, seedRecentBodyWeights: true
         ),
         // 训练视频 inbox: boot straight into a populated queue (spec 042).
         coachVideoQueue: makeDemoVideoQueue(),

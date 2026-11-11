@@ -13,7 +13,7 @@ struct E1RMRecorder: Sendable {
     let exerciseID: UUID
     let family: LiftFamily?
     let setLogID: UUID
-    let weightKg: Decimal
+    let weightKg: Decimal?
     let reps: Int
     let rpe: Decimal?
     let coachRPE: Decimal?
@@ -31,7 +31,7 @@ struct E1RMRecorder: Sendable {
       exerciseID: UUID,
       family: LiftFamily?,
       setLogID: UUID,
-      weightKg: Decimal,
+      weightKg: Decimal?,
       reps: Int,
       rpe: Decimal?,
       coachRPE: Decimal? = nil,
@@ -92,11 +92,12 @@ struct E1RMRecorder: Sendable {
   /// by set-log identity. Persistence remains best-effort and never blocks set
   /// logging.
   func record(_ input: Input) async -> PRBreakthroughEvent? {
-    guard input.completed, !input.failed, let family = input.family else {
+    guard input.completed, !input.failed, let family = input.family, let weightKg = input.weightKg
+    else {
       return nil
     }
 
-    let weight = NSDecimalNumber(decimal: input.weightKg).doubleValue
+    let weight = NSDecimalNumber(decimal: weightKg).doubleValue
     let sourceRPE = input.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
     let sourceCoachRPE = input.coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
     let effectiveRPE = sourceCoachRPE ?? sourceRPE

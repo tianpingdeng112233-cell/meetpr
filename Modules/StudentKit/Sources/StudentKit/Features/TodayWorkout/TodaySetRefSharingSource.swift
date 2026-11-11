@@ -69,7 +69,7 @@ struct TodaySetRefSharingSource: Sendable {
           exerciseName: exercise.exercise.name,
           setNumber: setNumber,
           setTotal: setTotal,
-          weightKg: Self.decimalSource(log.weightKg),
+          weightKg: log.weightKg.map(Self.decimalSource),
           reps: log.reps,
           repsMax: nil,
           rpe: log.rpe.map(Self.decimalSource),

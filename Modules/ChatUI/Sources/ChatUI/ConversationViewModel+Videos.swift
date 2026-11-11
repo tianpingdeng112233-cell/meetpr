@@ -130,6 +130,7 @@ extension ConversationViewModel {
       attachmentID: message.attachmentID,
       imageURL: message.imageURL,
       imageExpiresIn: message.imageExpiresIn,
+      exerciseRef: message.exerciseRef,
       setRef: message.setRef,
       videoURL: nil,
       videoExpiresIn: nil,

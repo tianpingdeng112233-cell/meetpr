@@ -44,3 +44,23 @@ struct CoachDayDetailPresentation: Sendable {
     }
   }
 }
+
+extension CoachDayDetailPresentation {
+  static func matchesPrescription(_ log: CoachSetLogDTO, prescribed: PrescribedSet) -> Bool {
+    guard let reps = prescribed.reps,
+      (reps...(prescribed.repsMax ?? reps)).contains(log.reps)
+    else { return false }
+    if case .weightRange(let low, let high) = prescribed.intensity {
+      guard let weight = log.weightKg, (low...high).contains(weight) else { return false }
+    } else if log.weightKg != prescribed.weightKg {
+      return false
+    }
+    switch prescribed.intensity {
+    case .rpeRange(let low, let high):
+      guard let rpe = log.rpe else { return false }
+      return log.actualRIR == nil && (low...high).contains(rpe)
+    case .rir(let target): return log.actualRIR == target && log.rpe == nil
+    default: return log.rpe == prescribed.rpe && log.actualRIR == nil
+    }
+  }
+}

@@ -27,6 +27,7 @@ import Testing
     await workout.load(dayID: day.id, studentID: student)
 
     plans.offline = true
+    queue.start()
     #expect(await workout.completeCurrentDay())
     #expect(workout.completionPhase == .celebration)
     #expect(workout.actionErrorMessage == nil)

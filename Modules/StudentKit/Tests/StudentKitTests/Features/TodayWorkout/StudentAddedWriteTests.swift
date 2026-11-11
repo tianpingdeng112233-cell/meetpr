@@ -19,7 +19,7 @@ import Testing
   model.updateWeight(rowIndex: 0, weight: 80)
   model.updateReps(rowIndex: 0, reps: 3)
   #expect(await model.commitSet(rowIndex: 0))
-  #expect(model.restTimer != nil)
+  #expect(model.restTimer == nil)
   await model.load(dayID: first.id, studentID: StudentDemoSeed.studentID)
   #expect(model.restTimer == nil)
   await model.load(dayID: other.id, studentID: StudentDemoSeed.studentID)
@@ -152,10 +152,9 @@ import Testing
 }
 
 @MainActor
-@Test func fullEntryRejectsOtherWeekWrites() async throws {
+@Test func fullEntryRejectsSettledDayWrites() async throws {
   let plan = StudentDemoSeed.makePlanView()
-  let cursor = try #require(StudentPlanSequence(days: plan.days).cursorDay)
-  let day = try #require(plan.days.first { $0.weekNumber != cursor.weekNumber })
+  let day = try #require(plan.days.first { $0.completedAt != nil })
   let logs = InMemoryStudentTrainingLogRepository()
   let model = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(

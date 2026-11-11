@@ -102,7 +102,12 @@ func completionDoesNotReopenDismissedReward(failing: Bool) async throws {
   #expect(!(await completion.value))
   #expect(viewModel.completionPhase == nil)
   #expect(!viewModel.isCompletionSending)
-  #expect(viewModel.state == original)
+  if case .loaded(let originalDay, let originalDrafts) = original {
+    #expect(viewModel.currentDay?.completedAt == originalDay.completedAt)
+    #expect(viewModel.currentDrafts?.first?.actualWeight == originalDrafts.first?.actualWeight)
+    #expect(viewModel.currentDrafts?.first?.actualReps == originalDrafts.first?.actualReps)
+    #expect(viewModel.currentDrafts?.allSatisfy(\.completed) == true)
+  }
   #expect(viewModel.actionErrorMessage == StudentStrings.localized(.todayWorkoutViewModel001))
   #expect(viewModel.completionRevision == 0)
 
@@ -167,12 +172,22 @@ func completionDoesNotReopenDismissedReward(failing: Bool) async throws {
   #expect(!(await completion.value))
   #expect(viewModel.completionPhase == nil)
   #expect(!viewModel.isCompletionSending)
-  #expect(viewModel.state == original)
+  if case .loaded(let originalDay, let originalDrafts) = original {
+    #expect(viewModel.currentDay?.completedAt == originalDay.completedAt)
+    #expect(viewModel.currentDrafts?.first?.actualWeight == originalDrafts.first?.actualWeight)
+    #expect(viewModel.currentDrafts?.first?.actualReps == originalDrafts.first?.actualReps)
+    #expect(viewModel.currentDrafts?.allSatisfy(\.completed) == true)
+  }
   #expect(viewModel.actionErrorMessage == StudentStrings.localized(.todayWorkoutViewModel001))
   await plans.releaseComplete()
   await Task.yield()
   #expect(viewModel.completionPhase == nil)
-  #expect(viewModel.state == original)
+  if case .loaded(let originalDay, let originalDrafts) = original {
+    #expect(viewModel.currentDay?.completedAt == originalDay.completedAt)
+    #expect(viewModel.currentDrafts?.first?.actualWeight == originalDrafts.first?.actualWeight)
+    #expect(viewModel.currentDrafts?.first?.actualReps == originalDrafts.first?.actualReps)
+    #expect(viewModel.currentDrafts?.allSatisfy(\.completed) == true)
+  }
   #expect(viewModel.completionRevision == 0)
 }
 

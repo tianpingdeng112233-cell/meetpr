@@ -284,6 +284,7 @@ public final class APIClient: Sendable {
     var request = request
     let language = preferredLocalization.map { InterfaceLanguage(localization: $0) } ?? .current
     request.setValue(language.rawValue, forHTTPHeaderField: "X-MeetPR-Locale")
+    request.setValue("set-weight-nullable", forHTTPHeaderField: "X-MeetPR-Caps")
     var response = try await transport(request)
 
     if response.statusCode == 401,
@@ -329,6 +330,16 @@ public final class APIClient: Sendable {
 }
 
 extension APIClient {
+  public func delete<Response: Decodable>(
+    path: String, accessToken: String, as responseType: Response.Type = Response.self
+  ) async throws -> Response {
+    var request = URLRequest(url: url(path: path))
+    request.httpMethod = "DELETE"
+    authorize(&request, accessToken: accessToken)
+    let data = try await perform(request, unauthorizedAccessToken: accessToken)
+    return try MeetPRCodec.decoder.decode(responseType, from: data)
+  }
+
   /// Public launch check. Connectivity, malformed responses and missing build metadata fail open.
   public func requiredAppUpdate(currentBuild: Int?) async -> Int? {
     guard let currentBuild else { return nil }

@@ -25,7 +25,9 @@ struct WorkoutKeypadCell: Identifiable, Sendable {
   }
 
   var context: String {
-    StudentStrings.replacing(.keypadContext, values: [name, String(number), fieldTitle])
+    StudentStrings.replacing(
+      .keypadContext,
+      values: [name, String(number), fieldTitle + (unit.map { " " + $0.lowercased() } ?? "")])
   }
 
   static func cells(
