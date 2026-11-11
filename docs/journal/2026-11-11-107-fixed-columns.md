@@ -23,3 +23,9 @@ David 拒收仅上下排布，要求如 Excel 同类数据固定位置，并统�
 - iPhone 17e 原生验证：直达 RPE；标签切 RIR；点重量再回 RIR；问号打开/关闭保留会话；图标外缘命中；点空白收起后可再直接编辑。证据：会话 outputs/fixed-columns/ios-final-direct.png，work/fixed-columns/ios-native-final-direct.txt、ios-native-blank-button.txt、ios-native-help-edge.txt。
 - 两轴定向复审 CLEAN；只覆盖本轮工程返修，不代替 David 视觉收货。未合并、未切包、未发布。相机真机取景及完整大字号/极长列表验收仍不能据本轮结果宣布通过。
 - Android 5570 原生补验通过：图标右外缘打开说明；关闭后标签切 RIR，键盘仍为第1组 RIR。命中区 UI hierarchy 实读 72×66 px（24×22 dp）；截图 outputs/fixed-columns/android-final-direct.png。5570 曾短暂 System UI 无响应，选择 Wait 后恢复，未清除应用数据。
+
+## 删除重复键盘确认入口
+
+- David 现场要求删除 iOS 键盘右上“确定”。text 模式只在显式下一项标题存在时显示顶部动作；普通键盘不改，右侧“完成”及下一项保留。
+- 先红后绿：DesignSystem 全量81项通过；StudentKit相应可访问性测试改验下一项推进、完成保存编辑值、无重复确定。iPhone17e原生已核实顶部无确定、右侧完成仍在，截图 outputs/fixed-columns/ios-no-confirm.png。
+- 定向审查CLEAN，未切包/发布。

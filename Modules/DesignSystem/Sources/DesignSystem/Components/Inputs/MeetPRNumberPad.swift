@@ -72,7 +72,7 @@ public struct MeetPRNumberPad: View {
   ) {
     self.init(
       field: field, value: 0, contextText: contextText,
-      commitTitle: commitTitle, onCommit: { _ in }, onCancel: onCancel)
+      nextTitle: commitTitle, commitTitle: commitTitle, onCommit: { _ in }, onCancel: onCancel)
     self._textInput = State(initialValue: NumberPadTextInput(value: text, field: field))
     self.onTextCommit = onTextCommit
     self.unitOverride = unit
@@ -195,12 +195,14 @@ extension MeetPRNumberPad {
           .foregroundStyle(Color.MeetPR.textSecondary)
           .lineLimit(2)
         Spacer(minLength: MeetPRSpacing.space2)
-        Button(action: commit) {
-          Text(commitTitle)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.goldText)
+        if let nextTitle {
+          Button(action: commit) {
+            Text(nextTitle)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.goldText)
+          }
+          .disabled(textInput?.isValid == false)
         }
-        .disabled(textInput?.isValid == false)
       }
       GeometryReader { proxy in
         let gap = MeetPRSpacing.space2

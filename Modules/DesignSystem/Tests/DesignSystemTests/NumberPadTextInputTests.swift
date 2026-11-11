@@ -55,4 +55,17 @@ struct NumberPadTextInputTests {
         try !$0.string().contains("2.5")
       })
   }
+  @Test func lastInlineFieldHasOnlyTheDoneAction() throws {
+    var finished = false
+    let pad = MeetPRNumberPad(
+      field: .rir, text: "2", contextText: "Set 1 · RIR", unit: nil,
+      onTextCommit: { _ in }, onCancel: { finished = true })
+    try pad.inspect().find(button: DesignSystemStrings.done).tap()
+    #expect(finished)
+    #expect(
+      try pad.inspect().findAll(ViewType.Text.self).allSatisfy {
+        try $0.string() != DesignSystemStrings.confirm
+      })
+  }
+
 }

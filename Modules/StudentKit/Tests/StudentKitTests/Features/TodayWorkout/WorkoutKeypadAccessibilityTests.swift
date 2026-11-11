@@ -37,7 +37,7 @@ struct WorkoutKeypadAccessibilityTests {
     }
   }
 
-  @Test func nextAndConfirmKeepTheirLabelsAndCommitInsteadOfCancelling() async throws {
+  @Test func nextAdvancesAndDoneSavesWithoutADuplicateConfirm() async throws {
     let session = WorkoutKeypadSession()
     let rowID = UUID()
     let cells = [
@@ -56,12 +56,17 @@ struct WorkoutKeypadAccessibilityTests {
     #expect(session.current?.id == cells[1].id)
     #expect(values.isEmpty)
 
-    let confirm = try WorkoutKeypadOverlay(session: session).inspect()
-      .find(button: DesignSystemStrings.confirm)
-    #expect(!confirm.isDisabled())
-    try confirm.tap()
+    session.update("9")
+    let panel = try WorkoutKeypadOverlay(session: session).inspect()
+    #expect(
+      panel.findAll(ViewType.Text.self).allSatisfy {
+        (try? $0.string()) != DesignSystemStrings.confirm
+      })
+    let done = try panel.find(button: StudentStrings.localized(.allDayDone))
+    #expect(!done.isDisabled())
+    try done.tap()
     #expect(session.current == nil)
-    #expect(values.isEmpty)
+    #expect(values == ["9"])
   }
 
   @Test func panelCancelRemainsAvailableWithoutCommitting() async throws {
