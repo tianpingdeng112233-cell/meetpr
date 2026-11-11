@@ -48,7 +48,6 @@ struct WorkoutCompletionFlowView: View {
       }
     }
     .background(Color.MeetPR.bgBase)
-    .ignoresSafeArea(.container, edges: model.phase == .celebration ? .all : [])
     .contentShape(.rect)
     .simultaneousGesture(
       DragGesture(minimumDistance: 0).onChanged { _ in model.touch() }
