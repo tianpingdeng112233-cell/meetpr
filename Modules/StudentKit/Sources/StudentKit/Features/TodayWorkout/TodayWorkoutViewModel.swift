@@ -162,14 +162,7 @@ public final class TodayWorkoutViewModel {
     preloadedPlan: StudentPlanView? = nil
   ) async {
     if currentStudentID != studentID {
-      allDayEffortChoices = (effortDefaults.dictionary(forKey: "meetpr.effort.\(studentID)") ?? [:])
-        .reduce(into: [:]) { result, pair in
-          if let id = UUID(uuidString: pair.key), let raw = pair.value as? String,
-            let mode = ActualEffortMode(rawValue: raw)
-          {
-            result[id] = mode
-          }
-        }
+      restoreAllDayEffortChoices(studentID: studentID)
       studentDraftCache = [:]
       addedDatePins = [:]
       addedLogs = []
@@ -2244,6 +2237,17 @@ extension TodayWorkoutViewModel {
       .max { $0.loggedAt < $1.loggedAt }
     if let previous { return previous.actualRIR == nil ? .rpe : .rir }
     return nil
+  }
+
+  private func restoreAllDayEffortChoices(studentID: UUID) {
+    allDayEffortChoices = (effortDefaults.dictionary(forKey: "meetpr.effort.\(studentID)") ?? [:])
+      .reduce(into: [:]) { result, pair in
+        if let id = UUID(uuidString: pair.key), let raw = pair.value as? String,
+          let mode = ActualEffortMode(rawValue: raw)
+        {
+          result[id] = mode
+        }
+      }
   }
 
   func rememberAllDayEffort(_ mode: ActualEffortMode, for draft: SetRowDraft) {
