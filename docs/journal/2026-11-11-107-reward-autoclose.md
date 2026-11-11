@@ -5,7 +5,7 @@
 - 测试 seam：StudentKit WorkoutCompletionFlowModel（注入 sleep，无真实等待）。
 - 测试证据：验收 18/19/20 分别先红后绿；StudentKit 全量 1260 tests 通过；改动 Swift 文件 swiftlint --strict 通过。
 - 独立 review-loop 一轮及定向复核：Standards 0 个阻塞；Spec 0 个未决缺陷。
-- 状态：本卡开发与原生验证完成；按 HANDOFF 等 PR CI 全绿后合并切包；大日志留本机 work/，不入仓。
+- 状态：开发与原生验证完成；PR #458 已在最终CI全绿后合入 release/1.0（d3892d2e，2026-11-11）；大日志留本机 work/，不入仓。
 
 ## 原生验证与定向修复
 
