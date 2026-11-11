@@ -598,10 +598,7 @@ public final class TodayWorkoutViewModel {
       }
       await loadExerciseCatalog(fallbackDays: plan.days)
     }
-    let resolvedID =
-      dayID
-      ?? FlexibleTrainingDay.defaultDay(
-        days: plan.days, logs: existingLogs, added: addedLogs, now: now(), calendar: calendar)?.id
+    let resolvedID = dayID ?? StudentPlanSequence(days: plan.days).cursorDay?.id
     guard let day = loadDay(from: plan, dayID: resolvedID) else {
       return nil
     }
@@ -1085,9 +1082,7 @@ public final class TodayWorkoutViewModel {
     // A fresh sheet is a fresh attempt: forget the previous attempt's slots.
     quickLogAttemptKey = nil
     quickLogWrittenSlots = []
-    // Sequence progression: the cursor day is loggable regardless of the
-    // coach's recommended date (spec 071 拍板 2 — 推荐日期纯展示). Only
-    // non-cursor days are off limits, and that gate lives in `isEditable`.
+    // Recommended dates do not restrict recording on unsettled published-plan days.
     let today = calendar.startOfDay(for: now())
     guard currentDay != nil, let drafts = currentDrafts, !drafts.isEmpty else { return nil }
     var prefilledDrafts = drafts

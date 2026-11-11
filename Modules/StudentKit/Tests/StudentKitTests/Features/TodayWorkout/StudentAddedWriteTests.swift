@@ -152,10 +152,9 @@ import Testing
 }
 
 @MainActor
-@Test func fullEntryRejectsOtherWeekWrites() async throws {
+@Test func fullEntryRejectsSettledDayWrites() async throws {
   let plan = StudentDemoSeed.makePlanView()
-  let cursor = try #require(StudentPlanSequence(days: plan.days).cursorDay)
-  let day = try #require(plan.days.first { $0.weekNumber != cursor.weekNumber })
+  let day = try #require(plan.days.first { $0.completedAt != nil })
   let logs = InMemoryStudentTrainingLogRepository()
   let model = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(
