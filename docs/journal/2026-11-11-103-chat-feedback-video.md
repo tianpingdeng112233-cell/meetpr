@@ -57,3 +57,8 @@ David 采纳视频封面直接播并保留标注，否决正文进详情；明�
 - XcodeBuildMCP：本工作树 MeetPR-DemoStudent / DemoStudent，iPhone17e iOS26.5，build_run_sim 成功80.9秒、0warnings/errors、PID55548。日志 `build_run_sim_2026-11-11T05-23-19-406Z_pid40124_1889e832.log`。
 - 现场：点击正文不跳转；点封面一次直接全屏（没有反馈详情中转），0:00→0:04 / 0:14，两个标注显示；点击0:02标注跳到0:02并出现绘图，倍速1x→1.5x；关闭回原聊天位置，第二次重开关闭位置亦保持。使用既有 Demo 素材，不代表用户私有视频/OSS真链路联验。截图在本聊天 outputs/direct-feedback-video。
 - 独立 review-loop 一轮：Standards CLEAN；Spec CLEAN。两个 reviewer 均读本卡四个Swift文件（含新增）与最新增补；生产代码随后无语义变更。正式测试已覆盖原审查发现的缺口。
+
+
+## Android 跟进（2026-11-11）
+
+David 追加 Android 同步检查后，spec108 两端镜像已更新为共同点击约定。Android 原本有封面直接播放，仅移除整卡 / 正文跳详情；独立分支 `fix/108-feedback-video-direct` @ `50d4dc9`，218 suites / 2285 tests、lint/tsc 通过，双轴审查 CLEAN，设备实点等待 ADB 操作授权。iOS 实现未再变更，本次仅同步两端 spec 与记录，不属于 beta/1.0-36。
