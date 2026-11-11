@@ -27,7 +27,9 @@ public struct TodayWorkoutView: View {
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
   private let onPlanChanged: (StudentPlanView) -> Void
-  private let onReturnToToday: () -> Void
+  @Environment(BodyWeightEntryModel.self) private var weightEntry: BodyWeightEntryModel?
+  @Environment(ProfileNavigation.self) private var profileNavigation: ProfileNavigation?
+  private let onOpenCoach: () -> Void
 
   @State private var restTimerHeight: CGFloat = 0
   @State private var viewModel: TodayWorkoutViewModel
@@ -51,7 +53,6 @@ public struct TodayWorkoutView: View {
   @State private var showingRestSettings = false
   @State private var accessoryRestSeconds = 60
   @State private var restPreference: StudentRestTimerPreference = .automatic
-  @State private var showingExerciseNote = false
   @State private var exerciseNoteSent = false
   @State private var exerciseNote: ExerciseRefV1?
   @Environment(ExerciseNoteNavigation.self) private var exerciseNavigation: ExerciseNoteNavigation?
@@ -97,7 +98,7 @@ public struct TodayWorkoutView: View {
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
-    onReturnToToday: @escaping () -> Void = {}
+    onOpenCoach: @escaping () -> Void = {}
   ) {
     self.isVisible = isVisible
     self.studentID = studentID
@@ -127,7 +128,7 @@ public struct TodayWorkoutView: View {
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onPlanChanged = onPlanChanged
-    self.onReturnToToday = onReturnToToday
+    self.onOpenCoach = onOpenCoach
     self._selectedDayID = State(initialValue: planHandoff?.dayID)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
@@ -172,8 +173,8 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     workoutContent
-      .sheet(isPresented: $showingExerciseNote) {
-        if let reference = exerciseNote {
+      .modifier(
+        ExerciseNotePresentation(reference: $exerciseNote) { reference in
           ExerciseNoteSheet(reference: reference) { note in
             guard let notifications, let chat = notifications.chatContext else { return false }
             let result = await notifications.openExerciseNoteConversation()
@@ -185,7 +186,7 @@ public struct TodayWorkoutView: View {
             return true
           }
         }
-      }
+      )
       .overlay(alignment: .top) {
         if exerciseNoteSent {
           Text(StudentStrings.localized(.allDaySent))
@@ -224,7 +225,7 @@ public struct TodayWorkoutView: View {
         dayState: selectedDayState,
         reviewCompleted: reviewCompleted,
         unreadCount: notifications?.totalUnreadCount ?? 0,
-        showsNotifications: notifications != nil,
+        showsNotifications: false,
         coachName: notifications?.activeCoach?.coachDisplayName
           ?? StudentStrings.localized(.todayWorkoutView001),
         showsAskCoach: showsSetRefEntry,
@@ -242,10 +243,10 @@ public struct TodayWorkoutView: View {
           showingReadinessSheet = true
         },
         onNotifications: {
-          showingNotifications = true
+          onOpenCoach()
         },
         onMessageCoach: {
-          showingNotifications = true
+          onOpenCoach()
         },
         onAskCoach: openSetRefPicker,
         onStart: {
@@ -272,7 +273,13 @@ public struct TodayWorkoutView: View {
         onRetryVideos: retryDayVideos,
         videoCompletion: videoCompletionPresentation,
         onExerciseNote: openExerciseNote,
-        onRefreshAsync: { await reloadCurrentDay() }
+        onRefreshAsync: { await reloadCurrentDay() },
+        weightEntry: weightEntry, studentID: studentID,
+        onEditMeet: { profileNavigation?.destination = .meet },
+        emptyState: trainingEmptyState,
+        showsCoach: notifications != nil,
+        onEditProfile: { profileNavigation?.destination = .about }
+
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -283,14 +290,7 @@ public struct TodayWorkoutView: View {
       .navigationDestination(isPresented: $showingHistory) {
         AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
       }
-      .modifier(
-        OptionalStudentNotificationHostModifier(
-          coordinator: notifications,
-          showsNotifications: $showingNotifications,
-          conversationID: $conversationID,
-          onOpenPlan: onOpenPlanNotification
-        )
-      )
+
     }
     .environment(replay)
     .environment(videoViewModel)
@@ -633,15 +633,24 @@ public struct TodayWorkoutView: View {
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
-          if !waitingForVideos {
-            returnToCurrentDay()
-            onReturnToToday()
-          }
+
         }
       )
     } else {
       Color.MeetPR.bgBase
     }
+  }
+
+  private var trainingEmptyState: TrainingEmptyStatePresentation? {
+    guard viewModel.state != .idle, viewModel.state != .loading else { return nil }
+    if case .error = viewModel.state { return nil }
+    // Pending video/set delivery continues to own the visible day until acknowledged.
+    if let day = currentDay,
+      viewModel.setSyncQueue?.completionGate.pendingDays.contains(day.id) == true
+    {
+      return nil
+    }
+    return TrainingEmptyStatePresentation.resolve(plan: viewModel.planProjection)
   }
 
   private var screenContent: TodayWorkoutScreen<TrainingWeekStrip>.Content {
@@ -735,7 +744,6 @@ public struct TodayWorkoutView: View {
   private func reloadCurrentDay() async {
     await replay.load(studentID: studentID)
     await loadWorkout(for: nil)
-    returnToCurrentDay()
   }
 
   private var selectedTrainingDate: Date {
@@ -808,7 +816,7 @@ public struct TodayWorkoutView: View {
       if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
         // The student may have closed the reward while it was sending.
         returnToCurrentDay()
-        onReturnToToday()
+
       }
     }
   }
@@ -1035,7 +1043,6 @@ public struct TodayWorkoutView: View {
       planDayID: day.id,
       planExerciseID: !draft.isStudentAdded ? draft.planExerciseID : nil,
       exerciseID: draft.exerciseID)
-    showingExerciseNote = true
   }
 
   private func openSetRefPicker() {
@@ -1061,11 +1068,18 @@ public struct TodayWorkoutView: View {
     for dayID: UUID?,
     preloadedPlan: StudentPlanView? = nil
   ) async {
-    await viewModel.load(
-      dayID: dayID,
-      studentID: studentID,
-      preloadedPlan: preloadedPlan
-    )
+    let plan: StudentPlanView?
+    if dayID == nil, preloadedPlan == nil {
+      plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+    } else {
+      plan = preloadedPlan
+    }
+    let target =
+      dayID
+      ?? plan.flatMap {
+        StudentTabShellPresentation.initialTrainingDay(in: $0.days)
+      }
+    await viewModel.load(dayID: target, studentID: studentID, preloadedPlan: plan)
     if selectedDayID == nil || !viewModel.planDays.contains(where: { $0.id == selectedDayID }) {
       selectedDayID = currentDay?.id
     }
@@ -1084,7 +1098,7 @@ public struct TodayWorkoutView: View {
       reconciliation.didReconcile,
       currentDay?.id == selectedDayID
     else { return }
-    await viewModel.load(dayID: dayID, studentID: studentID)
+    await viewModel.load(dayID: selectedDayID ?? target, studentID: studentID)
   }
 
   private func refreshWorkoutPlan() async {

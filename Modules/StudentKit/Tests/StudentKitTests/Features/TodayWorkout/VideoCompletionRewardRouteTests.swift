@@ -29,7 +29,7 @@ import ViewInspector
       logs: InMemoryStudentTrainingLogRepository(),
       videoUploads: VideoUploadServices(manager: harness.manager),
       planHandoff: TodayWorkoutPlanHandoff(plan: plan, dayID: day.id, existingLogs: []),
-      onReturnToToday: { todayNavigations += 1 })
+      onOpenCoach: { todayNavigations += 1 })
     let state = try #require(
       Mirror(reflecting: view).descendant("_viewModel") as? State<TodayWorkoutViewModel>)
     let model = state.wrappedValue
@@ -39,7 +39,7 @@ import ViewInspector
     let flow = try view.completionFlow(phase: .celebration).inspect()
       .find(WorkoutCompletionFlowView.self).actualView()
     flow.onFinish()
-    #expect(todayNavigations == (waiting ? 0 : 1))
+    #expect(todayNavigations == 0)
     #expect(model.completionPhase == nil)
     #expect(
       UserDefaultsSessionReviewStore().didCompleteReview(

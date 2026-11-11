@@ -14,6 +14,9 @@ public enum ChatDeliveryStatus: Equatable, Sendable {
 public final class ConversationViewModel {
   public static let maximumTextLength = SetRefMessageLengthPolicy.maximumBodyUTF16Count
 
+  /// A retained, hidden conversation may refresh data but must not advance read receipts.
+  public var isReadingActive = true
+
   public let conversationID: UUID
   public let currentUserID: UUID
   public internal(set) var messages: [ChatMessage] = []

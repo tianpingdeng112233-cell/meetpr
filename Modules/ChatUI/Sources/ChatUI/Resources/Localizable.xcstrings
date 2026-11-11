@@ -2645,6 +2645,29 @@
           }
         }
       }
+    },
+    "chat.studentNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员留言"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "學員留言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Student message"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

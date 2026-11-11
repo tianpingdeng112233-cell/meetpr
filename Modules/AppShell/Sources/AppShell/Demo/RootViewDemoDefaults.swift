@@ -72,7 +72,8 @@ enum RootViewDemoDefaults {
   static func onboarding() -> any OnboardingRepository {
     InMemoryOnboardingRepository(
       studentId: StudentDemoSeed.studentID,
-      seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
+      seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID),
+      seedRecentBodyWeights: true
     )
   }
 

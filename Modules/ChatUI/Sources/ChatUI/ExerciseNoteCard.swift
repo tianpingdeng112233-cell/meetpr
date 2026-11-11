@@ -26,7 +26,7 @@ public struct ExerciseNoteCard: View {
       } label: {
         VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
           HStack {
-            Text("\(reference.shortDate) · \(reference.exerciseName)")
+            Text("\(reference.shortDate) · \(reference.exerciseName) · \(ChatStrings.studentNote)")
               .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
             Image(systemName: "chevron.right")
           }

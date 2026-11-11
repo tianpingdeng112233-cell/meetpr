@@ -14,6 +14,10 @@ struct MyProfileFallbackRows: View {
   var recommendedWeekdays: Set<TrainingReminderWeekday>?
 
   var body: some View {
+    ProfileSettingsHeading(text: StudentStrings.localized(.studentRootView002))
+    MyProfileGroupCard {
+      DailyBodyWeightPreferenceRow(studentID: studentID)
+    }
     ProfileSettingsHeading(text: StudentStrings.localized(.profilePreferences))
     MyProfileGroupCard {
       AppearancePreferenceRow()

@@ -35,19 +35,31 @@ public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
   let selectedColor: Color
   let unselectedColor: Color
   let badgeColor: Color
+  let iconSize: CGFloat
+  let selectedWeight: Font.Weight
+  let badgeFontSize: CGFloat
+  let badgeBorder: Color
 
   public init(
     selection: Binding<ID>,
     items: [MeetPRTabBarItem<ID>],
     selectedColor: Color = Color.MeetPR.goldCTA,
     unselectedColor: Color = Color.MeetPR.textTertiary,
-    badgeColor: Color = Color.MeetPR.dangerFill
+    badgeColor: Color = Color.MeetPR.dangerFill,
+    iconSize: CGFloat = MeetPRSpacing.space6,
+    selectedWeight: Font.Weight = .regular,
+    badgeFontSize: CGFloat = MeetPRFontMetrics.size9,
+    badgeBorder: Color = .clear
   ) {
     self._selection = selection
     self.items = items
     self.selectedColor = selectedColor
     self.unselectedColor = unselectedColor
     self.badgeColor = badgeColor
+    self.iconSize = iconSize
+    self.selectedWeight = selectedWeight
+    self.badgeFontSize = badgeFontSize
+    self.badgeBorder = badgeBorder
   }
 
   public var body: some View {
@@ -58,16 +70,22 @@ public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
         } label: {
           VStack(spacing: MeetPRSpacing.space1) {
             MeetPRTabIconView(icon: item.icon)
-              .frame(width: MeetPRSpacing.space6, height: MeetPRSpacing.space6)
+              .frame(width: iconSize, height: iconSize)
               .overlay(alignment: .topTrailing) {
                 if item.badge > 0 {
-                  TabUnreadBadge(count: item.badge, color: badgeColor)
-                    .offset(x: MeetPRSpacing.point10, y: -MeetPRSpacing.point6)
+                  TabUnreadBadge(
+                    count: item.badge, color: badgeColor,
+                    fontSize: badgeFontSize, border: badgeBorder
+                  )
+                  .offset(x: MeetPRSpacing.point10, y: -MeetPRSpacing.point6)
                 }
               }
 
             Text(item.title)
-              .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
+              .font(
+                .MeetPR.system(
+                  size: MeetPRFontMetrics.size11,
+                  weight: selection == item.id ? selectedWeight : .regular))
           }
           .foregroundStyle(
             selection == item.id
@@ -305,14 +323,17 @@ private struct TodayTabArrowFill: Shape {
 private struct TabUnreadBadge: View {
   let count: Int
   let color: Color
+  let fontSize: CGFloat
+  let border: Color
 
   var body: some View {
     Text(count > 99 ? "99+" : count.formatted())
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size9, weight: .bold))
+      .font(.MeetPR.mono(size: fontSize, weight: .bold))
       .foregroundStyle(Color.white)
       .padding(.horizontal, MeetPRSpacing.point3)
       .frame(minWidth: MeetPRSpacing.space4, minHeight: MeetPRSpacing.space4)
       .background(color, in: .capsule)
+      .overlay { Capsule().stroke(border, lineWidth: 1.5) }
   }
 }
 

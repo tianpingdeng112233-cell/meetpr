@@ -22,6 +22,7 @@ public final class MyProfileViewModel {
 
   private let repo: any OnboardingRepository
   private let studentId: UUID
+  private var loadRevision = 0
 
   public init(studentId: UUID, repo: any OnboardingRepository) {
     self.studentId = studentId
@@ -34,17 +35,22 @@ public final class MyProfileViewModel {
   }
 
   public func reload() async {
+    loadRevision += 1
+    let revision = loadRevision
     let previousState = state
     let previouslyFailed = isFailed
     if state == .idle { state = .loading }
     isFailed = false
     do {
-      if let profile = try await repo.fetchProfile(studentId: studentId) {
+      let profile = try await repo.fetchProfile(studentId: studentId)
+      guard revision == loadRevision else { return }
+      if let profile {
         state = .loaded(profile)
       } else {
         state = .empty
       }
     } catch {
+      guard revision == loadRevision else { return }
       if error.isTaskCancellation {
         state = previousState
         isFailed = previouslyFailed
@@ -60,9 +66,38 @@ public final class MyProfileViewModel {
   /// reflect the server's truth (spec 032 D10). Returns false to keep the
   /// edit page up.
   public func save(_ patch: OnboardingPatch) async -> Bool {
+    await saveChanges(archivePatch: patch, todaysWeight: nil)
+  }
+
+  func saveCard(
+    _ patch: OnboardingPatch, kind: ProfileCardKind, originalWeight: Decimal?
+  ) async -> Bool {
+    guard kind == .weight || kind == .basics else { return await save(patch) }
+    var archivePatch = patch
+    archivePatch.weightKg = .absent
+    let weight: Decimal?
+    if case .value(let value) = patch.weightKg,
+      kind == .weight || value != originalWeight
+    {
+      weight = value
+    } else {
+      weight = nil
+    }
+    return await saveChanges(
+      archivePatch: kind == .weight ? nil : archivePatch, todaysWeight: weight)
+  }
+
+  private func saveChanges(archivePatch: OnboardingPatch?, todaysWeight: Decimal?) async -> Bool {
     saveError = nil
     do {
-      _ = try await repo.upsert(patch)
+      if let archivePatch { _ = try await repo.upsert(archivePatch) }
+      if let todaysWeight {
+        guard let weights = repo as? any BodyWeightRepository else {
+          throw BodyWeightError.unavailable
+        }
+        _ = try await weights.saveTodaysWeight(todaysWeight)
+        BodyWeightChanges.post(studentID: studentId)
+      }
       await reload()
       return true
     } catch OnboardingError.oneRMLocked {

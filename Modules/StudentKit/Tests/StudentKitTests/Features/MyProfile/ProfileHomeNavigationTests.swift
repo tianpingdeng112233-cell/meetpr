@@ -18,10 +18,10 @@ import ViewInspector
       isFailed: state == .failed, onOpen: { opened.append($0) }, onRetry: {}, onOneRMInfo: {})
     #expect(try view.inspect().findAll(ProfileIdentityCard.self).count == 1)
     let rows = try view.inspect().findAll(StudentMenuRow.self)
-    #expect(rows.count == (state == .empty ? 1 : 5))
+    #expect(rows.count == (state == .empty ? 1 : 4))
     #expect(try rows.last?.actualView().title == StudentStrings.localized(.profileSettings))
     for row in rows { try row.find(ViewType.Button.self).tap() }
-    #expect(opened == (state == .empty ? [.settings] : [.about, .health, .meet, .note, .settings]))
+    #expect(opened == (state == .empty ? [.settings] : [.about, .health, .meet, .settings]))
     #expect(ProfileMenuDestination.meet.editor == .competition)
     #expect(ProfileMenuDestination.note.editor == .note)
     #expect(ProfileMenuDestination.about.editor == nil)

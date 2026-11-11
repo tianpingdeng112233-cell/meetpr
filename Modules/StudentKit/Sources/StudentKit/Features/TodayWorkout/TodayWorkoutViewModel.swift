@@ -19,6 +19,9 @@ public final class TodayWorkoutViewModel {
   public typealias SetRowDraft = TodayWorkoutSetRowDraft
   public typealias RestTimerState = TodayWorkoutRestTimerState
 
+  /// Spec 107 walkthrough round 4: keep historical weight prefill paused.
+  public static let historyWeightPrefillEnabledByDefault = false
+
   private struct LoadedDaySnapshot {
     let day: StudentPlanDay
     let drafts: [SetRowDraft]
@@ -53,7 +56,6 @@ public final class TodayWorkoutViewModel {
 
   var allDayCollapsed: [UUID: Set<UUID>] = [:]
   var allDayExpansion: [UUID: UUID] = [:]
-  var allDayManuallyCollapsed: Set<UUID> = []
   var allDayWriting = false
 
   public private(set) var state: State = .idle
@@ -94,6 +96,7 @@ public final class TodayWorkoutViewModel {
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let restTimerActivityController: any RestTimerActivityControlling
+  private let historyWeightPrefillEnabled: Bool
   private let calendar: Calendar
   private let now: @Sendable () -> Date
   private let completionSleep: @MainActor @Sendable () async -> Void
@@ -125,6 +128,7 @@ public final class TodayWorkoutViewModel {
       UserDefaultsRestTimerSettingsStore(),
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
+    historyWeightPrefillEnabled: Bool = TodayWorkoutViewModel.historyWeightPrefillEnabledByDefault,
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() },
     completionSleep: @escaping @MainActor @Sendable () async -> Void = {
@@ -141,6 +145,7 @@ public final class TodayWorkoutViewModel {
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
     self.restTimerActivityController = restTimerActivityController
+    self.historyWeightPrefillEnabled = historyWeightPrefillEnabled
     restTimerActivityController.end()
     self.calendar = calendar
     self.now = now
@@ -599,10 +604,7 @@ public final class TodayWorkoutViewModel {
       }
       await loadExerciseCatalog(fallbackDays: plan.days)
     }
-    let resolvedID =
-      dayID
-      ?? FlexibleTrainingDay.defaultDay(
-        days: plan.days, logs: existingLogs, added: addedLogs, now: now(), calendar: calendar)?.id
+    let resolvedID = dayID ?? StudentPlanSequence(days: plan.days).cursorDay?.id
     guard let day = loadDay(from: plan, dayID: resolvedID) else {
       return nil
     }
@@ -613,17 +615,18 @@ public final class TodayWorkoutViewModel {
       studentID: studentID,
       before: day.scheduledDate
     )
-    async let suggestions = try? plans.weightSuggestions(studentID: studentID, dayID: day.id)
+    async let suggestions = historyWeightSuggestions(studentID: studentID, dayID: day.id)
     async let historyRefresh: Void = refreshAddedHistory(plan: plan, studentID: studentID)
     let (referenceSnapshot, historyLogs) = try await (referenceSnapshotTask, historyLogsTask)
     await historyRefresh
-    let matchingSuggestions = await suggestions ?? []
+    let matchingSuggestions = await suggestions
     return LoadedDaySnapshot(
       day: day,
       drafts: restoredStudentDrafts(
         day: day,
         planned: Self.makeDrafts(
           for: day, existingLogs: existingLogs, suggestions: matchingSuggestions,
+          historyWeightPrefillEnabled: historyWeightPrefillEnabled,
           onboardingProfile: onboardingProfile)),
       accessoryPreviousLogs: Dictionary(
         uniqueKeysWithValues: day.exercises.map { exercise in
@@ -642,6 +645,13 @@ public final class TodayWorkoutViewModel {
         planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)
       )
     )
+  }
+
+  private func historyWeightSuggestions(studentID: UUID, dayID: UUID) async
+    -> [SetWeightSuggestionRecord]
+  {
+    guard historyWeightPrefillEnabled else { return [] }
+    return (try? await plans.weightSuggestions(studentID: studentID, dayID: dayID)) ?? []
   }
 
   private func refreshAddedHistory(plan: StudentPlanView, studentID: UUID) async {
@@ -1086,9 +1096,7 @@ public final class TodayWorkoutViewModel {
     // A fresh sheet is a fresh attempt: forget the previous attempt's slots.
     quickLogAttemptKey = nil
     quickLogWrittenSlots = []
-    // Sequence progression: the cursor day is loggable regardless of the
-    // coach's recommended date (spec 071 拍板 2 — 推荐日期纯展示). Only
-    // non-cursor days are off limits, and that gate lives in `isEditable`.
+    // Recommended dates do not restrict recording on unsettled published-plan days.
     let today = calendar.startOfDay(for: now())
     guard currentDay != nil, let drafts = currentDrafts, !drafts.isEmpty else { return nil }
     var prefilledDrafts = drafts
@@ -2196,18 +2204,15 @@ extension TodayWorkoutViewModel {
 
   var expandedAllDayExerciseID: UUID? {
     guard let day = currentDay else { return nil }
-    if allDayManuallyCollapsed.contains(day.id) { return nil }
-    return allDayExpansion[day.id] ?? allDaySheet.first { $0.node != .completed }?.id
+    return allDayExpansion[day.id]
   }
 
   func toggleAllDayExpansion(_ exerciseID: UUID) {
     guard let day = currentDay else { return }
     if expandedAllDayExerciseID == exerciseID {
       allDayExpansion.removeValue(forKey: day.id)
-      allDayManuallyCollapsed.insert(day.id)
     } else {
       allDayExpansion[day.id] = exerciseID
-      allDayManuallyCollapsed.remove(day.id)
     }
   }
 
@@ -2234,7 +2239,6 @@ extension TodayWorkoutViewModel {
     if allDayCollapsed[day.id, default: []].contains(exerciseID) {
       allDayCollapsed[day.id]?.remove(exerciseID)
       allDayExpansion[day.id] = exerciseID
-      allDayManuallyCollapsed.remove(day.id)
       return true
     }
     allDayWriting = true
@@ -2252,7 +2256,6 @@ extension TodayWorkoutViewModel {
     guard currentDay?.id == day.id else { return false }
     allDayCollapsed[day.id, default: []].insert(exerciseID)
     allDayExpansion.removeValue(forKey: day.id)
-    allDayManuallyCollapsed.remove(day.id)
     return true
   }
 

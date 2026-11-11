@@ -4,7 +4,7 @@ import SwiftUI
 
 struct ProgressE1RMPage: View {
   let model: ProgressDataModel
-  let onOpenToday: () -> Void
+  let onOpenTraining: () -> Void
   @State private var selection = ProgressE1RMSelection()
   @State private var detail: GrowthE1RMDetail?
 
@@ -30,7 +30,7 @@ struct ProgressE1RMPage: View {
         GrowthE1RMCard(
           snapshot: model.snapshot(family: family, range: selection.range),
           range: selection.range, isGlobalTrainingEmpty: model.stats.trainingSessionCount == 0,
-          onOpenToday: onOpenToday, onCycleRange: { selection.cycleRange() },
+          onOpenTraining: onOpenTraining, onCycleRange: { selection.cycleRange() },
           onSelectPoint: { detail = model.detail(pointID: $0) }
         )
         .id(family)

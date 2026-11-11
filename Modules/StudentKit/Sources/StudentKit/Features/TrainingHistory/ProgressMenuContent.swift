@@ -4,6 +4,7 @@ import SwiftUI
 enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
   case e1rm
   case history
+  case bodyWeight
   case feedback
   case intensity
 
@@ -12,6 +13,7 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
     case .e1rm: StudentStrings.localized(.progressE1rm)
     case .history: StudentStrings.localized(.e1rmSourceHistory)
     case .feedback: StudentStrings.localized(.feedbackInboxView006)
+    case .bodyWeight: StudentStrings.localized(.bodyWeightTitle)
     case .intensity: StudentStrings.localized(.progressIntensity)
     }
   }
@@ -21,15 +23,17 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
     case .e1rm: "chart.line.uptrend.xyaxis"
     case .history: "clock"
     case .feedback: "bubble.left"
+    case .bodyWeight: "scalemass"
     case .intensity: "chart.bar"
     }
   }
 
-  func value(from values: ProgressMenuValues?) -> String? {
+  func value(from values: ProgressMenuValues?, bodyWeight: String? = nil) -> String? {
     switch self {
     case .e1rm: values?.e1rm
     case .history: values?.history
     case .feedback: values?.feedback
+    case .bodyWeight: bodyWeight
     case .intensity: values?.intensity
     }
   }
@@ -37,15 +41,18 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
 
 struct ProgressMenuContent: View {
   let values: ProgressMenuValues?
+  var bodyWeightValue: String?
   let isFailed: Bool
   let onOpen: (ProgressMenuDestination) -> Void
   let onRetry: () -> Void
 
   var body: some View {
+    let destinations = ProgressMenuDestination.allCases.filter { $0 != .feedback }
     VStack(spacing: MeetPRSpacing.point10) {
-      ForEach(ProgressMenuDestination.allCases, id: \.self) { destination in
+      ForEach(destinations, id: \.self) { destination in
         StudentMenuRow(
-          icon: destination.icon, title: destination.title, value: destination.value(from: values),
+          icon: destination.icon, title: destination.title,
+          value: destination.value(from: values, bodyWeight: bodyWeightValue),
           valueColor: destination == .feedback && values?.feedbackEmphasized == true
             ? .MeetPR.goldText : .MeetPR.textMuted,
           action: { onOpen(destination) })

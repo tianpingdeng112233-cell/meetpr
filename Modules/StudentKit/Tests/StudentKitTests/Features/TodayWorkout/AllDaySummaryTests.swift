@@ -115,7 +115,7 @@ extension AllDaySummaryTests {
   @Test func resolvedPercentageAndEmptyAddedExercise() {
     var rows = Self.rows(Self.sets(5, intensity: .percentage(75)))
     for index in rows.indices { rows[index].actualWeight = 112.5 }
-    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.load) == ["112.5 (75%)"])
+    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.load) == ["112.5"])
     rows = Self.rows(Self.sets(3, intensity: .percentage(60), anchor: .topSet))
     for index in rows.indices { rows[index].actualWeight = 90 }
     #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.load) == ["90"])

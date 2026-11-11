@@ -43,7 +43,7 @@ struct AllDaySetRow: View {
       }
       if editable {
         Button(action: onVideo) {
-          Image(systemName: "camera")
+          Image(systemName: "video")
             .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
             .foregroundStyle(cameraColor)
             .frame(width: 40, height: MeetPRSpacing.minimumHitTarget)
@@ -51,6 +51,12 @@ struct AllDaySetRow: View {
         .buttonStyle(.plain)
         .accessibilityLabel(StudentStrings.localized(.setVideoUploadIndicator001))
         .accessibilityIdentifier("allDay.camera.\(draft.id)")
+      }
+      if case .percentage(let value) = draft.prescribed.intensity {
+        Text(StudentFormatting.decimal(value) + "%")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+          .fixedSize()
       }
     }
     .contextMenu {
@@ -160,7 +166,9 @@ private struct AllDaySetValues: View {
   }
   private var effortText: String {
     if let rir = draft.actualRIR { return "RIR \(rir)" }
-    return draft.actualRPE.map { "RPE \(StudentFormatting.decimal($0))" } ?? "—"
+    if let rpe = draft.actualRPE { return "RPE \(StudentFormatting.decimal(rpe))" }
+    if case .rir = draft.prescribed.intensity { return "RIR —" }
+    return "RPE —"
   }
 }
 

@@ -59,6 +59,12 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var videoCompletion: VideoCompletionPresentation?
   var onExerciseNote: (TodayWorkoutSetRowDraft) -> Void = { _ in }
   var onRefreshAsync: (() async -> Void)?
+  var weightEntry: BodyWeightEntryModel?
+  var studentID: UUID?
+  var onEditMeet: () -> Void = {}
+  var emptyState: TrainingEmptyStatePresentation?
+  var showsCoach = true
+  var onEditProfile: () -> Void = {}
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -91,7 +97,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   private var trainingScrollContent: some View {
     TrainingContentStack(recording: flowSnapshot.dayID != nil) {
       TodayWorkoutHeader(
-        weekCode: String(weekCode.prefix { $0 != "D" }),
+        weekCode: emptyState?.heading ?? String(weekCode.prefix { $0 != "D" }),
         unreadCount: unreadCount,
         showsNotifications: showsNotifications,
         onRefresh: onRefresh,
@@ -101,8 +107,17 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onBackToToday: onBackToToday
       )
 
-      sequenceContent
-      screenContent
+      if let weightEntry, let studentID {
+        MeetWeightStrip(studentID: studentID, model: weightEntry, onEditMeet: onEditMeet)
+      }
+      if let emptyState {
+        TrainingEmptyStateView(
+          presentation: emptyState, coachName: coachName, showsCoach: showsCoach,
+          onCoach: onMessageCoach, onProfile: onEditProfile, onMeet: onEditMeet)
+      } else {
+        sequenceContent
+        screenContent
+      }
     }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
@@ -370,24 +385,7 @@ private struct TodayWorkoutHeader: View {
         .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
         .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
-      if showsNotifications {
-        TrainingHeaderButton(
-          accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen007),
-          action: onNotifications
-        ) {
-          Image(systemName: "bubble.left.and.bubble.right")
-            .foregroundStyle(Color.MeetPR.textPrimary)
-        }
-        .overlay(alignment: .topTrailing) {
-          if unreadCount > 0 {
-            Text(unreadCount > 99 ? "99+" : unreadCount.formatted())
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-              .foregroundStyle(Color.MeetPR.inkOnCTAFill)
-              .padding(.horizontal, MeetPRSpacing.space1)
-              .background(Color.MeetPR.unread, in: .capsule)
-          }
-        }
-      }
+
     }
   }
 }
@@ -497,7 +495,7 @@ struct TodayWorkoutHero: View {
 
       if isEditable {
         GoldCTA(
-          StudentStrings.localized(.dashboardPrimaryAction001),
+          StudentStrings.localized(.evaluationPeriodView012),
           sub: nil,
           icon: .none,
           action: onStart

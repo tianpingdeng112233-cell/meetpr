@@ -9,7 +9,7 @@ struct GrowthE1RMCard: View {
   let snapshot: GrowthCurveSnapshot
   let range: GrowthTimeRange
   let isGlobalTrainingEmpty: Bool
-  let onOpenToday: () -> Void
+  let onOpenTraining: () -> Void
   let onCycleRange: () -> Void
   let onSelectPoint: (UUID) -> Void
   @State private var selectedPointID: UUID?
@@ -79,7 +79,7 @@ struct GrowthE1RMCard: View {
       case .zero:
         GrowthZeroTrainingState(
           showsAction: isGlobalTrainingEmpty,
-          onOpenToday: onOpenToday
+          onOpenTraining: onOpenTraining
         )
         .frame(height: 228)
       case .formingProgress:
