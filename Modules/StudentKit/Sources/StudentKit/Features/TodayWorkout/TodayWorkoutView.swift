@@ -45,7 +45,7 @@ public struct TodayWorkoutView: View {
   @State private var quickLogToastTask: Task<Void, Never>?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
-  @State private var showingDirectCamera = false
+  @State private var pendingDirectCameraTarget: DirectCameraTarget?
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
@@ -424,10 +424,11 @@ public struct TodayWorkoutView: View {
     .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
       Button(VideoPrivacyCopy.consentAgree) {
         videoViewModel.recordConsent()
-        showingDirectCamera = directCameraTarget != nil
+        directCameraTarget = pendingDirectCameraTarget
+        pendingDirectCameraTarget = nil
       }
       Button(VideoPrivacyCopy.consentDecline, role: .cancel) {
-        directCameraTarget = nil
+        pendingDirectCameraTarget = nil
       }
     } message: {
       Text(VideoPrivacyCopy.consentBody)
@@ -459,28 +460,7 @@ public struct TodayWorkoutView: View {
       Text(videoViewModel.retryErrorMessage ?? "")
     }
     #if os(iOS)
-      .fullScreenCover(
-        isPresented: $showingDirectCamera,
-        onDismiss: { directCameraTarget = nil },
-        content: {
-          if let target = directCameraTarget {
-            CameraRecorderView(
-              maxDurationSeconds: videoViewModel.maxDurationSeconds,
-              isPresented: $showingDirectCamera,
-              onPicked: { url in
-                preparingVideoSetID = target.id
-                Task {
-                  await attachDirectCameraVideo(sourceURL: url, target: target)
-                }
-              },
-              onFailure: {
-                videoViewModel.reportVideoProcessingFailure()
-              },
-              allDayFlow: true
-            )
-          }
-        }
-      )
+      .fullScreenCover(item: $directCameraTarget, content: directCamera)
     #endif
     .onChange(of: scenePhase) { _, phase in
       if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
@@ -940,6 +920,27 @@ public struct TodayWorkoutView: View {
     return VideoDeliveryPresentation.hasFailure(attachment) ? .failed : attachment.status
   }
 
+  #if os(iOS)
+    private func directCamera(for target: DirectCameraTarget) -> CameraRecorderView {
+      CameraRecorderView(
+        maxDurationSeconds: videoViewModel.maxDurationSeconds,
+        isPresented: Binding(
+          get: { directCameraTarget != nil },
+          set: { if !$0 { directCameraTarget = nil } }),
+        onPicked: { url in
+          preparingVideoSetID = target.id
+          Task {
+            await attachDirectCameraVideo(sourceURL: url, target: target)
+          }
+        },
+        onFailure: {
+          videoViewModel.reportVideoProcessingFailure()
+        },
+        allDayFlow: true
+      )
+    }
+  #endif
+
   private var cameraAvailable: Bool {
     #if os(iOS)
       CameraRecorderView.isAvailable
@@ -949,11 +950,12 @@ public struct TodayWorkoutView: View {
   }
 
   private func beginDirectCamera(for draft: TodayWorkoutViewModel.SetRowDraft) {
-    directCameraTarget = DirectCameraTarget(
+    let target = DirectCameraTarget(
       id: draft.id, trainingDate: selectedTrainingDate, slot: draft.pendingVideoSlot)
     if videoViewModel.hasConsented {
-      showingDirectCamera = true
+      directCameraTarget = target
     } else {
+      pendingDirectCameraTarget = target
       showingDirectCameraConsent = true
     }
   }
@@ -1190,7 +1192,7 @@ private struct QuickLogRoute: Identifiable {
   let plan: QuickLogPlan
 }
 
-private struct DirectCameraTarget {
+private struct DirectCameraTarget: Identifiable {
   let id: UUID
   let trainingDate: Date
   let slot: VideoAttachment.SetSlot?
