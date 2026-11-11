@@ -39,3 +39,9 @@ David 拒收仅上下排布，要求如 Excel 同类数据固定位置，并统�
 - 原生：iPhone17e Demo真实VM勾选深蹲后下一条自加动作展开；Android5570真实AllDayBody画廊演示深蹲勾选后竞技卧推展开。Android画廊用本地状态模拟勾选，不写真实训练数据；实际保存路径由页面集成回归覆盖。截图 outputs/fixed-columns/ios-auto-expand.png 与 android-auto-expand.png。
 - 定向独立审查指出RN取消竞态，修复并补回归后CLEAN。验收仍由David决定，未合入发版线、未打包发布。
 - 最终 iOS StudentKit 全量1272项/90套件通过，目标SwiftLint通过。
+
+## 摘要强度列改金色（David 10:49截图要求）
+
+- 截图对应的摘要 RPE/RIR 整列统一使用 goldText，包含标签、数值、范围、缺值占位；保持T2字号、固定列位。此条覆盖此前摘要统一基准颜色的约定，仅限摘要强度列。
+- T0局部样式调整，无数据或交互变化。RN既有样式测试同步预期，训练页49项通过；原生截图 outputs/fixed-columns/android-gold-effort.png、ios-gold-effort.png。未发布。
+- iOS StudentKit全量1272项通过，SwiftLint通过，模拟器更新完成。

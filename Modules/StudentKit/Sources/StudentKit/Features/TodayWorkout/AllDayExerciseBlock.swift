@@ -208,7 +208,7 @@ private struct AllDaySummaryValues: View {
               .replacing("RPE ", with: "RPE\u{00a0}")
               .replacing("RIR ", with: "RIR\u{00a0}")
           )
-          .foregroundStyle(segment.effortChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+          .foregroundStyle(Color.MeetPR.goldText)
           .accessibilityIdentifier("allDay.summary.effort.\(index)")
         }
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
