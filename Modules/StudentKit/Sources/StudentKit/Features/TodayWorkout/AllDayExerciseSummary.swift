@@ -21,17 +21,7 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     rows: [TodayWorkoutSetRowDraft], unit: UnitPreference = .kg,
     locale: Locale = .current
   ) -> Self {
-    let efforts = rows.map { row -> String? in
-      if row.hasSavedRecord || row.completed || row.isStudentAdded {
-        if let rir = row.actualRIR { return "RIR \(rir)" }
-        return row.actualRPE.map { "RPE " + StudentFormatting.decimal($0) }
-      }
-      return effort(row.prescribed)
-    }
-    let commonEffort = efforts.first.flatMap { first in
-      efforts.allSatisfy { $0 == first } ? first : nil
-    }
-    let values = rows.map { segment($0, commonEffort: commonEffort, unit: unit, locale: locale) }
+    let values = rows.map { segment($0, unit: unit, locale: locale) }
     var groups: [[Segment]] = []
     for value in values {
       if let last = groups.last?.first, last.reps == value.reps {
@@ -65,7 +55,7 @@ struct AllDayExerciseSummary: Equatable, Sendable {
   }
 
   private static func segment(
-    _ row: TodayWorkoutSetRowDraft, commonEffort: String?, unit: UnitPreference, locale: Locale
+    _ row: TodayWorkoutSetRowDraft, unit: UnitPreference, locale: Locale
   ) -> Segment {
     let recorded = row.hasSavedRecord || row.completed || row.isStudentAdded || row.isExtra
     let count = recorded ? row.actualReps : row.prescribed.reps
@@ -82,16 +72,15 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     let load = load(row, recorded: recorded, unit: unit, locale: locale)
     let rowEffort = recorded ? actualEffort(row) : effort(row.prescribed)
     let text = load.intensityOnly && load.text == rowEffort ? "—" : load.text
-    let displayedEffort = load.intensityOnly ? rowEffort : commonEffort
     return Segment(
-      reps: reps, load: text, effort: displayedEffort ?? "—", intensityOnly: load.intensityOnly,
+      reps: reps, load: text, effort: rowEffort ?? "—", intensityOnly: load.intensityOnly,
       repsChanged: recorded && count != row.prescribed.reps,
       loadChanged: recorded
         && (row.actualWeight != row.prescribed.weightKg
           || row.actualRPE != row.prescribed.rpe
           || actualEffort(row) != effort(row.prescribed)),
       weightChanged: recorded && row.actualWeight != row.prescribed.weightKg,
-      effortChanged: recorded && displayedEffort != nil
+      effortChanged: recorded && rowEffort != nil
         && actualEffort(row) != effort(row.prescribed),
       shortReps: short)
   }

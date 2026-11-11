@@ -176,3 +176,25 @@ extension AllDaySummaryTests {
     #expect(result.segments.first?.weightChanged == true)
   }
 }
+
+extension AllDaySummaryTests {
+  @Test func recordedWeightedSetsKeepEveryRPEInTheSummary() {
+    var rows = Self.rows(Self.sets(4, reps: 7, weight: 100))
+    for (index, value) in [6, 7, 8, 8].enumerated() {
+      rows[index].actualWeight = [95, 100, 105, 110][index]
+      rows[index].actualRPE = Decimal(value)
+      rows[index].loggedSetID = UUID()
+    }
+    let result = AllDayExerciseSummary.build(rows: rows)
+    #expect(result.segments.map(\.reps) == ["4×7"])
+    #expect(result.segments.map(\.load) == ["95 / 100 / 105 / 110"])
+    #expect(result.segments.map(\.effort) == ["RPE 6/7/8/8"])
+    rows[1].actualRPE = nil
+    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.effort) == ["RPE 6/—/8/8"])
+    for (index, value) in [3, 2, 1, 1].enumerated() {
+      rows[index].actualRPE = nil
+      rows[index].actualRIR = value
+    }
+    #expect(AllDayExerciseSummary.build(rows: rows).segments.map(\.effort) == ["RIR 3/2/1/1"])
+  }
+}
