@@ -20609,6 +20609,29 @@
         }
       }
     },
+    "student.workoutCompletionFlowView.autoClose": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes automatically after 5 seconds"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 秒后自动关闭"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 秒後自動關閉"
+          }
+        }
+      }
+    },
     "student.workoutCompletionFlowView.copy001": {
       "extractionState": "manual",
       "localizations": {

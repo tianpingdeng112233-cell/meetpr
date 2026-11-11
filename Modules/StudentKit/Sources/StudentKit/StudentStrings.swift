@@ -1324,6 +1324,7 @@ enum StudentStrings {
     static let w4V3Previews003 = Key("student.w4V3Previews.copy003")
     static let w4V3Previews004 = Key("student.w4V3Previews.copy004")
     static let w4V3Previews005 = Key("student.w4V3Previews.copy005")
+    static let workoutCompletionAutoClose = Key("student.workoutCompletionFlowView.autoClose")
     static let workoutCompletionFlowView001 = Key("student.workoutCompletionFlowView.copy001")
     static let workoutCompletionFlowView002 = Key("student.workoutCompletionFlowView.copy002")
     static let workoutCompletionFlowView003 = Key("student.workoutCompletionFlowView.copy003")

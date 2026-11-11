@@ -2,13 +2,6 @@ import DesignSystem
 import Foundation
 import SwiftUI
 
-enum WorkoutCompletionFlowPhase: String, Identifiable, Sendable {
-  case celebration
-  case review
-
-  var id: String { rawValue }
-}
-
 @available(iOS 17.0, macOS 14.0, *)
 struct WorkoutCompletionFlowView: View {
   let presentation: WorkoutCompletionPresentation
@@ -18,8 +11,7 @@ struct WorkoutCompletionFlowView: View {
   let onFinish: () -> Void
 
   @Environment(\.dismiss) private var dismiss
-  @State private var phase: WorkoutCompletionFlowPhase
-  @State private var didFinish = false
+  @State private var model: WorkoutCompletionFlowModel
 
   init(
     presentation: WorkoutCompletionPresentation,
@@ -33,16 +25,17 @@ struct WorkoutCompletionFlowView: View {
     self.reflectionStore = reflectionStore
     self.initialPhase = initialPhase
     self.onFinish = onFinish
-    self._phase = State(initialValue: initialPhase)
+    self._model = State(initialValue: WorkoutCompletionFlowModel(initialPhase: initialPhase))
   }
 
   var body: some View {
     ZStack {
-      switch phase {
+      switch model.phase {
       case .celebration:
         WorkoutCelebrationView(
           presentation: presentation,
-          onOpenReview: { phase = .review },
+          autoClosePending: model.isAutoClosePending,
+          onOpenReview: model.openReview,
           onFinish: finish
         )
       case .review:
@@ -55,14 +48,21 @@ struct WorkoutCompletionFlowView: View {
       }
     }
     .background(Color.MeetPR.bgBase)
+    .contentShape(.rect)
+    .simultaneousGesture(
+      DragGesture(minimumDistance: 0).onChanged { _ in model.touch() }
+    )
+    .task { await model.autoClose(onFinish: close) }
     .interactiveDismissDisabled()
     .accessibilityElement(children: .contain)
     .accessibilityAddTraits(.isModal)
   }
 
   private func finish() {
-    guard !didFinish else { return }
-    didFinish = true
+    model.finish(onFinish: close)
+  }
+
+  private func close() {
     onFinish()
     dismiss()
   }
@@ -71,6 +71,7 @@ struct WorkoutCompletionFlowView: View {
 @available(iOS 17.0, macOS 14.0, *)
 struct WorkoutCelebrationView: View {
   let presentation: WorkoutCompletionPresentation
+  var autoClosePending = false
   let onOpenReview: () -> Void
   let onFinish: () -> Void
 
@@ -157,6 +158,12 @@ struct WorkoutCelebrationView: View {
           .modifier(CompletionFade(delay: 0.82))
 
           Spacer(minLength: MeetPRSpacing.space4)
+
+          if autoClosePending {
+            Text(StudentStrings.localized(.workoutCompletionAutoClose))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textMuted)
+          }
         }
         .padding(.horizontal, MeetPRSpacing.point28)
         .padding(.vertical, MeetPRSpacing.point32)
