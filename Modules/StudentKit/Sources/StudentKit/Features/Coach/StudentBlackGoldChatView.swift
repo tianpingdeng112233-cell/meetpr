@@ -42,7 +42,7 @@ struct StudentBlackGoldChatView: View {
   @State private var showsPhotoPreview = false
   @State private var cameraPermissionDenied = false
   @State private var photoUnavailable = false
-  @State private var selectedFeedback: CoachFeedback?
+  @State private var feedbackPlayback: FeedbackVideoPlaybackModel
   @State private var selectedImage: StudentChatImageSelection?
   @State private var showsSetRefPicker = false
   @State private var selectedVideo: StudentSelectedChatVideo?
@@ -79,6 +79,8 @@ struct StudentBlackGoldChatView: View {
     self.dismiss = dismiss
     self.setRefSharing = setRefSharing
     self.sendCoordinator = sendCoordinator
+    _feedbackPlayback = State(
+      initialValue: FeedbackVideoPlaybackModel(feedback: coordinator.feedbackViewModel))
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -114,17 +116,12 @@ struct StudentBlackGoldChatView: View {
     }
     .onChange(of: isVisible) { _, visible in
       viewModel.isReadingActive = visible && scenePhase == .active
+      if !visible { feedbackPlayback.cancel() }
     }
     .onChange(of: scenePhase) { _, phase in
       viewModel.isReadingActive = isVisible && phase == .active
     }
     .onDisappear { viewModel.isReadingActive = false }
-    .navigationDestination(item: $selectedFeedback) { item in
-      FeedbackDetailView(item: item, viewModel: coordinator.feedbackViewModel)
-        #if os(iOS)
-          .toolbar(.visible, for: .navigationBar)
-        #endif
-    }
     .onChange(of: viewModel.timelineItems.last?.id) { _, itemID in
       guard didChooseInitialScrollPosition, let itemID else { return }
       scrollAnchor = .bottom
@@ -216,8 +213,10 @@ struct StudentBlackGoldChatView: View {
     #endif
     #if os(iOS)
       .fullScreenCover(item: $selectedVideo, content: videoContent)
+      .fullScreenCover(item: $feedbackPlayback.selection, content: feedbackVideoContent)
     #else
       .sheet(item: $selectedVideo, content: videoContent)
+      .sheet(item: $feedbackPlayback.selection, content: feedbackVideoContent)
     #endif
   }
 
@@ -317,15 +316,10 @@ struct StudentBlackGoldChatView: View {
     case .plan(let notice):
       StudentPlanChatCard(notice: notice, action: openTraining)
     case .feedback(let feedback):
-      Button {
-        selectedFeedback = feedback
-        Task { await coordinator.markFeedbackRead(feedback) }
-      } label: {
-        StudentFeedbackChatCard(
-          feedback: feedback, model: coordinator.feedbackViewModel, isVisible: isVisible)
-      }
-      .buttonStyle(.plain)
-      .accessibilityIdentifier("coach.feedback.\(feedback.id)")
+      StudentFeedbackChatCard(
+        feedback: feedback, model: coordinator.feedbackViewModel, isVisible: isVisible,
+        playback: feedbackPlayback
+      )
       .onGeometryChange(for: CGRect.self) { proxy in
         proxy.frame(in: .named(Self.viewportCoordinateSpace))
       } action: { frame in
@@ -576,6 +570,22 @@ struct StudentBlackGoldChatView: View {
     )
   }
 
+  private func feedbackVideoContent(_ selection: FeedbackVideoPlaybackItem) -> some View {
+    FeedbackVideoPlayerView(
+      videoID: selection.id,
+      url: selection.url,
+      markers: selection.markers,
+      badge: selection.badge,
+      markersFailed: selection.markersFailed,
+      onSeek: { _ in },
+      onMarkersRefresh: { await feedbackPlayback.refreshMarkers(videoID: selection.id) },
+      refreshURL: { try await feedbackPlayback.freshURL(videoID: $0) }
+    )
+    .task(id: selection.id) {
+      await feedbackPlayback.refreshMarkers(videoID: selection.id)
+    }
+  }
+
   private func openTraining() {
     coordinator.markCurrentPlanSeen()
     dismiss()
@@ -807,10 +817,11 @@ private struct StudentPlanChatCard: View {
 }
 
 @MainActor
-private struct StudentFeedbackChatCard: View {
+struct StudentFeedbackChatCard: View {
   let feedback: CoachFeedback
   let model: FeedbackInboxViewModel
   let isVisible: Bool
+  let playback: FeedbackVideoPlaybackModel
   @State private var markerCount: Int?
   @Environment(\.locale) private var locale
 
@@ -827,7 +838,35 @@ private struct StudentFeedbackChatCard: View {
       Text(feedback.text)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      if feedback.videoID != nil { videoCover }
+      if feedback.videoID != nil {
+        if let video = feedback.video {
+          Button {
+            Task {
+              await playback.open(feedback)
+              if feedback.readAt == nil { await model.markRead(feedback) }
+            }
+          } label: {
+            videoCover
+          }
+          .buttonStyle(.plain)
+          .disabled(playback.resolvingFeedbackID != nil)
+          .accessibilityIdentifier("coach.feedback.video.\(feedback.id)")
+          .accessibilityLabel(
+            StudentStrings.replacing(
+              .feedbackDetailView007,
+              values: [FeedbackVideoPresentation.summary(video)]))
+        } else {
+          Label(StudentStrings.localized(.feedbackDetailView009), systemImage: "video.slash")
+            .foregroundStyle(Color.MeetPR.textMuted)
+        }
+      }
+      if playback.failedFeedbackID == feedback.id {
+        Label(
+          StudentStrings.localized(.feedbackDetailView004),
+          systemImage: "exclamationmark.triangle"
+        )
+        .foregroundStyle(Color.MeetPR.dangerMuted)
+      }
     }
     .padding(MeetPRSpacing.space3)
     .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: 16))
@@ -877,14 +916,20 @@ private struct StudentFeedbackChatCard: View {
 
       ChatVideoPoster(url: cover.posterURL, videoID: feedback.videoID)
 
-      Image(systemName: "play.fill")
-        .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .medium))
-        .foregroundStyle(.white)
-        .frame(width: 42, height: 42)
-        .background(.black.opacity(0.45), in: .circle)
-        .overlay {
-          Circle().stroke(.white.opacity(0.75), lineWidth: 1.5)
+      Group {
+        if playback.resolvingFeedbackID == feedback.id {
+          ProgressView().tint(.white)
+        } else {
+          Image(systemName: "play.fill")
         }
+      }
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .medium))
+      .foregroundStyle(.white)
+      .frame(width: 42, height: 42)
+      .background(.black.opacity(0.45), in: .circle)
+      .overlay {
+        Circle().stroke(.white.opacity(0.75), lineWidth: 1.5)
+      }
 
       if let markerCount, markerCount > 0 {
         Text(StudentStrings.replacing(.coachMarkerCount, values: [String(markerCount)]))

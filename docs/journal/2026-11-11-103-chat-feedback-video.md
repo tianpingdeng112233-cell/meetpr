@@ -43,3 +43,17 @@ swift test --package-path Modules/StudentKit --filter StudentFeedbackChatPlaybac
 David 在看到反馈详情后追问为何不是直接播放。当前 spec 108 明写“点卡进反馈详情”（§教练 tab，验收3），所以封面的播放图标也触发整卡导航，再点详情中的关联视频才进入播放器。这解释了当前行为，却不消除额外点击。
 
 已向 David 说明：更直接的交互是点视频封面直接播放、点反馈正文进详情。此项属于交互约定调整，需回到 Opus 的 spec，而非将原有108接线当成播放故障继续返修。本次未自行改变该行为。
+
+
+## 2026-11-11 后续授权：直接播放实装
+
+David 采纳视频封面直接播并保留标注，否决正文进详情；明确授权 Codex 直接接手（Claude 额度不足）。按此更新 spec 108 文末的本卡验收/seam，并只改学员聊天入口。随后 David 要求 iOS 完成后检查 Android，RN 单独跟进同一交互。
+
+- 基线：已合并现场最新 `origin/release/1.0` 的 `b427a65e`；期间 `beta/1.0-36` 已切在此 SHA。本修复不含在36 tag，不改号/tag，不替换正在切的包。
+- 实现：移除整卡 Button 与反馈详情导航；仅封面 Button 调用 `FeedbackVideoPlaybackModel.open`，宿主通过其 selection 呈现原 FeedbackVideoPlayerView。正文保持静态。现有角标、标注加载/重试/跳转、倍速、URL续签沿用。
+- 取链接中防连点，失败提示复用原文案并可重试；视频关联缺失显示原不可用提示。离开教练 tab 使请求标识失效，迟到结果不会打开播放器；已读继续由可见性和点视频处理。
+- 正式回归补齐：7个测试（2组参数化用例）覆盖真实卡片 Button.tap 后 selection/URL、正文不在按钮内、文本/失联视频无按钮、重复点击、取消后迟到结果、失败重试、签名重新获取、标注成功/失败/隐藏/恢复。使用既有有界等待和受控 actor 完成信号，替代前一阶段无效探针。
+- 先红后绿日志：`direct-red.log`→`direct-green-1.log`，`markers-red.log`→`markers-green.log`，`interactions-red.log`→`interactions-green.log`。最终 `swift test --package-path Modules/StudentKit --no-parallel` **1267 tests / 89 suites 全绿，30.435秒**（`direct-full-tests.log`）；四个Swift文件 swift-format / SwiftLint strict / diff-check 通过。
+- XcodeBuildMCP：本工作树 MeetPR-DemoStudent / DemoStudent，iPhone17e iOS26.5，build_run_sim 成功80.9秒、0warnings/errors、PID55548。日志 `build_run_sim_2026-11-11T05-23-19-406Z_pid40124_1889e832.log`。
+- 现场：点击正文不跳转；点封面一次直接全屏（没有反馈详情中转），0:00→0:04 / 0:14，两个标注显示；点击0:02标注跳到0:02并出现绘图，倍速1x→1.5x；关闭回原聊天位置，第二次重开关闭位置亦保持。使用既有 Demo 素材，不代表用户私有视频/OSS真链路联验。截图在本聊天 outputs/direct-feedback-video。
+- 独立 review-loop 一轮：Standards CLEAN；Spec CLEAN。两个 reviewer 均读本卡四个Swift文件（含新增）与最新增补；生产代码随后无语义变更。正式测试已覆盖原审查发现的缺口。
