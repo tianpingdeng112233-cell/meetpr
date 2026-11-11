@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (36)
 - 基底：`beta/1.0-35` @ `cfbbad09`；1.0(35) 已于 2026-11-08 上传（跳过 34，见 RELEASES），内容（106 / 103 §3 竖框 / 105 §6 RIR / 问教练）已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：工程内为 36（2026-11-11，`agvtool new-version 36`）；marketing version 保持 1.0。David 已确认 ASC 最新35，36尚未上传；待 tag CI / demo 核对后手动 Archive。
+- build 号：36；marketing version 1.0。tag `beta/1.0-36` @ `b427a65e`，CI run 42963387095 全绿；iPhone 17 教练 / iPhone 17 Pro 学员实际安装号均36，依赖已预拉。David确认ASC最新35、36未上传；已可手动Archive，取包树与四基线见本卡[JOURNAL](docs/journal/2026-11-11-107-release-cut.md)。
 
 ## 本版将包含
 
