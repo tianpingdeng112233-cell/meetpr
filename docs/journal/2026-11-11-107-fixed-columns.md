@@ -29,3 +29,13 @@ David 拒收仅上下排布，要求如 Excel 同类数据固定位置，并统�
 - David 现场要求删除 iOS 键盘右上“确定”。text 模式只在显式下一项标题存在时显示顶部动作；普通键盘不改，右侧“完成”及下一项保留。
 - 先红后绿：DesignSystem 全量81项通过；StudentKit相应可访问性测试改验下一项推进、完成保存编辑值、无重复确定。iPhone17e原生已核实顶部无确定、右侧完成仍在，截图 outputs/fixed-columns/ios-no-confirm.png。
 - 定向审查CLEAN，未切包/发布。
+
+## 勾选完成后自动展开下一动作（David 现场明确要求）
+
+- 已定行为：初次进入仍全部折叠，第一个动作手动展开。完成某动作并成功保存后，收起该动作、展开按显示顺序紧接的下一动作；最后一个完成后无下一项。取消勾选仍展开自身。保留手动展开任意动作。
+- 范围仅同日动作展开状态；不自动勾选、不改记录口径、不自动跨日、不新增导航或滚动规则。测试沿用本卡既有 TodayWorkoutView 页面与 TodayWorkoutViewModel seam。
+- iOS 在 toggleAllDayExercise 成功保存且日期仍一致后设置下一项；原 allDayWriting 防重入保留。RN 在 saveRow 成功后推进；日级操作版本阻止较早保存覆盖后续勾选，动作级版本确保失败仅撤销该次仍有效的本项勾选。
+- 先红后绿：iOS 顺序推进测试旧行为为 nil，新行为为第二项；AllDay 46项通过。RN页面49项通过，包含初始折叠、手动首项、推进、末项收起、取消；存储挂起→取消→旧保存成功/失败的交错回归。TS、ESLint通过。
+- 原生：iPhone17e Demo真实VM勾选深蹲后下一条自加动作展开；Android5570真实AllDayBody画廊演示深蹲勾选后竞技卧推展开。Android画廊用本地状态模拟勾选，不写真实训练数据；实际保存路径由页面集成回归覆盖。截图 outputs/fixed-columns/ios-auto-expand.png 与 android-auto-expand.png。
+- 定向独立审查指出RN取消竞态，修复并补回归后CLEAN。验收仍由David决定，未合入发版线、未打包发布。
+- 最终 iOS StudentKit 全量1272项/90套件通过，目标SwiftLint通过。

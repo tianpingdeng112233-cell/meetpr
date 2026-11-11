@@ -2255,7 +2255,8 @@ extension TodayWorkoutViewModel {
     }
     guard currentDay?.id == day.id else { return false }
     allDayCollapsed[day.id, default: []].insert(exerciseID)
-    allDayExpansion.removeValue(forKey: day.id)
+    allDayExpansion[day.id] =
+      allDaySheet.drop(while: { $0.id != exerciseID }).dropFirst().first?.id
     return true
   }
 

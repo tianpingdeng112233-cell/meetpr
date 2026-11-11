@@ -5,7 +5,7 @@ import Testing
 @testable import StudentKit
 
 @MainActor
-@Test func allDayStartsCollapsedAndOnlyExplicitTapsExpandExercises() async throws {
+@Test func allDayStartsCollapsedAndCompletingAnExerciseExpandsTheNext() async throws {
   let plan = StudentAddedTestPlan.unsettledDemo()
   let original = plan.days[0]
   let exercise = try #require(original.exercises.first)
@@ -35,8 +35,10 @@ import Testing
   #expect(model.expandedAllDayExerciseID == nil)
   model.toggleAllDayExpansion(first)
   #expect(await model.toggleAllDayExercise(first))
-  #expect(model.expandedAllDayExerciseID == nil)
+  #expect(model.expandedAllDayExerciseID == second)
   #expect(model.allDaySheet[1].node == .current)
+  #expect(await model.toggleAllDayExercise(second))
+  #expect(model.expandedAllDayExerciseID == nil)
   model.toggleAllDayExpansion(first)
   #expect(model.expandedAllDayExerciseID == first)
   #expect(model.allDaySheet.first?.node == .completed)
