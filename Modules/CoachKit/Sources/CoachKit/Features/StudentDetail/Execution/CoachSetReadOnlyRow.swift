@@ -11,19 +11,7 @@ struct CoachSetReadOnlyRow: View {
   var prescribed: PrescribedSet?
 
   var body: some View {
-    if let prescribed, CoachDayDetailPresentation.matchesPrescription(log, prescribed: prescribed) {
-      HStack {
-        Text("#\(log.setIndex + 1)").font(Font.MeetPR.monoLabel)
-        if log.weightKg == nil { Text("—").font(Font.MeetPR.body) }
-        Text(CoachLocalization.localized("coach.execution.asPrescribed"))
-          .font(Font.MeetPR.body)
-        Spacer()
-        Image(systemName: log.completed ? "checkmark.circle.fill" : "circle")
-          .foregroundStyle(Color.MeetPR.success)
-      }
-      .padding(MeetPRSpacing.sm)
-      .accessibilityIdentifier("coach.set.asPrescribed")
-    } else if prescribed != nil || log.actualRIR != nil {
+    if prescribed != nil || log.actualRIR != nil {
       CoachActualSetValues(
         log: log, prescribed: prescribed, isAccessibilitySize: isAccessibilitySize)
     } else if isAccessibilitySize {

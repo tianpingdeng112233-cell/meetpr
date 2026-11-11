@@ -136,7 +136,8 @@ public struct StudentRootView: View {
       onboarding
       ?? InMemoryOnboardingRepository(
         studentId: studentID,
-        seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
+        seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID),
+        seedRecentBodyWeights: true
       )
     self.onboarding = resolvedOnboarding
     self._weightEntry = State(

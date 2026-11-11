@@ -63,7 +63,7 @@ struct ProfileHomeContent: View {
         if state == .empty {
           MyProfileStateCard(text: StudentStrings.localized(.myProfileView001))
         }
-        ForEach(ProfileMenuDestination.allCases, id: \.self) { destination in
+        ForEach(ProfileMenuDestination.allCases.filter { $0 != .note }, id: \.self) { destination in
           if state != .empty || destination == .settings {
             StudentMenuRow(
               icon: destination.icon, title: destination.title,

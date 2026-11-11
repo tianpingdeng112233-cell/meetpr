@@ -47,8 +47,9 @@ struct ProgressMenuContent: View {
   let onRetry: () -> Void
 
   var body: some View {
+    let destinations = ProgressMenuDestination.allCases.filter { $0 != .feedback }
     VStack(spacing: MeetPRSpacing.point10) {
-      ForEach(ProgressMenuDestination.allCases, id: \.self) { destination in
+      ForEach(destinations, id: \.self) { destination in
         StudentMenuRow(
           icon: destination.icon, title: destination.title,
           value: destination.value(from: values, bodyWeight: bodyWeightValue),

@@ -10,24 +10,53 @@ struct CoachActualSetValues: View {
 
   private var originalWeight: String? {
     guard let prescribed else { return nil }
+    if case .percentage(let value) = prescribed.intensity {
+      let anchor =
+        prescribed.effectivePercentageAnchor == .topSet
+        ? " " + CoachLocalization.localized("coach.execution.topSet") : ""
+      return value.formatted() + "%" + anchor
+    }
     if case .weightRange(let low, let high) = prescribed.intensity {
-      if let weight = log.weightKg, (low...high).contains(weight) { return nil }
       return "\(low.formatted())–\(high.formatted())"
     }
-    return prescribed.weightKg == log.weightKg ? nil : prescribed.weightKg?.formatted() ?? "—"
+    return prescribed.weightKg?.formatted() ?? "—"
   }
 
   private var originalEffort: String? {
     guard let prescribed else { return nil }
     switch prescribed.intensity {
     case .rir(let target):
-      return log.actualRIR == target && log.rpe == nil ? nil : "RIR \(target)"
+      return "RIR \(target)"
     case .rpeRange(let low, let high):
-      if let rpe = log.rpe, log.actualRIR == nil, (low...high).contains(rpe) { return nil }
       return "RPE \(low.formatted())–\(high.formatted())"
     default:
-      return log.rpe == prescribed.rpe && log.actualRIR == nil
-        ? nil : prescribed.rpe.map { "RPE \($0.formatted())" } ?? "—"
+      return prescribed.rpe.map { "RPE \($0.formatted())" } ?? "—"
+    }
+  }
+
+  private var weightChanged: Bool {
+    guard let prescribed else { return false }
+    if case .weightRange(let low, let high) = prescribed.intensity {
+      return log.weightKg.map { !(low...high).contains($0) } ?? true
+    }
+    if case .percentage = prescribed.intensity, prescribed.weightKg == nil {
+      return false
+    }
+    return log.weightKg != prescribed.weightKg
+  }
+
+  private var repsChanged: Bool {
+    guard let prescribed, let reps = prescribed.reps else { return false }
+    return !(reps...(prescribed.repsMax ?? reps)).contains(log.reps)
+  }
+
+  private var effortChanged: Bool {
+    guard let prescribed else { return false }
+    switch prescribed.intensity {
+    case .rir(let target): return log.actualRIR != target || log.rpe != nil
+    case .rpeRange(let low, let high):
+      return log.actualRIR != nil || !(log.rpe.map { (low...high).contains($0) } ?? false)
+    default: return log.rpe != prescribed.rpe || log.actualRIR != nil
     }
   }
 
@@ -40,19 +69,19 @@ struct CoachActualSetValues: View {
       Text("#\(log.setIndex + 1)").font(Font.MeetPR.monoLabel)
       CoachSetMetric(
         actual: log.weightKg.map { "\($0.formatted()) kg" } ?? "—",
-        original: originalWeight)
+        original: originalWeight, changed: weightChanged)
       CoachSetMetric(
         actual: String(log.reps),
         original: prescribed.flatMap { set in
-          guard let reps = set.reps, !(reps...(set.repsMax ?? reps)).contains(log.reps) else {
+          guard let reps = set.reps else {
             return nil
           }
           return set.repsMax.map { "\(reps)–\($0)" } ?? String(reps)
-        })
+        }, changed: repsChanged)
       if !isAccessibilitySize { Spacer(minLength: 0) }
       CoachSetMetric(
         actual: log.actualRIR.map { "RIR \($0)" } ?? log.rpe.map { "RPE \($0.formatted())" } ?? "—",
-        original: originalEffort)
+        original: originalEffort, changed: effortChanged)
       Image(systemName: log.completed ? "checkmark.circle.fill" : "circle")
         .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textSecondary)
     }
@@ -65,12 +94,13 @@ struct CoachActualSetValues: View {
 private struct CoachSetMetric: View {
   let actual: String
   let original: String?
+  let changed: Bool
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
       Text(actual).foregroundStyle(
-        original == nil ? Color.MeetPR.textPrimary : Color.MeetPR.goldText)
+        changed ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
       if let original {
-        Text(CoachLocalization.localized("coach.execution.original") + " " + original)
+        Text(CoachLocalization.localized("coach.execution.target") + " " + original)
           .font(.caption2).foregroundStyle(Color.MeetPR.textSecondary)
       }
     }

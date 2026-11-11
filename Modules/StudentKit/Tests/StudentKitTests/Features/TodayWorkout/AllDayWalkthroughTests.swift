@@ -56,7 +56,7 @@ import ViewInspector
 }
 
 @MainActor
-@Test func exerciseSummaryKeepsPercentageLoadTogetherAndOffersLeadingSecondLine() throws {
+@Test func exerciseSummaryShowsConvertedLoadWithoutPercentage() throws {
   let day = StudentAddedTestPlan.unsettledDemo().days[0]
   var draft = try #require(TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []).first)
   draft.prescribed = PrescribedSet(
@@ -66,7 +66,7 @@ import ViewInspector
   let block = AllDayExerciseBlock(
     group: group, note: "", expanded: false, hidesName: false, viewModel: nil,
     editable: true, onExpand: {}, onVideo: { _ in }, onNote: { _ in }, onRemove: {})
-  let load = try block.inspect().find(text: "150\u{00a0}(75%)")
+  let load = try block.inspect().find(text: "150")
   #expect(try load.multilineTextAlignment() == .leading)
   #expect(try load.parent().parent().vStack().alignment() == .leading)
 }

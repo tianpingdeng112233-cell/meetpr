@@ -127,12 +127,7 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     if case .percentage(let value) = set.intensity {
       let percentage = StudentFormatting.decimal(value) + "%"
       if let resolved = row.actualWeight {
-        return (
-          weight(resolved)
-            + (set.effectivePercentageAnchor == .topSet
-              ? "" : " (" + percentage + ")"),
-          false
-        )
+        return (weight(resolved), false)
       }
       let suffix =
         set.effectivePercentageAnchor == .topSet

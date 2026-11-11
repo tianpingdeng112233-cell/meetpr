@@ -20,11 +20,14 @@ import ViewInspector
     try rows.map { try $0.actualView().label } == [
       StudentStrings.localized(.profileCardsSection002),
       StudentStrings.localized(.myProfileView011),
+      "目标与顾虑",
     ])
   #expect(try rows[0].actualView().value == "178 cm · 83.00 kg")
+  try #require(rows.count == 3)
+  #expect(try rows[2].actualView().value == OnboardingSummaryFormatter.note(profile))
   let buttons = try view.inspect().findAll(ViewType.Button.self)
   for button in buttons { try button.tap() }
-  #expect(opened == [.basics, .background])
+  #expect(opened == [.basics, .background, .note])
   let repository = InMemoryOnboardingRepository(studentId: profile.userId, seed: profile)
   let model = MyProfileViewModel(studentId: profile.userId, repo: repository)
   await model.loadIfNeeded()

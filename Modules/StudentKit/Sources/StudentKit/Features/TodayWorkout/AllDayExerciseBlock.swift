@@ -25,7 +25,8 @@ struct AllDayExerciseBlock: View {
       if expanded {
         if !note.isEmpty {
           Text(StudentStrings.replacing(.allDayCoachNote, values: [note]))
-            .lineLimit(1)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.goldText)
         }
@@ -52,8 +53,15 @@ struct AllDayExerciseBlock: View {
                 ? group.rows.count >= StudentAddedRows.limit
                 : group.rows.filter(\.isExtra).count >= StudentAddedRows.limit)
             Spacer()
-            Button(StudentStrings.askCoach, systemImage: "text.bubble") { onNote(first) }
-              .accessibilityIdentifier("allDay.note.\(group.id)")
+            Button {
+              onNote(first)
+            } label: {
+              Image(systemName: "text.bubble")
+                .frame(
+                  width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+            }
+            .accessibilityLabel(StudentStrings.localized(.allDayAskCoach))
+            .accessibilityIdentifier("allDay.note.\(group.id)")
           }
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
           .foregroundStyle(Color.MeetPR.goldText)
@@ -121,10 +129,10 @@ private struct AllDayExerciseHeader: View {
       }
     }
     .padding(.horizontal, MeetPRSpacing.space1)
-    .background(
-      (expanded || group.node == .current) ? Color.MeetPR.goldRGB.opacity(0.10) : .clear,
-      in: .rect(cornerRadius: 12)
-    )
+    .background {
+      RoundedRectangle(cornerRadius: 12)
+        .fill(group.node == .current ? Color.MeetPR.goldRGB.opacity(0.10) : .clear)
+    }
     .overlay {
       if expanded || group.node == .current {
         RoundedRectangle(cornerRadius: 12).strokeBorder(Color.MeetPR.gold500, lineWidth: 1)
@@ -196,7 +204,7 @@ private struct AllDaySummaryValues: View {
           segment.shortReps
             ? Color.MeetPR.danger
             : segment.repsChanged ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
-      // Keep a load and its percentage/effort together; only list separators may wrap.
+      // Keep a load and its effort together; only list separators may wrap.
       let load = Text(
         segment.load.replacing(" ", with: "\u{00a0}")
           .replacing("\u{00a0}/\u{00a0}", with: " / ")

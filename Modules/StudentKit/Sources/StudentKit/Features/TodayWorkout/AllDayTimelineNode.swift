@@ -21,7 +21,11 @@ struct AllDayTimelineNode: View {
     Color.clear
       .frame(width: 22)
       .overlay(alignment: .top) {
-        if !last { AllDayTimelineConnector().stroke(fill, lineWidth: 3) }
+        if !last {
+          AllDayTimelineConnector().stroke(fill, lineWidth: 3)
+            .padding(.top, MeetPRSpacing.space2 + 11)
+            .padding(.bottom, -(MeetPRSpacing.space4 + MeetPRSpacing.space2 + 11))
+        }
       }
       .overlay(alignment: .top) {
         Circle()
@@ -43,13 +47,12 @@ struct AllDayTimelineNode: View {
   }
 }
 
-/// Draw through the inter-row spacing to the next node's center; the next node covers the endpoint.
+/// The caller extends the layout to the next node so the stroke and gradient share one bounds.
 struct AllDayTimelineConnector: Shape {
   func path(in rect: CGRect) -> Path {
-    let center = MeetPRSpacing.space2 + 11
-    return Path { path in
-      path.move(to: CGPoint(x: rect.midX, y: rect.minY + center))
-      path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY + MeetPRSpacing.space4 + center))
+    Path { path in
+      path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+      path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
     }
   }
 }

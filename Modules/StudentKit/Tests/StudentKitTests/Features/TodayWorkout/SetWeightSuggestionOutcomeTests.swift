@@ -207,7 +207,7 @@ import ViewInspector
     #expect(fixed.viewModel.currentDrafts?.first?.actualWeight == 150)
     #expect(
       AllDayExerciseSummary.build(rows: pct.viewModel.currentDrafts ?? [])
-        .segments.map(\.load) == ["90 (75%)"])
+        .segments.map(\.load) == ["90"])
     #expect(
       AllDayExerciseSummary.build(rows: fixed.viewModel.currentDrafts ?? [])
         .segments.map(\.load) == ["150"])

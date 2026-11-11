@@ -15,6 +15,7 @@ public actor InMemoryOnboardingRepository: OnboardingRepository, BodyWeightRepos
   public init(
     studentId: UUID,
     seed: OnboardingProfile? = nil,
+    seedRecentBodyWeights: Bool = false,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.studentId = studentId
@@ -28,6 +29,18 @@ public actor InMemoryOnboardingRepository: OnboardingRepository, BodyWeightRepos
           ]
         }
       } ?? []
+    if seedRecentBodyWeights, let weight = seed?.weightKg {
+      let today = now()
+      let calendar = Calendar(identifier: .gregorian)
+      self.bodyWeights = [29, 24, 19, 14, 9, 4, 0].compactMap { daysAgo in
+        guard let date = calendar.date(byAdding: .day, value: -daysAgo, to: today) else {
+          return nil
+        }
+        return BodyWeightRecord(
+          recordedOn: BodyWeightDay.string(from: date),
+          weightKg: weight + Decimal(daysAgo) / 20)
+      }
+    }
     self.now = now
   }
 

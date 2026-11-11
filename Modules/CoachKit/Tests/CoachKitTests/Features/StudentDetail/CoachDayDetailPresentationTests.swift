@@ -101,7 +101,7 @@ struct CoachDayDetailPresentationTests {
 }
 
 @MainActor
-@Test func allDayCoachShowsAsPrescribedOnlyForMatchingValues() throws {
+@Test func allDayCoachShowsActualAndTargetEvenWhenTheyMatch() throws {
   let day = CoachDayDetailPresentationTests().fixture()
   let prescribed = try #require(day.planDay?.exercises.first?.prescribedSets.first)
   let log = try #require(day.allLogs.first { $0.setIndex == 0 })
@@ -111,9 +111,14 @@ struct CoachDayDetailPresentationTests {
   let row = try CoachSetReadOnlyRow(
     log: log, isAccessibilitySize: false, prescribed: prescribed
   ).inspect()
+  #expect(try row.find(text: "100 kg").string() == "100 kg")
   #expect(
-    try row.find(text: CoachLocalization.localized("coach.execution.asPrescribed"))
-      .string() == CoachLocalization.localized("coach.execution.asPrescribed"))
+    try row.find(text: CoachLocalization.localized("coach.execution.target") + " 100").string()
+      == CoachLocalization.localized("coach.execution.target") + " 100")
+  #expect(
+    try row.find(text: CoachLocalization.localized("coach.execution.target") + " 3").string()
+      == CoachLocalization.localized("coach.execution.target") + " 3")
+  #expect(row.findAll { try $0.accessibilityIdentifier() == "coach.set.asPrescribed" }.isEmpty)
 }
 
 @MainActor
@@ -127,6 +132,24 @@ func asPrescribedEmptyWeightStillShowsDash(mode: PlanLoadMode) throws {
   let inspected = try row.inspect()
   #expect(try inspected.find(text: "—").string() == "—")
   #expect(
-    try inspected.find(text: CoachLocalization.localized("coach.execution.asPrescribed")).string()
-      .isEmpty == false)
+    inspected.findAll { try $0.accessibilityIdentifier() == "coach.set.asPrescribed" }.isEmpty)
+  #expect(try inspected.find(text: "RPE 8").string() == "RPE 8")
+}
+
+@MainActor
+@Test func coachPercentageTargetKeepsItsAnchorAlongsideConvertedWeight() throws {
+  let log = CoachSetLogDTO(
+    id: UUID(), studentID: UUID(), planExerciseID: UUID(), setIndex: 0,
+    weightKg: 120, reps: 5, completed: true, loggedAt: .now)
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(60), percentageAnchor: .topSet,
+    loadMode: .percentage, reps: 5)
+  let row = try CoachSetReadOnlyRow(
+    log: log, isAccessibilitySize: false, prescribed: prescribed
+  ).inspect()
+  let target =
+    CoachLocalization.localized("coach.execution.target") + " 60% "
+    + CoachLocalization.localized("coach.execution.topSet")
+  #expect(try row.find(text: target).string() == target)
+  #expect(try row.find(text: "120 kg").string() == "120 kg")
 }

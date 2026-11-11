@@ -66,6 +66,10 @@ struct ProfileDetailRows: View {
         row(
           .background, title: StudentStrings.localized(.myProfileView011),
           value: summary.trainingBackground)
+        MyProfileDivider()
+        row(
+          .note, title: StudentStrings.localized(.profileNote),
+          value: OnboardingSummaryFormatter.note(profile))
       } else {
         row(
           .injuries, title: StudentStrings.localized(.myProfileView005),

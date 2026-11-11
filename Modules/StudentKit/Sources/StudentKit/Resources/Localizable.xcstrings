@@ -14842,19 +14842,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Anything to tell your coach? (optional)"
+            "value": "Goals and concerns"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "想对教练说什么?(可选)"
+            "value": "目标与顾虑"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "想對教練說什麼?(可選)"
+            "value": "目標與顧慮"
           }
         }
       }
@@ -22524,19 +22524,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Note to coach"
+            "value": "Goals and concerns"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "给教练的留言"
+            "value": "目标与顾虑"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "給教練的留言"
+            "value": "目標與顧慮"
           }
         }
       }
@@ -27450,19 +27450,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "想请教练帮你看什么？"
+            "value": "这组感觉怎么样，或想问教练什么"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "想請教練幫你看什麼？"
+            "value": "這組感覺怎麼樣，或想問教練什麼"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "What would you like your coach to look at?"
+            "value": "How did this set feel, or what would you like to ask your coach?"
           }
         }
       }
@@ -27473,19 +27473,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "问教练"
+            "value": "给教练留言"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "問教練"
+            "value": "給教練留言"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ask coach"
+            "value": "Message your coach"
           }
         }
       }

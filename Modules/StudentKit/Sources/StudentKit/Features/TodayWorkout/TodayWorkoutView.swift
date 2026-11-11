@@ -53,7 +53,6 @@ public struct TodayWorkoutView: View {
   @State private var showingRestSettings = false
   @State private var accessoryRestSeconds = 60
   @State private var restPreference: StudentRestTimerPreference = .automatic
-  @State private var showingExerciseNote = false
   @State private var exerciseNoteSent = false
   @State private var exerciseNote: ExerciseRefV1?
   @Environment(ExerciseNoteNavigation.self) private var exerciseNavigation: ExerciseNoteNavigation?
@@ -174,8 +173,8 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     workoutContent
-      .sheet(isPresented: $showingExerciseNote) {
-        if let reference = exerciseNote {
+      .modifier(
+        ExerciseNotePresentation(reference: $exerciseNote) { reference in
           ExerciseNoteSheet(reference: reference) { note in
             guard let notifications, let chat = notifications.chatContext else { return false }
             let result = await notifications.openExerciseNoteConversation()
@@ -187,7 +186,7 @@ public struct TodayWorkoutView: View {
             return true
           }
         }
-      }
+      )
       .overlay(alignment: .top) {
         if exerciseNoteSent {
           Text(StudentStrings.localized(.allDaySent))
@@ -1044,7 +1043,6 @@ public struct TodayWorkoutView: View {
       planDayID: day.id,
       planExerciseID: !draft.isStudentAdded ? draft.planExerciseID : nil,
       exerciseID: draft.exerciseID)
-    showingExerciseNote = true
   }
 
   private func openSetRefPicker() {

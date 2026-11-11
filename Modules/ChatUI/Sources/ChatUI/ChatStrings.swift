@@ -25,6 +25,8 @@ enum ChatStrings {
     return String(localized: "chat.timestamp.yesterday", bundle: bundle, locale: locale)
   }
 
+  static let studentNote = String(
+    localized: "chat.studentNote", defaultValue: "学员留言", bundle: .module)
   static let askCoach = localized("chat.askCoach")
   static let setRefPrompt = localized("chat.setRefPrompt")
   static let setRefQuestion = localized("chat.setRefQuestion")
