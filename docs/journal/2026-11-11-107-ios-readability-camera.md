@@ -39,3 +39,7 @@ David 将两端问题定为 P0，但最新指令要求：修完打开模拟器�
 - 截图索引：本会话 `outputs/ios-inspection/验收索引.html`。百分比已换算的数值显示由现有单元测试覆盖；模拟器没有后置相机，真机取景和录制仍未验证。
 - 为 David 查看保留的 gallery App 只在本会话 `work/ios-inspection/gallery-MeetPR.app`，临时 seed/App 源副本在同一 work 目录；均未入仓。恢复展示用 `--qa-gallery -meetpr.appearance light`。QA 学员与原 Demo 学员隔离，无真实数据清理。
 - 发布状态：等待 David 模拟器收货。两端均不打新发布 tag、不签发/上传新包；iOS 仍为已上传 37，Android 线上仍为 CN 11。
+
+## 2026-11-11 收货与切包
+
+David 查看 iPhone 17e 多场景验收后回复「那就这样」，按当前效果收货，恢复两端 P0 切包。PR #460 CI 三项全绿，已合入 release/1.0（b3782272）。准备 iOS 1.0(38)；Archive/Upload 仍由 David 手动；相机真机取景仍未验证，不将模拟器入口测试等同录制验收。
