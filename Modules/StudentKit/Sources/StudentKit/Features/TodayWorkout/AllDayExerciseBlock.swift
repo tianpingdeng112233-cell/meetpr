@@ -154,23 +154,9 @@ private struct AllDayExerciseLabel: View {
   let summary: AllDayExerciseSummary
 
   var body: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: MeetPRSpacing.space2) {
-        AllDayExerciseName(name: name, completed: completed)
-        AllDaySummaryValues(summary: summary)
-          .fixedSize(horizontal: true, vertical: true)
-      }
-      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
-        HStack(spacing: MeetPRSpacing.space2) {
-          AllDayExerciseName(name: name, completed: completed)
-          if summary.segments.count == 1 {
-            AllDaySummaryValues(summary: summary, part: .reps)
-              .fixedSize(horizontal: true, vertical: true)
-          }
-        }
-        AllDaySummaryValues(
-          summary: summary, part: summary.segments.count == 1 ? .load : .all)
-      }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      AllDayExerciseName(name: name, completed: completed)
+      AllDaySummaryValues(summary: summary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.vertical, MeetPRSpacing.space1)
@@ -191,14 +177,12 @@ private struct AllDayExerciseName: View {
 }
 
 private struct AllDaySummaryValues: View {
-  enum Part { case all, reps, load }
   let summary: AllDayExerciseSummary
-  var part: Part = .all
 
   var body: some View {
     let text = summary.segments.enumerated().reduce(Text("")) { result, pair in
       let segment = pair.element
-      let reps = Text(segment.reps + (part == .all ? "  " : ""))
+      let reps = Text(segment.reps + "  ")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
         .foregroundStyle(
           segment.shortReps
@@ -220,8 +204,7 @@ private struct AllDaySummaryValues: View {
           ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
       return result
         + Text(pair.offset > 0 ? " · " : "").foregroundStyle(Color.MeetPR.textSecondary)
-        + (part == .load ? Text("") : reps)
-        + (part == .reps ? Text("") : load)
+        + reps + load
     }
     text.monospacedDigit()
       .multilineTextAlignment(.leading)

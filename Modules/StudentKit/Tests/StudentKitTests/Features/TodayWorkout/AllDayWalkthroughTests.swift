@@ -66,9 +66,9 @@ import ViewInspector
   let block = AllDayExerciseBlock(
     group: group, note: "", expanded: false, hidesName: false, viewModel: nil,
     editable: true, onExpand: {}, onVideo: { _ in }, onNote: { _ in }, onRemove: {})
-  let load = try block.inspect().find(text: "150")
+  let load = try block.inspect().find(text: "1×1  150")
   #expect(try load.multilineTextAlignment() == .leading)
-  #expect(try load.parent().parent().vStack().alignment() == .leading)
+  #expect(try !load.string().contains("%"))
 }
 
 private struct EffortCellCase {
