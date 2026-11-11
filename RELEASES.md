@@ -35,7 +35,7 @@
 - 奖励页验收18–20：无触碰5秒关闭、触碰取消、查看报告不被关闭；iOS/RN单测与原生验证通过。直接播放：iOS1267项测试、Standards/Spec CLEAN、iPhone17e单击播放/标注跳转/倍速/原位返回通过。
 - plan-web025 @7c69b26已随backend#399换装staging160bacc2，镜像/部署均绿，health200、入口JS哈希与本地构建一致；未执行SQL或修改后端业务代码。
 - 历史重量预填仍默认关闭；真实账号网页联调继续按交接挂账。原生播放证据使用既有demo素材，不代表真实OSS或用户私有视频联验。
-- AndroidCN11已签名，当前做正式10→11升级验证，尚未发布；不与iOS上传状态混记。
+- AndroidCN0.1.0(11)已于2026-11-11发布；正式10→11保留登录与旧记录，线上双APK哈希/no-cache、latest.json=11及旧包更新提示均已核实。
 
 ## 1.0 (35) — 已上传（2026-11-08；同日 David 截图：外测组 Ceshi 正在提交 Beta App Review，内测组 Neice 状态未核实）
 - 打包来源：annotated tag `beta/1.0-35` @ `cfbbad09`（`release/1.0`，基底 `beta/1.0-33`；tag = 发版线 tip，零落差）。tag CI run 42482057879 全绿。
