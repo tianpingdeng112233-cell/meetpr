@@ -1,0 +1,25 @@
+[4/6] Compiling StudentKit AllDayExerciseBlock.swift
+[5/6] Emitting module StudentKit
+[6/12] Compiling StudentKitTests AllDayWalkthroughTests.swift
+[7/12] Compiling StudentKitTests AllDayWalkthrough3Tests.swift
+[8/12] Compiling StudentKitTests AllDayVideoReplayTests.swift
+[9/12] Compiling StudentKitTests AllDayDirectEditingTests.swift
+[10/12] Emitting module StudentKitTests
+[10/12] Write Objects.LinkFileList
+[11/12] Linking StudentKitPackageTests
+Build complete! (18.28s)
+Test Suite 'Selected tests' started at 2026-11-12 07:44:34.717.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-12 07:44:34.718.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-12 07:44:34.718.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-12 07:44:34.718.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AllDayVideoReplayTests started.
+◇ Test completedSetRowRetainsItsVideoControl() started.
+✘ Test completedSetRowRetainsItsVideoControl() recorded an issue at AllDayVideoReplayTests.swift:12:4: Caught error: Search did not find a match
+✘ Test completedSetRowRetainsItsVideoControl() failed after 0.040 seconds with 1 issue.
+✘ Suite AllDayVideoReplayTests failed after 0.040 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.040 seconds with 1 issue.

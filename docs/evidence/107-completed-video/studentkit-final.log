@@ -1,0 +1,25 @@
+✔ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() passed after 5.431 seconds.
+✔ Suite OfflineSetRecordingTests passed after 5.477 seconds.
+✔ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() passed after 5.379 seconds.
+✔ Test reopeningAlwaysSelectsCursorDespiteRecentWorkInAnotherWeek() passed after 5.218 seconds.
+✔ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() passed after 5.489 seconds.
+✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 5.444 seconds.
+✔ Test heroCameraFirstUploadDoesNotRequireEntryPrefill(editsArriveDuringCapture:) with 2 test cases passed after 5.403 seconds.
+✔ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() passed after 5.398 seconds.
+✔ Test allDayEffortChoiceSurvivesReloadAndIsolatesAccountsAndExercises() passed after 5.401 seconds.
+✔ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() passed after 5.474 seconds.
+✔ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() passed after 5.385 seconds.
+✔ Test extraSetCameraVideoRebindsAfterDraftIdentityChangesOnReload() passed after 5.207 seconds.
+✔ Test anyWeekCanRecordAndCompleteWithoutAdvancingPastUnsettledWeek(daysFromSelected:) with 3 test cases passed after 5.225 seconds.
+✔ Suite PublishedDayTrainingTests passed after 5.486 seconds.
+✔ Test pendingCameraVideoSurvivesRestartAndRetentionBeforeBinding() passed after 5.211 seconds.
+✔ Test singleSetCameraReturnDuringSaveKeepsVideo(overlapsSave:) with 2 test cases passed after 5.214 seconds.
+✔ Test cameraReturnAcrossDayChangeRetainsVideoUntilOriginalDayReturns() passed after 5.218 seconds.
+✔ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) with 9 test cases passed after 5.481 seconds.
+✔ Test cameraReturnOverlappingSetSaveKeepsAllThreeVideos(targetRow:overlapsSave:) with 4 test cases passed after 5.244 seconds.
+✔ Suite CameraReturnDuringPersistenceTests passed after 5.518 seconds.
+✔ Test resizingPlayerSurfacePreservesActualPlaybackTime() passed after 5.485 seconds.
+✔ Suite SetEntryVideoPlayerTests passed after 5.693 seconds.
+✔ Test ledgerReadFailureCannotBeMistakenForACompletedVideoDay() passed after 26.515 seconds.
+✔ Suite VideoCompletionBoundaryTests passed after 26.639 seconds.
+✔ Test run with 1281 tests in 91 suites passed after 26.641 seconds.
