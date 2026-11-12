@@ -9,7 +9,8 @@ struct AllDaySetRow: View {
   let onVideo: () -> Void
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var showsRemoval = false
-  @Environment(VideoAttachmentViewModel.self) private var videos: VideoAttachmentViewModel?
+  @Environment(VideoAttachmentViewModel.self) private var uploads: VideoAttachmentViewModel?
+  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
 
   private var editing: Bool { keypad?.current?.rowID == draft.id }
   private var shortReps: Bool {
@@ -34,17 +35,9 @@ struct AllDaySetRow: View {
           editable: editable, onEdit: openEditor
         )
       }
-      if editable {
-        Button(action: onVideo) {
-          Image(systemName: "video")
-            .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
-            .foregroundStyle(cameraColor)
-            .frame(width: 40, height: MeetPRSpacing.minimumHitTarget)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(StudentStrings.localized(.setVideoUploadIndicator001))
-        .accessibilityIdentifier("allDay.camera.\(draft.id)")
-      }
+      AllDaySetVideoButton(
+        draft: draft, trainingDate: viewModel?.currentDay?.scheduledDate ?? .distantPast,
+        editable: editable, uploads: uploads, replay: replay, onEditVideo: onVideo)
       if case .percentage(let value) = draft.prescribed.intensity {
         Text(StudentFormatting.decimal(value) + "%")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
@@ -68,20 +61,6 @@ struct AllDaySetRow: View {
       editing
         ? Color.MeetPR.goldRGB.opacity(0.10)
         : shortReps ? Color.MeetPR.dangerSoft : Color.MeetPR.surfaceCard)
-  }
-
-  private var cameraColor: Color {
-    let state =
-      videos?.pendingRowState(
-        draftID: draft.id, trainingDate: viewModel?.currentDay?.scheduledDate ?? .distantPast,
-        slot: draft.pendingVideoSlot)
-      ?? draft.loggedSetID.flatMap { videos?.rowStates[$0] }
-    switch state?.attachment.status {
-    case .uploaded: return Color.MeetPR.success
-    case .pending, .uploading: return Color.MeetPR.gold500
-    case .failed: return Color.MeetPR.danger
-    case nil: return Color.MeetPR.textSecondary
-    }
   }
 
   private func openEditor(_ field: MeetPRNumberPad.Field) {
