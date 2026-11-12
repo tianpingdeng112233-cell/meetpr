@@ -20,3 +20,10 @@
 - Standards（独立只读 reviewer）：CLEAN，0 实质 finding。
 - Spec（独立只读 reviewer）：初审 1 项 P2（较新远端片被旧本机编辑路由截走），红测证实并修复；定向复审 CLEAN，0 未决项。
 - 本记录为开发自测/自审证据，不替代 Opus 按 spec 的收货终审或真实账号验收。
+
+## 合入发版线（2026-11-12）
+
+- David 明确授权「合并进发版线，下个包带上」。PR #461 已于 08:01 UTC squash 合入 `release/1.0`，合并 SHA `c2302d201b8db05133c016bc5770fb9d1b31ed1b`；下个从发版线切出的包包含本修复，发布档 P1。
+- 合并前核对 PR head `4b75415071381bb98904e7df6a23c38ac0a91cbc`：无冲突，CI run `43177963462` 的 Swift Build & Test（全仓包测试、Xcode test）、SwiftLint、swift-format 全绿；合并后 StudentKit 与受检 head 无差异。
+- 最终包补充实点：iPhone 17e 上带两条视频的演示训练日，撤销完成后确认两组绿色入口；长按底部「完成今日训练」1.5 秒，奖励页自动关闭后两组绿色入口仍在，点第一组可播放，表格只读。
+- 未改 build/tag，未 Archive/Upload。发版线工程已为 build 39，但 `NEXT-RELEASE.md` 仍描述 38；不推定下个上传包号，正典发布账本由 Opus 切包时对齐，本次合入与下包授权以本记录及 PR 为证。
