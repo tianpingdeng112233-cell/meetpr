@@ -18,6 +18,18 @@
 
 ---
 
+## 1.0 (39) — 已上传（2026-11-11；David 确认已提交 Ceshi 外测审核）
+- 来源：`beta/1.0-39-rc2` @ `c89bcff6b6873edceb4b09194579d8243255b131`，tag CI [43013765230](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/43013765230) 全绿；两台 demo 实际安装号 39。原 `beta/1.0-39` 因 lint 失败保留，由新 rc2 tag 替代。
+- 包含：训练摘要固定列与逐组强度、直接编辑及 RPE/RIR 切换、同动作强度类型记忆、完成动作后展开下一动作、删除重复键盘确认入口。原值只在与明确计划不一致时显示。
+- 验证：StudentKit 1276 tests；独立双轴审查与 iPhone 17e 原生证据见 `docs/journal/2026-11-11-107-fixed-columns.md`。
+- 上传依据：Codex 聊天「阅读 Cards 107 交接文档」2026-11-11 的 David 原话「39 已上传，已提交 Ceshi 外测审核」及该聊天 `outputs/release-39-cn13/release-evidence.json`。本条于 2026-11-13 补录；David 同日截图确认 Neice 39 为 Testing，Ceshi 审核结果未核实。
+- 同批 Android CN 0.1.0(13) 已上线：版本路径和固定 APK 哈希均为 `0acdc854411b4c6486d2d45c24f9c0ab4bfdd009e8be24c97b4479a7c9dee9b6`，覆盖升级保留登录、3 条历史及 75kg 体重。Android12 未公开发布。
+
+## 1.0 (38) — 已上传（2026-11-11，David 口报；2026-11-13 补录）
+- 来源：`beta/1.0-38` @ `fada898a7066f5b1853af5ef7365aef805a83a0e`；tag CI [42987824563](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/42987824563) 全绿，两台 demo 实际安装号 38。
+- 包含：#460 动作名与训练摘要分行、已同意权限后首次相机入口空白修复。StudentKit 1267 tests、6/6 相机入口及独立双轴审查通过，真机取景未验。
+- 上传依据：`docs/journal/2026-11-11-107-fixed-columns.md` 的「David 确认 iOS38 已上传、39 未用」。David 2026-11-13 截图确认 Neice 38 为 Testing；当时外测审核状态未核实。
+
 ## 1.0 (37) — 已上传（2026-11-11；David确认Ceshi已提交外测审核，审核结果与Neice分发状态未核实）
 - 打包来源：annotated tag `beta/1.0-37` @ `fb1c46e0c75db3dd55e6732bf950860ee5464d77`，release/1.0；tag CI run42968380551三项全绿。两台demo从该SHA构建，iPhone17教练/iPhone17Pro学员实际安装号均37。
 - **跳过36**：原beta/1.0-36 @ b427a65e已准备但未上传；David随后要求加入反馈视频直接播放#459，保留旧tag、重切37。35→37为本次实际上传顺序。

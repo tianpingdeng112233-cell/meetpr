@@ -1,6 +1,6 @@
 # Spec 109 · 辅助项上次重量
 
-Status: InReview · T2 / P1 · 2026-11-13 David 定稿并授权进下一班 iOS / Android。
+Status: Done · T2 / P1 · 2026-11-13 David 定稿并授权进下一班 iOS / Android。
 
 先读仓根 CONTEXT.md、AGENTS.md / CLAUDE.md。正典为 iOS 仓本 spec；Android 同目录是本次批准内容的交付快照。本 spec 只解除 spec 107 的辅助项历史重量暂缓，主项及变式仍暂缓。
 
@@ -41,7 +41,7 @@ David 看 iPhone 17e 原生截图后要求：只显示“上次”，放在数�
 - [x] A6 改首组 22.5，其余仍20/17.5；修改后普通字色且无“上次”标记；打开收起无写入；已有完成记录和视频保留。
 - [x] A7 刷新/切日/迟到历史不盖手动值；旧缓存可解码；离线失败仍可训练，账号隔离沿用既有查询键。
 - [x] A8 iPhone17e 与既有 Android 模拟器亲看扫视/编辑、浅深色、窄屏；真实历史读取链路用仓储/HTTP seam 验证，demo 不冒充真账号。
-- [ ] A9 单测、类型/格式/lint、原生构建与 Standards / Spec 独立审查；PR CI 通过；两端候选台账附 PR/SHA。
+- [x] A9 单测、类型/格式/lint、原生构建与 Standards / Spec 独立审查；PR CI 通过；两端候选台账附 PR/SHA。
 
 ## Out of Scope
 
@@ -49,4 +49,6 @@ David 看 iPhone 17e 原生截图后要求：只显示“上次”，放在数�
 
 ## 下一班候选
 
-基线：iOS origin/release/1.0@fdb0b21a；Android origin/main@fa41544。当前 build 与发布台账存在时间差，版本号留切包时核定，本任务不重写已切 tag。T2 交付双端 PR 待 David 按仓规合并；本次“进下一班”授权已记，不重复问排期。
+基线：iOS origin/release/1.0@fdb0b21a；Android origin/main@fa41544。当前 build 与发布台账存在时间差，版本号留切包时核定，本任务不重写已切 tag。T2 双端 PR 已获 David 最终批准并合入；本次“进下一班”授权已记。
+
+2026-11-13 发布接手补记：双端 PR CI 全绿，David 明确批准合并并切包；iOS #462 / Android #190 已合入各发版线。包上传状态单独以发布 JOURNAL 为准。

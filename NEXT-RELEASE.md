@@ -4,19 +4,15 @@
 > 发版模型:1.0(7) 基底小步直推,落线即候选,tag 切包;main = 大包待分诊库存,不进本线。
 > 权威规则见 [AGENTS.md §发版直推流](./AGENTS.md)。
 
-## 🎯 目标：1.0 (38)
-- 基底：`beta/1.0-37` @ `fb1c46e0`；1.0(37)已于2026-11-11上传，David确认Ceshi已提交外测审核；审核结果与Neice分发状态未核实。
-- 工程 build 已升 38、marketing version 1.0；ASC 最新已上传 37（David 本会话确认）。准备 tag beta/1.0-38；CI 与双端 demo 完成后交 David 手动 Archive/Upload。36 tag 保留且未上传。
+## 🎯 目标：1.0 (40)
+- 基底：`beta/1.0-39-rc2` @ `c89bcff6b6873edceb4b09194579d8243255b131`；David 于 2026-11-11 明确确认 39 已上传并提交 Ceshi 外测审核。Ceshi 审核结果未核实；2026-11-13 David 截图确认 Neice 的 38、39 均为 Testing。
+- 工程 build 40，marketing version 1.0。准备新 annotated tag `beta/1.0-40`，待准确 tag CI、双端 demo 与取包树核验后交 David 手动 Archive/Upload。旧 39 tag 的 lint 失败记录和 39-rc2 tag 均保留。
 
 ## 本版将包含
 
-- **spec 107 P0 训练摘要与相机入口修复（#460）**：动作名固定在上、完整组次/重量摘要在下，避免混排；相机按拍摄目标呈现，修复已同意权限后首次打开空白页。StudentKit 1267 项测试、原生冷启动两轮共 6/6 次相机入口、Standards/Spec 独立审查与 PR CI 通过。David 于 2026-11-11 查看多场景演示后回复「那就这样」，恢复切包；真机取景/录制尚未实测。
+- **辅助项上次重量（spec 109，#462，T2/P1）**：辅助项无明确重量时，按同动作最近一次训练逐组预填；扫视态金色，编辑态数字右侧显示“上次”。已存/手改/教练明确值优先；缺组留空，不预填主项、次数、RPE/RIR。已获 David 合并批准，落线 `df38eec1`，PR CI、独立双轴与原生验收通过。见 `specs/109-accessory-history/SPEC.md`。
 
-## 2026-11-13 下一班新增候选（spec 109）
-
-- **P1 辅助项上次重量**：David 已定稿并要求双端随下一班车。仅辅助项按最近实际训练逐组预填重量；紧凑行金色，点开后重量格内显示上次值；教练明确重量和已保存记录优先。主项、次数、RPE/RIR、训练完成规则不变。
-- 实装分支 `feat/109-accessory-history` 基于 `release/1.0@fdb0b21a`；[PR #462](https://github.com/tianpingdeng112233-cell/meetpr/pull/462)，实现 `063966d4`；原生浅深色及本地测试/双轴审查已过，PR CI 运行中，T2 合并待 David。规范与验收见 `specs/109-accessory-history/SPEC.md`、`docs/journal/2026-11-13-109-ios.md`。
-- 当前工程已出现 build 39，而本文件上方仍记录 38 准备态；本卡不推断 38/39 的上传状态、不改 tag。具体下一包号由 prep-beta 现场核定，候选不得遗漏。
+- **已完成训练日视频状态与回放修复（spec 096 / 107，#461，P1）**：完成后仍显示上传中黄色、送达绿色、失败红色；已送达视频可只读回看；有较新远端片时优先最新来源。无视频的完成组不出现拍摄入口。已合入 `c2302d20`；StudentKit 1281 tests、独立 Standards/Spec、iPhone 17e 原生完成后回看与 PR CI 通过。证据见 `docs/journal/2026-11-12-107-completed-video.md`；原生证据使用 Demo 素材，不冒称真实用户 OSS 联验。
 
 ## 延期候选（未排期，前置解锁后另行排期）
 
