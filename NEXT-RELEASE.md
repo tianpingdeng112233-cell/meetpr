@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (40)
 - 基底：`beta/1.0-39-rc2` @ `c89bcff6b6873edceb4b09194579d8243255b131`；David 于 2026-11-11 明确确认 39 已上传并提交 Ceshi 外测审核。Ceshi 审核结果未核实；2026-11-13 David 截图确认 Neice 的 38、39 均为 Testing。
-- 工程 build 40，marketing version 1.0。准备新 annotated tag `beta/1.0-40`，待准确 tag CI、双端 demo 与取包树核验后交 David 手动 Archive/Upload。旧 39 tag 的 lint 失败记录和 39-rc2 tag 均保留。
+- 工程 build 40，marketing version 1.0。annotated tag `beta/1.0-40` @ `74a60299` 已通过 tag CI 43372844191；双端 demo 实际安装40并核对角色，已可交 David 手动 Archive/Upload。40尚未上传。旧 39 tag 的 lint 失败记录和 39-rc2 tag 均保留。
 
 ## 本版将包含
 
