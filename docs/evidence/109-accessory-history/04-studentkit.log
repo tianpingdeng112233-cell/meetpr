@@ -1,0 +1,25 @@
+摘录；完整本地日志留 work/ios-full-logs。
+✘ Test dismissDuringExportWinsTheSingleShotAndDeletesTheOrphanOutput() recorded an issue at VideoTrimCompletionTests.swift:217:2: Caught error: TimeoutError()
+✘ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:22:2: Caught error: TimeoutError()
+✘ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() recorded an issue at VideoUploadRecoveryTests.swift:240:2: Caught error: TimeoutError()
+✘ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:57:2: Caught error: TimeoutError()
+✘ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() recorded an issue at VideoUploadGenerationRecoveryTests.swift:33:2: Caught error: TimeoutError()
+✘ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:7:2: Caught error: TimeoutError()
+✘ Test productionUploaderPairsContinuationWithBackgroundEvents() recorded an issue at BackgroundVideoPartUploaderTests.swift:20:2: Caught error: TimeoutError()
+✘ Test sameGenerationSiblingCallbacksCompleteAcrossSeparateWakes() recorded an issue at VideoUploadGenerationRecoveryTests.swift:7:2: Caught error: TimeoutError()
+✘ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:53:2: Caught error: TimeoutError()
+✘ Test productionUploaderDefersFailureToRestoredEventOwner() recorded an issue at BackgroundVideoPartUploaderTests.swift:69:2: Caught error: TimeoutError()
+✘ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() recorded an issue at VideoUploadGenerationRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test osWakeAfterManualClaimCannotStartASecondWriter() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:80:2: Caught error: TimeoutError()
+✘ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() recorded an issue at VideoUploadFailureRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test exportCompletingAfterCancellationDiscardsItsOutput() recorded an issue at VideoTrimCompletionTests.swift:264:2: Caught error: TimeoutError()
+✘ Test completionRegistrySerializesManualClaimAgainstHandlerStorage() recorded an issue at BackgroundUploadCompletionRegistryTests.swift:93:2: Caught error: TimeoutError()
+✘ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() recorded an issue at VideoUploadHarvestClaimRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test overlappingSessionFinishCallbacksShareOneDrainWriter() recorded an issue at VideoUploadDrainSingleFlightTests.swift:6:2: Caught error: TimeoutError()
+✘ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() recorded an issue at VideoUploadGenerationRaceTests.swift:47:2: Caught error: TimeoutError()
+✘ Test backgroundCompletionWaitsForRestoredETagPersistenceAndComplete() recorded an issue at VideoUploadRecoveryTests.swift:199:2: Caught error: TimeoutError()
+✘ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() recorded an issue at VideoUploadRecoveryTests.swift:322:2: Caught error: TimeoutError()
+✔ Test ledgerReadFailureCannotBeMistakenForACompletedVideoDay() passed after 37.611 seconds.
+✔ Suite VideoCompletionBoundaryTests passed after 37.768 seconds.
+✘ Test run with 1289 tests in 94 suites failed after 37.773 seconds with 21 issues.

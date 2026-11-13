@@ -529,6 +529,7 @@ public final class TodayWorkoutViewModel {
       var mergedDraft = refreshedDraft
       if editedFields.contains(.weight) {
         mergedDraft.actualWeight = currentDraft.actualWeight
+        mergedDraft.isHistoryWeightPrefill = false
       }
       if editedFields.contains(.reps) {
         mergedDraft.actualReps = currentDraft.actualReps
@@ -622,9 +623,13 @@ public final class TodayWorkoutViewModel {
     )
     async let suggestions = historyWeightSuggestions(studentID: studentID, dayID: day.id)
     async let historyRefresh: Void = refreshAddedHistory(plan: plan, studentID: studentID)
-    let (referenceSnapshot, historyLogs) = try await (referenceSnapshotTask, historyLogsTask)
-    await historyRefresh
+    let (referenceSnapshot, historyLogs, _) = try await (
+      referenceSnapshotTask, historyLogsTask, historyRefresh
+    )
     let matchingSuggestions = await suggestions
+    let accessoryHistory = AccessoryWeightHistory.previous(
+      logs: addedHistorySnapshot?.planned ?? historyLogs, day: day, studentID: studentID,
+      now: now(), planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day))
     return LoadedDaySnapshot(
       day: day,
       drafts: restoredStudentDrafts(
@@ -632,17 +637,11 @@ public final class TodayWorkoutViewModel {
         planned: Self.makeDrafts(
           for: day, existingLogs: existingLogs, suggestions: matchingSuggestions,
           historyWeightPrefillEnabled: historyWeightPrefillEnabled,
+          accessoryHistory: accessoryHistory,
           onboardingProfile: onboardingProfile)),
-      accessoryPreviousLogs: Dictionary(
-        uniqueKeysWithValues: day.exercises.map { exercise in
-          (
-            exercise.id,
-            AccessoryHistory.previousSession(
-              logs: historyLogs, exerciseID: exercise.exercise.id,
-              currentPlanExerciseID: exercise.id,
-              planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day))
-          )
-        }),
+      accessoryPreviousLogs: AccessoryHistory.previousSessions(
+        logs: historyLogs, day: day,
+        planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)),
       references: referenceSnapshot.references,
       suggestionE1RMByExercise: referenceSnapshot.suggestionE1RMByExercise,
       lastWeightByExercise: Self.lastWeights(
@@ -691,7 +690,10 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateWeight(rowIndex: Int, weight: Decimal?) {
-    mutateDraft(rowIndex: rowIndex, editedField: .weight) { $0.actualWeight = weight }
+    mutateDraft(rowIndex: rowIndex, editedField: .weight) {
+      $0.actualWeight = weight
+      $0.isHistoryWeightPrefill = false
+    }
   }
 
   public func updateReps(rowIndex: Int, reps: Int?) {

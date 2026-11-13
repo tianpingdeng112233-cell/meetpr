@@ -32,6 +32,9 @@ public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiabl
   /// with a strictly lower value.
   public let planExerciseSortOrder: Int
   public var prescribed: PrescribedSet
+  /// Optional local-only metadata; old cached drafts decode without these keys.
+  public var previousAccessoryWeight: Decimal?
+  public var isHistoryWeightPrefill: Bool?
   public var actualWeight: Decimal?
   public var actualReps: Int?
   public var actualRIR: Int?

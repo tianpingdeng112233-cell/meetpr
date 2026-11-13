@@ -324,17 +324,18 @@ extension TodayWorkoutViewModel {
     existingLogs: [StudentSetLog],
     suggestions: [SetWeightSuggestionRecord] = [],
     historyWeightPrefillEnabled: Bool = historyWeightPrefillEnabledByDefault,
+    accessoryHistory: [UUID: [Int: StudentSetLog]] = [:],
     onboardingProfile: OnboardingProfile? = nil
   ) -> [SetRowDraft] {
     day.exercises.flatMap { exercise in
       exercise.prescribedSets.map { set in
-        makeDraft(
-          exercise: exercise,
-          set: set,
-          existingLogs: existingLogs,
-          suggestions: historyWeightPrefillEnabled ? suggestions : [],
-          onboardingProfile: onboardingProfile
-        )
+        AccessoryWeightHistory.apply(
+          to: makeDraft(
+            exercise: exercise, set: set, existingLogs: existingLogs,
+            suggestions: historyWeightPrefillEnabled ? suggestions : [],
+            onboardingProfile: onboardingProfile),
+          previousWeight: accessoryHistory[exercise.id]?[set.setIndex]?.weightKg)
+
       } + StudentAddedRows.restoredExtras(exercise: exercise, logs: existingLogs)
     }
   }

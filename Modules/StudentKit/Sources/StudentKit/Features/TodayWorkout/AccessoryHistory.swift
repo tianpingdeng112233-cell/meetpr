@@ -2,6 +2,20 @@ import CoreModels
 import Foundation
 
 enum AccessoryHistory {
+  static func previousSessions(
+    logs: [StudentSetLog], day: StudentPlanDay, planExerciseToExercise: [UUID: UUID]
+  ) -> [UUID: [Int: StudentSetLog]] {
+    Dictionary(
+      uniqueKeysWithValues: day.exercises.map { exercise in
+        (
+          exercise.id,
+          previousSession(
+            logs: logs, exerciseID: exercise.exercise.id, currentPlanExerciseID: exercise.id,
+            planExerciseToExercise: planExerciseToExercise)
+        )
+      })
+  }
+
   static func previousSession(
     logs: [StudentSetLog], exerciseID: UUID, currentPlanExerciseID: UUID,
     planExerciseToExercise: [UUID: UUID]

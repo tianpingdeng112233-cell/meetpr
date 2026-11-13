@@ -1,0 +1,44 @@
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/9] Compiling StudentKit TodayWorkoutViewModel.swift
+[5/9] Compiling StudentKit AllDaySetRow.swift
+[6/9] Compiling StudentKit AccessoryWeightHistory.swift
+[7/9] Emitting module StudentKit
+[8/12] Compiling StudentKitTests AccessoryWeightHistoryGuardsTests.swift
+[9/12] Compiling StudentKitTests AccessoryWeightHistoryIntegrationTests.swift
+[10/12] Emitting module StudentKitTests
+[10/12] Write Objects.LinkFileList
+[11/12] Linking StudentKitPackageTests
+Build complete! (137.39s)
+Test Suite 'Selected tests' started at 2026-11-13 04:03:47.554.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-13 04:03:47.559.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-13 04:03:47.559.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-13 04:03:47.559.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryWeightHistoryTests started.
+◇ Suite AccessoryWeightHistoryGuardsTests started.
+◇ Suite AccessoryWeightHistoryIntegrationTests started.
+◇ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() started.
+◇ Test oldCachedDraftWithoutMetadataStillDecodes() started.
+◇ Test coachSavedAndManualValuesWinIncludingExplicitEmpty() started.
+◇ Test absentInvalidAndZeroHistoryAreDistinct() started.
+◇ Test doesNotChangeOtherClassificationsOrLoadModes() started.
+◇ Test newestSessionDoesNotBorrowMissingGroupsAndIgnoresIneligibleLogs() started.
+◇ Test loadsAcrossPlansBeyondTwelveWeeksWithoutMatchingRepsOrEffort() started.
+✔ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() passed after 0.002 seconds.
+✔ Test oldCachedDraftWithoutMetadataStillDecodes() passed after 0.002 seconds.
+✔ Test coachSavedAndManualValuesWinIncludingExplicitEmpty() passed after 0.002 seconds.
+✔ Test absentInvalidAndZeroHistoryAreDistinct() passed after 0.002 seconds.
+✔ Test doesNotChangeOtherClassificationsOrLoadModes() passed after 0.002 seconds.
+✔ Suite AccessoryWeightHistoryTests passed after 0.003 seconds.
+✔ Suite AccessoryWeightHistoryGuardsTests passed after 0.003 seconds.
+✔ Test newestSessionDoesNotBorrowMissingGroupsAndIgnoresIneligibleLogs() passed after 0.016 seconds.
+✔ Test loadsAcrossPlansBeyondTwelveWeeksWithoutMatchingRepsOrEffort() passed after 0.039 seconds.
+✔ Suite AccessoryWeightHistoryIntegrationTests passed after 0.040 seconds.
+✔ Test run with 7 tests in 3 suites passed after 0.040 seconds.
