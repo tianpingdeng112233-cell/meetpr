@@ -18,9 +18,9 @@
 
 ---
 
-## 1.0 (40) — 已上传（2026-11-13，David 确认）
+## 1.0 (40) — 已上传并提交 Ceshi 外测审核（2026-11-13，David 确认）
 - 来源：annotated tag `beta/1.0-40` @ `74a6029994a8ae12843a16083789469c9db6ea15`，发版线 `release/1.0`；后续落线差异仅为发布文档。
-- 上传依据：本会话针对「iOS 1.0(40) 现在上传结果如何？」David 明确回复「上传成功」。Neice 分发状态及 Ceshi 提交/审核结果未核实。
+- 上传依据：本会话针对「iOS 1.0(40) 现在上传结果如何？」David 明确回复「上传成功」。David 随后明确确认已点击 Submit for Review，提交 Ceshi 外测审核；审核结果与 Neice 分发状态未核实。
 
 ### 本版包含
 - **辅助项上次重量（spec 109，#462，T2/P1）**：辅助项无明确重量时，按同动作最近一次训练逐组预填；扫视态金色，编辑态数字右侧显示“上次”。已存/手改/教练明确值优先；缺组留空，不预填主项、次数、RPE/RIR。已获 David 合并批准，落线 `df38eec1`，PR CI、独立双轴与原生验收通过。见 `specs/109-accessory-history/SPEC.md`。
@@ -30,7 +30,7 @@
 ### 验证与边界
 - Tag CI [43372844191](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/43372844191) 全绿；SPM 各模块测试数 30/126/96/492/168/81/156/6/1289，Xcode 9 项通过。
 - iPhone 17 教练与 iPhone 17 Pro 学员均从该 tag 构建，实际安装 Info.plist 为 1.0(40)，两端首页截图已核对。四基线、独立审查与取包树见 `docs/journal/2026-11-13-prep-beta-40.md`。
-- 完成日视频回放验证使用既有 Demo 素材，不代表真实用户 OSS 联验。Android CN14 同批已签名且13→14保留登录与旧数据，仍待原生 CI 及 OSS 发布；Android 正典以 RN 发布 JOURNAL 为准。
+- 完成日视频回放验证使用既有 Demo 素材，不代表真实用户 OSS 联验。Android CN14 同批已发布：CI全绿，13→14保留登录与旧数据，公网双APK哈希、latest.json=14、固定路径no-cache及类型已核实；视频诊断真实入库仍待验收，Android正典以RN发布JOURNAL为准。
 
 ## 1.0 (39) — 已上传（2026-11-11；David 确认已提交 Ceshi 外测审核）
 - 来源：`beta/1.0-39-rc2` @ `c89bcff6b6873edceb4b09194579d8243255b131`，tag CI [43013765230](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/43013765230) 全绿；两台 demo 实际安装号 39。原 `beta/1.0-39` 因 lint 失败保留，由新 rc2 tag 替代。
