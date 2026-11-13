@@ -1,0 +1,26 @@
+摘录；完整本地日志留 work/ios-full-logs。
+✔ Test fallDSTUsesFourAMWallClockInsteadOfFourElapsedHours() passed after 0.001 seconds.
+◇ Test deviceCalendarGymDayRangeRollsAtFourAM() started.
+✔ Test deviceCalendarGymDayRangeRollsAtFourAM() passed after 0.001 seconds.
+✔ Suite WorkoutDatePolicyTests passed after 0.004 seconds.
+◇ Suite WorkoutKeypadAccessibilityTests started.
+◇ Test scrimIsHiddenFromAccessibilityButStillCancelsWithoutCommitting() started.
+✔ Test scrimIsHiddenFromAccessibilityButStillCancelsWithoutCommitting() passed after 0.009 seconds.
+◇ Test numberKeysRemainIndividuallyLabeledButtons() started.
+✔ Test numberKeysRemainIndividuallyLabeledButtons() passed after 0.826 seconds.
+◇ Test nextAdvancesAndDoneSavesWithoutADuplicateConfirm() started.
+✔ Test nextAdvancesAndDoneSavesWithoutADuplicateConfirm() passed after 0.169 seconds.
+◇ Test panelCancelRemainsAvailableWithoutCommitting() started.
+✔ Test panelCancelRemainsAvailableWithoutCommitting() passed after 0.094 seconds.
+✔ Suite WorkoutKeypadAccessibilityTests passed after 1.100 seconds.
+◇ Suite WorkoutKeypadSessionTests started.
+◇ Test advancesAcrossRowsAndSkipsUnavailableFields() started.
+✔ Test advancesAcrossRowsAndSkipsUnavailableFields() passed after 0.001 seconds.
+◇ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() started.
+✔ Test cancelAndEmptyCommitsPreserveRequiredFieldsAndClearEffort() passed after 0.001 seconds.
+◇ Test invalidValueDoesNotAdvanceOrCommit() started.
+✔ Test invalidValueDoesNotAdvanceOrCommit() passed after 0.001 seconds.
+◇ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() started.
+✔ Test realRowCellsPreserveUnitsSkipEffortAndSaveTrailingDecimal() passed after 0.009 seconds.
+✔ Suite WorkoutKeypadSessionTests passed after 0.011 seconds.
+✔ Test run with 1289 tests in 94 suites passed after 58.006 seconds.

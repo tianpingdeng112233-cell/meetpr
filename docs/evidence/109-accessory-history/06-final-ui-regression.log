@@ -1,0 +1,173 @@
+[0/1] Planning build
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling StudentKit TodayWorkoutViewModel.swift
+[4/6] Emitting module StudentKit
+[5/6] Compiling StudentKit AllDaySetRow.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking StudentKitPackageTests
+Build complete! (11.43s)
+Test Suite 'Selected tests' started at 2026-11-13 04:19:24.356.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-13 04:19:24.359.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-13 04:19:24.359.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-13 04:19:24.359.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryWeightHistoryGuardsTests started.
+◇ Test coachSavedAndManualValuesWinIncludingExplicitEmpty() started.
+✔ Test coachSavedAndManualValuesWinIncludingExplicitEmpty() passed after 0.001 seconds.
+◇ Test doesNotChangeOtherClassificationsOrLoadModes() started.
+✔ Test doesNotChangeOtherClassificationsOrLoadModes() passed after 0.001 seconds.
+◇ Test absentInvalidAndZeroHistoryAreDistinct() started.
+✔ Test absentInvalidAndZeroHistoryAreDistinct() passed after 0.001 seconds.
+◇ Test oldCachedDraftWithoutMetadataStillDecodes() started.
+✔ Test oldCachedDraftWithoutMetadataStillDecodes() passed after 0.001 seconds.
+✔ Suite AccessoryWeightHistoryGuardsTests passed after 0.001 seconds.
+◇ Suite AccessoryWeightHistoryIntegrationTests started.
+◇ Test loadsAcrossPlansBeyondTwelveWeeksWithoutMatchingRepsOrEffort() started.
+✔ Test loadsAcrossPlansBeyondTwelveWeeksWithoutMatchingRepsOrEffort() passed after 0.008 seconds.
+◇ Test newestSessionDoesNotBorrowMissingGroupsAndIgnoresIneligibleLogs() started.
+✔ Test newestSessionDoesNotBorrowMissingGroupsAndIgnoresIneligibleLogs() passed after 0.001 seconds.
+◇ Test refreshedHistoryKeepsManualWeightAndClearedWeight(weight:) started.
+◇ Test case passing 1 argument weight → 22.5 to refreshedHistoryKeepsManualWeightAndClearedWeight(weight:) started.
+◇ Test case passing 1 argument weight → nil to refreshedHistoryKeepsManualWeightAndClearedWeight(weight:) started.
+✔ Test refreshedHistoryKeepsManualWeightAndClearedWeight(weight:) with 2 test cases passed after 0.001 seconds.
+✔ Suite AccessoryWeightHistoryIntegrationTests passed after 0.010 seconds.
+◇ Suite AccessoryWeightHistoryTests started.
+◇ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() started.
+✔ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() passed after 0.001 seconds.
+✔ Suite AccessoryWeightHistoryTests passed after 0.001 seconds.
+◇ Suite AllDayDirectEditingTests started.
+◇ Test keypadLeavesInlineFieldsReachable() started.
+✔ Test keypadLeavesInlineFieldsReachable() passed after 0.070 seconds.
+◇ Test restingRowHasDirectEffortEntry() started.
+✔ Test restingRowHasDirectEffortEntry() passed after 0.017 seconds.
+✔ Suite AllDayDirectEditingTests passed after 0.088 seconds.
+◇ Test effortComparisonOnlyShowsAConcreteDifferentPrescription() started.
+✔ Test effortComparisonOnlyShowsAConcreteDifferentPrescription() passed after 0.036 seconds.
+◇ Test allDayProjectionKeepsExplicitWeightAndEffort(mode:) started.
+◇ Test case passing 1 argument mode → .fixedWeight to allDayProjectionKeepsExplicitWeightAndEffort(mode:) started.
+◇ Test case passing 1 argument mode → .bodyweight to allDayProjectionKeepsExplicitWeightAndEffort(mode:) started.
+✔ Test allDayProjectionKeepsExplicitWeightAndEffort(mode:) with 2 test cases passed after 0.001 seconds.
+◇ Test allDayClearWeightThenNextFieldDoesNotRestoreOriginalValue() started.
+✔ Test allDayClearWeightThenNextFieldDoesNotRestoreOriginalValue() passed after 0.001 seconds.
+◇ Test allDayRecordedEmptyWeightRetainsActualEffortAndHighlightsRIRChange() started.
+✔ Test allDayRecordedEmptyWeightRetainsActualEffortAndHighlightsRIRChange() passed after 0.001 seconds.
+◇ Test allDayClearingCompletedWeightRemovesDerivedHistory(queued:) started.
+◇ Test case passing 1 argument queued → false to allDayClearingCompletedWeightRemovesDerivedHistory(queued:) started.
+◇ Test case passing 1 argument queued → true to allDayClearingCompletedWeightRemovesDerivedHistory(queued:) started.
+✔ Test allDayClearingCompletedWeightRemovesDerivedHistory(queued:) with 2 test cases passed after 0.002 seconds.
+◇ Test allDayStartsCollapsedAndCompletingAnExerciseExpandsTheNext() started.
+✔ Test allDayStartsCollapsedAndCompletingAnExerciseExpandsTheNext() passed after 0.001 seconds.
+◇ Test allDayTopSetPercentagePrefillsAfterCompletionAndSavesDisplayedWeight() started.
+✔ Test allDayTopSetPercentagePrefillsAfterCompletionAndSavesDisplayedWeight() passed after 0.001 seconds.
+◇ Test allDayCompletionSkipsBlankExtraAndAllowsAnEmptyDay() started.
+✔ Test allDayCompletionSkipsBlankExtraAndAllowsAnEmptyDay() passed after 0.001 seconds.
+◇ Test allDayLoadedCompletedExerciseStaysCollapsedUntilExplicitlyReopened() started.
+✔ Test allDayLoadedCompletedExerciseStaysCollapsedUntilExplicitlyReopened() passed after 0.001 seconds.
+◇ Test allDayPoundEditingStoresMetricAndAllowsClearingWeight() started.
+✔ Test allDayPoundEditingStoresMetricAndAllowsClearingWeight() passed after 0.001 seconds.
+◇ Test allDayEffortChoiceSurvivesReloadAndIsolatesAccountsAndExercises() started.
+✔ Test allDayEffortChoiceSurvivesReloadAndIsolatesAccountsAndExercises() passed after 0.003 seconds.
+◇ Test allDayScreenStartsWithCollapsedExercisesAndNoRetiredEntries() started.
+✔ Test allDayScreenStartsWithCollapsedExercisesAndNoRetiredEntries() passed after 0.088 seconds.
+◇ Test allDayScreenOnlyExpandsOneSlotAndKeepsRepeatedExerciseRowsIndependent() started.
+✔ Test allDayScreenOnlyExpandsOneSlotAndKeepsRepeatedExerciseRowsIndependent() passed after 0.074 seconds.
+◇ Test allDaySheetDoesNotInventUnprescribedEffort() started.
+✔ Test allDaySheetDoesNotInventUnprescribedEffort() passed after 0.001 seconds.
+◇ Test allDaySheetSavesEmptyWeightWithoutInventingZero() started.
+✔ Test allDaySheetSavesEmptyWeightWithoutInventingZero() passed after 0.001 seconds.
+◇ Test allDaySheetExerciseCompletionCollapsesAndCancellationKeepsRecords() started.
+✔ Test allDaySheetExerciseCompletionCollapsesAndCancellationKeepsRecords() passed after 0.001 seconds.
+◇ Test allDaySheetCompletionWritesUntouchedSetsAndPreservesEditedSet() started.
+✔ Test allDaySheetCompletionWritesUntouchedSetsAndPreservesEditedSet() passed after 0.001 seconds.
+◇ Test allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → false to allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → true to allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion(historyPrefillEnabled:) started.
+✔ Test allDaySheetPrefillUsesRecordedThenPrescriptionThenMatchingSuggestion(historyPrefillEnabled:) with 2 test cases passed after 0.001 seconds.
+◇ Test allDayUpgradeRestoresOldQueuedValuesAndKeepsNewEmptyWeights() started.
+✔ Test allDayUpgradeRestoresOldQueuedValuesAndKeepsNewEmptyWeights() passed after 0.002 seconds.
+◇ Test allDayInlineEditingChangesOnlySelectedRowAndSurvivesDismissal() started.
+✔ Test allDayInlineEditingChangesOnlySelectedRowAndSurvivesDismissal() passed after 0.001 seconds.
+◇ Test allDayCompletionSkipsBlankAddedRowsAndAllowsEveryEmptyWeight() started.
+✔ Test allDayCompletionSkipsBlankAddedRowsAndAllowsEveryEmptyWeight() passed after 0.001 seconds.
+◇ Test allDayOfflineCompletionQueuesIntentAndKeepsRewardUntilReconnect() started.
+✔ Test allDayOfflineCompletionQueuesIntentAndKeepsRewardUntilReconnect() passed after 0.003 seconds.
+◇ Suite AllDaySummaryTests started.
+◇ Test planProjectionPreservesAMRAPAndCountsWarmupNormally(type:) started.
+◇ Test case passing 1 argument type → .amrap to planProjectionPreservesAMRAPAndCountsWarmupNormally(type:) started.
+◇ Test case passing 1 argument type → .warmup to planProjectionPreservesAMRAPAndCountsWarmupNormally(type:) started.
+✔ Test planProjectionPreservesAMRAPAndCountsWarmupNormally(type:) with 2 test cases passed after 0.002 seconds.
+◇ Test uniformWeight() started.
+✔ Test uniformWeight() passed after 0.001 seconds.
+◇ Test perSetWeightsAndRepSegments() started.
+✔ Test perSetWeightsAndRepSegments() passed after 0.001 seconds.
+◇ Test actualValuesAndShortRepsUseStyleMarkersAndPreferredUnits() started.
+✔ Test actualValuesAndShortRepsUseStyleMarkersAndPreferredUnits() passed after 0.001 seconds.
+◇ Test rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 5DBC3004-71F0-408F-9695-6A16AB3AB8B0, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.weightRange(100, 110)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 5480E379-CE48-46A5-80F7-F4E6FB2B737E, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.weightRange(100, 110)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: E2C6EF2C-D0CE-4233-B22C-2EC65E9032BD, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.weightRange(100, 110)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: CE411498-6C1E-4740-925B-4B48A51FC242, setIndex: 3, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.weightRange(100, 110)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "4×5", load: "100–110", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 457B7599-AF28-4EC2-94F5-04BE1C5B1FEE, setIndex: 0, setType: CoreModels.SetType.working, weightKg: Optional(60), intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(8), repsMax: Optional(10), restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: C1582949-38E0-49CE-A058-14FEF0B0E837, setIndex: 1, setType: CoreModels.SetType.working, weightKg: Optional(60), intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(8), repsMax: Optional(10), restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: E34F9D18-709C-48E3-842E-70E171BFE2EC, setIndex: 2, setType: CoreModels.SetType.working, weightKg: Optional(60), intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(8), repsMax: Optional(10), restSeconds: nil, coachNote: nil)], reps: "3×8–10", load: "60", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 039D3127-ABB2-4C4F-8EAE-C0EAA42977E8, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: F9700642-350B-482F-BDB0-7218A79017D5, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: B04C32CC-9C29-46AA-B662-A07CC1FF897A, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×10", load: "自重", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 4413C90D-CC5B-447C-9E0F-D4D03A3275BC, setIndex: 0, setType: CoreModels.SetType.working, weightKg: Optional(10), intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(8), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 4BA59224-3AC5-466E-A605-8092A85086C2, setIndex: 1, setType: CoreModels.SetType.working, weightKg: Optional(10), intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(8), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 5851BCD5-B973-410B-AE26-47072D144C4D, setIndex: 2, setType: CoreModels.SetType.working, weightKg: Optional(10), intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.bodyweight), reps: Optional(8), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×8", load: "自重+10", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: E79F06BA-26CF-4BA1-BEFF-FB2D093C362D, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.freeWeight), reps: Optional(12), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: B0A6799B-6CCB-4DA5-93A5-DABA5AFB66E7, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.freeWeight), reps: Optional(12), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: E84DA629-393C-4AAA-8919-85A3E3D4B0F8, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.freeWeight), reps: Optional(12), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 869D00CA-77B1-4306-997E-AC5990221A7B, setIndex: 3, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.freeWeight), reps: Optional(12), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "4×12", load: "自选", effort: "RPE 8") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 1FD32D6F-B50A-4D92-8C0D-1D5859F56603, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: A3834DB0-C78F-432F-915B-B8CBE8873D34, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: C3FB2377-80D3-4BDE-A085-3D312DB18B8A, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×5", load: "—", effort: "RPE 8") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 685ADDB3-3B19-4BDB-B7E7-F68201069384, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpeRange(7, 8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 52143F74-78B2-4880-8302-98E4E42EBD92, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpeRange(7, 8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: EB07B1AE-48FB-4D12-A085-7F86C5ECD678, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpeRange(7, 8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×5", load: "—", effort: "RPE 7–8") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: B7B4BA79-6551-4AB6-8758-5B438AD02CDB, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rir(2)), percentageAnchor: nil, loadMode: nil, reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 2DA1F1C6-0AAC-4CD1-90DA-2C9B2D0A5630, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rir(2)), percentageAnchor: nil, loadMode: nil, reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: FBFA6B0C-7C7C-4521-A8EF-06F89FCC5E4A, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rir(2)), percentageAnchor: nil, loadMode: nil, reps: Optional(10), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×10", load: "—", effort: "RIR 2") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: FDE9E9D1-76D3-4368-A4F2-C904D3AB618F, setIndex: 0, setType: CoreModels.SetType.working, weightKg: Optional(100), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 84744D0E-D88E-4BDC-B36A-FF1224947AC5, setIndex: 1, setType: CoreModels.SetType.working, weightKg: Optional(100), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 855529AB-8900-4EFA-84C3-E401EA4D338D, setIndex: 2, setType: CoreModels.SetType.working, weightKg: Optional(100), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 63E5B116-F84C-4876-905B-632B75B18A2B, setIndex: 3, setType: CoreModels.SetType.working, weightKg: Optional(100), intensity: Optional(CoreModels.PrescribedIntensity.rpe(7)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "4×5", load: "100", effort: "RPE 7") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: ABB58B06-CB36-45C1-B509-240426F647CD, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(75)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 53ACC8BC-400F-45D9-B2FD-8745CAB04E7D, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(75)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 9924276E-9144-43E2-8B07-B0661B34DAD9, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(75)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 30827FAD-690A-4FEF-9777-8E154C418A57, setIndex: 3, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(75)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: CAEF74BA-8528-4AFF-A6FB-7FEE9A62A30E, setIndex: 4, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(75)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "5×5", load: "75%", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+◇ Test case passing 1 argument sample → PrescriptionCase(sets: [CoreModels.PrescribedSet(id: 759E4759-8852-48A7-A395-8EE899EB396E, setIndex: 0, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(60)), percentageAnchor: Optional(CoreModels.PercentageAnchor.topSet), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: F99A55D9-7977-4744-9BD1-1DD04D34F4F1, setIndex: 1, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(60)), percentageAnchor: Optional(CoreModels.PercentageAnchor.topSet), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), CoreModels.PrescribedSet(id: 65090655-5818-41A7-86E8-FAF4C7CA3A21, setIndex: 2, setType: CoreModels.SetType.working, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(60)), percentageAnchor: Optional(CoreModels.PercentageAnchor.topSet), loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil)], reps: "3×5", load: "60% 顶组", effort: "RPE —") to rangesBodyweightAndEffortPrescriptions(sample:) started.
+✔ Test rangesBodyweightAndEffortPrescriptions(sample:) with 11 test cases passed after 0.002 seconds.
+◇ Test varyingRPEKeepsCoachWordsAndHidesSuggestedWeightsUntilRecorded() started.
+✔ Test varyingRPEKeepsCoachWordsAndHidesSuggestedWeightsUntilRecorded() passed after 0.001 seconds.
+◇ Test resolvedPercentageAndEmptyAddedExercise() started.
+✔ Test resolvedPercentageAndEmptyAddedExercise() passed after 0.001 seconds.
+◇ Test allDayKeypadUsesPreferredUnit() started.
+✔ Test allDayKeypadUsesPreferredUnit() passed after 0.001 seconds.
+◇ Test oldPrescriptionCacheStillDecodesAfterAMRAPProjection() started.
+✔ Test oldPrescriptionCacheStillDecodesAfterAMRAPProjection() passed after 0.001 seconds.
+◇ Test sameRepsStayInOneSegmentAfterRecordingOneWeight() started.
+✔ Test sameRepsStayInOneSegmentAfterRecordingOneWeight() passed after 0.001 seconds.
+◇ Test recordedWeightedSetsKeepEveryRPEInTheSummary() started.
+✔ Test recordedWeightedSetsKeepEveryRPEInTheSummary() passed after 0.001 seconds.
+◇ Test emptyRecordedEffortKeepsCoachTypeWithoutRestoringTarget() started.
+✔ Test emptyRecordedEffortKeepsCoachTypeWithoutRestoringTarget() passed after 0.001 seconds.
+◇ Test emptyEffortUsesRememberedTypeAfterCoachAndNeverRelabelsActuals() started.
+✔ Test emptyEffortUsesRememberedTypeAfterCoachAndNeverRelabelsActuals() passed after 0.001 seconds.
+✔ Suite AllDaySummaryTests passed after 0.007 seconds.
+◇ Test fixedColumnsReserveMissingWeightForRPE() started.
+✔ Test fixedColumnsReserveMissingWeightForRPE() passed after 0.001 seconds.
+◇ Test timelineConnectorKeepsItsEntireStrokeWithinTheGradientAcrossRowHeights() started.
+✔ Test timelineConnectorKeepsItsEntireStrokeWithinTheGradientAcrossRowHeights() passed after 0.001 seconds.
+◇ Suite AllDayVideoReplayTests started.
+◇ Test completedSetRowRetainsItsVideoControl() started.
+✔ Test completedSetRowRetainsItsVideoControl() passed after 0.004 seconds.
+◇ Test completedExerciseKeepsDeliveredVideoAndOpensReadOnlyReplay() started.
+✔ Test completedExerciseKeepsDeliveredVideoAndOpensReadOnlyReplay() passed after 0.002 seconds.
+◇ Test uploadingTurnsFromYellowToGreenAndSurvivesDayCompletion() started.
+✔ Test uploadingTurnsFromYellowToGreenAndSurvivesDayCompletion() passed after 0.768 seconds.
+◇ Test completedSetWithoutVideoDoesNotOfferRecording() started.
+✔ Test completedSetWithoutVideoDoesNotOfferRecording() passed after 0.001 seconds.
+◇ Test newerServerVideoPlaysInsteadOfOpeningAnOlderLocalAttachment() started.
+✔ Test newerServerVideoPlaysInsteadOfOpeningAnOlderLocalAttachment() passed after 0.002 seconds.
+✔ Suite AllDayVideoReplayTests passed after 0.778 seconds.
+◇ Test expandedExerciseOnlyUsesGoldFillWhenCurrent() started.
+✔ Test expandedExerciseOnlyUsesGoldFillWhenCurrent() passed after 0.006 seconds.
+◇ Test expandedCoachNoteShowsAllLines() started.
+✔ Test expandedCoachNoteShowsAllLines() passed after 0.003 seconds.
+◇ Test exerciseMessageUsesAnIconAndCenteredDialogCopy() started.
+✔ Test exerciseMessageUsesAnIconAndCenteredDialogCopy() passed after 0.019 seconds.
+◇ Test percentagePrescriptionRemainsAtTheEndOfEachExpandedSet() started.
+✔ Test percentagePrescriptionRemainsAtTheEndOfEachExpandedSet() passed after 0.009 seconds.
+◇ Test allDayEffortColumnKeepsItsLabelForValuesAndEmptyCells() started.
+✔ Test allDayEffortColumnKeepsItsLabelForValuesAndEmptyCells() passed after 0.018 seconds.
+◇ Test perSetCaptureUsesVideoCameraAndKeepsItsAction() started.
+✔ Test perSetCaptureUsesVideoCameraAndKeepsItsAction() passed after 0.007 seconds.
+◇ Test collapsedCurrentExerciseHasGoldOutlineBeforeAnyTap() started.
+✔ Test collapsedCurrentExerciseHasGoldOutlineBeforeAnyTap() passed after 0.002 seconds.
+◇ Test exerciseSummaryShowsConvertedLoadWithoutPercentage() started.
+✔ Test exerciseSummaryShowsConvertedLoadWithoutPercentage() passed after 0.006 seconds.
+✔ Test run with 60 tests in 6 suites passed after 1.186 seconds.

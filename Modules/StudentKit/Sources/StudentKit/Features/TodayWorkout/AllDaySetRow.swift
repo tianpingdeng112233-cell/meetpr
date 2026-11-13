@@ -84,7 +84,9 @@ private struct AllDaySetValues: View {
       } label: {
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space1) {
           Text(draft.actualWeight.map { UnitDisplay.weightText(kg: $0, unit: unit) } ?? "—")
-            .foregroundStyle(weightChanged ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+            .foregroundStyle(
+              weightChanged || (draft.isHistoryWeightPrefill == true && !draft.hasSavedRecord)
+                ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
           if draft.actualWeight != nil {
             Text(UnitDisplay.weightUnitSuffix(unit)).font(
               .MeetPR.body(size: MeetPRFontMetrics.size12)
@@ -222,13 +224,28 @@ private struct AllDayInlineEditor: View {
               keypad?.openAllDay(draft: draft, viewModel: viewModel, field: cell.field)
             }
           } label: {
-            Text(
-              (keypad?.current?.id == cell.id ? keypad?.previewText : cell.value).flatMap {
-                $0.isEmpty ? nil : $0
-              } ?? "—"
-            )
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textPrimary)
+            HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space1) {
+              Text(
+                (keypad?.current?.id == cell.id ? keypad?.previewText : cell.value).flatMap {
+                  $0.isEmpty ? nil : $0
+                } ?? "—"
+              )
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .semibold))
+              .lineLimit(1)
+              .minimumScaleFactor(0.75)
+              .foregroundStyle(
+                cell.field == .weight && draft.isHistoryWeightPrefill == true
+                  && !draft.hasSavedRecord
+                  ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
+              if cell.field == .weight, draft.isHistoryWeightPrefill == true, !draft.hasSavedRecord
+              {
+                Text(StudentStrings.localized(.accessoryLast))
+                  .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
+                  .foregroundStyle(Color.MeetPR.goldText)
+                  .fixedSize()
+                  .accessibilityIdentifier("allDay.previousWeight.\(draft.id)")
+              }
+            }
             .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
             .padding(.horizontal, MeetPRSpacing.space2)
             .background(Color.MeetPR.bgBase, in: .rect(cornerRadius: 8))

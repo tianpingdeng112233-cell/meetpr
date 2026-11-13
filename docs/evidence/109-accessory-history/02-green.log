@@ -1,0 +1,26 @@
+摘录；完整本地日志留 work/ios-full-logs。
+[307/314] Compiling StudentKitTests StudentTrainingLogRepositoryTests.swift
+[308/314] Compiling StudentKitTests StudentFormattingLocalizationTests.swift
+[309/314] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[310/314] Compiling StudentKitTests StudentRootViewTests.swift
+[311/314] Compiling StudentKitTests StudentStringsTests.swift
+[312/314] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[313/316] Compiling StudentKitPackageTests runner.swift
+[314/316] Emitting module StudentKitPackageTests
+[314/316] Write Objects.LinkFileList
+[315/316] Linking StudentKitPackageTests
+Build complete! (244.92s)
+Test Suite 'Selected tests' started at 2026-11-13 04:01:07.536.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-13 04:01:07.540.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-13 04:01:07.541.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-13 04:01:07.541.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite AccessoryWeightHistoryTests started.
+◇ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() started.
+✔ Test appliesOnlyCorrespondingWeightWithoutCreatingARecord() passed after 0.003 seconds.
+✔ Suite AccessoryWeightHistoryTests passed after 0.003 seconds.
+✔ Test run with 1 test in 1 suite passed after 0.003 seconds.

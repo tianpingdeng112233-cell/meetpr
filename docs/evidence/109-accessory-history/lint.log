@@ -1,0 +1,11 @@
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryHistory.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryWeightHistory.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AllDaySetRow.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutTypes.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel+DraftBuilding.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryWeightHistoryGuardsTests.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryWeightHistoryIntegrationTests.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryWeightHistoryTests.swift
+Linting 'TodayWorkoutViewModel.swift' (1/9)
+Linting 'AccessoryWeightHistoryGuardsTests.swift' (2/9)
+Linting 'AccessoryWeightHistoryTests.swift' (3/9)
+Linting 'TodayWorkoutViewModel+DraftBuilding.swift' (4/9)
+Linting 'AccessoryWeightHistory.swift' (5/9)
+Linting 'AccessoryHistory.swift' (6/9)
+Linting 'AllDaySetRow.swift' (7/9)
+Linting 'TodayWorkoutTypes.swift' (8/9)
+Linting 'AccessoryWeightHistoryIntegrationTests.swift' (9/9)
+Done linting! Found 0 violations, 0 serious in 9 files.

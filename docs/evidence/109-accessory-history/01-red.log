@@ -1,0 +1,7 @@
+摘录；完整本地日志留 work/ios-full-logs。
+/Users/david/.codex/worktrees/accessory-history-ios/MeetPR-demo-latest/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryWeightHistoryTests.swift:20:15: error: cannot find 'AccessoryWeightHistory' in scope
+   |               `- error: cannot find 'AccessoryWeightHistory' in scope
+[623/627] Compiling StudentKitTests StudentRootViewTests.swift
+[624/627] Compiling StudentKitTests StudentStringsTests.swift
+[625/627] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+error: fatalError
