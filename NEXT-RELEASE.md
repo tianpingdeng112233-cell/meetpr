@@ -15,7 +15,7 @@
 ## 2026-11-13 下一班新增候选（spec 109）
 
 - **P1 辅助项上次重量**：David 已定稿并要求双端随下一班车。仅辅助项按最近实际训练逐组预填重量；紧凑行金色，点开后重量格内显示上次值；教练明确重量和已保存记录优先。主项、次数、RPE/RIR、训练完成规则不变。
-- 实装分支 `feat/109-accessory-history` 基于 `release/1.0@fdb0b21a`；PR / 验收证据待本卡交付填写，T2 合并待 David。规范与验收见 `specs/109-accessory-history/SPEC.md`、`docs/journal/2026-11-13-109-ios.md`。
+- 实装分支 `feat/109-accessory-history` 基于 `release/1.0@fdb0b21a`；[PR #462](https://github.com/tianpingdeng112233-cell/meetpr/pull/462)，实现 `063966d4`；原生浅深色及本地测试/双轴审查已过，PR CI 运行中，T2 合并待 David。规范与验收见 `specs/109-accessory-history/SPEC.md`、`docs/journal/2026-11-13-109-ios.md`。
 - 当前工程已出现 build 39，而本文件上方仍记录 38 准备态；本卡不推断 38/39 的上传状态、不改 tag。具体下一包号由 prep-beta 现场核定，候选不得遗漏。
 
 ## 延期候选（未排期，前置解锁后另行排期）
