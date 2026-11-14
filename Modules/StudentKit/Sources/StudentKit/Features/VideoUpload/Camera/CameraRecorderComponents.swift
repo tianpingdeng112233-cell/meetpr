@@ -275,6 +275,22 @@
     }
   }
 
+  struct RecorderAlbumImportView: View {
+    let onClose: () -> Void
+
+    var body: some View {
+      VStack {
+        ProgressView(StudentStrings.localized(.videoTrimView001))
+          .tint(.white)
+        Button(StudentStrings.localized(.cameraRecorderView005), action: onClose)
+          .padding()
+      }
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background(.black)
+    }
+  }
+
   enum RecorderTimeFormatter {
     static func string(from duration: TimeInterval) -> String {
       let totalSeconds = max(0, Int(duration.rounded(.down)))
