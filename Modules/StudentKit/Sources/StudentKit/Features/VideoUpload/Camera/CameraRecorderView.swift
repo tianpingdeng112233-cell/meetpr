@@ -12,6 +12,10 @@
     let onFailure: () -> Void
     let allDayFlow: Bool
     @State private var pickedAlbumVideo: PhotosPickerItem?
+    @State private var albumImportTask: Task<Void, Never>?
+    @State private var isImportingAlbumVideo = false
+    @State private var showingAlbumImportFailure = false
+    @State private var albumTrimFailed = false
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var controller: RecorderSessionController
@@ -57,75 +61,82 @@
     var body: some View {
       ZStack {
         Color.black.ignoresSafeArea()
-        switch controller.phase {
-        case .preparing:
-          ProgressView(StudentStrings.localized(.cameraRecorderView001))
-            .tint(.white)
-            .foregroundStyle(.white)
-        case .ready, .starting, .recording, .stopping:
-          RecorderCaptureView(
-            session: controller.captureSession,
-            phase: controller.phase,
-            recordedDuration: controller.recordedDuration,
-            maximumDuration: maxDurationSeconds,
-            onClose: close,
-            onRecordToggle: toggleRecording
-          )
-        case .review:
-          if let url = controller.reviewURL {
-            RecorderReviewView(
-              url: url,
-              duration: controller.recordedDuration,
-              saveToPhotoLibrary: saveToggleBinding,
-              isBusy: isUsingRecording || isApplyingTrim,
-              showsTrimSuggestion: trimSuggestionState.shouldShow,
-              onTrim: { prepareTrim(of: url) },
-              onNeverSuggestTrim: disableTrimSuggestion,
-              onUse: { Task { await useRecording(url) } },
-              onClose: close
+        Group {
+          switch controller.phase {
+          case .preparing:
+            ProgressView(StudentStrings.localized(.cameraRecorderView001))
+              .tint(.white)
+              .foregroundStyle(.white)
+          case .ready, .starting, .recording, .stopping:
+            RecorderCaptureView(
+              session: controller.captureSession,
+              phase: controller.phase,
+              recordedDuration: controller.recordedDuration,
+              maximumDuration: maxDurationSeconds,
+              onClose: close,
+              onRecordToggle: toggleRecording
+            )
+          case .review:
+            if let url = controller.reviewURL {
+              RecorderReviewView(
+                url: url,
+                duration: controller.recordedDuration,
+                saveToPhotoLibrary: saveToggleBinding,
+                isBusy: isUsingRecording || isApplyingTrim,
+                showsTrimSuggestion: trimSuggestionState.shouldShow,
+                onTrim: { prepareTrim(of: url) },
+                onNeverSuggestTrim: disableTrimSuggestion,
+                onUse: { Task { await useRecording(url) } },
+                onClose: close
+              )
+            }
+          case .permissionDenied:
+            RecorderStatusView(
+              systemImage: "lock.trianglebadge.exclamationmark",
+              title: StudentStrings.localized(.cameraRecorderView002),
+              message: StudentStrings.localized(.cameraRecorderView003),
+              primaryAction: .init(
+                title: StudentStrings.localized(.cameraRecorderView004), systemImage: "gear",
+                action: openSettings),
+              secondaryAction: .init(
+                title: StudentStrings.localized(.cameraRecorderView005), action: close)
+            )
+          case .unavailable:
+            RecorderStatusView(
+              systemImage: "video.slash",
+              title: StudentStrings.localized(.cameraRecorderView006),
+              message: StudentStrings.localized(.cameraRecorderView007),
+              secondaryAction: .init(
+                title: StudentStrings.localized(.cameraRecorderView005), action: close)
+            )
+          case .failed(let message):
+            RecorderStatusView(
+              systemImage: "exclamationmark.triangle",
+              title: StudentStrings.localized(.cameraRecorderView008),
+              message: message,
+              primaryAction: .init(
+                title: StudentStrings.localized(.cameraRecorderView009),
+                systemImage: "arrow.clockwise",
+                action: { Task { await controller.retry() } }
+              ),
+              secondaryAction: .init(
+                title: StudentStrings.localized(.cameraRecorderView005),
+                action: {
+                  onFailure()
+                  close()
+                }
+              )
             )
           }
-        case .permissionDenied:
-          RecorderStatusView(
-            systemImage: "lock.trianglebadge.exclamationmark",
-            title: StudentStrings.localized(.cameraRecorderView002),
-            message: StudentStrings.localized(.cameraRecorderView003),
-            primaryAction: .init(
-              title: StudentStrings.localized(.cameraRecorderView004), systemImage: "gear",
-              action: openSettings),
-            secondaryAction: .init(
-              title: StudentStrings.localized(.cameraRecorderView005), action: close)
-          )
-        case .unavailable:
-          RecorderStatusView(
-            systemImage: "video.slash",
-            title: StudentStrings.localized(.cameraRecorderView006),
-            message: StudentStrings.localized(.cameraRecorderView007),
-            secondaryAction: .init(
-              title: StudentStrings.localized(.cameraRecorderView005), action: close)
-          )
-        case .failed(let message):
-          RecorderStatusView(
-            systemImage: "exclamationmark.triangle",
-            title: StudentStrings.localized(.cameraRecorderView008),
-            message: message,
-            primaryAction: .init(
-              title: StudentStrings.localized(.cameraRecorderView009),
-              systemImage: "arrow.clockwise",
-              action: { Task { await controller.retry() } }
-            ),
-            secondaryAction: .init(
-              title: StudentStrings.localized(.cameraRecorderView005),
-              action: {
-                onFailure()
-                close()
-              }
-            )
-          )
         }
+        .disabled(isImportingAlbumVideo)
+        .accessibilityHidden(isImportingAlbumVideo)
 
         if let toastMessage {
           RecorderToastView(message: toastMessage)
+        }
+        if isImportingAlbumVideo {
+          RecorderAlbumImportView(onClose: close)
         }
       }
       .overlay(alignment: .bottomLeading) {
@@ -134,13 +145,21 @@
             Label(StudentStrings.localized(.allDayAlbum), systemImage: "photo")
               .padding().foregroundStyle(.white)
           }
+          .disabled(isImportingAlbumVideo)
           .padding(.bottom, 32)
         }
       }
       .onChange(of: pickedAlbumVideo) { _, item in
-        guard let item else { return }
+        guard let item, !isImportingAlbumVideo else { return }
         pickedAlbumVideo = nil
-        Task { await importAlbumVideo(item) }
+        isImportingAlbumVideo = true
+        albumImportTask = Task { await importAlbumVideo(item) }
+      }
+      .alert(
+        StudentStrings.localized(.videoAttachmentViewModel001),
+        isPresented: $showingAlbumImportFailure
+      ) {
+        Button(StudentStrings.localized(.cameraRecorderView005), role: .cancel) {}
       }
       .onChange(of: controller.phase) { _, phase in
         if allDayFlow, phase == .review, let url = controller.reviewURL,
@@ -215,6 +234,7 @@
     }
 
     private func toggleRecording() {
+      guard !isImportingAlbumVideo else { return }
       Task {
         if controller.phase == .recording {
           await controller.stopRecording()
@@ -225,9 +245,20 @@
     }
 
     private func importAlbumVideo(_ item: PhotosPickerItem) async {
+      defer {
+        isImportingAlbumVideo = false
+        albumImportTask = nil
+      }
       do {
-        guard let movie = try await item.loadTransferable(type: PickedVideo.self) else {
-          onFailure()
+        let movie = try await item.loadTransferable(type: PickedVideo.self)
+        // A provider may complete after the student closes the recorder.
+        // Release its temporary copy instead of reopening an abandoned flow.
+        guard isPresented, !Task.isCancelled else {
+          if let movie { try? FileManager.default.removeItem(at: movie.url) }
+          return
+        }
+        guard let movie else {
+          reportAlbumImportFailure()
           return
         }
         let session = VideoTrimSession(
@@ -240,12 +271,20 @@
           },
           onCancel: { recordingToTrim = nil },
           onFailure: {
+            albumTrimFailed = true
             recordingToTrim = nil
-            onFailure()
           })
         activeRecordingTrimSession = session
         recordingToTrim = session
-      } catch { onFailure() }
+      } catch {
+        guard isPresented, !Task.isCancelled else { return }
+        reportAlbumImportFailure()
+      }
+    }
+
+    private func reportAlbumImportFailure() {
+      showingAlbumImportFailure = true
+      onFailure()
     }
 
     private func prepareTrim(of sourceURL: URL) {
@@ -325,12 +364,21 @@
       activeRecordingTrimSession?.cancelled()
       activeRecordingTrimSession = nil
       recordingToTrim = nil
-      if !isPresented { shutdownRecorder() }
+      let shouldReportFailure = albumTrimFailed
+      albumTrimFailed = false
+      if !isPresented {
+        shutdownRecorder()
+      } else if shouldReportFailure {
+        // Present only after the failed editor has fully dismissed.
+        reportAlbumImportFailure()
+      }
     }
 
     private func shutdownRecorder() {
       guard !didRequestShutdown else { return }
       didRequestShutdown = true
+      albumImportTask?.cancel()
+      albumImportTask = nil
       activeRecordingTrimSession?.cancelled()
       activeRecordingTrimSession = nil
       recordingToTrim = nil
