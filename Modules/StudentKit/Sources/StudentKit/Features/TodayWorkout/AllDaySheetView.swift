@@ -74,6 +74,10 @@ struct AllDaySheetView: View {
         }
       }
     }
+    .transaction(value: viewModel?.expandedAllDayExerciseID ?? previewExpanded) { transaction in
+      transaction.animation = nil
+      transaction.disablesAnimations = true
+    }
     .confirmationDialog(
       StudentStrings.localized(.addedConfirmExercise),
       isPresented: Binding(get: { removal != nil }, set: { if !$0 { removal = nil } }),
