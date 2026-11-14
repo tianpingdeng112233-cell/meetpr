@@ -32,8 +32,8 @@ public struct AVFoundationVideoExporter: VideoExporting {
       try Task.checkCancellation()
       let asset = AVURLAsset(url: sourceURL)
       let videoTracks = try await asset.loadTracks(withMediaType: .video)
-      guard videoTracks.count == 1, let videoTrack = videoTracks.first else {
-        throw VideoUploadError.exportFailed("Expected exactly one video track")
+      guard let videoTrack = try await AVAssetMainVideoTrack.select(from: videoTracks) else {
+        throw VideoUploadError.exportFailed("No enabled video track")
       }
       let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
       let decision = try await Self.exportDecision(videoTrack: videoTrack, audioTrack: audioTrack)
@@ -80,34 +80,32 @@ public struct AVFoundationVideoExporter: VideoExporting {
     )
     let bitRate = Self.outputVideoBitRate(sourceBitRate: estimatedDataRate)
 
-    let readerOutput = AVAssetReaderTrackOutput(
-      track: track,
-      outputSettings: [
-        kCVPixelBufferPixelFormatTypeKey as String:
-          kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
-      ]
-    )
+    let convertsToSDR = try await Self.requiresSDRConversion(track)
+    var readerSettings: [String: Any] = [
+      kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+    ]
+    if convertsToSDR { readerSettings[AVVideoColorPropertiesKey] = Self.sdrColorProperties }
+    let readerOutput = AVAssetReaderTrackOutput(track: track, outputSettings: readerSettings)
     readerOutput.alwaysCopiesSampleData = false
     guard reader.canAdd(readerOutput) else {
       throw VideoUploadError.exportFailed("Unable to add the video reader output")
     }
     reader.add(readerOutput)
 
-    let writerInput = AVAssetWriterInput(
-      mediaType: .video,
-      outputSettings: [
-        AVVideoCodecKey: AVVideoCodecType.h264,
-        AVVideoWidthKey: geometry.width,
-        AVVideoHeightKey: geometry.height,
-        AVVideoCompressionPropertiesKey: [
-          AVVideoAverageBitRateKey: bitRate,
-          AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
-          kVTCompressionPropertyKey_DataRateLimits as String: [
-            Self.peakVideoBitRate / 8, 1,
-          ],
+    var writerSettings: [String: Any] = [
+      AVVideoCodecKey: AVVideoCodecType.h264,
+      AVVideoWidthKey: geometry.width,
+      AVVideoHeightKey: geometry.height,
+      AVVideoCompressionPropertiesKey: [
+        AVVideoAverageBitRateKey: bitRate,
+        AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
+        kVTCompressionPropertyKey_DataRateLimits as String: [
+          Self.peakVideoBitRate / 8, 1,
         ],
-      ]
-    )
+      ],
+    ]
+    if convertsToSDR { writerSettings[AVVideoColorPropertiesKey] = Self.sdrColorProperties }
+    let writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: writerSettings)
     writerInput.expectsMediaDataInRealTime = false
     writerInput.transform = geometry.transform
     guard writer.canAdd(writerInput) else {

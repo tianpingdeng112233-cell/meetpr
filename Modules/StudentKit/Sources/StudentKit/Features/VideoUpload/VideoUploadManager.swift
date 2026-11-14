@@ -131,8 +131,9 @@ public actor VideoUploadManager {
       }
     }
 
-    let duration = try await exporter.durationSeconds(of: sourceURL)
+    let duration = try await diagnosedDuration(of: sourceURL)
     guard duration <= configuration.maxDurationSeconds + Self.durationGraceSeconds else {
+      VideoProcessingDiagnostics().report(.duration, code: .tooLong)
       throw VideoUploadError.durationExceedsLimit(
         seconds: duration,
         maxSeconds: configuration.maxDurationSeconds

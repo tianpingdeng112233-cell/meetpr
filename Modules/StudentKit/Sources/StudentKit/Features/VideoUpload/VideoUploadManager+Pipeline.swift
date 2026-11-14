@@ -33,10 +33,17 @@ extension VideoUploadManager {
   ) async throws -> VideoAttachment {
     try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
     let destination = fileURL(for: record)
-    let duration = try await exporter.durationSeconds(of: sourceURL)
+    let duration: Double
+    do {
+      duration = try await exporter.durationSeconds(of: sourceURL)
+    } catch {
+      VideoProcessingDiagnostics().report(.export, error: error)
+      throw error
+    }
     do {
       try await exporter.export(from: sourceURL, to: destination)
     } catch {
+      VideoProcessingDiagnostics().report(.export, error: error)
       try? FileManager.default.removeItem(at: destination)
       throw error
     }
