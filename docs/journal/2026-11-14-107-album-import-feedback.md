@@ -50,3 +50,7 @@
 - 全仓 SwiftLint strict 零输出；变更 Swift 文件 swift-format lint strict 通过；git diff check 通过。代码无临时 DEBUG/delay。
 - 原始相册文件保留；本任务两个合成样本留在17e供复验。未改两台demo机、MeetPR-CI或真用户数据。
 - 本次提交交 PR（P1，未合并/未发布）；修复必须随新的 TestFlight build 分发才能到学员端。
+
+## 2026-11-14 纳入下一班 TestFlight
+
+David 确认「进下班车」。[PR #463](https://github.com/tianpingdeng112233-cell/meetpr/pull/463) 已 squash 合入 `release/1.0`，提交 `d5cea4c8` 与审查通过的 `43a9f31b` 文件树一致。[CI 43545486675](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/43545486675) 三项通过。已列入 `NEXT-RELEASE.md` 的 1.0 (41) 候选，工程 build 仍为 40。
