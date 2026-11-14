@@ -65,9 +65,10 @@ extension VideoUploadManager {
     guard let source = retainedSourceURL(recordID: recordID) else {
       throw VideoUploadError.localFileMissing
     }
-    let duration = try await exporter.durationSeconds(of: source)
+    let duration = try await diagnosedDuration(of: source)
     try requirePendingBindingContext(recordID: recordID, generation: generation)
     guard duration <= configuration.maxDurationSeconds + Self.durationGraceSeconds else {
+      VideoProcessingDiagnostics().report(.duration, code: .tooLong)
       throw VideoUploadError.durationExceedsLimit(
         seconds: duration, maxSeconds: configuration.maxDurationSeconds)
     }

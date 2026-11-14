@@ -9,12 +9,11 @@
 
   struct VideoTrimThumbnailGenerator {
     func thumbnails(
-      sourceURL: URL,
+      asset: AVAsset,
       durationSeconds: Double,
       count: Int
     ) async -> [VideoTrimThumbnail] {
       guard durationSeconds > 0, count > 0 else { return [] }
-      let asset = AVURLAsset(url: sourceURL)
       let generator = AVAssetImageGenerator(asset: asset)
       generator.appliesPreferredTrackTransform = true
       generator.maximumSize = CGSize(width: 320, height: 180)

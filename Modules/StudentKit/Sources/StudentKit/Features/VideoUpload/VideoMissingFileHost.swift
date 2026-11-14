@@ -29,6 +29,7 @@ private struct VideoMissingFileSheet: View {
   let onRestored: () async -> Void
   @State private var item: PhotosPickerItem?
   @State private var isImporting = false
+  @State private var importTask: Task<Void, Never>?
   @State private var trim: VideoTrimSession?
 
   var body: some View {
@@ -40,7 +41,7 @@ private struct VideoMissingFileSheet: View {
       .font(.title3.bold()).foregroundStyle(Color.MeetPR.danger)
       Text(StudentStrings.localized(.videoMissingBody))
         .font(.body).fixedSize(horizontal: false, vertical: true)
-      PhotosPicker(selection: $item, matching: .videos) {
+      PhotosPicker(selection: $item, matching: .videos, preferredItemEncoding: .current) {
         Text(StudentStrings.localized(.videoPickAgain))
           .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
       }
@@ -59,16 +60,25 @@ private struct VideoMissingFileSheet: View {
       guard let selected else { return }
       item = nil
       isImporting = true
-      Task { await importVideo(selected) }
+      importTask = Task { await importVideo(selected) }
     }
+    .onDisappear { importTask?.cancel() }
     #if os(iOS)
       .fullScreenCover(item: $trim) { session in VideoTrimView(session: session) }
     #endif
   }
 
   private func importVideo(_ item: PhotosPickerItem) async {
+    defer { importTask = nil }
     do {
-      guard let movie = try await item.loadTransferable(type: PickedVideo.self) else {
+      let movie = try await item.loadTransferable(type: PickedVideo.self)
+      guard !Task.isCancelled, model.missingAttachment?.id == record.id else {
+        if let movie { try? FileManager.default.removeItem(at: movie.url) }
+        isImporting = false
+        return
+      }
+      guard let movie else {
+        VideoProcessingDiagnostics().report(.picker, code: .noTransferable)
         isImporting = false
         return
       }
@@ -93,6 +103,8 @@ private struct VideoMissingFileSheet: View {
       #endif
     } catch {
       isImporting = false
+      guard !Task.isCancelled, model.missingAttachment?.id == record.id else { return }
+      VideoProcessingDiagnostics().report(.picker, error: error)
       model.reportVideoProcessingFailure()
     }
   }

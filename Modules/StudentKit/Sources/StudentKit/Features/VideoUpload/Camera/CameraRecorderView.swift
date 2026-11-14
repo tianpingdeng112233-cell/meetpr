@@ -141,7 +141,9 @@
       }
       .overlay(alignment: .bottomLeading) {
         if allDayFlow, controller.phase != .recording, controller.phase != .review {
-          PhotosPicker(selection: $pickedAlbumVideo, matching: .videos) {
+          PhotosPicker(
+            selection: $pickedAlbumVideo, matching: .videos, preferredItemEncoding: .current
+          ) {
             Label(StudentStrings.localized(.allDayAlbum), systemImage: "photo")
               .padding().foregroundStyle(.white)
           }
@@ -185,9 +187,7 @@
         }
       }
       .onDisappear {
-        // A full-screen editor temporarily hides this view without ending the
-        // recorder. External dismissal flips `isPresented` to false and takes
-        // the shutdown path below, including both trim files and idle timer.
+        // Editor presentation hides the recorder; external dismissal shuts it down.
         guard activeRecordingTrimSession == nil || !isPresented else { return }
         shutdownRecorder()
       }
@@ -251,13 +251,13 @@
       }
       do {
         let movie = try await item.loadTransferable(type: PickedVideo.self)
-        // A provider may complete after the student closes the recorder.
-        // Release its temporary copy instead of reopening an abandoned flow.
+        // Discard a provider's late copy after the recorder closes.
         guard isPresented, !Task.isCancelled else {
           if let movie { try? FileManager.default.removeItem(at: movie.url) }
           return
         }
         guard let movie else {
+          VideoProcessingDiagnostics().report(.picker, code: .noTransferable)
           reportAlbumImportFailure()
           return
         }
@@ -278,6 +278,7 @@
         recordingToTrim = session
       } catch {
         guard isPresented, !Task.isCancelled else { return }
+        VideoProcessingDiagnostics().report(.picker, error: error)
         reportAlbumImportFailure()
       }
     }
