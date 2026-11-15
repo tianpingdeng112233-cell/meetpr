@@ -30,6 +30,7 @@ struct DayCompletionBanner: View {
       }
       .meetPRShimmer()
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .contentShape(.rect)
     }
     .accessibilityLabel(StudentStrings.replacing(.dayCompletionBanner003, values: ["\(totalSets)"]))
   }

@@ -32,6 +32,7 @@ public struct TodayWorkoutView: View {
   private let onOpenCoach: () -> Void
 
   @State private var restTimerHeight: CGFloat = 0
+  @State private var completionDockTop: CGFloat?
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var replay: CompletedVideoReplayModel
@@ -256,19 +257,12 @@ public struct TodayWorkoutView: View {
         onEdit: openEditor,
         onVideoAction: openVideoAction,
         onComplete: completeTraining,
-        onUndoCompletion: {
-          Task {
-            _ = await viewModel.undoCurrentDayCompletion()
-          }
-        },
-        onShowReview: {
-          viewModel.completionPhase = .review
-        },
         accessoryViewModel: viewModel,
         accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
         sequencePage: sequencePage,
         gymDayToday: gymDayToday,
         restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
+        completionDockTop: completionDockTop,
         videoFailureCount: videoFailurePresentation.failureCount,
         onRetryVideos: retryDayVideos,
         videoCompletion: videoCompletionPresentation,
@@ -307,13 +301,30 @@ public struct TodayWorkoutView: View {
     .task { await replay.load(studentID: studentID) }
     .safeAreaInset(edge: .bottom) {
       VStack(spacing: 0) {
-        if !showingHistory, case .workout(let presentation) = screenContent,
-          presentation.completionAvailability(isEditable: selectedDayState.isEditable).sticky
-            || videoCompletionPresentation?.waiting == true
-        {
-          TrainingCompletionDock(
-            onComplete: completeTraining, coordinator: viewModel.setSyncCompletion,
-            videoCompletion: videoCompletionPresentation, onRetryVideos: retryDayVideos)
+        if case .workout(let presentation) = screenContent {
+          let dockContent = presentation.completionDock(
+            dayState: selectedDayState, showingHistory: showingHistory,
+            waitingForVideos: videoCompletionPresentation?.waiting == true)
+          if dockContent != .none {
+            TrainingCompletionDock(
+              content: dockContent,
+              totalSets: presentation.exercises.flatMap(\.prescribedRows).count,
+              onComplete: completeTraining,
+              onUndoCompletion: {
+                Task { _ = await viewModel.undoCurrentDayCompletion() }
+              },
+              onShowReview: { viewModel.completionPhase = .review },
+              isUndoDisabled: viewModel.isCompletionMutationInFlight,
+              coordinator: viewModel.setSyncCompletion,
+              videoCompletion: videoCompletionPresentation, onRetryVideos: retryDayVideos
+            )
+            .onGeometryChange(for: CGFloat.self) {
+              $0.frame(in: .global).minY
+            } action: {
+              completionDockTop = $0
+            }
+            .onDisappear { completionDockTop = nil }
+          }
         }
 
       }

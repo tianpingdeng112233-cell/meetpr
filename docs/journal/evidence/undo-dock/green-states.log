@@ -1,0 +1,166 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/11] Compiling StudentKit TrainingFlowScroll.swift
+[5/11] Compiling StudentKit TodayWorkoutViewModel.swift
+[6/11] Compiling StudentKit TrainingCompletionAvailability.swift
+[7/11] Compiling StudentKit TodayWorkoutView.swift
+[8/11] Compiling StudentKit TodayWorkoutScreen.swift
+[9/11] Compiling StudentKit TodayWorkoutV3Previews.swift
+[10/11] Emitting module StudentKit
+[11/50] Compiling StudentKit TrainingExerciseProgress.swift
+[12/50] Compiling StudentKit TrainingFlowPresentation.swift
+[13/50] Compiling StudentKit TrainingSetProgress.swift
+[14/50] Compiling StudentKit TrainingSetProgressBar.swift
+[15/50] Compiling StudentKit W4V3Previews.swift
+[16/50] Compiling StudentKit WorkoutCompletionPresentation.swift
+[17/50] Compiling StudentKit VideoAttachmentViewModel+Delivery.swift
+[18/50] Compiling StudentKit VideoAttachmentViewModel+PendingSet.swift
+[19/50] Compiling StudentKit AllDayVideoSheet.swift
+[20/50] Compiling StudentKit CompletedDayOverviewCard.swift
+[21/50] Compiling StudentKit CompletedDayPresentation.swift
+[22/50] Compiling StudentKit CompletedTrainingExercise.swift
+[23/50] Compiling StudentKit TodayWorkoutPresentation.swift
+[24/50] Compiling StudentKit TodayWorkoutViewModel+DraftBuilding.swift
+[25/50] Compiling StudentKit TodayWorkoutViewModel+RecordingError.swift
+[26/50] Compiling StudentKit TrainingDayPreview.swift
+[27/50] Compiling StudentKit ExtraSetControls.swift
+[28/50] Compiling StudentKit QuickLogPlan.swift
+[29/50] Compiling StudentKit QuickLogSheet.swift
+[30/50] Compiling StudentKit RemoveStudentSetButton.swift
+[31/50] Compiling StudentKit RestTimerOverlay.swift
+[32/50] Compiling StudentKit SetEntryAnalytics.swift
+[33/50] Compiling StudentKit SetEntryPlateLoadout.swift
+[34/50] Compiling StudentKit SetEntrySheet.swift
+[35/50] Compiling StudentKit PendingSetRecord.swift
+[36/50] Compiling StudentKit SetSyncQueue.swift
+[37/50] Compiling StudentKit StudentRootView.swift
+[38/50] Compiling StudentKit StudentAddedExerciseSection.swift
+[39/50] Compiling StudentKit StudentAddedInlineRows.swift
+[40/50] Compiling StudentKit StudentExercisePicker.swift
+[41/50] Compiling StudentKit StudentSessionSummary.swift
+[42/50] Compiling StudentKit StudentAddedDemoScenario.swift
+[43/50] Compiling StudentKit EvaluationPeriodView.swift
+[44/50] Compiling StudentKit AccessoryLogCard.swift
+[45/50] Compiling StudentKit AccessoryWorkoutHero.swift
+[46/50] Compiling StudentKit AllDayExerciseBlock.swift
+[47/50] Compiling StudentKit AllDayKeypadEditing.swift
+[48/50] Compiling StudentKit AllDaySetRow.swift
+[49/50] Compiling StudentKit AllDaySheetView.swift
+[50/119] Compiling StudentKitTests LoadTypePresentationTests.swift
+[51/119] Compiling StudentKitTests OfflineAccessoryTests.swift
+[52/119] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[53/119] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[54/119] Compiling StudentKitTests PublishedDayTrainingTests.swift
+[55/119] Compiling StudentKitTests QuickLogPlanTests.swift
+[56/119] Compiling StudentKitTests SetSyncDraftTests.swift
+[57/119] Compiling StudentKitTests SetSyncReceiptTests.swift
+[58/119] Compiling StudentKitTests AllDayDirectEditingTests.swift
+[59/119] Compiling StudentKitTests AllDayReviewRegressionTests.swift
+[60/119] Compiling StudentKitTests AllDayRevisionTests.swift
+[61/119] Compiling StudentKitTests AllDayScreenTests.swift
+[62/119] Compiling StudentKitTests AllDaySheetTests.swift
+[63/119] Compiling StudentKitTests AllDayVideoReplayTests.swift
+[64/119] Compiling StudentKitTests AllDayWalkthrough3Tests.swift
+[65/119] Compiling StudentKitTests AllDayWalkthroughTests.swift
+[66/119] Compiling StudentKitTests TodayWorkoutHistoryPrefillTests.swift
+[67/119] Compiling StudentKitTests TodayWorkoutPRHookTests.swift
+[68/119] Compiling StudentKitTests TodayWorkoutPersistOrderingTests.swift
+[69/119] Compiling StudentKitTests TodayWorkoutPresentationTests.swift
+[70/119] Compiling StudentKitTests TodayWorkoutQuickLogDateRangeTests.swift
+[71/119] Compiling StudentKitTests TodayWorkoutQuickLogRetryTests.swift
+[72/119] Compiling StudentKitTests TodayWorkoutQuickLogTestSupport.swift
+[73/126] Compiling StudentKitTests StudentAddedFailureTests.swift
+[74/126] Compiling StudentKitTests StudentAddedRowsTests.swift
+[75/126] Compiling StudentKitTests StudentAddedWriteTests.swift
+[76/126] Compiling StudentKitTests TodaySetRefSharingSourceTests.swift
+[77/126] Compiling StudentKitTests TodayWorkoutAssumedWriteBackTests.swift
+[78/126] Compiling StudentKitTests TodayWorkoutCompletionInFlightTests.swift
+[79/126] Compiling StudentKitTests TodayWorkoutExerciseSectionTests.swift
+[80/126] Compiling StudentKitTests VideoDeliveryPresentationTests.swift
+[81/126] Compiling StudentKitTests VideoDeliveryRetryTests.swift
+[82/126] Compiling StudentKitTests VideoRestoreDayScopeTests.swift
+[83/126] Compiling StudentKitTests AllDayProjectionTests.swift
+[84/126] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[85/126] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[86/126] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[87/126] Compiling StudentKitTests TodayWorkoutQuickLogTests.swift
+[88/126] Compiling StudentKitTests TodayWorkoutRefreshTests.swift
+[89/126] Compiling StudentKitTests TodayWorkoutRestTimerTests.swift
+[90/126] Compiling StudentKitTests TodayWorkoutSetRefEntryLayoutTests.swift
+[91/126] Compiling StudentKitTests TodayWorkoutSuggestionBaselineTests.swift
+[92/126] Compiling StudentKitTests TodayWorkoutViewModelTests.swift
+[93/126] Compiling StudentKitTests TrainingFlowTests.swift
+[94/126] Compiling StudentKitTests SetSyncRegressionTests.swift
+[95/126] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[96/126] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[97/126] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[98/126] Compiling StudentKitTests SetWeightSuggestionTests.swift
+[99/126] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[100/126] Compiling StudentKitTests StudentAddedErrorTests.swift
+[101/126] Compiling StudentKitTests VideoCompletionBoundaryTests.swift
+[102/126] Compiling StudentKitTests VideoCompletionIntegrationTests.swift
+[103/126] Compiling StudentKitTests VideoCompletionReviewRegressionTests.swift
+[104/126] Compiling StudentKitTests VideoCompletionRewardRouteTests.swift
+[105/126] Compiling StudentKitTests WorkoutCompletionPresentationTests.swift
+[106/126] Compiling StudentKitTests WorkoutDatePolicyTests.swift
+[107/126] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[108/126] Compiling StudentKitTests E1RMCoachRPEReconcilerTests.swift
+[109/126] Compiling StudentKitTests SetNumberSurfaceTests.swift
+[110/126] Compiling StudentKitTests AccessoryColumnsTests.swift
+[111/126] Compiling StudentKitTests AccessoryPresentationTests.swift
+[112/126] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[113/126] Compiling StudentKitTests AccessoryRowTests.swift
+[114/126] Compiling StudentKitTests AccessorySaveTests.swift
+[115/126] Compiling StudentKitTests AccessoryWeightHistoryIntegrationTests.swift
+[116/126] Compiling StudentKitTests AskCoachVisibilityTests.swift
+[117/126] Compiling StudentKitTests CameraPersistenceFixture.swift
+[118/126] Compiling StudentKitTests CameraReturnDuringPersistenceTests.swift
+[119/126] Compiling StudentKitTests CompletedDayPresentationTests.swift
+[120/126] Compiling StudentKitTests CompletedVideoReplayTests.swift
+[121/126] Compiling StudentKitTests HeroCameraUploadTests.swift
+[122/126] Compiling StudentKitTests IntensityWeightSuggestionTests.swift
+[123/126] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[124/126] Emitting module StudentKitTests
+[124/126] Write Objects.LinkFileList
+[125/126] Linking StudentKitPackageTests
+Build complete! (47.24s)
+Test Suite 'Selected tests' started at 2026-11-15 07:21:28.114.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-15 07:21:28.115.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-15 07:21:28.115.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-15 07:21:28.115.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite TrainingFlowTests started.
+◇ Test allDayScreenStartsWithCollapsedExercisesAndNoRetiredEntries() started.
+◇ Test allDayScreenOnlyExpandsOneSlotAndKeepsRepeatedExerciseRowsIndependent() started.
+◇ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() started.
+◇ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() started.
+◇ Test segmentsAdvanceAndDistinguishFailure() started.
+◇ Test completionAlwaysDocksForEditableDay() started.
+◇ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() started.
+◇ Test partitionFollowsPlanOrderAndRealResults() started.
+◇ Test completionDockSelectsCompletedAndHiddenStates() started.
+◇ Test pageOrdersCompletedBeforeHeroAndRestoresAfterCancellation() started.
+◇ Test completionDockShowsHoldForEditableDay() started.
+◇ Test mainLiftHeroKeepsItsOwnGroupTableBelow() started.
+✔ Test allDayScreenStartsWithCollapsedExercisesAndNoRetiredEntries() passed after 0.117 seconds.
+✔ Test accessoryHeroDoesNotRepeatBelowAndNextAccessoryTakesItsPlace() passed after 0.122 seconds.
+✔ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() passed after 0.122 seconds.
+✔ Test pageOrdersCompletedBeforeHeroAndRestoresAfterCancellation() passed after 0.121 seconds.
+✔ Test completionAlwaysDocksForEditableDay() passed after 0.122 seconds.
+✔ Test mainLiftHeroKeepsItsOwnGroupTableBelow() passed after 0.121 seconds.
+✔ Test partitionFollowsPlanOrderAndRealResults() passed after 0.122 seconds.
+✔ Test completionDockShowsHoldForEditableDay() passed after 0.122 seconds.
+✔ Test completionDockSelectsCompletedAndHiddenStates() passed after 0.122 seconds.
+✔ Test segmentsAdvanceAndDistinguishFailure() passed after 0.122 seconds.
+✔ Suite TrainingFlowTests passed after 0.122 seconds.
+✔ Test allDayScreenOnlyExpandsOneSlotAndKeepsRepeatedExerciseRowsIndependent() passed after 0.196 seconds.
+✔ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() passed after 0.198 seconds.
+✔ Test run with 12 tests in 1 suite passed after 0.198 seconds.

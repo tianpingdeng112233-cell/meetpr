@@ -7,23 +7,51 @@ struct TrainingFlowSnapshot: Equatable {
 }
 
 struct TrainingCompletionDock: View {
+  let content: TrainingCompletionDockContent
+  let totalSets: Int
   let onComplete: () -> Void
+  let onUndoCompletion: () -> Void
+  let onShowReview: () -> Void
+  let isUndoDisabled: Bool
   var coordinator: SetSyncCompletionCoordinator?
   var videoCompletion: VideoCompletionPresentation?
   var onRetryVideos: () -> Void = {}
 
   var body: some View {
-    VideoCompletionControl(
-      presentation: videoCompletion, coordinator: coordinator,
-      onComplete: onComplete, onRetry: onRetryVideos
-    )
+    VStack(spacing: 0) {
+      switch content {
+      case .holdToComplete:
+        VideoCompletionControl(
+          presentation: videoCompletion, coordinator: coordinator,
+          onComplete: onComplete, onRetry: onRetryVideos
+        )
+        .accessibilityIdentifier("training.completionDock")
+      case .completed(let showsUndo):
+        DayCompletionBanner(totalSets: totalSets, onShowReview: onShowReview)
+        if showsUndo {
+          Button(action: onUndoCompletion) {
+            Label(
+              StudentStrings.localized(.todayWorkoutScreen023), systemImage: "arrow.uturn.backward"
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textMuted)
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+            .contentShape(.rect)
+          }
+          .buttonStyle(.plain)
+          .disabled(isUndoDisabled)
+          .accessibilityIdentifier("training.completedDay.undo")
+        }
+      case .none:
+        EmptyView()
+      }
+    }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.vertical, MeetPRSpacing.space3)
     .background(Color.MeetPR.bgBase)
     .overlay(alignment: .top) {
       Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: 1)
     }
-    .accessibilityIdentifier("training.completionDock")
   }
 }
 

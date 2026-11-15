@@ -1,0 +1,7 @@
+Native runtime snapshot, iPhone 17e / iOS 26.5, after completing pct-anchors day:
+Before fix: e92|tap|button|撤销完成||training.completionDock
+Expected: undo keeps training.completedDay.undo and review banner remains independently actionable.
+Cause: identifier on the shared VStack propagated to its child buttons.
+Fix: retain training.completionDock on the hold-to-complete control only.
+
+最终无探针构建原生快照：e92|tap|button|撤销完成||training.completedDay.undo（展开动作后 e99）。点击后出现 training.completionDock，撤销入口消失。PASS。
