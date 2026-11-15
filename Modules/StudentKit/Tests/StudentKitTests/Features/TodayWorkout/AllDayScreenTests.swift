@@ -20,7 +20,7 @@ import ViewInspector
     showsBackToToday: false, onBackToToday: {}, onRefresh: {}, onHistory: {},
     onReadiness: {}, onNotifications: {}, onMessageCoach: {}, onAskCoach: {},
     onStart: {}, onQuickLog: {}, onEdit: { _ in }, onVideoAction: { _ in },
-    onComplete: {}, onUndoCompletion: {}, onShowReview: {})
+    onComplete: {})
   let inspected = try screen.inspect()
   #expect(try inspected.find(text: "W1").string() == "W1")
   let rowIDs = inspected.findAll {

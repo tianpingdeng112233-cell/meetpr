@@ -47,13 +47,12 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let onComplete: () -> Void
-  let onUndoCompletion: () -> Void
-  let onShowReview: () -> Void
   var accessoryViewModel: TodayWorkoutViewModel?
   var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
   var sequencePage: TrainingSequencePage?
   var gymDayToday: Date = WorkoutDatePolicy.gymDayToday()
   var restTimerHeight: CGFloat = 0
+  var completionDockTop: CGFloat?
   var videoFailureCount = 0
   var onRetryVideos: () -> Void = {}
   var videoCompletion: VideoCompletionPresentation?
@@ -69,6 +68,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
   @State private var isManualScrolling = false
+  @State private var scrollBottom: CGFloat = 0
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var feedbackExercises: [UUID] = []
 
@@ -92,6 +92,11 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       if let onRefreshAsync { await onRefreshAsync() } else { onRefresh() }
     }
     .background(Color.MeetPR.bgBase)
+    .onGeometryChange(for: CGFloat.self) {
+      $0.frame(in: .global).maxY
+    } action: {
+      scrollBottom = $0
+    }
   }
 
   private var trainingScrollContent: some View {
@@ -135,10 +140,13 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     }
   }
 
-  // The enclosing NavigationStack does not forward the rest bar's inset to
-  // this scroll content. Reserve its measured height only for the inline CTA.
+  // Reserve only the dock's actual overlap if NavigationStack does not forward
+  // its inset. When safeAreaInset already shrinks the scroll view, this is zero.
   private var inlineCompletionBottomInset: CGFloat {
     guard case .workout(let presentation) = content else { return 0 }
+    if case .completed = dayState, let completionDockTop {
+      return max(0, scrollBottom - completionDockTop)
+    }
     let completion = presentation.completionAvailability(isEditable: dayState.isEditable)
     return completion.button && !completion.sticky ? restTimerHeight : 0
   }
@@ -158,11 +166,6 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         presentation: presentation, viewModel: accessoryViewModel,
         editable: dayState.isEditable, today: gymDayToday,
         onVideo: onVideoAction, onNote: onExerciseNote)
-      if case .completed(let canUndo) = dayState, canUndo {
-        Button(StudentStrings.localized(.todayWorkoutScreen023), action: onUndoCompletion)
-          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-          .accessibilityIdentifier("training.completedDay.undo")
-      }
       completionContent(presentation)
     case .noPlan:
       TodayWorkoutPlanUnavailableCard(
@@ -181,11 +184,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
 
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
-    if case .completed = dayState {
-      DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.prescribedRows).count) {
-        onShowReview()
-      }
-    } else if presentation.completionAvailability(isEditable: dayState.isEditable).button,
+    if presentation.completionAvailability(isEditable: dayState.isEditable).button,
       !presentation.completionAvailability(isEditable: dayState.isEditable).sticky,
       videoCompletion?.waiting != true
     {

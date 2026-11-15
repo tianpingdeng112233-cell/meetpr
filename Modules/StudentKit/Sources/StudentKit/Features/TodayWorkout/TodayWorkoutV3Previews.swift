@@ -48,9 +48,7 @@
         onQuickLog: {},
         onEdit: { _ in },
         onVideoAction: { _ in },
-        onComplete: {},
-        onUndoCompletion: {},
-        onShowReview: {}
+        onComplete: {}
       )
     }
 

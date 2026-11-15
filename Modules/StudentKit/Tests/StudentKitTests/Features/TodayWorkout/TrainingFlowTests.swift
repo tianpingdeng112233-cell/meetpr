@@ -58,6 +58,39 @@ import Testing
     #expect(TrainingSetProgress.segments(drafts) == [.current, .failed, .complete])
   }
 
+  @Test func completionDockShowsHoldForEditableDay() {
+    #expect(
+      makeFixture().presentation().completionDock(dayState: .current, showingHistory: false)
+        == .holdToComplete)
+  }
+
+  @Test func completionDockSelectsCompletedAndHiddenStates() {
+    func dock(
+      _ dayState: TodayWorkoutDayState, history: Bool = false, waiting: Bool = false
+    ) -> TrainingCompletionDockContent {
+      var fixture = makeFixture()
+      if case .completed = dayState {
+        fixture.day = fixture.day.replacingCompletion(completedAt: Date(), source: "manual")
+      }
+      return fixture.presentation().completionDock(
+        dayState: dayState, showingHistory: history, waitingForVideos: waiting)
+    }
+    #expect(dock(.completed(canUndo: true)) == .completed(showsUndo: true))
+    #expect(dock(.completed(canUndo: false)) == .completed(showsUndo: false))
+    #expect(dock(.current, history: true) == .none)
+    #expect(dock(.completed(canUndo: true), history: true) == .none)
+    #expect(dock(.upcoming(previousDay: nil)) == .none)
+    #expect(dock(.current, waiting: true) == .holdToComplete)
+    #expect(dock(.current, history: true, waiting: true) == .none)
+    #expect(dock(.completed(canUndo: true), waiting: true) == .completed(showsUndo: true))
+    var completedFixture = makeFixture()
+    completedFixture.day = completedFixture.day.replacingCompletion(
+      completedAt: Date(), source: "manual")
+    #expect(
+      completedFixture.presentation().completionDock(dayState: .current, showingHistory: false)
+        == .none)
+  }
+
   @Test func completionAlwaysDocksForEditableDay() {
     var fixture = makeFixture()
     for index in fixture.drafts.indices { fixture.drafts[index].completed = true }

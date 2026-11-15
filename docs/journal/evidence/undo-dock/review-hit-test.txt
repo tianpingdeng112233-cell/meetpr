@@ -1,0 +1,10 @@
+原生验收回归：iPhone 17e / iOS 26.5 / pct-anchors fixture
+操作：长按完成 -> 等奖励页关闭 -> 点击完成横幅。
+修复前：banner e87 intermittently absent from actionable targets；可点击时点击中心后仍停留训练页。
+加入临时 callback / phase 探针后：仅出现 celebration -> nil，横幅尚无可操作 target；未发现 review phase 转换。
+三个假设：命中热区缺失；异步 phase 被覆盖；fullScreenCover 展示失败。
+实验：只对 DayCompletionBanner 的 label 添加 contentShape(.rect)，保留探针复测。
+实验结果：e87 稳定可点击；tap(e87) 在 x195/y678 命中，同一回调输出 review callback -> phase review，原生快照出现「训练回顾」与「完成 · 回到训练」。
+结论：横幅 label 缺少完整热区。增加 contentShape 后回调及原展示路径正常；不改共享 ButtonStyle/shimmer。诊断日志随后移除。
+回归 seam：原生命中测试，纯 SwiftPM/ViewInspector 的 Button.tap 不能验证坐标热区。
+最终无探针构建再次 tap e87 x195/y678：快照 e105|text|text|训练回顾；截图 review-opened-iphone17e.jpg。PASS。

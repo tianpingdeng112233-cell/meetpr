@@ -1,0 +1,42 @@
+{
+  "build": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 90424,
+      "target": "simulator"
+    },
+    "artifacts": {
+      "appPath": "/Users/david/Projects/apps/MeetPR-wt-undo-dock/.build/undo-dock-app/Build/Products/DemoStudent-iphonesimulator/MeetPR.app",
+      "bundleId": "com.meetpr.app",
+      "processId": 28544,
+      "simulatorId": "5D5FA360-BA49-48C6-A887-2F0D22F89749",
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-undo-dock-3862b7aa4095/logs/build_run_sim_2026-11-15T07-38-03-223Z_pid8221_232a371c.log",
+      "runtimeLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-undo-dock-3862b7aa4095/logs/com.meetpr.app_2026-11-15T07-39-31-375Z_helperpid28540_ownerpid8221_1eeefe52.log",
+      "osLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-undo-dock-3862b7aa4095/logs/com.meetpr.app_oslog_2026-11-15T07-39-33-596Z_helperpid28652_ownerpid8221_0a4d4c0f.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": []
+    }
+  },
+  "tests": {
+    "summary": {
+      "status": "SUCCEEDED",
+      "durationMs": 51770,
+      "counts": {
+        "passed": 1291,
+        "failed": 0,
+        "skipped": 0
+      },
+      "target": "swift-package"
+    },
+    "artifacts": {
+      "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-undo-dock-3862b7aa4095/logs/swift_package_test_2026-11-15T07-39-33-662Z_pid8221_267e1b0a.log"
+    },
+    "diagnostics": {
+      "warnings": [],
+      "errors": [],
+      "testFailures": []
+    }
+  }
+}

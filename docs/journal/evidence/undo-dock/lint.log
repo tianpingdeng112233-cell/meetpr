@@ -1,0 +1,28 @@
+PASS: all 9 changed Swift files
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/DayCompletionBanner.swift
+Linting 'DayCompletionBanner.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift
+Linting 'TodayWorkoutScreen.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutV3Previews.swift
+Linting 'TodayWorkoutV3Previews.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
+Linting 'TodayWorkoutView.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift
+Linting 'TodayWorkoutViewModel.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingCompletionAvailability.swift
+Linting 'TrainingCompletionAvailability.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingFlowScroll.swift
+Linting 'TrainingFlowScroll.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AllDayScreenTests.swift
+Linting 'AllDayScreenTests.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.
+Linting Swift files at paths Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TrainingFlowTests.swift
+Linting 'TrainingFlowTests.swift' (1/1)
+Done linting! Found 0 violations, 0 serious in 1 file.

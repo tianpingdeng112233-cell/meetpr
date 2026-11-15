@@ -107,7 +107,7 @@ public final class TodayWorkoutViewModel {
   private var recordingGeneration = 0
   private var pendingPersist: Task<Bool, Never>?
   private var planLogsSnapshot: PlanLogsSnapshot?
-  private var isCompletionMutationInFlight = false
+  private(set) var isCompletionMutationInFlight = false
   private var editedDraftFields: [DraftIdentity: Set<EditedDraftField>] = [:]
   private var planRefreshThrottle = StudentTodayRefreshThrottle()
   // Retry memo for one quick-log attempt: keyed by (day, training date) so an
