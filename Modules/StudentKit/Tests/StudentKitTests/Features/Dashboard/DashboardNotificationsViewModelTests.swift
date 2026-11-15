@@ -3,7 +3,9 @@ import ChatUI
 import CoreModels
 import Foundation
 import RepositoryContracts
+import SwiftUI
 import Testing
+import ViewInspector
 
 @testable import StudentKit
 
@@ -23,11 +25,88 @@ import Testing
   #expect(viewModel.totalUnreadCount == 1)
 
   viewModel.markCurrentPlanSeen()
-  #expect(viewModel.planNotice == nil)
+  #expect(viewModel.planNotice?.isUnread == false)
   #expect(viewModel.totalUnreadCount == 0)
 
   await viewModel.reload(studentID: studentID)
-  #expect(viewModel.planNotice == nil)
+  #expect(viewModel.planNotice?.isUnread == false)
+}
+
+@MainActor
+@Test func openingCoachTimelineClearsPlanBadgeWithoutTappingTraining() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan]))
+  let coordinator = makeNotifications(plans: plans)
+  let repository = InMemoryChatRepository(
+    currentUserID: studentID,
+    seed: ChatDemoSeed(conversations: [], messagesByConversationID: [:], otherPartyNames: [:]))
+  let conversation = try await repository.openConversation(withOtherParty: StudentDemoSeed.coachID)
+  let timeline = StudentBlackGoldChatView(
+    conversationID: conversation.id, coachName: "教练", coordinator: coordinator,
+    currentUserID: studentID, repository: repository,
+    inbox: ChatInboxViewModel(repository: repository, currentUserID: studentID),
+    sendCoordinator: ChatSendCoordinator(repository: repository, currentUserID: studentID),
+    onOpenTraining: {}, dismiss: {}
+  ).environment(\.scenePhase, .active)
+
+  await coordinator.loadIfNeeded(studentID: studentID)
+  #expect(coordinator.totalUnreadCount == 1)
+  try await ViewHosting.host(timeline, size: CGSize(width: 390, height: 800)) {
+    for _ in 0..<100 where coordinator.totalUnreadCount != 0 {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+  }
+  await coordinator.reload(studentID: studentID)
+  #expect(coordinator.totalUnreadCount == 0)
+  #expect(coordinator.planNotice?.weekIndex == plan.weekIndex)
+}
+
+@MainActor
+@Test func returningToStationaryVisibleFeedbackMarksItRead() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let item = CoachFeedback(
+    id: UUID(), coachID: StudentDemoSeed.coachID, studentID: studentID,
+    text: "收", postedAt: Date())
+  let feedback = FeedbackInboxViewModel(repository: InMemoryStudentFeedbackRepository(seed: [item]))
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore())
+  let coordinator = StudentNotificationsCoordinator(
+    plans: plans, feedback: feedback, evaluation: makeEvaluationViewModel(plans: plans),
+    activeCoach: nil, chatContext: nil, seenStore: InMemoryDashboardPlanSeenStore())
+  let repository = InMemoryChatRepository(
+    currentUserID: studentID,
+    seed: ChatDemoSeed(conversations: [], messagesByConversationID: [:], otherPartyNames: [:]))
+  let conversation = try await repository.openConversation(withOtherParty: StudentDemoSeed.coachID)
+  let inbox = ChatInboxViewModel(repository: repository, currentUserID: studentID)
+  let sender = ChatSendCoordinator(repository: repository, currentUserID: studentID)
+  let tab = CoachTabSelection()
+  let host = CoachTabTestHost {
+    StudentBlackGoldChatView(
+      conversationID: conversation.id, coachName: "教练", coordinator: coordinator,
+      currentUserID: studentID, repository: repository, inbox: inbox, sendCoordinator: sender,
+      isVisible: tab.isVisible, onOpenTraining: {}, dismiss: {}
+    ).environment(\.scenePhase, .active)
+  }
+  await coordinator.loadIfNeeded(studentID: studentID)
+  try await ViewHosting.host(host, size: CGSize(width: 390, height: 800)) {
+    #expect(coordinator.totalUnreadCount == 1)
+    tab.isVisible = true
+    for _ in 0..<100 where coordinator.feedbackUnreadCount != 0 {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+  }
+  await coordinator.reload(studentID: studentID)
+  #expect(coordinator.totalUnreadCount == 0)
+}
+
+@MainActor @Observable
+private final class CoachTabSelection {
+  var isVisible = false
+}
+
+private struct CoachTabTestHost<Content: View>: View {
+  @ViewBuilder let content: () -> Content
+  var body: some View { content() }
 }
 
 @MainActor

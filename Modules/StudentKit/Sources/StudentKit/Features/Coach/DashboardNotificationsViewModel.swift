@@ -25,6 +25,7 @@ struct DashboardPlanNotice: Equatable, Sendable {
   let signature: DashboardPlanSignature
   let weekIndex: Int
   let occurredAt: Date
+  var isUnread = true
 }
 
 enum StudentConversationOpenResult: Equatable, Sendable {
@@ -171,7 +172,7 @@ public final class StudentNotificationsCoordinator {
   }
 
   var totalUnreadCount: Int {
-    (planNotice == nil ? 0 : 1)
+    (planNotice?.isUnread == true ? 1 : 0)
       + feedbackUnreadCount
       + chatUnreadCount
     // Evaluation remains implemented for a future unseal, but the 2026-07-13
@@ -205,14 +206,9 @@ public final class StudentNotificationsCoordinator {
         return
       }
       let signature = DashboardPlanSignature(plan: plan)
-      let notice =
-        seenStore.hasSeen(studentID: studentID, signature: signature)
-        ? nil
-        : DashboardPlanNotice(
-          signature: signature,
-          weekIndex: plan.weekIndex,
-          occurredAt: plan.startDate
-        )
+      let notice = DashboardPlanNotice(
+        signature: signature, weekIndex: plan.weekIndex, occurredAt: plan.startDate,
+        isUnread: !seenStore.hasSeen(studentID: studentID, signature: signature))
       state = .loaded(notice)
     } catch {
       if error.isTaskCancellation {
@@ -237,11 +233,12 @@ public final class StudentNotificationsCoordinator {
   }
 
   func markCurrentPlanSeen() {
-    guard let currentStudentID, let notice = planNotice else {
+    guard let currentStudentID, var notice = planNotice, notice.isUnread else {
       return
     }
     seenStore.markSeen(studentID: currentStudentID, signature: notice.signature)
-    state = .loaded(nil)
+    notice.isUnread = false
+    state = .loaded(notice)
   }
 
   func markFeedbackRead(_ item: CoachFeedback) async {
