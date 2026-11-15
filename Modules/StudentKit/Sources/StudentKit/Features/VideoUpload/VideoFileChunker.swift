@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 /// Slices the exported video file into fixed-size multipart chunks.
@@ -73,5 +74,23 @@ public struct VideoFileChunker: Sendable {
 
   public func partFileURL(partNumber: Int, in directory: URL) -> URL {
     directory.appending(path: "part-\(partNumber).chunk")
+  }
+}
+
+extension VideoAttachment {
+  /// Count each PUT once, including the shorter final chunk and restored ETags.
+  func uploadFraction(partSize: Int, sentBytes: [Int: Int64] = [:]) -> Double {
+    if status == .uploaded { return 1 }
+    guard sizeBytes > 0, partSize > 0 else { return 0 }
+    let chunkSize = Int64(partSize)
+    var bytesByPart = sentBytes
+    for part in uploadedParts { bytesByPart[part.partNumber] = chunkSize }
+    var sent: Int64 = 0
+    for (number, bytes) in bytesByPart {
+      guard number > 0, Int64(number - 1) <= (sizeBytes - 1) / chunkSize else { continue }
+      let remaining = sizeBytes - Int64(number - 1) * chunkSize
+      sent += min(max(0, bytes), min(chunkSize, remaining))
+    }
+    return Double(sent) / Double(sizeBytes)
   }
 }

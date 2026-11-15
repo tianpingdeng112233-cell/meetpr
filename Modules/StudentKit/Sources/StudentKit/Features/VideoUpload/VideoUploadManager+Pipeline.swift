@@ -290,10 +290,7 @@ extension VideoUploadManager {
       )
     else { throw CancellationError() }
     try requireLiveWakeContext(recordID: recordID, generation: generation)
-    let progress =
-      latest.uploadPartCount > 0
-      ? Double(latest.uploadedParts.count) / Double(latest.uploadPartCount)
-      : nil
+    let progress = latest.uploadFraction(partSize: configuration.partSizeBytes)
     broadcast(.updated(latest, progress: progress))
   }
 

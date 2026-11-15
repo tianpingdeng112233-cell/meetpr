@@ -11,10 +11,14 @@ struct AllDaySetVideoButton: View {
   let replay: CompletedVideoReplayModel?
   let onEditVideo: () -> Void
 
-  private var attachment: VideoAttachment? {
+  private var rowState: VideoAttachmentViewModel.RowState? {
     uploads?.pendingRowState(
-      draftID: draft.id, trainingDate: trainingDate, slot: draft.pendingVideoSlot)?.attachment
-      ?? draft.loggedSetID.flatMap { uploads?.rowStates[$0]?.attachment }
+      draftID: draft.id, trainingDate: trainingDate, slot: draft.pendingVideoSlot)
+      ?? draft.loggedSetID.flatMap { uploads?.rowStates[$0] }
+  }
+
+  private var attachment: VideoAttachment? {
+    rowState?.attachment
       ?? VideoDeliveryPresentation.attachment(
         for: draft, trainingDate: trainingDate, in: replay?.local ?? [])
   }
@@ -36,17 +40,47 @@ struct AllDaySetVideoButton: View {
     return nil
   }
 
+  private var observedTransfer: VideoAttachment? {
+    guard let live = rowState?.attachment, live.status == .uploading,
+      live.uploadGeneration != nil, live.remoteAttachmentID != nil
+    else { return nil }
+    return live
+  }
+
+  private var fillFraction: Double? {
+    guard status == .uploading || status == .pending else { return nil }
+    if attachment?.status == .uploaded { return 1 }
+    if let rowState { return rowState.progress }
+    let partSize =
+      uploads?.manager.configuration.partSizeBytes
+      ?? VideoUploadConfiguration.default.partSizeBytes
+    return attachment?.uploadFraction(partSize: partSize) ?? 0
+  }
+
   var body: some View {
     if editable || status != nil {
       Button(action: openVideo) {
-        Image(systemName: "video")
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        Image(systemName: status == .uploaded ? "video.fill" : "video")
           .foregroundStyle(color)
+          .overlay {
+            if let fillFraction {
+              Image(systemName: "video.fill")
+                .foregroundStyle(color)
+                .mask { Rectangle().scaleEffect(y: fillFraction, anchor: .bottom) }
+            }
+          }
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
           .frame(width: 40, height: MeetPRSpacing.minimumHitTarget)
       }
       .buttonStyle(.plain)
       .disabled(!editable && video == nil && status != .failed)
       .accessibilityLabel(accessibilityLabel)
+      .accessibilityValue(
+        Text(verbatim: fillFraction?.formatted(.percent.precision(.fractionLength(0))) ?? "")
+      )
+      .task(id: observedTransfer?.remoteAttachmentID) {
+        if let observedTransfer { await uploads?.observeTransfer(of: observedTransfer) }
+      }
       .accessibilityIdentifier("allDay.camera.\(draft.id)")
     }
   }

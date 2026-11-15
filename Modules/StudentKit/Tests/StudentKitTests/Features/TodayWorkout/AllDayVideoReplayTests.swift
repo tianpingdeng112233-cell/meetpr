@@ -42,6 +42,7 @@ struct AllDayVideoReplayTests {
     #expect(
       try button.labelView().find(ViewType.Image.self).foregroundStyleShapeStyle(Color.self)
         == Color.MeetPR.success)
+    #expect(try button.labelView().find(ViewType.Image.self).actualImage().name() == "video.fill")
     try button.tap()
     #expect(replay.selected?.video == .remote(video.id))
     #expect(!editingOpened)
@@ -85,6 +86,55 @@ struct AllDayVideoReplayTests {
     } else {
       Issue.record("Expected the retained local video to remain playable")
     }
+  }
+
+  @Test func cameraReportsPartialFillBeforeDelivery() throws {
+    let day = StudentAddedTestPlan.unsettledDemo().days[0]
+    var draft = try #require(TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []).first)
+    let setID = UUID()
+    draft.loggedSetID = setID
+    let uploads = VideoAttachmentViewModel(manager: VideoUploadHarness().manager)
+    let record = VideoAttachment(
+      id: UUID(), setLogID: setID, studentID: StudentDemoSeed.studentID, status: .uploading,
+      contentType: "video/mp4", durationSeconds: 2, sizeBytes: 100, recordedAt: .now)
+    let view = AllDaySetVideoButton(
+      draft: draft, trainingDate: day.scheduledDate, editable: true, uploads: uploads,
+      replay: nil, onEditVideo: {})
+    for fraction in [0.25, 0.5, 1] {
+      uploads.apply(.updated(record, progress: fraction))
+      let button = try view.inspect().find(ViewType.Button.self)
+      #expect(try button.accessibilityValue().string() == fraction.formatted(.percent))
+      #expect(try color(of: view) == Color.MeetPR.gold500)
+    }
+  }
+
+  @Test func restoredCameraShowsConfirmedBytesBeforeLiveStateLoads() async throws {
+    let day = StudentAddedTestPlan.unsettledDemo().days[0]
+    var draft = try #require(TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []).first)
+    let setID = UUID()
+    draft.loggedSetID = setID
+    let harness = VideoUploadHarness(configuration: .init(partSizeBytes: 100))
+    let record = VideoAttachment(
+      id: UUID(), setLogID: setID, studentID: StudentDemoSeed.studentID,
+      remoteAttachmentID: UUID(), status: .uploading, contentType: "video/mp4",
+      durationSeconds: 1, sizeBytes: 250, recordedAt: .now, uploadPartCount: 3,
+      uploadedParts: [.init(partNumber: 3, etag: "tail")], uploadGeneration: 1)
+    try await harness.repository.save(record)
+    let replay = CompletedVideoReplayModel(
+      services: VideoUploadServices(manager: harness.manager), feedback: nil)
+    await replay.load(studentID: StudentDemoSeed.studentID)
+    let uploads = VideoAttachmentViewModel(manager: harness.manager)
+    let camera = AllDaySetVideoButton(
+      draft: draft, trainingDate: day.scheduledDate, editable: true, uploads: uploads,
+      replay: replay, onEditVideo: {})
+    #expect(uploads.rowStates[setID] == nil)
+    #expect(
+      try camera.inspect().find(ViewType.Button.self).accessibilityValue().string()
+        == 0.2.formatted(.percent))
+    uploads.apply(.updated(record, progress: 0.44821487))
+    #expect(
+      try camera.inspect().find(ViewType.Button.self).accessibilityValue().string()
+        == 0.45.formatted(.percent))
   }
 
   @Test func completedSetWithoutVideoDoesNotOfferRecording() throws {

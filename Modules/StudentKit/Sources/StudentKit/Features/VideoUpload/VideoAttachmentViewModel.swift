@@ -92,10 +92,32 @@ public final class VideoAttachmentViewModel {
     for attachment in attachments.sorted(by: { $0.recordedAt < $1.recordedAt }) {
       rowStates[attachment.setLogID] = RowState(
         attachment: attachment,
-        progress: attachment.status == .uploaded ? 1 : 0
+        progress: attachment.uploadFraction(partSize: manager.configuration.partSizeBytes)
       )
     }
     hasLoadedAttachments = true
+  }
+
+  /// Sample only while this camera is visible and its upload is in flight.
+  func observeTransfer(of attachment: VideoAttachment) async {
+    guard let reporter = manager.service as? any VideoUploadByteReporting else { return }
+    let key = attachment.setLogID
+    while !Task.isCancelled, let current = rowStates[key]?.attachment,
+      current.id == attachment.id, current.status == .uploading,
+      let generation = current.uploadGeneration
+    {
+      let bytes = await reporter.sentBytesByPart(recordID: current.id, generation: generation)
+      if !Task.isCancelled, let latest = rowStates[key],
+        latest.attachment.id == current.id, latest.attachment.uploadGeneration == generation,
+        latest.attachment.remoteAttachmentID == current.remoteAttachmentID,
+        latest.attachment.status == .uploading
+      {
+        let fraction = latest.attachment.uploadFraction(
+          partSize: manager.configuration.partSizeBytes, sentBytes: bytes)
+        if fraction > latest.progress { rowStates[key]?.progress = fraction }
+      }
+      try? await Task.sleep(for: .milliseconds(250))
+    }
   }
 
   // MARK: - Actions
@@ -159,14 +181,17 @@ public final class VideoAttachmentViewModel {
       {
         return
       }
-      var state =
-        rowStates[attachment.setLogID]
-        ?? RowState(attachment: attachment, progress: 0)
-      state.attachment = attachment
-      if let progress {
-        state.progress = progress
-      }
-      rowStates[attachment.setLogID] = state
+      let previous = rowStates[attachment.setLogID]
+      let sameTransfer =
+        previous?.attachment.id == attachment.id
+        && previous?.attachment.uploadGeneration == attachment.uploadGeneration
+        && previous?.attachment.remoteAttachmentID == attachment.remoteAttachmentID
+        && previous?.attachment.status == .uploading && attachment.status == .uploading
+      let confirmed =
+        progress ?? attachment.uploadFraction(partSize: manager.configuration.partSizeBytes)
+      rowStates[attachment.setLogID] = RowState(
+        attachment: attachment,
+        progress: sameTransfer ? max(previous?.progress ?? 0, confirmed) : confirmed)
     case .removed(let setLogID, let attachmentID):
       if rowStates[setLogID]?.attachment.id == attachmentID {
         rowStates[setLogID] = nil
