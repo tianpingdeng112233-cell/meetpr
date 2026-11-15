@@ -21,3 +21,20 @@ import ViewInspector
   #expect(try card.find(text: "11/10 · 暂停卧推 · 学员留言").string() == "11/10 · 暂停卧推 · 学员留言")
   #expect(try card.find(text: "第二组感觉很重").string() == "第二组感觉很重")
 }
+
+@MainActor
+@Test func exerciseNoteCardUsesTheOfferedWidthForShortAndLongNotes() throws {
+  let reference = ExerciseRefV1(
+    exerciseName: "深蹲", dayDate: "2026-11-15", planDayID: UUID(),
+    planExerciseID: UUID(), exerciseID: UUID())
+  for note in ["完成", String(repeating: "最后一组想请教练看一下。", count: 8)] {
+    let message = ChatMessage(
+      id: UUID(), conversationID: UUID(), seq: 1, senderID: UUID(), kind: .text,
+      text: reference.body(note: note, english: false), attachmentID: nil,
+      imageURL: nil, imageExpiresIn: nil, exerciseRef: reference,
+      clientID: "note", createdAt: .now)
+    let renderer = ImageRenderer(content: ExerciseNoteCard(message: message))
+    renderer.proposedSize = ProposedViewSize(width: 280, height: nil)
+    #expect(try #require(renderer.cgImage).width == 280)
+  }
+}
