@@ -114,6 +114,12 @@ struct StudentBlackGoldChatView: View {
       chooseInitialScrollPositionIfNeeded()
       await viewModel.pollUntilCancelled()
     }
+    .onChange(
+      of: isVisible && scenePhase == .active ? coordinator.planNotice?.signature : nil,
+      initial: true
+    ) { _, signature in
+      if signature != nil { coordinator.markCurrentPlanSeen() }
+    }
     .onChange(of: isVisible) { _, visible in
       viewModel.isReadingActive = visible && scenePhase == .active
       if !visible { feedbackPlayback.cancel() }
@@ -320,10 +326,18 @@ struct StudentBlackGoldChatView: View {
         feedback: feedback, model: coordinator.feedbackViewModel, isVisible: isVisible,
         playback: feedbackPlayback
       )
-      .onGeometryChange(for: CGRect.self) { proxy in
-        proxy.frame(in: .named(Self.viewportCoordinateSpace))
-      } action: { frame in
-        markFeedbackReadIfVisible(feedback, frame: frame)
+      .background {
+        GeometryReader { proxy in
+          let frame = proxy.frame(in: .named(Self.viewportCoordinateSpace))
+          let viewport = CGRect(x: 0, y: 0, width: frame.width, height: viewportHeight)
+          let canRead =
+            isVisible && scenePhase == .active && feedback.readAt == nil
+            && StudentChatTimeline.visibleFraction(card: frame, viewport: viewport)
+              >= StudentChatTimeline.feedbackReadVisibilityThreshold
+          Color.clear.onChange(of: canRead, initial: true) { _, visible in
+            if visible { markFeedbackRead(feedback) }
+          }
+        }
       }
     }
   }
@@ -627,18 +641,8 @@ struct StudentBlackGoldChatView: View {
 
   /// Mirrors mockup `checkVisible` at lines 865-867: only feedback cards with
   /// at least 55% of their own height inside `chatScroll` become read.
-  private func markFeedbackReadIfVisible(_ feedback: CoachFeedback, frame: CGRect) {
-    guard isVisible, feedback.readAt == nil,
-      !feedbackBeingMarkedRead.contains(feedback.id),
-      viewportHeight > 0
-    else { return }
-    let viewport = CGRect(x: 0, y: 0, width: frame.width, height: viewportHeight)
-    guard
-      StudentChatTimeline.visibleFraction(card: frame, viewport: viewport)
-        >= StudentChatTimeline.feedbackReadVisibilityThreshold
-    else { return }
-
-    feedbackBeingMarkedRead.insert(feedback.id)
+  private func markFeedbackRead(_ feedback: CoachFeedback) {
+    guard feedbackBeingMarkedRead.insert(feedback.id).inserted else { return }
     Task {
       await coordinator.markFeedbackRead(feedback)
       feedbackBeingMarkedRead.remove(feedback.id)
