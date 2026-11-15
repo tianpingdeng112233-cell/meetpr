@@ -20,7 +20,7 @@
 
 ## 1.0 (41) — 2026-11-15 — 已上传 Apple
 
-Xcode Organizer 的归档记录确认 com.meetpr.app 1.0 (41) 于 2026-11-15 15:02:08 UTC 成功上传 Apple（Uploaded to Apple，build 41）。Ceshi 外测审核提交与分发状态待确认。
+Xcode Organizer 的归档记录确认 com.meetpr.app 1.0 (41) 于 2026-11-15 15:02:08 UTC 成功上传 Apple（Uploaded to Apple，build 41）。已在 App Store Connect 的 Ceshi 外测组核实 1.0 (41) 为 Testing。
 
 取包 tag 为 `beta/1.0-41`，提交 `84bd30b0`。
 
