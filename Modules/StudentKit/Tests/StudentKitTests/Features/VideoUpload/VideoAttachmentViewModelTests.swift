@@ -146,6 +146,21 @@ import Testing
   #expect(model.rowStates[setID]?.attachment.id == latest.id)
 }
 
+@Test func transferProgressCountsBytesIncludingShortAndInFlightParts() {
+  var attachment = VideoAttachment(
+    id: UUID(), setLogID: UUID(), studentID: UUID(), status: .uploading,
+    contentType: "video/mp4", durationSeconds: 1, sizeBytes: 250, recordedAt: .now,
+    uploadPartCount: 3, uploadedParts: [.init(partNumber: 3, etag: "tail")])
+  // A restored tail (50 bytes) plus two concurrent PUTs (40 + 10 bytes).
+  // The tail may still appear in URLSession while its ETag is already persisted.
+  #expect(attachment.uploadFraction(partSize: 100, sentBytes: [1: 40, 2: 10, 3: 50]) == 0.4)
+  #expect(attachment.uploadFraction(partSize: 100) == 0.2)
+  attachment.sizeBytes = 80
+  attachment.uploadPartCount = 1
+  attachment.uploadedParts = []
+  #expect(attachment.uploadFraction(partSize: 100, sentBytes: [1: 40]) == 0.5)
+}
+
 @MainActor
 private func makeDefaults() -> UserDefaults {
   let suiteName = "video-vm-tests-\(UUID().uuidString)"

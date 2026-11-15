@@ -168,17 +168,19 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
     task.resume()
   }
 
+  func sentBytesByPart(recordID: UUID, generation: Int) async -> [Int: Int64] {
+    var bytes: [Int: Int64] = [:]
+    for task in await session.allTasks {
+      guard let identifier = VideoUploadPartIdentifier(taskDescription: task.taskDescription),
+        identifier.recordID == recordID, identifier.generation == generation
+      else { continue }
+      bytes[identifier.partNumber] = max(bytes[identifier.partNumber] ?? 0, task.countOfBytesSent)
+    }
+    return bytes
+  }
+
   func pendingParts(recordID: UUID, generation: Int) async -> Set<Int> {
-    let tasks = await session.allTasks
-    return Set(
-      tasks.compactMap { task in
-        guard let identifier = VideoUploadPartIdentifier(taskDescription: task.taskDescription),
-          identifier.recordID == recordID,
-          identifier.generation == generation
-        else { return nil }
-        return identifier.partNumber
-      }
-    )
+    Set(await sentBytesByPart(recordID: recordID, generation: generation).keys)
   }
 
   func cancelLegacyParts(recordID: UUID) async -> Bool {

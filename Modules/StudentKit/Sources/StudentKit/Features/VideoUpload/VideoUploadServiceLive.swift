@@ -1,10 +1,14 @@
 import Foundation
 import Networking
 
+protocol VideoUploadByteReporting: Sendable {
+  func sentBytesByPart(recordID: UUID, generation: Int) async -> [Int: Int64]
+}
+
 /// Production `VideoUploadService`: backend `/uploads/*` via `APIClient` and
 /// part PUTs straight to OSS via `OSSPartUploader` (presigned URLs live on
 /// the OSS domain, outside the API base URL).
-public struct BackendVideoUploadService: VideoUploadService {
+public struct BackendVideoUploadService: VideoUploadService, VideoUploadByteReporting {
   private let api: APIClient
   private let session: any SessionStateReader
   private let partUploader: BackgroundVideoPartUploader
@@ -68,6 +72,10 @@ public struct BackendVideoUploadService: VideoUploadService {
     BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
       identifier: BackgroundVideoPartUploader.sessionIdentifier
     )
+  }
+
+  func sentBytesByPart(recordID: UUID, generation: Int) async -> [Int: Int64] {
+    await partUploader.sentBytesByPart(recordID: recordID, generation: generation)
   }
 
   public func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> {
