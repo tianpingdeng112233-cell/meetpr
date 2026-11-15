@@ -39,9 +39,9 @@ struct VideoAttachmentSection: View {
   @State private var playbackLoadRevision = 0
   /// True from the moment a video is chosen until the upload manager owns a
   /// row for it. Covers the otherwise feedback-less window where the picked
-  /// file is copied out of the picker sandbox (or saved to the library) before
-  /// `enqueue` broadcasts its first `.pending` event.
+  /// file is copied from the picker, until `enqueue` emits its first `.pending` event.
   @State private var isPreparing = false
+  @State private var importTask: Task<Void, Never>?
 
   private enum PendingSource {
     case camera
@@ -155,13 +155,17 @@ struct VideoAttachmentSection: View {
           }
         })
     )
-    .photosPicker(isPresented: $showingPhotosPicker, selection: $pickedItem, matching: .videos)
+    .photosPicker(
+      isPresented: $showingPhotosPicker, selection: $pickedItem, matching: .videos,
+      preferredItemEncoding: .current
+    )
     .onChange(of: pickedItem) { _, newItem in
       guard let newItem else { return }
       pickedItem = nil
       isPreparing = true
-      Task { await importPicked(newItem) }
+      importTask = Task { await importPicked(newItem) }
     }
+    .onDisappear { importTask?.cancel() }
     .onChange(of: rowState?.attachment.status) { _, status in
       // Once the manager owns a row, its status drives the UI; drop the
       // local placeholder so error/cancel paths can restore the pick buttons.
@@ -278,17 +282,25 @@ extension VideoAttachmentSection {
       showingPhotosPicker = true
     }
   }
-
   private func importPicked(_ item: PhotosPickerItem) async {
+    defer { importTask = nil }
     let movie: PickedVideo?
     do {
       movie = try await item.loadTransferable(type: PickedVideo.self)
     } catch {
+      isPreparing = false
+      guard !Task.isCancelled else { return }
+      VideoProcessingDiagnostics().report(.picker, error: error)
       videoViewModel.reportVideoProcessingFailure()
+      return
+    }
+    guard !Task.isCancelled else {
+      if let movie { try? FileManager.default.removeItem(at: movie.url) }
       isPreparing = false
       return
     }
     guard let movie else {
+      VideoProcessingDiagnostics().report(.picker, code: .noTransferable)
       videoViewModel.reportVideoProcessingFailure()
       isPreparing = false
       return

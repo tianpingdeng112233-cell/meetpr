@@ -84,26 +84,27 @@
       do {
         let asset = AVURLAsset(url: session.sourceURL)
         let duration = try await asset.load(.duration)
-        // The exporter downstream requires exactly one video track, so an
-        // asset that can never survive upload must fail here rather than
-        // reach a savable state and strand a permanently-failed record.
         let videoTracks = try await asset.loadTracks(withMediaType: .video)
+        let mainTrack = try await AVAssetMainVideoTrack.select(from: videoTracks)
         // Every write below — terminal outcome, player item, ready flag — must
         // be gated on cancellation: `.task(id:)` tears down on disappear and a
         // late write would target a cover that is already gone.
         try Task.checkCancellation()
-        guard duration.isNumeric, duration.seconds > 0, videoTracks.count == 1 else {
-          session.failed()
+        guard duration.isNumeric, duration.seconds > 0, let mainTrack else {
+          session.failed(stage: .trimInfo)
           return
         }
         selection = VideoTrimSelection(
           sourceDurationSeconds: duration.seconds,
           maxDurationSeconds: session.maxDurationSeconds
         )
-        player.replaceCurrentItem(with: AVPlayerItem(asset: asset))
+        let preview = try await AVAssetMainVideoTrack.previewAsset(
+          source: asset, mainTrack: mainTrack, videoTrackCount: videoTracks.count)
+        try Task.checkCancellation()
+        player.replaceCurrentItem(with: AVPlayerItem(asset: preview))
         isReady = true
         let generated = await VideoTrimThumbnailGenerator().thumbnails(
-          sourceURL: session.sourceURL,
+          asset: preview,
           durationSeconds: duration.seconds,
           count: 10
         )
@@ -115,7 +116,7 @@
         // a spurious 「视频处理失败」.
       } catch {
         guard !Task.isCancelled else { return }
-        session.failed()
+        session.failed(stage: .trimInfo, error: error)
       }
     }
 

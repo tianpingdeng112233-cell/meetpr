@@ -48,8 +48,9 @@ final class VideoTrimCompletion: @unchecked Sendable {
     }
   }
 
-  func failed() {
+  func failed(report: () -> Void = {}) {
     finish {
+      report()
       try? FileManager.default.removeItem(at: sourceURL)
       onOutcome(.failed)
     }
@@ -111,6 +112,17 @@ final class VideoTrimSession: Identifiable {
     completion.failed()
   }
 
+  func failed(stage: VideoProcessingStage, error: Error? = nil) {
+    guard !Task.isCancelled else { return }
+    completion.failed {
+      if let error {
+        VideoProcessingDiagnostics().report(stage, error: error)
+      } else {
+        VideoProcessingDiagnostics().report(stage, code: .invalidSource)
+      }
+    }
+  }
+
   /// Main-actor isolated so the outcome handlers it fires mutate SwiftUI state
   /// on the main actor; the export itself suspends off it.
   @MainActor
@@ -136,7 +148,7 @@ final class VideoTrimSession: Identifiable {
       // Teardown owns the outcome: a cancelled export means the cover is going
       // away, and reporting a failure here would race that with a false alarm.
     } catch {
-      failed()
+      failed(stage: .trimExport, error: error)
     }
   }
 }

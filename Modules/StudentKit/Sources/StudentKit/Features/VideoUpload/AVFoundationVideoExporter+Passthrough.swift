@@ -6,6 +6,7 @@ extension AVFoundationVideoExporter {
     videoTrack: AVAssetTrack,
     audioTrack: AVAssetTrack?
   ) async throws -> VideoExportDecision {
+    if try await requiresSDRConversion(videoTrack) { return .transcode }
     let naturalSize = try await videoTrack.load(.naturalSize)
     let transform = try await videoTrack.load(.preferredTransform)
     let videoProperties = VideoTrackExportProperties(
