@@ -39,6 +39,7 @@ public struct ExerciseNoteCard: View {
           .foregroundStyle(Color.MeetPR.textPrimary)
           .multilineTextAlignment(.leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(MeetPRSpacing.space3)
         .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.card))
       }

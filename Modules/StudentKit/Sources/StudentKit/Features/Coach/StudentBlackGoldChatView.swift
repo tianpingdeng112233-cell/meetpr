@@ -332,6 +332,9 @@ struct StudentBlackGoldChatView: View {
   private func chatMessageRow(_ message: ChatMessage) -> some View {
     if message.exerciseRef?.version == 1 {
       ExerciseNoteCard(message: message)
+        .padding(
+          message.senderID == viewModel.currentUserID ? .leading : .trailing,
+          MeetPRSpacing.xl)
     } else if let presentation = ChatSetCardPresentation(message: message) {
       ChatSetCardView(
         presentation: presentation,
