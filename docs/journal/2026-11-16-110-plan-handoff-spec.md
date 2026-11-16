@@ -24,3 +24,10 @@
 - David 追问“网页端是否需要更改”。只读核查 web worktree / status / log / CLAUDE / CONTEXT；`0c59fba` 为已记录部署的代码，`origin/main=fa0ff54`，后者为该部署记录的合并。
 - `PlanWorkspace.tsx` 的 `fetchRosterWeekTonnage` 按 updated_at 选 published 计划，`activePublishedPlanId` 取第一份 published，确实与新选择语义冲突；编辑器另有自己的记忆计划与切换入口，两者应保持区分。
 - 修正前稿遗漏：增加 web 状态 / 游标 / 发布结果文案的适配范围、公开组件测试 seam、验收 M；四仓每仓一卡。文案与状态显示仍为提案，没有修改网页代码或部署。既有教练关注规则不擅自改写。
+
+## 接管与定稿（Claude 会话，同日）
+
+- David 在 Claude 会话问「你这边为什么不可以推进」，110 由该会话接管；接管时 Codex 托管树 `plan-handoff` 干净、无未推送提交。
+- 按 David 当日裁定重写 SPEC：撤回切换入口、存量首次选择、服务端指针；新增日期重叠拦截、只读翻看下一份、「正在练」服务端推导规则（David 确认「可以」）。`AMENDMENT-2026-11-16.md` 已并入并删除。
+- 现网：backend #412 垫片在国内 staging `ef17157`，反馈学员确认本周计划恢复（David 转述）。110 后端卡以「隐藏 published_at 晚于正在练那份的计划」取代按日期过滤，使旧包也按接续规则走。
+- 下一步：后端卡即派；学员端屏幕稿待「定稿」后派 iOS / Android / web 三卡。
