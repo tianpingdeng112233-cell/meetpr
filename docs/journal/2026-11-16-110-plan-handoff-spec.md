@@ -18,3 +18,9 @@
 - 110 SPEC：确认规则、入口结构、升级 / 离线 / 并发 / 旧包兼容、测试 seam、A–L 验收与 Out of Scope；实装按 backend / iOS / Android 每仓一卡。
 - 校验本次 Markdown 相对链接、关键验收段、diff whitespace；纯文档变更未运行 Swift / 原生 UI 测试。CI workflow 对 Markdown 与 specs 路径跳过，不能写成 CI 通过。
 - 待 David 审入口布局与存量处理后固定跨端契约、写实装卡，开始先红后绿和独立验收。
+
+## 网页影响补查
+
+- David 追问“网页端是否需要更改”。只读核查 web worktree / status / log / CLAUDE / CONTEXT；`0c59fba` 为已记录部署的代码，`origin/main=fa0ff54`，后者为该部署记录的合并。
+- `PlanWorkspace.tsx` 的 `fetchRosterWeekTonnage` 按 updated_at 选 published 计划，`activePublishedPlanId` 取第一份 published，确实与新选择语义冲突；编辑器另有自己的记忆计划与切换入口，两者应保持区分。
+- 修正前稿遗漏：增加 web 状态 / 游标 / 发布结果文案的适配范围、公开组件测试 seam、验收 M；四仓每仓一卡。文案与状态显示仍为提案，没有修改网页代码或部署。既有教练关注规则不擅自改写。
