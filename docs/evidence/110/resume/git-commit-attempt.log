@@ -1,0 +1,5 @@
+2026-11-16 continuation; branch feat/110-plan-handoff; HEAD 22ef3fd673d6f1efb9801baf2a8601bcda27c817
+Attempted git add docs/journal/2026-11-16-110-ios.md and git commit of staged history-prefill fix, with root-cause body preserved in commit-messages.txt.
+Both operations returned exit 128:
+fatal: Unable to create '/Users/david/Projects/apps/MeetPR/.git/worktrees/MeetPR-wt-110/index.lock': Operation not permitted
+No new commit or push was performed. No attempt to bypass the filesystem boundary.

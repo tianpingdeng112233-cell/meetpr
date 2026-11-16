@@ -1,0 +1,404 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/5] /Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/.build/arm64-apple-macosx/debug/NetworkingPackageTests.derived/runner.swift
+[1/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/39] Emitting module NetworkingTests
+[6/42] Compiling NetworkingTests PlanCompletionDTOTests.swift
+[7/42] Compiling NetworkingTests PlanIntensityDTOTests.swift
+[8/42] Compiling NetworkingTests PlanLoadTypesTests.swift
+[9/42] Compiling NetworkingTests AuthRefreshRequestEncodingTests.swift
+[10/42] Compiling NetworkingTests BackendContractDecodingTests.swift
+[11/42] Compiling NetworkingTests BindDTOTests.swift
+[12/42] Compiling NetworkingTests BodyWeightDTOTests.swift
+[13/42] Compiling NetworkingTests NetworkingTypedEndpointTests.swift
+[14/42] Compiling NetworkingTests OSSPartUploaderTests.swift
+[15/42] Compiling NetworkingTests OnboardingDTOTests.swift
+[16/42] Compiling NetworkingTests PlanSetCoachNoteDTOTests.swift
+[17/42] Compiling NetworkingTests RealtimeClientTests.swift
+[18/42] Compiling NetworkingTests RealtimeEventTests.swift
+[19/42] Compiling NetworkingTests SetLogDTOTests.swift
+[20/42] Compiling NetworkingTests StudentAddedSetDTOTests.swift
+[21/42] Compiling NetworkingTests StudentPlanCacheTests.swift
+[22/42] Compiling NetworkingTests BuildConfigTests.swift
+[23/42] Compiling NetworkingTests ChatDTOTests.swift
+[24/42] Compiling NetworkingTests ChatSetRefDTOTests.swift
+[25/42] Compiling NetworkingTests CoachSetReadTests.swift
+[26/42] Compiling NetworkingTests UploadsEndpointTests.swift
+[27/42] Compiling NetworkingTests VideoMarkerDTOTests.swift
+[28/42] Compiling NetworkingTests WireFormattingTests.swift
+[29/42] Compiling NetworkingTests MinimumAppVersionTests.swift
+[30/42] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[31/42] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[32/42] Compiling NetworkingTests NetworkingLayerTests.swift
+[33/42] Compiling NetworkingTests EvaluationDTOTests.swift
+[34/42] Compiling NetworkingTests ExerciseStatsDTOTests.swift
+[35/42] Compiling NetworkingTests FeedbackVideoDTOTests.swift
+[36/42] Compiling NetworkingTests GlobalAuthEndpointTests.swift
+[37/42] Compiling NetworkingTests APIClientDevicesTests.swift
+[38/42] Compiling NetworkingTests APIClientTests.swift
+[39/42] Compiling NetworkingTests AccountEndpointTests.swift
+[40/42] Compiling NetworkingTests AllDayContractTests.swift
+[41/44] Emitting module NetworkingPackageTests
+[42/44] Compiling NetworkingPackageTests runner.swift
+[42/44] Write Objects.LinkFileList
+[43/44] Linking NetworkingPackageTests
+Build complete! (3.22s)
+Test Suite 'All tests' started at 2026-11-16 10:42:31.357.
+Test Suite 'All tests' passed at 2026-11-16 10:42:31.359.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test authRefreshRequestEncodesSnakeCaseRefreshTokenKey() started.
+◇ Test endpointsExposeExpectedPaths() started.
+◇ Suite RealtimeEventTests started.
+◇ Test studentPlanCacheDefaultsMissingPercentageAnchorToRegisteredOneRM() started.
+◇ Test apiRequestsNegotiateLocaleAndPreserveSessionLanguageHeader() started.
+◇ Test registerDeviceTokenPostsAuthenticatedIOSPayload() started.
+◇ Test apiClientRefreshesAndRetriesAuthenticatedRequestAfter401() started.
+◇ Test coachStudentsContractDecodesBackendSummaryShape() started.
+◇ Test inviteCodeDTODecodesBackendWireShape() started.
+◇ Test buildConfigDefaultsToChinaTrack() started.
+◇ Test emptyChatConversationFixtureDecodesNullableFields() started.
+◇ Test buildConfigSelectsGlobalTrack() started.
+◇ Test studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test globalAuthEndpointsExposeBackendPaths() started.
+◇ Test valueFieldsEncodeBackendKeyNamesVerbatim() started.
+◇ Test emailAndTimezoneEndpointsPinBackendContracts() started.
+◇ Test partUploaderSendsPUTAndStripsETagQuotes() started.
+◇ Test decimalsEncodeAsStringsRoundedToColumnScale() started.
+◇ Test plansContractDecodesNullCoachID() started.
+◇ Suite RealtimeClientTests started.
+◇ Test partUploaderReadsCaseInsensitiveETagHeader() started.
+◇ Test chatReadFixtureDecodesCursorObject() started.
+◇ Test planSetDTOUnknownPercentageAnchorDecodesAsNil() started.
+◇ Test planAndDayDecodeSequenceCompletionFields() started.
+◇ Test studentAddedResponseKeepsNullablePlanSlotAndOptionalDay() started.
+◇ Test networkChatRepositoryEncodesSetRefPostWithoutImageCleanupRequests() started.
+◇ Test evaluationSummaryPutBodyOmitsBlankWords() started.
+◇ Test identityProvidersPinCamelCaseWireContracts() started.
+◇ Test absentFieldsNeverAppearInBody() started.
+◇ Test minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test buildConfigUsesEnvironmentBaseURLWhenPresent() started.
+◇ Test rejectBodyEncodesStrictEmptyObject() started.
+◇ Test readSideSetRefWithMissingNullableFieldDegradesToText() started.
+◇ Test firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test requestDTOsEncodeSnakeCaseDecimalStringsAndDateOnlyFields() started.
+◇ Test partUploaderThrowsOnHTTPFailure() started.
+◇ Test abortUploadSendsStrictlyEmptyObjectBody() started.
+◇ Test completionResponseDecodesWireIdentity() started.
+◇ Test onboardingProfileDecodesEmptyShellWithNullArrays() started.
+◇ Test chatConversationFixtureDecodesEveryWireField() started.
+◇ Test feedbackCacheDropsInvalidJSON() started.
+◇ Test bindErrorMapsAllFiveMachineCodes() started.
+◇ Test chatMessagesFixtureDecodesKindsAndNullableMatrix() started.
+◇ Test authContractDecodesSnakeCaseTokensAndFractionalCreatedAt() started.
+◇ Test sharedClientHasDefaultBaseURL() started.
+◇ Test "legacy video marker wire DTO decodes when annotation fields are absent" started.
+◇ Suite SetLogDTOTests started.
+◇ Test apiClientInjectsBearerTokenOnTypedEndpoint() started.
+◇ Test chatSetRefFixtureDecodesCardAndVideoFields() started.
+◇ Test studentAddedRequestUsesDayAndAllScopeWithoutChangingPlanDefault() started.
+◇ Test initiateUploadEncodesSnakeCaseWireBody() started.
+◇ Test onboardingProfileDecodeEncodeDecodeIsStable() started.
+◇ Test createFeedbackRequestEncodesVideoIDAsSnakeCase() started.
+◇ Test onboardingIncompleteEnvelopeCarriesMissingFields() started.
+◇ Test networkChatRepositoryEncodesMessageQueryExactly() started.
+◇ Test feedbackCacheLoadsLegacyEntriesWithoutVideoFields() started.
+◇ Test partUploaderThrowsOnMissingETag() started.
+◇ Test onboardingProfileDecodesFullWireFixture() started.
+◇ Test bodyWeightWireRecordsDecodeDecimalStringsAndCalendarDates() started.
+◇ Test malformedSetRefsInsideMessageArrayDegradeOnlyThoseCardsToText() started.
+◇ Test completeUploadEncodesPartsAsSnakeCase() started.
+◇ Test apiClientPublishesAuthInvalidOn401() started.
+◇ Test feedbackDTODecodesDeletedLinkedVideo() started.
+◇ Test chinaEmailRegistrationSendsVerificationCodeWithoutChangingGlobalPayload() started.
+◇ Test networkChatRepositoryUploadsJPEGThenSendsImage() started.
+◇ Test exclusiveEndRollsOverMonthAndYear() started.
+◇ Test createPlanSetRequestEncodesCoachNoteAsSnakeCase() started.
+◇ Test dateOnlyStringUsesUTCDay() started.
+◇ Test createBindRequestBodyEncodesSnakeCaseFieldNames() started.
+◇ Test uploadEndpointsUseBackendWirePaths() started.
+◇ Test coachStudentsContractFallsBackToFlatLegacyShape() started.
+◇ Test planSetDTOsDecodeSixFormsSparseDualAndLegacyRows() started.
+◇ Test feedbackDTODecodesVideoWithNoSetLogMetadata() started.
+◇ Test planSetDTODecodesCoachNoteAndPassesItToDomain() started.
+◇ Test apiClientPostsJSONToConfiguredEndpoint() started.
+◇ Test planDTODecodesKindWithRegularDefault() started.
+◇ Test coachBindRequestItemDecodesNineItemSummary() started.
+◇ Test studentPlanCacheInvalidatesPreSequenceProjectionFiles() started.
+◇ Test case passing 1 argument code → "SETS_PLAN_DAY_NOT_PUBLISHED" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test minimumVersionUsesBuildNumberAndConfiguredDistributionURL() started.
+◇ Test case passing 1 argument code → "SETS_ADHOC_DAY_CONFLICT" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test feedbackDTODecodesAndMapsLinkedVideo() started.
+◇ Test case passing 1 argument code → "SET_NOT_STUDENT_ADDED" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test acceptBindRequestBodyOmitsSkipReasonWhenNil() started.
+◇ Test exerciseStatsDecodesLegacyResponseWithoutE1RMSeries() started.
+◇ Test case passing 1 argument code → "SET_HAS_ATTACHMENT" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_COACH_FEEDBACK" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_NOT_FOUND" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test plannedLogDecodesOptionalDayOwnership() started.
+◇ Test coachReadRequestsAllLogs() started.
+◇ Test chatRequestDTOsEncodeExactSnakeCaseBodies() started.
+◇ Test setLogDTOPreservesAssumedTrueAndMapsToDomain() started.
+◇ Test planSetDTODecodesMissingCoachNoteAsNil() started.
+◇ Test bindRequestDTODecodesNullableJoinFields() started.
+◇ Test allDayRequestsAdvertiseNullableWeightCapability() started.
+◇ Test bindRequestDTOPreservesEndedAt() started.
+◇ Test planIntensityDTOFieldsRoundTripWithWireTypes() started.
+◇ Test studentPlanCacheRoundTripsCompletionForOfflineCursor() started.
+◇ Test exerciseStatsDecodesOptionalSeriesAndUnknownTrend() started.
+◇ Test minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test firstRunDecodesServerPlanSummary() started.
+◇ Test "video marker request and response encode through MeetPRCodec snake-case" started.
+◇ Test feedbackDTODecodesAndMapsLinkedVideoRPE() started.
+◇ Test networkChatRepositoryEncodesOpenTextAndReadRequests() started.
+◇ Test coachBindRequestItemDecodesDegradedNullOnboarding() started.
+◇ Test oneRMKeysSpellOutDigitBlocks() started.
+◇ Test planLoadTypesDecodeNullLegacyTargets(mode:) started.
+◇ Test myBindRequestResponseDecodesNullAndValue() started.
+◇ Test createPlanRequestAlwaysCarriesExplicitKind() started.
+◇ Test accountEndpointsSendAuthenticatedRequests() started.
+◇ Test setLogDTODecodesMissingCoachRPEAsNil() started.
+◇ Test "marker repository maps 404 and transport errors to unavailable, everything else to failed" started.
+◇ Test feedbackDTODecodesDateOnlyAndISOTimestamps() started.
+◇ Test setLogDTODecodesDecimalStringsAndMapsToDomain() started.
+◇ Test acceptResponseDecodesNullEvaluationPeriodOnSkip() started.
+◇ Test case passing 1 argument minimum → 0 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test createInviteCodeBodyOmitsAbsentOptionals() started.
+◇ Test nullEncodesJSONNullForNullableColumns() started.
+◇ Test setLogDTODecodesFailedTrueAndMapsToDomain() started.
+◇ Test case passing 1 argument minimum → 27 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test plannedDTOAcceptsMissingPlanDayID() started.
+◇ Test emptyPatchEncodesEmptyBody() started.
+◇ Test networkChatRepositoryMapsBackendChatErrors() started.
+◇ Test case passing 1 argument minimum → 28 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test case passing 1 argument field → "" to firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test networkChatRepositoryAbortsAttachmentWhenImageUploadIsCancelled() started.
+◇ Test chatMessageFixtureRejectsMissingClientIDAndWrongSequenceType() started.
+◇ Test case passing 1 argument minimum → 29 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test evaluationPeriodDTODecodesAndMapsToDomain() started.
+◇ Test case passing 1 argument field → ","first_run":null" to firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test bodyWeightMutationDecodesCurrentWeightAndDeletionNull() started.
+◇ Test case passing 1 argument minimum → 100 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test acceptResponseDecodesEvaluationPeriod() started.
+◇ Test bindRequestDTODecodesWithoutEndedAt() started.
+◇ Test initiateUploadOmitsNilFilename() started.
+◇ Test allDayBackend065SharedFixtureDecodesNullableLogAndExerciseNote() started.
+◇ Test networkChatRepositoryDeletesNewAttachmentOnIdempotentOldMessage() started.
+◇ Test "video marker wire DTO decodes snake-case and maps to the domain" started.
+◇ Test coachReadDecodesUnplannedAndLegacyLogs() started.
+◇ Test bindErrorIsNilForUnknownCodeAndTransportErrors() started.
+◇ Test studentPlanCacheLoadsPre072LegacyPayload() started.
+◇ Test typedEndpointsUseWireContractPaths() started.
+◇ Test planTreeDTODecodesAndMapsToCoreModels() started.
+◇ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test createPlanSetRequestOmitsCoachNoteWhenNil() started.
+◇ Test networkChatRepositoryDeletesCompletedAttachmentWhenMessageFails() started.
+◇ Test networkChatRepositoryEncodesBeforeAndLatestQueriesExactly() started.
+◇ Test allDayExerciseRequestPreservesCanonicalContractWithoutVideoOrSetRef() started.
+◇ Test oneRMLockedAndNotFoundEnvelopesMap() started.
+◇ Test inviteCodesResponseDecodesListEnvelope() started.
+◇ Test planDTOAnchorWeekdayDecodesAndLegacyAbsenceDefaultsNil() started.
+◇ Test attachmentKindChatImageRoundTripsWireValue() started.
+◇ Test readSideSetRefIgnoresUnknownV1FieldsWithoutLooseningStrictCodec() started.
+◇ Test studentVideosContractDecodesLinkedAndUnlinkedItems() started.
+◇ Test studentPlanCacheRoundTripsNewIntensityPayload() started.
+◇ Test exclusiveEndKeepsClosedUpperBoundDayInWindow() started.
+◇ Test unknownAndMalformedEventsAreSkipped() started.
+◇ Test decodesKnownEvents() started.
+✔ Test endpointsExposeExpectedPaths() passed after 0.009 seconds.
+✔ Test authRefreshRequestEncodesSnakeCaseRefreshTokenKey() passed after 0.010 seconds.
+✔ Test buildConfigSelectsGlobalTrack() passed after 0.011 seconds.
+✔ Test buildConfigDefaultsToChinaTrack() passed after 0.011 seconds.
+✔ Test globalAuthEndpointsExposeBackendPaths() passed after 0.013 seconds.
+✔ Test emptyChatConversationFixtureDecodesNullableFields() passed after 0.014 seconds.
+✔ Test studentPlanCacheDefaultsMissingPercentageAnchorToRegisteredOneRM() passed after 0.014 seconds.
+✔ Test valueFieldsEncodeBackendKeyNamesVerbatim() passed after 0.014 seconds.
+✔ Test partUploaderSendsPUTAndStripsETagQuotes() passed after 0.014 seconds.
+✔ Test inviteCodeDTODecodesBackendWireShape() passed after 0.014 seconds.
+✔ Test decimalsEncodeAsStringsRoundedToColumnScale() passed after 0.014 seconds.
+✔ Test coachStudentsContractDecodesBackendSummaryShape() passed after 0.014 seconds.
+✔ Test apiRequestsNegotiateLocaleAndPreserveSessionLanguageHeader() passed after 0.014 seconds.
+◇ Test disconnectPublishesDisconnectedBeforeItsSuspensionEvenWhenConnectRaces() started.
+◇ Test sendsProtocolPingEveryTwentySeconds() started.
+◇ Test failuresUseCappedExponentialBackoffAndDisconnectStopsReconnects() started.
+◇ Test helloConnectsWithBearerHeaderAndTokenNeverEntersURL() started.
+✔ Test apiClientRefreshesAndRetriesAuthenticatedRequestAfter401() passed after 0.014 seconds.
+◇ Test staleRunCannotOverwriteStateAfterReconnect() started.
+◇ Test helloResetsBackoffBeforeTheNextFailure() started.
+✔ Test studentAddedErrorCodesSurviveTransport(code:) with 6 test cases passed after 0.014 seconds.
+✔ Test partUploaderReadsCaseInsensitiveETagHeader() passed after 0.014 seconds.
+✔ Test chatReadFixtureDecodesCursorObject() passed after 0.014 seconds.
+✔ Test registerDeviceTokenPostsAuthenticatedIOSPayload() passed after 0.015 seconds.
+◇ Test case passing 1 argument failure → "timeout" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "http" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "malformed" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "negative" to minimumVersionFailureAllowsLaunch(failure:) started.
+✔ Test evaluationSummaryPutBodyOmitsBlankWords() passed after 0.017 seconds.
+◇ Test case passing 1 argument mode → "free_weight" to planLoadTypesDecodeNullLegacyTargets(mode:) started.
+◇ Test case passing 1 argument mode → "bodyweight" to planLoadTypesDecodeNullLegacyTargets(mode:) started.
+✔ Test absentFieldsNeverAppearInBody() passed after 0.019 seconds.
+✔ Test buildConfigUsesEnvironmentBaseURLWhenPresent() passed after 0.020 seconds.
+✔ Test rejectBodyEncodesStrictEmptyObject() passed after 0.022 seconds.
+✔ Test emailAndTimezoneEndpointsPinBackendContracts() passed after 0.022 seconds.
+✔ Test minimumVersionBlocksOnlyOlderBuilds(minimum:) with 5 test cases passed after 0.022 seconds.
+✔ Test requestDTOsEncodeSnakeCaseDecimalStringsAndDateOnlyFields() passed after 0.022 seconds.
+✔ Test studentAddedResponseKeepsNullablePlanSlotAndOptionalDay() passed after 0.022 seconds.
+✔ Test networkChatRepositoryEncodesSetRefPostWithoutImageCleanupRequests() passed after 0.023 seconds.
+✔ Test readSideSetRefWithMissingNullableFieldDegradesToText() passed after 0.023 seconds.
+✔ Test partUploaderThrowsOnHTTPFailure() passed after 0.023 seconds.
+✔ Test abortUploadSendsStrictlyEmptyObjectBody() passed after 0.024 seconds.
+✔ Test identityProvidersPinCamelCaseWireContracts() passed after 0.025 seconds.
+◇ Test case passing 2 arguments localization → "zh-Hant", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hant-TW", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh_TW", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-HK", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-MO", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hans", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hans-TW", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hant-CN", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-CN", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+✔ Test completionResponseDecodesWireIdentity() passed after 0.025 seconds.
+◇ Test case passing 2 arguments localization → "zh", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "en-GB", expected → "en" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "fr", expected → "en" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+✔ Test bindErrorMapsAllFiveMachineCodes() passed after 0.025 seconds.
+✔ Test feedbackCacheDropsInvalidJSON() passed after 0.026 seconds.
+✔ Test sharedClientHasDefaultBaseURL() passed after 0.027 seconds.
+✔ Test onboardingProfileDecodesEmptyShellWithNullArrays() passed after 0.027 seconds.
+◇ Test fetchedLogDecodesLoggedDateAndAnchorsBackfilledLogsOnTheirTrainingDay() started.
+◇ Test explicitEmptyActualRIRClearsPreviouslyRecordedEffort() started.
+◇ Test nilLoggedDateOmitsWireKey() started.
+✔ Test firstRunMissingOrNullKeepsLegacyContract(field:) with 2 test cases passed after 0.029 seconds.
+◇ Test fetchedLogWithoutLoggedDateKeepsServerTimestamp() started.
+◇ Test backfilledLogOnADSTTransitionDayStillAnchorsAtLocalNoon() started.
+◇ Test loggedDateUsesSnakeCaseWireKey() started.
+◇ Test actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() started.
+◇ Test fetchedLogOnItsOwnGymDayKeepsServerTimestamp() started.
+✔ Test apiClientInjectsBearerTokenOnTypedEndpoint() passed after 0.029 seconds.
+✔ Test chatConversationFixtureDecodesEveryWireField() passed after 0.029 seconds.
+✔ Test studentAddedRequestUsesDayAndAllScopeWithoutChangingPlanDefault() passed after 0.029 seconds.
+✔ Test initiateUploadEncodesSnakeCaseWireBody() passed after 0.029 seconds.
+✔ Test plansContractDecodesNullCoachID() passed after 0.029 seconds.
+✔ Test createFeedbackRequestEncodesVideoIDAsSnakeCase() passed after 0.029 seconds.
+✔ Test onboardingIncompleteEnvelopeCarriesMissingFields() passed after 0.029 seconds.
+✔ Test partUploaderThrowsOnMissingETag() passed after 0.028 seconds.
+✔ Test chatSetRefFixtureDecodesCardAndVideoFields() passed after 0.029 seconds.
+✔ Test chatMessagesFixtureDecodesKindsAndNullableMatrix() passed after 0.029 seconds.
+✔ Test "legacy video marker wire DTO decodes when annotation fields are absent" passed after 0.029 seconds.
+✔ Test apiClientPublishesAuthInvalidOn401() passed after 0.028 seconds.
+✔ Test bodyWeightWireRecordsDecodeDecimalStringsAndCalendarDates() passed after 0.028 seconds.
+✔ Test authContractDecodesSnakeCaseTokensAndFractionalCreatedAt() passed after 0.029 seconds.
+✔ Test chinaEmailRegistrationSendsVerificationCodeWithoutChangingGlobalPayload() passed after 0.028 seconds.
+✔ Test feedbackDTODecodesDeletedLinkedVideo() passed after 0.028 seconds.
+✔ Test networkChatRepositoryEncodesMessageQueryExactly() passed after 0.029 seconds.
+✔ Test createPlanSetRequestEncodesCoachNoteAsSnakeCase() passed after 0.028 seconds.
+✔ Test planAndDayDecodeSequenceCompletionFields() passed after 0.029 seconds.
+✔ Test feedbackCacheLoadsLegacyEntriesWithoutVideoFields() passed after 0.029 seconds.
+✔ Test createBindRequestBodyEncodesSnakeCaseFieldNames() passed after 0.028 seconds.
+✔ Test onboardingProfileDecodesFullWireFixture() passed after 0.029 seconds.
+✔ Test completeUploadEncodesPartsAsSnakeCase() passed after 0.028 seconds.
+✔ Test exclusiveEndRollsOverMonthAndYear() passed after 0.028 seconds.
+✔ Test malformedSetRefsInsideMessageArrayDegradeOnlyThoseCardsToText() passed after 0.029 seconds.
+✔ Test apiClientPostsJSONToConfiguredEndpoint() passed after 0.028 seconds.
+✔ Test dateOnlyStringUsesUTCDay() passed after 0.028 seconds.
+✔ Test coachStudentsContractFallsBackToFlatLegacyShape() passed after 0.028 seconds.
+✔ Test feedbackDTODecodesVideoWithNoSetLogMetadata() passed after 0.028 seconds.
+✔ Test minimumVersionUsesBuildNumberAndConfiguredDistributionURL() passed after 0.028 seconds.
+✔ Test uploadEndpointsUseBackendWirePaths() passed after 0.028 seconds.
+✔ Test planSetDTODecodesCoachNoteAndPassesItToDomain() passed after 0.028 seconds.
+✔ Test acceptBindRequestBodyOmitsSkipReasonWhenNil() passed after 0.026 seconds.
+✔ Test exerciseStatsDecodesLegacyResponseWithoutE1RMSeries() passed after 0.026 seconds.
+✔ Test networkChatRepositoryUploadsJPEGThenSendsImage() passed after 0.029 seconds.
+✔ Test coachBindRequestItemDecodesNineItemSummary() passed after 0.028 seconds.
+✔ Test coachReadRequestsAllLogs() passed after 0.024 seconds.
+✔ Test chatRequestDTOsEncodeExactSnakeCaseBodies() passed after 0.024 seconds.
+✔ Test onboardingProfileDecodeEncodeDecodeIsStable() passed after 0.029 seconds.
+✔ Test allDayRequestsAdvertiseNullableWeightCapability() passed after 0.024 seconds.
+✔ Test planSetDTODecodesMissingCoachNoteAsNil() passed after 0.024 seconds.
+✔ Test plannedLogDecodesOptionalDayOwnership() passed after 0.024 seconds.
+✔ Test bindRequestDTODecodesNullableJoinFields() passed after 0.024 seconds.
+✔ Test exerciseStatsDecodesOptionalSeriesAndUnknownTrend() passed after 0.024 seconds.
+✔ Test planDTODecodesKindWithRegularDefault() passed after 0.028 seconds.
+✔ Test bindRequestDTOPreservesEndedAt() passed after 0.024 seconds.
+✔ Test feedbackDTODecodesAndMapsLinkedVideo() passed after 0.028 seconds.
+✔ Test minimumVersionFailureAllowsLaunch(failure:) with 4 test cases passed after 0.024 seconds.
+✔ Test "video marker request and response encode through MeetPRCodec snake-case" passed after 0.024 seconds.
+✔ Test setLogDTOPreservesAssumedTrueAndMapsToDomain() passed after 0.024 seconds.
+✔ Test planSetDTOUnknownPercentageAnchorDecodesAsNil() passed after 0.030 seconds.
+✔ Test coachBindRequestItemDecodesDegradedNullOnboarding() passed after 0.024 seconds.
+✔ Test oneRMKeysSpellOutDigitBlocks() passed after 0.024 seconds.
+✔ Test studentPlanCacheInvalidatesPreSequenceProjectionFiles() passed after 0.029 seconds.
+✔ Test createPlanRequestAlwaysCarriesExplicitKind() passed after 0.024 seconds.
+✔ Test networkChatRepositoryEncodesOpenTextAndReadRequests() passed after 0.024 seconds.
+✔ Test firstRunDecodesServerPlanSummary() passed after 0.024 seconds.
+✔ Test accountEndpointsSendAuthenticatedRequests() passed after 0.024 seconds.
+✔ Test "marker repository maps 404 and transport errors to unavailable, everything else to failed" passed after 0.024 seconds.
+✔ Test createInviteCodeBodyOmitsAbsentOptionals() passed after 0.024 seconds.
+✔ Test setLogDTODecodesMissingCoachRPEAsNil() passed after 0.024 seconds.
+✔ Test feedbackDTODecodesAndMapsLinkedVideoRPE() passed after 0.024 seconds.
+✔ Test nullEncodesJSONNullForNullableColumns() passed after 0.024 seconds.
+✔ Test myBindRequestResponseDecodesNullAndValue() passed after 0.024 seconds.
+✔ Test emptyPatchEncodesEmptyBody() passed after 0.024 seconds.
+✔ Test setLogDTODecodesDecimalStringsAndMapsToDomain() passed after 0.024 seconds.
+✔ Test planLoadTypesDecodeNullLegacyTargets(mode:) with 2 test cases passed after 0.024 seconds.
+✔ Test networkChatRepositoryMapsBackendChatErrors() passed after 0.024 seconds.
+✔ Test bodyWeightMutationDecodesCurrentWeightAndDeletionNull() passed after 0.023 seconds.
+✔ Test plannedDTOAcceptsMissingPlanDayID() passed after 0.024 seconds.
+✔ Test chatMessageFixtureRejectsMissingClientIDAndWrongSequenceType() passed after 0.023 seconds.
+✔ Test feedbackDTODecodesDateOnlyAndISOTimestamps() passed after 0.024 seconds.
+✔ Test setLogDTODecodesFailedTrueAndMapsToDomain() passed after 0.024 seconds.
+✔ Test bindRequestDTODecodesWithoutEndedAt() passed after 0.023 seconds.
+✔ Test initiateUploadOmitsNilFilename() passed after 0.023 seconds.
+✔ Test acceptResponseDecodesNullEvaluationPeriodOnSkip() passed after 0.024 seconds.
+✔ Test "video marker wire DTO decodes snake-case and maps to the domain" passed after 0.023 seconds.
+✔ Test bindErrorIsNilForUnknownCodeAndTransportErrors() passed after 0.023 seconds.
+✔ Test planSetDTOsDecodeSixFormsSparseDualAndLegacyRows() passed after 0.029 seconds.
+✔ Test evaluationPeriodDTODecodesAndMapsToDomain() passed after 0.023 seconds.
+✔ Test studentPlanCacheRoundTripsCompletionForOfflineCursor() passed after 0.025 seconds.
+✔ Test allDayBackend065SharedFixtureDecodesNullableLogAndExerciseNote() passed after 0.023 seconds.
+✔ Test createPlanSetRequestOmitsCoachNoteWhenNil() passed after 0.022 seconds.
+✔ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) with 12 test cases passed after 0.022 seconds.
+✔ Test oneRMLockedAndNotFoundEnvelopesMap() passed after 0.022 seconds.
+✔ Test allDayExerciseRequestPreservesCanonicalContractWithoutVideoOrSetRef() passed after 0.022 seconds.
+✔ Test acceptResponseDecodesEvaluationPeriod() passed after 0.023 seconds.
+✔ Test attachmentKindChatImageRoundTripsWireValue() passed after 0.021 seconds.
+✔ Test readSideSetRefIgnoresUnknownV1FieldsWithoutLooseningStrictCodec() passed after 0.021 seconds.
+✔ Test coachReadDecodesUnplannedAndLegacyLogs() passed after 0.023 seconds.
+✔ Test exclusiveEndKeepsClosedUpperBoundDayInWindow() passed after 0.021 seconds.
+✔ Test unknownAndMalformedEventsAreSkipped() passed after 0.021 seconds.
+✔ Test inviteCodesResponseDecodesListEnvelope() passed after 0.022 seconds.
+✔ Test decodesKnownEvents() passed after 0.021 seconds.
+✔ Test networkChatRepositoryEncodesBeforeAndLatestQueriesExactly() passed after 0.022 seconds.
+✔ Test studentPlanCacheLoadsPre072LegacyPayload() passed after 0.024 seconds.
+✔ Test explicitEmptyActualRIRClearsPreviouslyRecordedEffort() passed after 0.002 seconds.
+✔ Test planTreeDTODecodesAndMapsToCoreModels() passed after 0.024 seconds.
+✔ Test nilLoggedDateOmitsWireKey() passed after 0.002 seconds.
+✔ Test studentVideosContractDecodesLinkedAndUnlinkedItems() passed after 0.023 seconds.
+✔ Test fetchedLogWithoutLoggedDateKeepsServerTimestamp() passed after 0.002 seconds.
+✔ Test loggedDateUsesSnakeCaseWireKey() passed after 0.002 seconds.
+✔ Test fetchedLogDecodesLoggedDateAndAnchorsBackfilledLogsOnTheirTrainingDay() passed after 0.003 seconds.
+✔ Test backfilledLogOnADSTTransitionDayStillAnchorsAtLocalNoon() passed after 0.002 seconds.
+✔ Suite RealtimeEventTests passed after 0.032 seconds.
+✔ Test networkChatRepositoryAbortsAttachmentWhenImageUploadIsCancelled() passed after 0.025 seconds.
+✔ Test networkChatRepositoryDeletesNewAttachmentOnIdempotentOldMessage() passed after 0.025 seconds.
+✔ Test networkChatRepositoryDeletesCompletedAttachmentWhenMessageFails() passed after 0.023 seconds.
+✔ Test actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() passed after 0.002 seconds.
+✔ Test helloConnectsWithBearerHeaderAndTokenNeverEntersURL() passed after 0.017 seconds.
+✔ Test fetchedLogOnItsOwnGymDayKeepsServerTimestamp() passed after 0.002 seconds.
+✔ Suite SetLogDTOTests passed after 0.032 seconds.
+✔ Test studentPlanCacheRoundTripsNewIntensityPayload() passed after 0.023 seconds.
+✔ Test planDTOAnchorWeekdayDecodesAndLegacyAbsenceDefaultsNil() passed after 0.024 seconds.
+✔ Test sendsProtocolPingEveryTwentySeconds() passed after 0.019 seconds.
+✔ Test planIntensityDTOFieldsRoundTripWithWireTypes() passed after 0.029 seconds.
+✔ Test typedEndpointsUseWireContractPaths() passed after 0.027 seconds.
+✔ Test helloResetsBackoffBeforeTheNextFailure() passed after 0.021 seconds.
+✔ Test disconnectPublishesDisconnectedBeforeItsSuspensionEvenWhenConnectRaces() passed after 0.022 seconds.
+✔ Test staleRunCannotOverwriteStateAfterReconnect() passed after 0.021 seconds.
+✔ Test failuresUseCappedExponentialBackoffAndDisconnectStopsReconnects() passed after 0.029 seconds.
+✔ Suite RealtimeClientTests passed after 0.044 seconds.
+✔ Test run with 156 tests in 3 suites passed after 0.044 seconds.

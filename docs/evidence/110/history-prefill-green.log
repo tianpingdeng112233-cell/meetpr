@@ -1,0 +1,26 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module StudentKitTests
+[4/5] Compiling StudentKitTests TodayWorkoutHistoryPrefillTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (11.85s)
+Test Suite 'Selected tests' started at 2026-11-16 10:27:01.688.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:27:01.689.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:27:01.689.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:27:01.689.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → true to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → false to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+✔ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) with 2 test cases passed after 0.013 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.013 seconds.

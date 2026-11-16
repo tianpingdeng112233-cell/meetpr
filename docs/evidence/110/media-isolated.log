@@ -1,0 +1,24 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKit TodayWorkoutViewModel.swift
+[4/5] Emitting module StudentKit
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (7.33s)
+Test Suite 'Selected tests' started at 2026-11-16 10:40:50.323.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:40:50.324.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:40:50.324.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:40:50.324.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" started.
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" recorded an issue at AVFoundationVideoExporterTests.swift:9:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" failed after 0.030 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.030 seconds with 1 issue.

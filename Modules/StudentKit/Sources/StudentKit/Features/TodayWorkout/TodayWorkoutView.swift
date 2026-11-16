@@ -200,6 +200,9 @@ public struct TodayWorkoutView: View {
             }
         }
       }
+      .onChange(of: safeHandoffBoundary) { _, _ in
+        viewModel.invalidatePlanNavigation()
+      }
       .onChange(of: exerciseNavigation?.reference) { _, reference in
         guard let reference else { return }
         Task {
@@ -220,6 +223,8 @@ public struct TodayWorkoutView: View {
       }
   }
 
+  // One initializer keeps all existing screen bindings and callbacks together.
+  // swiftlint:disable:next function_body_length
   private func makeWorkoutScreen() -> TodayWorkoutScreen<TrainingWeekStrip> {
     TodayWorkoutScreen(
       content: screenContent,
@@ -287,6 +292,8 @@ public struct TodayWorkoutView: View {
     )
   }
 
+  // A separate opaque result bounds SwiftUI type checking of the presentation chain.
+  // swiftlint:disable:next function_body_length
   private func workoutBase() -> some View {
     NavigationStack {
       makeWorkoutScreen()
@@ -319,7 +326,7 @@ public struct TodayWorkoutView: View {
         if viewModel.isPreviewingPlan {
           PlanHandoffReturnDock(remaining: viewModel.remainingCurrentTrainingDays) {
             Task {
-              await viewModel.returnToCurrentPlan()
+              await viewModel.returnToCurrentPlan(isSafe: { safeHandoffBoundary })
               selectedDayID = viewModel.currentDay?.id
             }
           }
@@ -747,7 +754,9 @@ public struct TodayWorkoutView: View {
   }
 
   private var isEditable: Bool {
-    guard let currentDay else { return false }
+    guard !viewModel.browsingPastPlan, !viewModel.isPreviewingPlan, let currentDay else {
+      return false
+    }
     return FlexibleTrainingDay.canWrite(currentDay, in: viewModel.planDays)
   }
 
@@ -770,7 +779,7 @@ public struct TodayWorkoutView: View {
   private func returnToCurrentDay() {
     if viewModel.browsingPastPlan || viewModel.isPreviewingPlan {
       Task {
-        await viewModel.returnToCurrentPlan()
+        await viewModel.returnToCurrentPlan(isSafe: { safeHandoffBoundary })
         selectedDayID = viewModel.currentDay?.id
       }
     } else {
@@ -788,7 +797,8 @@ public struct TodayWorkoutView: View {
   }
 
   private var weekCode: String {
-    if let previewDay { return "W\(previewDay.weekNumber)D\(previewDay.dayOfWeek)" }
+    if let previewDay { return "W\(previewDay.weekNumber)" }
+    if viewModel.handoff != nil, let currentDay { return "W\(currentDay.weekNumber)" }
     if viewModel.state == .noPlan {
       return "W—"
     }
@@ -1137,6 +1147,7 @@ public struct TodayWorkoutView: View {
   private var safeHandoffBoundary: Bool {
     editing == nil && quickLogRoute == nil && directCameraTarget == nil
       && pendingDirectCameraTarget == nil && preparingVideoSetID == nil
+      && weightEntry?.isPresented != true
       && viewModel.completionPhase == nil && keypad?.current == nil
       && !videoViewModel.rowStates.values.contains { $0.attachment.status == .uploading }
   }
@@ -1144,7 +1155,7 @@ public struct TodayWorkoutView: View {
   private func turnPlan(forward: Bool) {
     guard safeHandoffBoundary else { return }
     Task {
-      await viewModel.browseAdjacentPlan(forward: forward)
+      await viewModel.browseAdjacentPlan(forward: forward, isSafe: { safeHandoffBoundary })
       if viewModel.isPreviewingPlan {
         previewDayID = viewModel.previewPlan?.days.first?.id
       } else {
@@ -1155,7 +1166,7 @@ public struct TodayWorkoutView: View {
 
   private func enterTrainingIfSafe() async {
     guard safeHandoffBoundary else { return }
-    await viewModel.enterTraining()
+    await viewModel.enterTraining(isSafe: { safeHandoffBoundary })
     selectedDayID = viewModel.currentDay?.id
   }
 

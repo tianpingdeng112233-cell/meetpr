@@ -36,11 +36,38 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
-    let token = try await session.accessToken()
-    let tree = try await api.plan(id: id, accessToken: token).toDomain()
-    guard tree.plan.traineeID == studentID else { return nil }
-    let exercises = try await exerciseCatalog(accessToken: token)
-    return StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+    do {
+      let token = try await session.accessToken()
+      let tree = try await api.plan(id: id, accessToken: token).toDomain()
+      guard tree.plan.traineeID == studentID else { return nil }
+      let exercises = try await exerciseCatalog(accessToken: token)
+      var plan = StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+      plan.handoff = await cache.loadPlan(studentID: studentID)?.handoff
+      try await cache.saveSnapshot(plan: plan, studentID: studentID)
+      return plan
+    } catch {
+      if error.isTaskCancellation { throw error }
+      if error is URLError, let cached = await cache.loadPlan(id: id, studentID: studentID) {
+        return cached
+      }
+      throw error
+    }
+  }
+
+  public func fetchPlan(containing dayID: UUID, studentID: UUID) async throws -> StudentPlanView? {
+    if let cached = await cache.loadPlan(containing: dayID, studentID: studentID) {
+      return try await fetchPlan(id: cached.cycleID, studentID: studentID)
+    }
+    guard let current = try await fetchCurrentPlan(studentID: studentID) else { return nil }
+    if current.days.contains(where: { $0.id == dayID }) { return current }
+    for entry in current.handoff?.plans ?? [] where entry.id != current.cycleID {
+      if let plan = try await fetchPlan(id: entry.id, studentID: studentID),
+        plan.days.contains(where: { $0.id == dayID })
+      {
+        return plan
+      }
+    }
+    return nil
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -58,7 +85,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func fetchDay(studentID: UUID, dayID: UUID) async throws -> StudentPlanDay? {
-    guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
+    guard let plan = try await fetchPlan(containing: dayID, studentID: studentID) else {
       return nil
     }
     return plan.days.first { $0.id == dayID }
@@ -131,27 +158,8 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   private func performPlanRefresh(studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
-    let planID: UUID?
-    let handoff: StudentPlanHandoff?
-    do {
-      let response = try await api.planHandoff(studentID: studentID, accessToken: token)
-      planID = response.currentPlanID
-      handoff = response.handoff
-    } catch {
-      if error.isTaskCancellation { throw error }
-      handoff = nil
-      // Compatibility only, including a server that has not deployed /plan-handoff yet.
-      let response = try await api.studentPlans(
-        studentID: studentID, status: [.published], accessToken: token)
-      planID =
-        response.plans.max {
-          if $0.publishedAt != $1.publishedAt {
-            return ($0.publishedAt ?? .distantPast) < ($1.publishedAt ?? .distantPast)
-          }
-          if $0.createdAt != $1.createdAt { return $0.createdAt < $1.createdAt }
-          return $0.id.uuidString < $1.id.uuidString
-        }?.id
-    }
+    let response = try await api.planHandoff(studentID: studentID, accessToken: token)
+    let planID = response.currentPlanID
     guard let planID else {
       await cache.removePlan(studentID: studentID)
       return nil
@@ -164,16 +172,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
       catalog: exercises,
       weekIndex: 1
     )
-    projection.handoff =
-      handoff
-      ?? StudentPlanHandoff(
-        currentPlanID: projection.cycleID,
-        plans: [
-          .init(
-            id: projection.cycleID, name: tree.plan.name, weeks: tree.plan.planWeeks,
-            completedTrainingDays: projection.days.filter { $0.completedAt != nil }.count,
-            totalTrainingDays: projection.days.count, status: .current)
-        ])
+    projection.handoff = response.handoff
     try await cache.save(plan: projection, studentID: studentID)
     return projection
   }

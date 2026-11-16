@@ -1,0 +1,11 @@
+Pending commit 1:
+Fix history prefill fixture for plan handoff (spec: 110-plan-handoff)
+
+Root cause: the preload path already refreshed the current plan once per load before spec 110. The old HTTP stub misclassified the new plan-handoff GET as an exercises request; production did not add redundant refreshes. Match the exact student GET and assert cumulative request counts 1, 2, and 3 without relaxing history-prefill assertions.
+
+Pending commit 2:
+Fix plan handoff recovery and recording boundaries (spec: 110-plan-handoff)
+
+Preserve account and interaction boundaries across late responses, keep server current authority including nil, and retain pending days across cache replacement and restart. Resolve old days by explicit plan identity for completion recovery without duplicate writes. Keep abandoned tails and future previews read-only, and dismiss the handoff notice only for completed sets belonging to the current plan.
+
+Validation: handoff and consumer regressions pass; two independent read-only review axes are CLEAN. Full StudentKit still has 16 media encoder failures and AppShell has 2 Keychain failures. Simulator builds/screenshots are blocked. Draft only; do not merge or claim acceptance.

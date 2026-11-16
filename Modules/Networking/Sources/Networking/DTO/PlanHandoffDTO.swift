@@ -13,15 +13,16 @@ public struct PlanHandoffDTO: Decodable, Sendable {
 
     public init(from decoder: Decoder) throws {
       plan = try PlanDTO(from: decoder)
-      let container = try decoder.container(keyedBy: CodingKeys.self)
+      let container = try decoder.container(keyedBy: EntryCodingKeys.self)
       completedTrainingDays = try container.decode(Int.self, forKey: .completedTrainingDays)
       totalTrainingDays = try container.decode(Int.self, forKey: .totalTrainingDays)
       handoffStatus = try container.decode(StudentPlanHandoff.Status.self, forKey: .handoffStatus)
     }
 
-    private enum CodingKeys: String, CodingKey {
-      case completedTrainingDays, totalTrainingDays, handoffStatus
-    }
+  }
+
+  private enum EntryCodingKeys: String, CodingKey {
+    case completedTrainingDays, totalTrainingDays, handoffStatus
   }
 
   public var handoff: StudentPlanHandoff {

@@ -1,0 +1,414 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/5] /Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/.build/arm64-apple-macosx/debug/CoreModelsPackageTests.derived/runner.swift
+[1/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/35] Compiling CoreModelsTests PlanEnumRawValueTests.swift
+[6/35] Compiling CoreModelsTests PlanPercentageAnchorCodableTests.swift
+[7/35] Compiling CoreModelsTests PrescribedIntensityCodableTests.swift
+[8/38] Emitting module CoreModelsTests
+[9/38] Compiling CoreModelsTests ReadinessCheckinTests.swift
+[10/38] Compiling CoreModelsTests RestDefaultsTests.swift
+[11/38] Compiling CoreModelsTests SetRefV1Tests.swift
+[12/38] Compiling CoreModelsTests TaskCancellationTests.swift
+[13/38] Compiling CoreModelsTests TestSupport.swift
+[14/38] Compiling CoreModelsTests VideoMarkerCodableTests.swift
+[15/38] Compiling CoreModelsTests E1RMEntitiesCodecTests.swift
+[16/38] Compiling CoreModelsTests E1RMPlateauDetectorTests.swift
+[17/38] Compiling CoreModelsTests EntityCodableTests.swift
+[18/38] Compiling CoreModelsTests PlateMathCalculatorTests.swift
+[19/38] Compiling CoreModelsTests PrescribedSetLoadTypeTests.swift
+[20/38] Compiling CoreModelsTests PushNotificationRoutingTests.swift
+[21/38] Compiling CoreModelsTests StudentPlanExerciseNotesCodableTests.swift
+[22/38] Compiling CoreModelsTests StudentSetLogDateTests.swift
+[23/38] Compiling CoreModelsTests VideoAttachmentTests.swift
+[24/38] Compiling CoreModelsTests MeetPRCodecTests.swift
+[25/38] Compiling CoreModelsTests OnboardingEntitiesTests.swift
+[26/38] Compiling CoreModelsTests PlanEntityCodableTests.swift
+[27/38] Compiling CoreModelsTests BindEntitiesTests.swift
+[28/38] Compiling CoreModelsTests ChatModelsTests.swift
+[29/38] Compiling CoreModelsTests CoachFeedbackVideoCodecTests.swift
+[30/38] Compiling CoreModelsTests CompetitionLiftResolverTests.swift
+[31/38] Compiling CoreModelsTests EnumRawValueTests.swift
+[32/38] Compiling CoreModelsTests EvaluationEntitiesCodecTests.swift
+[33/38] Compiling CoreModelsTests ExerciseRefTests.swift
+[34/38] Compiling CoreModelsTests CompletionHistoryTests.swift
+[35/38] Compiling CoreModelsTests E1RMAnomalyClassifierTests.swift
+[36/38] Compiling CoreModelsTests E1RMCalculatorTests.swift
+[37/40] Emitting module CoreModelsPackageTests
+[38/40] Compiling CoreModelsPackageTests runner.swift
+[38/40] Write Objects.LinkFileList
+[39/40] Linking CoreModelsPackageTests
+Build complete! (2.74s)
+Test Suite 'All tests' started at 2026-11-16 10:42:01.489.
+Test Suite 'All tests' passed at 2026-11-16 10:42:01.490.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test measuredWeightPREventRoundTripsWithoutE1RMPoint() started.
+◇ Test plateauSubThresholdCreepIsPlateau() started.
+◇ Test codecDecodesBackendDateFormats(rawValue:expectedTimeInterval:) started.
+◇ Suite StudentSetLogDateTests started.
+◇ Test completionAggregatesTwoCycleAlignedWeeks() started.
+◇ Test codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Suite SetRefV1Tests started.
+◇ Test exerciseCodableRoundTripPreservesCatalogFields() started.
+◇ Test planSetTargetRepsRangeEncodesMax() started.
+◇ Test competitionFamilyResolverCoversStanceDecisionMatrix() started.
+◇ Test exerciseCompetitionStanceDecodesAndLegacyPayloadDefaultsToNil() started.
+◇ Test plateauRecentMeaningfulGainResetsStall() started.
+◇ Test prBreakthroughEventDecodesLegacyJSONWithoutSetLogID() started.
+◇ Test completionEmptyPlanReturnsNoWeeks() started.
+◇ Test movementPatternEncodesRawValue() started.
+◇ Test e1rmHistoryPointDecodesLegacyJSONWithoutFamilyOrConfidence() started.
+◇ Test completionIncompleteAndUnmappedLogsIgnored() started.
+◇ Test trainingModeEncodesSnakeCaseRawValue() started.
+◇ Test planSetWeightCodableRoundTripPreservesDecimalString() started.
+◇ Test activeCoachContextHasPublicConstructionAndCodable() started.
+◇ Test studentProfileCodableRoundTripPreservesOnboardingFields() started.
+◇ Test touchesOneRMFlagsEachLockedField() started.
+◇ Test boundaryRules() started.
+◇ Test coachFeedbackVideoDecodesLegacyPayloadWithoutEnglishName() started.
+◇ Test unitPreferenceVocabularyMatchesBackendVerbatim() started.
+◇ Test normalizeUppercasesAndStripsSeparators() started.
+◇ Test suggestedWeightReversesRTSTable() started.
+◇ Test e1rmHistoryPointDecodesLegacyJSONWithoutOriginAsLogged() started.
+◇ Test exerciseTypeEncodesSnakeCaseRawValue() started.
+◇ Test planSetRPECodableRoundTripPreservesDecimalString() started.
+◇ Test trainingPlanKindRoundTripsAdaptation() started.
+◇ Test "legacy video markers decode with absent annotation fields" started.
+◇ Test bindAcceptedPushRequestsAnAuthoritativeBindingRefresh() started.
+◇ Test userRoleEncodesSnakeCaseRawValue() started.
+◇ Test setTypeEncodesRawValue() started.
+◇ Test validAcceptsExactlyTenAlphabetChars() started.
+◇ Test plateauEmptyIsNone() started.
+◇ Test planSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() started.
+◇ Test suggestedWeightRejectsInputsOutsideReverseTable() started.
+◇ Test inviteCodeCodableRoundTripPreservesTypeRawValue() started.
+◇ Test videoAttachmentStatusRawValuesStayStable() started.
+◇ Test codecDecodesDateOnlyStringsAsUTCStartOfDay() started.
+◇ Test groupedRendersFourThreeThree() started.
+◇ Test bindRequestStatusEncodesRawValue() started.
+◇ Test planExerciseCodableRoundTripPreservesMainLiftFalse() started.
+◇ Test userCodableRoundTripPreservesIdentityFields() started.
+◇ Test bindRequestDecodesWithoutEndedAt(endedField:) started.
+◇ Test prescribedSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() started.
+◇ Test taskCancellationRecognizesSwiftAndURLSessionErrors() started.
+◇ Test equipmentEncodesRawValue() started.
+◇ Test exerciseNotePreservesReferenceAndCanonicalBody() started.
+◇ Test codecStillDecodesFullISO8601Timestamps() started.
+◇ Test codecRoundTripsISO8601Dates() started.
+◇ Test studentProfileDecodesNullArraysAsEmptyArrays() started.
+◇ Test planSetCoachNoteOmittedWhenNil() started.
+◇ Test allowedMuscleGroupsAreExactlyEightUniqueCases() started.
+◇ Test prBreakthroughEventRoundTripsAndAcknowledges() started.
+◇ Test foregroundPolicySuppressesOnlyChatMessages() started.
+◇ Test suggestedWeightExtrapolatesToRPEFive() started.
+◇ Test anomalyClassifierKeepsNormalChangesTrusted() started.
+◇ Test codecAcceptsValidLeapYearDate() started.
+◇ Test prescribedSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() started.
+◇ Test validRejectsWrongLengthAndForeignChars() started.
+◇ Test onboardingProfileRoundTripPreservesAllFields() started.
+◇ Test exerciseNoteDateFallbackNeverSilentlySelectsAnotherDay() started.
+◇ Test case passing 2 arguments rawValue → "2026-05-22", expectedTimeInterval → 1779408000.0 to codecDecodesBackendDateFormats(rawValue:expectedTimeInterval:) started.
+◇ Test case passing 2 arguments rawValue → "2026-05-22T10:27:16Z", expectedTimeInterval → 1779445636.0 to codecDecodesBackendDateFormats(rawValue:expectedTimeInterval:) started.
+◇ Test case passing 2 arguments rawValue → "2026-05-22T10:27:16.254Z", expectedTimeInterval → 1779445636.254 to codecDecodesBackendDateFormats(rawValue:expectedTimeInterval:) started.
+◇ Test chatModelsCodablePreservesAcronymFields() started.
+◇ Test restDefaultsMapsRPEBoundaries() started.
+◇ Test parsesAllSupportedPushRoutes() started.
+◇ Test coachProfileCodableRoundTripPreservesValues() started.
+◇ Test bindRequestDecodesEndedAt() started.
+◇ Test epleyFallbackForSubSixRPE() started.
+◇ Test bindRequestRoundTripPreservesNullableFields() started.
+◇ Test case passing 1 argument rawValue → "2025-02-29" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test plateMathFixtureTable() started.
+◇ Test case passing 1 argument rawValue → "2026-13-50" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test e1rmHistoryPointPreservesLowConfidenceAcrossRoundTrip() started.
+◇ Test epleyFallbackWhenRPEMissing() started.
+◇ Test legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test case passing 1 argument rawValue → "2026-04-31" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test planStatusEncodesRawValue() started.
+◇ Test intensityModeEncodesRawValue() started.
+◇ Test case passing 1 argument rawValue → "2026-00-15" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test case passing 1 argument rawValue → "2026-04-00" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test evaluationPeriodDecodesBackendWireShape() started.
+◇ Test extendedTableCanonicalExamples(reps:rpe:expected:) started.
+◇ Test case passing 1 argument rawValue → "abc-def-ghi" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test liftFamilyEncodesRawValue() started.
+◇ Test e1rmHistoryPointReplacingIDPreservesPayload() started.
+◇ Test case passing 1 argument rawValue → "" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test gymTierEncodesSnakeCaseRawValue() started.
+◇ Test gymTierVocabularyMatchesBackendVerbatim() started.
+◇ Test case passing 1 argument rawValue → "2026-04" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test planSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() started.
+◇ Test completionAttributedByPlanExerciseNotLogDate() started.
+◇ Test case passing 1 argument rawValue → "2026-04-27extra" to codecRejectsInvalidDateStrings(rawValue:) started.
+◇ Test completionRatesComputed() started.
+◇ Test plateauRisingNeverPlateaus() started.
+◇ Test completionRestDaysExcludedFromDenominator() started.
+◇ Test unitSystemEncodesRawValue() started.
+◇ Test planExerciseCodableRoundTripPreservesMainLiftTrue() started.
+◇ Test onboardingProfileEmptyShellRoundTrips() started.
+◇ Test trainingPlanKindDefaultsToRegularWhenAbsent() started.
+◇ Test exerciseFacetMultiSelectEncodesArrays() started.
+◇ Test patchEqualityDistinguishesAllThreeStates() started.
+◇ Test benchGripEncodesRawValue() started.
+◇ Test plateauInsufficientDataIsNeverPlateau() started.
+◇ Test studentPlanViewPlanKindDefaultsToRegular() started.
+◇ Test e1rmHistoryPointRoundTripsWithNilRPE() started.
+◇ Test spec106CanonicalFixture() started.
+◇ Test codecEncodesAndDecodesSnakeCaseKeys() started.
+◇ Test completedEvaluationPeriodIsNeverOverdue() started.
+◇ Test rejectsUnknownKindsAndMalformedRequiredIdentifiers() started.
+◇ Test "video marker annotation fields decode through the shared snake-case codec" started.
+◇ Test benchGripVocabularyMatchesBackendVerbatim() started.
+◇ Test plateauFlatIsPlateau() started.
+◇ Test emptyPatchIsAllAbsentAndTouchesNoOneRM() started.
+◇ Test e1rmHistoryPointRoundTrips() started.
+◇ Test readinessCheckinRoundTripsWithFatigue() started.
+◇ Test genderEncodesBackendRawValue() started.
+◇ Test injuryAreaVocabularyMatchesBackendVerbatim() started.
+◇ Test isExactReflectsRounding() started.
+◇ Test muscleGroupEncodesRawValue() started.
+◇ Test anomalyClassifierFlagsHardAnomaliesForFutureConfirmation() started.
+◇ Test studentSetLogMissingFlagsDecodeFalseAndRoundTrip() started.
+◇ Test genderVocabularyMatchesBackendVerbatim() started.
+◇ Test deadliftStanceEncodesRawValue() started.
+◇ Test userRoundTripsDateOnlyBirthDate() started.
+◇ Test evaluationSummaryExcerptTruncatesLinesAndLength() started.
+◇ Test extractsInviteCodeFromMessagePreferringLink() started.
+◇ Test trainingPlanCodableRoundTripPreservesPlanFields() started.
+◇ Test evaluationPeriodRemainingAndProgressDeriveFromLocalNow() started.
+◇ Test bindRequestStatusVocabularyMatchesBackendVerbatim() started.
+◇ Test strengthenMuscleGroupsAreTenUniqueBackendTokens() started.
+◇ Test anomalyClassifierQuarantinesSoftAnomalies() started.
+◇ Test planSetPercentageAnchorRoundTripsAndUnknownValueDecodesAsNil() started.
+◇ Test coachFeedbackVideoRoundTripPreservesMetadata() started.
+◇ Test prescribedSetIndependentWeightAndIntensityRoundTrip() started.
+◇ Test competitionStanceVocabularyMatchesBackendVerbatim() started.
+◇ Test inviteCodeTypeVocabularyMatchesBackendVerbatim() started.
+◇ Test trainingDayVocabularyMatchesBackendVerbatim() started.
+◇ Test completionAssumedLogsExcludedFromSetsAndTrainingDays() started.
+◇ Test planSetTargetRepsExactOmitsMax() started.
+◇ Test inviteCodeTypeEncodesSnakeCaseRawValue() started.
+◇ Test parsesStudentPlanChangePushRoutes() started.
+◇ Test coachFeedbackDecodesLegacyPayloadWithoutVideoFields() started.
+◇ Test videoAttachmentDecodesRecordsWrittenBeforeBackgroundUploadMetadata() started.
+◇ Test belowBarReturnsNil() started.
+◇ Test planSourceEncodesRawValue() started.
+◇ Test squatStanceEncodesSnakeCaseRawValue() started.
+◇ Test e1rmHistoryPointPreservesImportedOriginAcrossRoundTrip() started.
+◇ Test rpeInterpolationBetweenHalfSteps() started.
+◇ Test extendedTableSuggestedWeightPreservesRawRoundTrip() started.
+◇ Test planDayCodableRoundTripPreservesWeekFields() started.
+◇ Test plateauUnsortedInputHandled() started.
+◇ Test malformedSetRefsInsideDomainMessageArrayAreLocallyLossy() started.
+◇ Test evaluationSummaryDecodesBackendWireShape() started.
+◇ Test rtsTableAll108CellsMatchSpec() started.
+◇ Test anomalyClassifierTrustsColdStartAndNonPositiveBaselines() started.
+◇ Test deadliftStyleVocabularyMatchesBackendVerbatim() started.
+◇ Test inviteCodeRoundTripPreservesAllFields() started.
+◇ Test plateauStallBoundaryAtFourWeeks() started.
+◇ Test bindRequestCodableRoundTripPreservesStatusAndDates() started.
+◇ Test squatStanceVocabularyMatchesBackendVerbatim() started.
+◇ Test studentPlanExerciseNotesRoundTripsAndDecodesMissingAsNil() started.
+◇ Test e1rmHistoryPointReplacingConfidencePreservesPayloadAndID() started.
+◇ Test videoAttachmentRoundTripsThroughJSON() started.
+◇ Test competitionFamilyResolverIncludesGenericCompetitionLiftAndRejectsVariation() started.
+◇ Test case passing 1 argument endedField → "" to bindRequestDecodesWithoutEndedAt(endedField:) started.
+◇ Test case passing 1 argument endedField → ", "ended_at": null" to bindRequestDecodesWithoutEndedAt(endedField:) started.
+◇ Test wireTrainingDateUsesGregorianYearWithTheDevicesTimeZone() started.
+✔ Test measuredWeightPREventRoundTripsWithoutE1RMPoint() passed after 0.008 seconds.
+◇ Test readValueIgnoresFieldsThisBuildPredates() started.
+◇ Test everyExpandedWireFieldMustBePresentEvenWhenNull() started.
+◇ Test everyNewCrossFieldInvariantHasItsOwnError() started.
+◇ Test goldenInvalidExerciseNamesAreRejected() started.
+◇ Test encodingUsesStableCanonicalKeyOrderAndExplicitNulls() started.
+✔ Test plateauSubThresholdCreepIsPlateau() passed after 0.009 seconds.
+◇ Test goldenInvalidCasesAreRejectedBeforeFormatting() started.
+◇ Test invalidSourcePrecisionAndRPEStepAreRejected() started.
+◇ Test sourceWireDecimalsNormalizeThroughIntegerMinorUnits() started.
+◇ Test canonicalBodyAddsExactlyOneNewlineOnlyForNonemptyNote() started.
+◇ Test goldenFixturesMatchCanonicalFormatterByteForByte() started.
+◇ Test case passing 1 argument testCase → LegacyBodyweightCase(weight: Optional(135), rpe: nil, bodyweight: false) to legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test case passing 1 argument testCase → LegacyBodyweightCase(weight: Optional(135), rpe: Optional(10), bodyweight: false) to legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test goldenExerciseNameCodePointBoundariesAreEnforced() started.
+◇ Test case passing 1 argument testCase → LegacyBodyweightCase(weight: nil, rpe: nil, bodyweight: false) to legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test case passing 1 argument testCase → LegacyBodyweightCase(weight: nil, rpe: Optional(8), bodyweight: false) to legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test case passing 1 argument testCase → LegacyBodyweightCase(weight: nil, rpe: Optional(10), bodyweight: true) to legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) started.
+◇ Test case passing 3 arguments reps → 3, rpe → 9.0, expected → 112.11 to extendedTableCanonicalExamples(reps:rpe:expected:) started.
+✔ Test completionAggregatesTwoCycleAlignedWeeks() passed after 0.010 seconds.
+✔ Test codecDecodesBackendDateFormats(rawValue:expectedTimeInterval:) with 3 test cases passed after 0.010 seconds.
+◇ Test case passing 3 arguments reps → 1, rpe → 10.0, expected → 100.0 to extendedTableCanonicalExamples(reps:rpe:expected:) started.
+◇ Test case passing 3 arguments reps → 11, rpe → 8.0, expected → 153.14 to extendedTableCanonicalExamples(reps:rpe:expected:) started.
+◇ Test case passing 3 arguments reps → 12, rpe → 8.0, expected → 159.74 to extendedTableCanonicalExamples(reps:rpe:expected:) started.
+✔ Test codecRejectsInvalidDateStrings(rawValue:) with 9 test cases passed after 0.010 seconds.
+✔ Test planSetTargetRepsRangeEncodesMax() passed after 0.010 seconds.
+✔ Test exerciseCodableRoundTripPreservesCatalogFields() passed after 0.010 seconds.
+✔ Test competitionFamilyResolverCoversStanceDecisionMatrix() passed after 0.010 seconds.
+✔ Test plateauRecentMeaningfulGainResetsStall() passed after 0.010 seconds.
+✔ Test completionEmptyPlanReturnsNoWeeks() passed after 0.010 seconds.
+✔ Test movementPatternEncodesRawValue() passed after 0.010 seconds.
+✔ Test prBreakthroughEventDecodesLegacyJSONWithoutSetLogID() passed after 0.010 seconds.
+✔ Test e1rmHistoryPointDecodesLegacyJSONWithoutFamilyOrConfidence() passed after 0.010 seconds.
+✔ Test trainingModeEncodesSnakeCaseRawValue() passed after 0.011 seconds.
+✔ Test completionIncompleteAndUnmappedLogsIgnored() passed after 0.011 seconds.
+✔ Test activeCoachContextHasPublicConstructionAndCodable() passed after 0.011 seconds.
+✔ Test boundaryRules() passed after 0.011 seconds.
+✔ Test normalizeUppercasesAndStripsSeparators() passed after 0.011 seconds.
+✔ Test planSetWeightCodableRoundTripPreservesDecimalString() passed after 0.011 seconds.
+✔ Test coachFeedbackVideoDecodesLegacyPayloadWithoutEnglishName() passed after 0.011 seconds.
+✔ Test touchesOneRMFlagsEachLockedField() passed after 0.011 seconds.
+✔ Test exerciseTypeEncodesSnakeCaseRawValue() passed after 0.011 seconds.
+✔ Test suggestedWeightReversesRTSTable() passed after 0.011 seconds.
+✔ Test unitPreferenceVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test e1rmHistoryPointDecodesLegacyJSONWithoutOriginAsLogged() passed after 0.012 seconds.
+✔ Test bindAcceptedPushRequestsAnAuthoritativeBindingRefresh() passed after 0.013 seconds.
+✔ Test planSetRPECodableRoundTripPreservesDecimalString() passed after 0.013 seconds.
+✔ Test exerciseCompetitionStanceDecodesAndLegacyPayloadDefaultsToNil() passed after 0.013 seconds.
+✔ Test userRoleEncodesSnakeCaseRawValue() passed after 0.013 seconds.
+✔ Test validAcceptsExactlyTenAlphabetChars() passed after 0.013 seconds.
+✔ Test suggestedWeightRejectsInputsOutsideReverseTable() passed after 0.013 seconds.
+✔ Test "legacy video markers decode with absent annotation fields" passed after 0.014 seconds.
+✔ Test setTypeEncodesRawValue() passed after 0.014 seconds.
+✔ Test groupedRendersFourThreeThree() passed after 0.014 seconds.
+✔ Test plateauEmptyIsNone() passed after 0.015 seconds.
+✔ Test bindRequestStatusEncodesRawValue() passed after 0.015 seconds.
+✔ Test videoAttachmentStatusRawValuesStayStable() passed after 0.015 seconds.
+✔ Test planExerciseCodableRoundTripPreservesMainLiftFalse() passed after 0.015 seconds.
+✔ Test prescribedSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() passed after 0.015 seconds.
+✔ Test equipmentEncodesRawValue() passed after 0.015 seconds.
+✔ Test taskCancellationRecognizesSwiftAndURLSessionErrors() passed after 0.015 seconds.
+✔ Test exerciseNotePreservesReferenceAndCanonicalBody() passed after 0.015 seconds.
+✔ Test studentProfileCodableRoundTripPreservesOnboardingFields() passed after 0.015 seconds.
+✔ Test planSetCoachNoteOmittedWhenNil() passed after 0.015 seconds.
+✔ Test codecDecodesDateOnlyStringsAsUTCStartOfDay() passed after 0.015 seconds.
+✔ Test allowedMuscleGroupsAreExactlyEightUniqueCases() passed after 0.015 seconds.
+✔ Test inviteCodeCodableRoundTripPreservesTypeRawValue() passed after 0.015 seconds.
+✔ Test prBreakthroughEventRoundTripsAndAcknowledges() passed after 0.015 seconds.
+✔ Test foregroundPolicySuppressesOnlyChatMessages() passed after 0.015 seconds.
+✔ Test suggestedWeightExtrapolatesToRPEFive() passed after 0.015 seconds.
+✔ Test anomalyClassifierKeepsNormalChangesTrusted() passed after 0.015 seconds.
+✔ Test prescribedSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() passed after 0.015 seconds.
+✔ Test validRejectsWrongLengthAndForeignChars() passed after 0.015 seconds.
+✔ Test planSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() passed after 0.015 seconds.
+✔ Test exerciseNoteDateFallbackNeverSilentlySelectsAnotherDay() passed after 0.015 seconds.
+✔ Test codecRoundTripsISO8601Dates() passed after 0.015 seconds.
+✔ Test restDefaultsMapsRPEBoundaries() passed after 0.015 seconds.
+✔ Test codecStillDecodesFullISO8601Timestamps() passed after 0.015 seconds.
+✔ Test parsesAllSupportedPushRoutes() passed after 0.015 seconds.
+✔ Test bindRequestDecodesWithoutEndedAt(endedField:) with 2 test cases passed after 0.016 seconds.
+✔ Test epleyFallbackForSubSixRPE() passed after 0.015 seconds.
+✔ Test codecAcceptsValidLeapYearDate() passed after 0.015 seconds.
+✔ Test studentProfileDecodesNullArraysAsEmptyArrays() passed after 0.016 seconds.
+✔ Test plateMathFixtureTable() passed after 0.015 seconds.
+✔ Test trainingPlanKindRoundTripsAdaptation() passed after 0.016 seconds.
+✔ Test epleyFallbackWhenRPEMissing() passed after 0.015 seconds.
+✔ Test legacyPrescribedSetRequiresExactBodyweightEncoding(testCase:) with 5 test cases passed after 0.016 seconds.
+✔ Test planStatusEncodesRawValue() passed after 0.016 seconds.
+✔ Test intensityModeEncodesRawValue() passed after 0.016 seconds.
+✔ Test e1rmHistoryPointPreservesLowConfidenceAcrossRoundTrip() passed after 0.016 seconds.
+✔ Test coachProfileCodableRoundTripPreservesValues() passed after 0.016 seconds.
+✔ Test extendedTableCanonicalExamples(reps:rpe:expected:) with 4 test cases passed after 0.015 seconds.
+✔ Test userCodableRoundTripPreservesIdentityFields() passed after 0.016 seconds.
+✔ Test chatModelsCodablePreservesAcronymFields() passed after 0.016 seconds.
+✔ Test liftFamilyEncodesRawValue() passed after 0.013 seconds.
+✔ Test e1rmHistoryPointReplacingIDPreservesPayload() passed after 0.013 seconds.
+✔ Test gymTierVocabularyMatchesBackendVerbatim() passed after 0.013 seconds.
+✔ Test gymTierEncodesSnakeCaseRawValue() passed after 0.013 seconds.
+✔ Test plateauRisingNeverPlateaus() passed after 0.013 seconds.
+✔ Test completionAttributedByPlanExerciseNotLogDate() passed after 0.013 seconds.
+✔ Test completionRatesComputed() passed after 0.013 seconds.
+✔ Test unitSystemEncodesRawValue() passed after 0.013 seconds.
+✔ Test planExerciseCodableRoundTripPreservesMainLiftTrue() passed after 0.013 seconds.
+✔ Test completionRestDaysExcludedFromDenominator() passed after 0.013 seconds.
+✔ Test exerciseFacetMultiSelectEncodesArrays() passed after 0.013 seconds.
+✔ Test benchGripEncodesRawValue() passed after 0.013 seconds.
+✔ Test patchEqualityDistinguishesAllThreeStates() passed after 0.013 seconds.
+✔ Test e1rmHistoryPointRoundTripsWithNilRPE() passed after 0.012 seconds.
+✔ Test plateauInsufficientDataIsNeverPlateau() passed after 0.013 seconds.
+✔ Test completedEvaluationPeriodIsNeverOverdue() passed after 0.012 seconds.
+✔ Test evaluationPeriodDecodesBackendWireShape() passed after 0.015 seconds.
+✔ Test spec106CanonicalFixture() passed after 0.012 seconds.
+✔ Test rejectsUnknownKindsAndMalformedRequiredIdentifiers() passed after 0.012 seconds.
+✔ Test benchGripVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test plateauFlatIsPlateau() passed after 0.012 seconds.
+✔ Test emptyPatchIsAllAbsentAndTouchesNoOneRM() passed after 0.012 seconds.
+✔ Test e1rmHistoryPointRoundTrips() passed after 0.012 seconds.
+✔ Test bindRequestRoundTripPreservesNullableFields() passed after 0.016 seconds.
+✔ Test onboardingProfileRoundTripPreservesAllFields() passed after 0.016 seconds.
+✔ Test readinessCheckinRoundTripsWithFatigue() passed after 0.012 seconds.
+✔ Test genderEncodesBackendRawValue() passed after 0.012 seconds.
+✔ Test injuryAreaVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test isExactReflectsRounding() passed after 0.012 seconds.
+✔ Test anomalyClassifierFlagsHardAnomaliesForFutureConfirmation() passed after 0.012 seconds.
+✔ Test muscleGroupEncodesRawValue() passed after 0.012 seconds.
+✔ Test studentPlanViewPlanKindDefaultsToRegular() passed after 0.013 seconds.
+✔ Test genderVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test evaluationSummaryExcerptTruncatesLinesAndLength() passed after 0.012 seconds.
+✔ Test bindRequestDecodesEndedAt() passed after 0.016 seconds.
+✔ Test codecEncodesAndDecodesSnakeCaseKeys() passed after 0.013 seconds.
+✔ Test deadliftStanceEncodesRawValue() passed after 0.012 seconds.
+✔ Test anomalyClassifierQuarantinesSoftAnomalies() passed after 0.012 seconds.
+✔ Test "video marker annotation fields decode through the shared snake-case codec" passed after 0.013 seconds.
+✔ Test strengthenMuscleGroupsAreTenUniqueBackendTokens() passed after 0.012 seconds.
+✔ Test bindRequestStatusVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test evaluationPeriodRemainingAndProgressDeriveFromLocalNow() passed after 0.012 seconds.
+✔ Test competitionStanceVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test planSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() passed after 0.013 seconds.
+✔ Test inviteCodeTypeVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test trainingDayVocabularyMatchesBackendVerbatim() passed after 0.012 seconds.
+✔ Test completionAssumedLogsExcludedFromSetsAndTrainingDays() passed after 0.012 seconds.
+✔ Test planSetTargetRepsExactOmitsMax() passed after 0.012 seconds.
+✔ Test prescribedSetIndependentWeightAndIntensityRoundTrip() passed after 0.012 seconds.
+✔ Test inviteCodeTypeEncodesSnakeCaseRawValue() passed after 0.012 seconds.
+✔ Test parsesStudentPlanChangePushRoutes() passed after 0.012 seconds.
+✔ Test extractsInviteCodeFromMessagePreferringLink() passed after 0.012 seconds.
+✔ Test belowBarReturnsNil() passed after 0.012 seconds.
+✔ Test squatStanceEncodesSnakeCaseRawValue() passed after 0.012 seconds.
+✔ Test planSourceEncodesRawValue() passed after 0.012 seconds.
+✔ Test e1rmHistoryPointPreservesImportedOriginAcrossRoundTrip() passed after 0.012 seconds.
+✔ Test rpeInterpolationBetweenHalfSteps() passed after 0.012 seconds.
+✔ Test plateauUnsortedInputHandled() passed after 0.011 seconds.
+✔ Test planDayCodableRoundTripPreservesWeekFields() passed after 0.012 seconds.
+✔ Test onboardingProfileEmptyShellRoundTrips() passed after 0.013 seconds.
+✔ Test rtsTableAll108CellsMatchSpec() passed after 0.011 seconds.
+✔ Test videoAttachmentDecodesRecordsWrittenBeforeBackgroundUploadMetadata() passed after 0.012 seconds.
+✔ Test extendedTableSuggestedWeightPreservesRawRoundTrip() passed after 0.011 seconds.
+✔ Test deadliftStyleVocabularyMatchesBackendVerbatim() passed after 0.011 seconds.
+✔ Test studentSetLogMissingFlagsDecodeFalseAndRoundTrip() passed after 0.013 seconds.
+✔ Test trainingPlanKindDefaultsToRegularWhenAbsent() passed after 0.013 seconds.
+✔ Test plateauStallBoundaryAtFourWeeks() passed after 0.011 seconds.
+✔ Test squatStanceVocabularyMatchesBackendVerbatim() passed after 0.011 seconds.
+✔ Test coachFeedbackDecodesLegacyPayloadWithoutVideoFields() passed after 0.012 seconds.
+✔ Test e1rmHistoryPointReplacingConfidencePreservesPayloadAndID() passed after 0.011 seconds.
+✔ Test competitionFamilyResolverIncludesGenericCompetitionLiftAndRejectsVariation() passed after 0.011 seconds.
+✔ Test anomalyClassifierTrustsColdStartAndNonPositiveBaselines() passed after 0.011 seconds.
+✔ Test videoAttachmentRoundTripsThroughJSON() passed after 0.011 seconds.
+✔ Test planSetPercentageAnchorRoundTripsAndUnknownValueDecodesAsNil() passed after 0.012 seconds.
+✔ Test evaluationSummaryDecodesBackendWireShape() passed after 0.012 seconds.
+✔ Test coachFeedbackVideoRoundTripPreservesMetadata() passed after 0.012 seconds.
+✔ Test malformedSetRefsInsideDomainMessageArrayAreLocallyLossy() passed after 0.012 seconds.
+✔ Test wireTrainingDateUsesGregorianYearWithTheDevicesTimeZone() passed after 0.009 seconds.
+✔ Test trainingPlanCodableRoundTripPreservesPlanFields() passed after 0.012 seconds.
+✔ Test encodingUsesStableCanonicalKeyOrderAndExplicitNulls() passed after 0.008 seconds.
+✔ Test inviteCodeRoundTripPreservesAllFields() passed after 0.011 seconds.
+✔ Test invalidSourcePrecisionAndRPEStepAreRejected() passed after 0.008 seconds.
+✔ Test userRoundTripsDateOnlyBirthDate() passed after 0.013 seconds.
+✔ Test canonicalBodyAddsExactlyOneNewlineOnlyForNonemptyNote() passed after 0.008 seconds.
+✔ Test goldenInvalidExerciseNamesAreRejected() passed after 0.008 seconds.
+✔ Test sourceWireDecimalsNormalizeThroughIntegerMinorUnits() passed after 0.008 seconds.
+✔ Test studentPlanExerciseNotesRoundTripsAndDecodesMissingAsNil() passed after 0.011 seconds.
+✔ Test everyNewCrossFieldInvariantHasItsOwnError() passed after 0.008 seconds.
+✔ Test bindRequestCodableRoundTripPreservesStatusAndDates() passed after 0.012 seconds.
+✔ Test goldenExerciseNameCodePointBoundariesAreEnforced() passed after 0.008 seconds.
+✔ Suite StudentSetLogDateTests passed after 0.018 seconds.
+✔ Test readValueIgnoresFieldsThisBuildPredates() passed after 0.011 seconds.
+✔ Test everyExpandedWireFieldMustBePresentEvenWhenNull() passed after 0.012 seconds.
+✔ Test goldenFixturesMatchCanonicalFormatterByteForByte() passed after 0.011 seconds.
+✔ Test goldenInvalidCasesAreRejectedBeforeFormatting() passed after 0.012 seconds.
+✔ Suite SetRefV1Tests passed after 0.021 seconds.
+✔ Test run with 168 tests in 2 suites passed after 0.022 seconds.

@@ -1,0 +1,8 @@
+Keychain unique nonexistent-item query status: -50
+Keychain status description: One or more parameters passed to a function were not valid.
+Standalone H.264 writer.startWriting: false
+Writer error domain/code: AVFoundationErrorDomain -11834
+Writer error details: ["AVErrorMediaTypeKey": vide, "NSLocalizedDescription": Cannot Encode, "AVErrorMediaSubTypeKey": <__NSSingleObjectArrayI 0xc336c4000>(
+1635148593
+)
+, "NSLocalizedFailureReason": The encoder required for this media cannot be found.]

@@ -125,6 +125,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       }
       if let weightEntry, let studentID {
         MeetWeightStrip(studentID: studentID, model: weightEntry, onEditMeet: onEditMeet)
+          .disabled(previewDay != nil)
       }
       if let emptyState {
         TrainingEmptyStateView(

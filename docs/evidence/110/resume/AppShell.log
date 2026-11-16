@@ -1,0 +1,1843 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Fetching https://github.com/maxdesiatov/XMLCoder.git from cache
+Fetching https://github.com/nalexn/ViewInspector from cache
+Fetching https://github.com/CoreOffice/CoreXLSX from cache
+Fetching https://github.com/weichsel/ZIPFoundation.git from cache
+Fetched https://github.com/maxdesiatov/XMLCoder.git from cache (0.01s)
+Fetched https://github.com/CoreOffice/CoreXLSX from cache (0.01s)
+Fetched https://github.com/nalexn/ViewInspector from cache (0.04s)
+Fetched https://github.com/weichsel/ZIPFoundation.git from cache (0.08s)
+Creating working copy for https://github.com/maxdesiatov/XMLCoder.git
+Creating working copy for https://github.com/weichsel/ZIPFoundation.git
+Creating working copy for https://github.com/CoreOffice/CoreXLSX
+Creating working copy for https://github.com/nalexn/ViewInspector
+Working copy of https://github.com/CoreOffice/CoreXLSX resolved at 0.14.2
+Working copy of https://github.com/weichsel/ZIPFoundation.git resolved at 0.9.20
+Working copy of https://github.com/maxdesiatov/XMLCoder.git resolved at 0.14.0
+Working copy of https://github.com/nalexn/ViewInspector resolved at 0.10.3
+Building for debugging...
+[0/44] /Users/david/Projects/apps/MeetPR-wt-110/Modules/AppShell/.build/arm64-apple-macosx/debug/AppShellPackageTests.derived/runner.swift
+[1/44] Write sources
+[1/44] Copying Localizable.xcstrings
+[1/44] Copying Info.plist
+[1/44] Write sources
+[14/44] Copying Info.plist
+[14/44] Copying PrivacyInfo.xcprivacy
+[15/44] Copying Info.plist
+[16/44] Copying Localizable.xcstrings
+[16/44] Copying exercise-names-zh-Hant.json
+[16/44] Copying OpenCC-LICENSE.txt
+[16/44] Copying Localizable.xcstrings
+[16/44] Copying exercise-search-zh-Hant.json
+[16/44] Copying OpenCC-NOTICE.txt
+[16/44] Copying exercise-catalog-v2.json
+[25/44] Copying Localizable.xcstrings
+[25/44] Copying Info.plist
+[28/44] Copying exercise-aliases.json
+[30/44] Copying Localizable.xcstrings
+[30/44] Write sources
+[30/44] Copying Localizable.xcstrings
+[30/44] Write sources
+[34/44] Copying Info.plist
+[34/44] Write sources
+[37/44] Copying Localizable.xcstrings
+[38/44] Copying Info.plist
+[39/44] Copying InviteShare.xcassets
+[40/44] Copying Media.xcassets
+[41/44] Write swift-version--58304C5D6DBC2206.txt
+[43/362] Compiling ViewInspector ConfigurationModifiers.swift
+[44/362] Compiling ViewInspector CustomStyleModifiers.swift
+[45/362] Compiling ViewInspector EnvironmentModifiers.swift
+[46/362] Compiling ViewInspector Alert.swift
+[47/362] Compiling ViewInspector AngularGradient.swift
+[48/366] Compiling ViewInspector Link.swift
+[49/366] Compiling ViewInspector List.swift
+[50/366] Compiling ViewInspector LocationButton.swift
+[51/366] Compiling ViewInspector Map.swift
+[52/366] Compiling ViewInspector MapAnnotation.swift
+[53/366] Compiling XMLCoder XMLEncodingStorage.swift
+[54/366] Compiling XMLCoder XMLKeyedEncodingContainer.swift
+[55/366] Compiling XMLCoder XMLReferencingEncoder.swift
+[56/366] Compiling XMLCoder XMLUnkeyedEncodingContainer.swift
+[57/366] Compiling ViewInspector Canvas.swift
+[58/366] Compiling ViewInspector ClassifiedView.swift
+[59/366] Compiling ViewInspector AsyncImage.swift
+[60/366] Compiling ViewInspector Button.swift
+[61/368] Compiling ViewInspector Menu.swift
+[62/368] Compiling ViewInspector MenuButton.swift
+[63/368] Compiling ViewInspector MultiDatePicker.swift
+[64/368] Compiling ViewInspector CustomView.swift
+[65/368] Compiling ViewInspector CustomViewModifier.swift
+[66/368] Compiling CoreModels CatalogExerciseName.swift
+[67/368] Compiling CoreModels ActiveCoachContext.swift
+[68/368] Compiling CoreModels ChatConversation.swift
+[69/368] Compiling CoreModels ChatCursor.swift
+[70/368] Compiling CoreModels ChatMessage.swift
+[71/368] Compiling ViewInspector AnyView.swift
+[82/368] Compiling ViewInspector DatePicker.swift
+[83/368] Compiling ViewInspector DelayedPreferenceView.swift
+[84/376] Compiling ViewInspector NavigationBarModifiers.swift
+[85/376] Compiling ViewInspector PositioningModifiers.swift
+[86/376] Compiling ViewInspector PreviewModifiers.swift
+[87/376] Compiling ViewInspector SizingModifiers.swift
+[88/376] Compiling ViewInspector TextInputModifiers.swift
+[89/376] Compiling ViewInspector TransformingModifiers.swift
+[90/376] Compiling ViewInspector TransitiveModifiers.swift
+[91/376] Compiling ViewInspector VisualEffectModifiers.swift
+[96/376] Compiling ViewInspector Overlay.swift
+[97/376] Compiling ViewInspector PasteButton.swift
+[98/376] Compiling ViewInspector Picker.swift
+[99/376] Compiling ViewInspector Popover.swift
+[100/376] Compiling ViewInspector PopoverContent.swift
+[101/376] Compiling ViewInspector EventsModifiers.swift
+[102/376] Compiling ViewInspector GestureModifiers.swift
+[103/376] Compiling ViewInspector InteractionModifiers.swift
+[104/376] Compiling CoreModels ChatMessageKind.swift
+[105/376] Compiling ViewInspector Inspector.swift
+[106/376] Compiling ViewInspector LazyGroup.swift
+[107/376] Compiling ViewInspector AccessibilityModifiers.swift
+[108/376] Compiling ViewInspector AnimationModifiers.swift
+[109/376] Emitting module XMLCoder
+[112/376] Compiling ViewInspector DisclosureGroup.swift
+[113/376] Compiling ViewInspector Divider.swift
+[114/376] Compiling ViewInspector EditButton.swift
+[127/376] Emitting module ZIPFoundation
+[128/376] Compiling ZIPFoundation URL+ZIP.swift
+[129/376] Compiling ZIPFoundation resource_bundle_accessor.swift
+[130/376] Compiling ViewInspector ConditionalContent.swift
+[131/376] Compiling ViewInspector ConfirmationDialog.swift
+[132/376] Compiling ViewInspector ContentUnavailableView.swift
+[133/376] Compiling ViewInspector ControlGroup.swift
+[134/376] Compiling ViewInspector LazyHStack.swift
+[135/376] Compiling ViewInspector LazyVGrid.swift
+[136/376] Compiling ViewInspector LazyVStack.swift
+[137/376] Compiling ViewInspector LinearGradient.swift
+[166/376] Emitting module CoreModels
+[182/376] Compiling ViewInspector Form.swift
+[183/388] Compiling ViewInspector GeometryReader.swift
+[184/388] Compiling ViewInspector NavigationDestination.swift
+[185/388] Compiling ViewInspector NavigationLink.swift
+[186/388] Compiling ViewInspector NavigationSplitView.swift
+[187/388] Compiling ViewInspector NavigationStack.swift
+[188/388] Compiling ViewInspector NavigationView.swift
+[189/388] Compiling ViewInspector OptionalContent.swift
+[190/388] Compiling ViewInspector OutlineGroup.swift
+[191/388] Compiling CoreModels UnitPreference.swift
+[192/388] Compiling CoreModels UnitSystem.swift
+[193/388] Compiling CoreModels UserRole.swift
+[194/388] Compiling CoreModels ExerciseSearchText.swift
+[195/388] Compiling CoreModels InterfaceLanguage.swift
+[196/388] Compiling CoreModels PushNotificationRouting.swift
+[197/388] Compiling CoreModels TaskCancellation.swift
+[198/388] Compiling CoreModels resource_bundle_accessor.swift
+[199/407] Emitting module CoreXLSX
+[200/407] Compiling RepositoryContracts StudentPlanRepository.swift
+[201/407] Compiling RepositoryContracts StudentPlanStore.swift
+[202/407] Compiling CoreXLSX ColumnReference.swift
+[203/407] Compiling CoreXLSX Workbook.swift
+[204/407] Compiling RepositoryContracts RepositoryStrings.swift
+[205/407] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[206/407] Compiling CoreXLSX CellReference.swift
+[207/407] Compiling CoreXLSX Worksheet.swift
+[208/408] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[209/408] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[210/408] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[211/408] Compiling RepositoryContracts InviteCodeRepository.swift
+[212/408] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[213/408] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[216/408] Compiling RepositoryContracts AccountRepository.swift
+[217/408] Compiling RepositoryContracts BindRepository.swift
+[218/410] Compiling RepositoryContracts E1RMRepository.swift
+[219/410] Compiling RepositoryContracts EvaluationRepository.swift
+[220/410] Compiling RepositoryContracts VideoMarkerRepository.swift
+[221/410] Compiling RepositoryContracts resource_bundle_accessor.swift
+[222/410] Compiling RepositoryContracts OnboardingRepository.swift
+[223/410] Compiling RepositoryContracts ReadinessRepository.swift
+[226/410] Emitting module RepositoryContracts
+[227/410] Compiling RepositoryContracts ChatRepository.swift
+[228/410] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[229/467] Compiling CoreXLSX XLSXFile.swift
+[230/467] Compiling CoreXLSX Cell.swift
+[231/467] Compiling CoreXLSX CellQueries.swift
+[232/467] Compiling CoreXLSX Styles.swift
+[233/467] Compiling Networking APIClient+Exercises.swift
+[234/467] Compiling Networking APIClient+Feedback.swift
+[235/467] Compiling Networking APIClient+Onboarding.swift
+[236/467] Compiling Networking APIClient+Plans.swift
+[237/467] Compiling Networking APIClient+Readiness.swift
+[238/467] Compiling Networking APIClient+Sets.swift
+[239/467] Compiling Networking APIClient+StudentAddedSets.swift
+[240/473] Compiling Networking APIClient+Account.swift
+[241/473] Compiling Networking APIClient+Bind.swift
+[242/473] Compiling Networking APIClient+BindQueue.swift
+[243/473] Compiling Networking APIClient+BodyWeights.swift
+[244/473] Compiling Networking APIClient+CoachSets.swift
+[245/473] Compiling Networking APIClient+Devices.swift
+[246/473] Compiling Networking APIClient+Evaluations.swift
+[247/473] Compiling Networking APIClient+Auth.swift
+[248/473] Compiling Networking AuthDTOs.swift
+[249/473] Compiling Networking SessionStateReader.swift
+[250/473] Compiling Networking BackendVideoMarkerRepository.swift
+[251/473] Compiling Networking BuildConfig.swift
+[252/473] Compiling Networking ExerciseCatalogCache.swift
+[253/473] Compiling Networking SetLogDTOs.swift
+[254/473] Compiling Networking StudentVideoDTOs.swift
+[255/473] Compiling Networking UploadDTOs.swift
+[256/473] Compiling Networking VideoMarkerDTOs.swift
+[257/473] Compiling Networking WireFormatting.swift
+[258/473] Compiling Networking Endpoints.swift
+[259/473] Compiling Networking OnboardingDTOs.swift
+[260/473] Compiling Networking OnboardingPatchDTO.swift
+[261/473] Compiling Networking PlanDTOs.swift
+[262/473] Compiling Networking PlanHandoffDTO.swift
+[263/473] Compiling Networking PlanRequestDTOs.swift
+[264/473] Compiling Networking ReadinessDTOs.swift
+[265/473] Compiling Networking ErrorEnvelope.swift
+[266/473] Compiling Networking DomainMapping.swift
+[267/473] Compiling Networking NetworkChatRepository.swift
+[268/473] Compiling Networking OSSPartUploader.swift
+[269/473] Compiling Networking RealtimeClient.swift
+[270/473] Compiling Networking RealtimeEvent.swift
+[284/479] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[285/479] Compiling Networking DecimalCoding.swift
+[286/479] Compiling Networking EvaluationDTOs.swift
+[287/479] Compiling Networking ExerciseDTOs.swift
+[288/479] Compiling Networking ExerciseStatsDTOs.swift
+[289/479] Compiling Networking FeedbackDTOs.swift
+[290/479] Compiling Networking FeedbackCache.swift
+[305/479] Compiling Networking ChatDTOs.swift
+[306/479] Compiling Networking CoachSetLogDTO.swift
+[307/479] Compiling Networking CoachStudentDTOs.swift
+[312/479] Compiling Networking JSONFileCache.swift
+[313/479] Compiling Networking PlanCache.swift
+[314/479] Compiling Networking StudentPlanCache.swift
+[315/479] Compiling Networking TrainingLogCache.swift
+[316/479] Compiling Networking AllStudentSetLogsDTO.swift
+[317/479] Compiling Networking APIClient+StudentVideos.swift
+[318/479] Compiling Networking APIClient+Students.swift
+[319/479] Compiling Networking APIClient+Uploads.swift
+[320/479] Compiling Networking APIClient+VideoMarkers.swift
+[321/479] Compiling Networking APIClient+WeightSuggestions.swift
+[322/479] Compiling Networking APIClient.swift
+[323/479] Compiling Networking BindDTOs.swift
+[324/479] Compiling Networking BindQueueDTOs.swift
+[325/479] Compiling Networking BodyWeightDTOs.swift
+[344/479] Emitting module Networking
+[358/479] Emitting module DesignSystem
+[359/479] Compiling DesignSystem SemanticTone.swift
+[360/479] Compiling DesignSystem Spacing.swift
+[361/479] Compiling DesignSystem Typography.swift
+[362/479] Compiling DesignSystem VideoColors.swift
+[363/479] Compiling DesignSystem VisualEffects.swift
+[364/479] Compiling DesignSystem resource_bundle_accessor.swift
+[365/537] Emitting module Analytics
+[366/537] Compiling ChatUI ChatComposer.swift
+[367/537] Compiling ChatUI ChatDemoSeed.swift
+[368/538] Compiling Analytics resource_bundle_accessor.swift
+[369/538] Compiling Analytics CrashCapture.swift
+[370/538] Compiling Analytics AnalyticsTypes.swift
+[371/538] Compiling Analytics FrictionFeedback.swift
+[372/538] Compiling Analytics AnalyticsStrings.swift
+[373/538] Compiling Analytics AnalyticsSessionStore.swift
+[374/538] Compiling ChatUI ChatEntryButton.swift
+[375/538] Compiling ChatUI ChatImageDownsampler.swift
+[376/538] Compiling Analytics EventQueueStore.swift
+[377/538] Compiling Analytics EventFlusher.swift
+[378/538] Compiling ChatUI ChatTaskCancellation.swift
+[379/538] Compiling ChatUI ChatTimelineItem.swift
+[380/538] Compiling ChatUI ChatTimestampSeparator.swift
+[381/538] Compiling ChatUI ChatVideoCoverPresentation.swift
+[382/538] Compiling ChatUI ChatVideoPoster.swift
+[383/543] Emitting module ChatUI
+[384/543] Compiling ChatUI ChatOutboxItem.swift
+[385/543] Compiling ChatUI ChatPosterLoader.swift
+[386/543] Compiling ChatUI ChatRealtimeRouter.swift
+[387/543] Compiling ChatUI ChatRelativeTime.swift
+[388/543] Compiling ChatUI ChatSendCoordinator+SetRef.swift
+[389/543] Compiling ChatUI ConversationViewModel+Images.swift
+[390/543] Compiling ChatUI ConversationViewModel+Loading.swift
+[391/543] Compiling ChatUI ConversationViewModel+Videos.swift
+[392/543] Compiling ChatUI ConversationViewModel.swift
+[393/543] Compiling ChatUI ExerciseNoteCard.swift
+[394/543] Compiling ChatUI SetRefPickerPresentation.swift
+[395/543] Compiling ChatUI SetRefSendIntent.swift
+[396/543] Compiling ChatUI SetRefSharePicker.swift
+[397/543] Compiling ChatUI SetRefSharingContext.swift
+[398/543] Compiling ChatUI VideoBadgeCard.swift
+[399/543] Compiling ViewInspector Gesture.swift
+[400/543] Compiling ViewInspector Grid.swift
+[401/543] Compiling ViewInspector Group.swift
+[402/543] Compiling ViewInspector GroupBox.swift
+[403/543] Compiling ViewInspector HSplitView.swift
+[404/543] Compiling ViewInspector HStack.swift
+[405/543] Compiling ViewInspector HelpView.swift
+[406/543] Compiling ViewInspector IDView.swift
+[407/543] Compiling ViewInspector Image.swift
+[408/543] Compiling ViewInspector Label.swift
+[409/543] Compiling ViewInspector LabeledContent.swift
+[410/543] Compiling ViewInspector LazyHGrid.swift
+[428/555] Compiling ChatUI ChatInboxViewModel.swift
+[429/555] Compiling ViewInspector Spacer.swift
+[430/555] Compiling ViewInspector Stepper.swift
+[431/555] Compiling ViewInspector StyleConfiguration.swift
+[432/555] Compiling ViewInspector SubscriptionView.swift
+[433/555] Compiling ViewInspector TabView.swift
+[434/555] Compiling ViewInspector Text.swift
+[435/555] Compiling ViewInspector TextAttributes.swift
+[436/555] Compiling ViewInspector TextEditor.swift
+[437/555] Compiling ViewInspector TextField.swift
+[438/555] Compiling ViewInspector TimelineView.swift
+[439/555] Compiling ViewInspector Toggle.swift
+[440/555] Compiling ViewInspector Toolbar.swift
+[441/555] Compiling ChatUI VideoBadgeExporter.swift
+[442/555] Compiling ChatUI VideoBadgeInfo.swift
+[443/555] Compiling ChatUI VideoBadgeOverlay.swift
+[444/555] Compiling ChatUI VideoBadgePhotoLibrary.swift
+[445/555] Compiling ChatUI resource_bundle_accessor.swift
+[446/555] Compiling ChatUI FeedbackVideoAnnotationOverlay.swift
+[447/555] Compiling ChatUI FeedbackVideoFailureCard.swift
+[448/555] Compiling ChatUI FeedbackVideoMarkerOverlay.swift
+[449/555] Compiling ChatUI FeedbackVideoPlayerActions.swift
+[450/555] Compiling ChatUI FeedbackVideoPlayerChrome.swift
+[451/555] Compiling ChatUI FeedbackVideoWorkbenchPlayer.swift
+[452/555] Compiling ChatUI InMemoryChatRepository.swift
+[476/555] Compiling ChatUI ChatVideoPosterDimensions.swift
+[477/555] Compiling ChatUI ConversationListSection.swift
+[478/555] Compiling ChatUI ConversationMessageRows.swift
+[479/555] Compiling ChatUI ConversationTimelinePresentation.swift
+[480/555] Compiling ChatUI ConversationView.swift
+[481/555] Compiling ChatUI ChatSendCoordinator.swift
+[482/555] Compiling ChatUI ChatSetCardPresentation.swift
+[483/555] Compiling ChatUI ChatSetCardView.swift
+[484/555] Compiling ChatUI ChatSetRefDisplayFormatter.swift
+[485/555] Compiling ChatUI ChatStrings.swift
+[486/555] Compiling ChatUI FeedbackVideoPlayerMetrics.swift
+[487/555] Compiling ChatUI FeedbackVideoPlayerView.swift
+[488/555] Compiling ChatUI FeedbackVideoScrubber.swift
+[503/555] Emitting module ViewInspector
+[510/555] Compiling ViewInspector SecureField.swift
+[511/555] Compiling ViewInspector Shape.swift
+[512/555] Compiling ViewInspector ShareLink.swift
+[513/555] Compiling ViewInspector Sheet.swift
+[514/555] Compiling ViewInspector SignInWithAppleButton.swift
+[515/555] Compiling ViewInspector Slider.swift
+[516/612] Compiling CoachKit CoachStrings.swift
+[517/612] Compiling CoachKit ConversationListView.swift
+[518/612] Compiling CoachKit CoachDashboardView.swift
+[519/612] Compiling CoachKit CoachTodayFormatting.swift
+[520/612] Compiling CoachKit CoachTodayStrings.swift
+[521/612] Compiling CoachKit CoachTodayTodoList.swift
+[522/612] Compiling CoachKit PlanningIntent.swift
+[523/612] Compiling CoachKit PlanningStep.swift
+[524/612] Compiling CoachKit PlanningValidationError.swift
+[525/612] Compiling CoachKit PlanningViewModel.swift
+[526/612] Compiling CoachKit ProgressionRuleDimension.swift
+[527/612] Compiling CoachKit ProgressionRuleType.swift
+[528/612] Compiling CoachKit SBDFrequency.swift
+[529/618] Compiling CoachKit CoachRootView.swift
+[530/618] Compiling CoachKit CoachTabAccessibilityHost.swift
+[531/619] Compiling CoachKit AcceptBindRequestSheet.swift
+[532/619] Compiling CoachKit BackendCoachBindQueueRepository.swift
+[533/619] Compiling CoachKit BindQueueViewModel.swift
+[534/619] Compiling CoachKit BindRequestCard.swift
+[535/619] Compiling CoachKit CoachBindStrings.swift
+[536/619] Compiling CoachKit CoachOnboardingDisplay.swift
+[537/619] Compiling CoachKit InMemoryCoachBindQueueRepository.swift
+[538/619] Compiling CoachKit StudentOnboardingProfileView.swift
+[539/619] Compiling CoachKit CoachChatContext.swift
+[540/619] Compiling CoachKit CoachChatHeaderButton.swift
+[541/619] Compiling CoachKit CoachChatStatusSubtitle.swift
+[542/727] Compiling CoachKit CoachPlanningStrings.swift
+[543/727] Compiling CoachKit DraftMapping.swift
+[544/727] Compiling CoachKit IntensityReviewSection.swift
+[545/727] Compiling CoachKit XLSXReader.swift
+[546/727] Compiling CoachKit PlanPublishAssembler.swift
+[547/727] Compiling CoachKit PlanToStudentProjection.swift
+[548/727] Compiling CoachKit AbnormalReason.swift
+[549/727] Compiling CoachKit BackendPlanRepository.swift
+[550/727] Compiling CoachKit CoachStudentStatus.swift
+[551/727] Compiling CoachKit CoachStudentSummary.swift
+[552/727] Compiling CoachKit InMemoryPlanRepository.swift
+[553/727] Compiling CoachKit PlanPublishErrorMapping.swift
+[554/949] Compiling StudentKit Step4EnvironmentSection.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[555/949] Compiling StudentKit Step5RecoverySection.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[556/949] Compiling StudentKit Step6MaterialsSection.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[557/949] Compiling StudentKit Step7ExtrasSection.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[558/949] Compiling StudentKit UnitDisplay.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[559/949] Compiling StudentKit ReadinessCheckinSheet.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[560/949] Compiling StudentKit ReadinessCheckinViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[561/949] Compiling StudentKit E1RMCoachRPEReconciler.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[562/949] Compiling StudentKit E1RMCompetitionLiftGate.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[563/949] Compiling StudentKit E1RMCompetitionLiftMigration.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[564/949] Compiling StudentKit E1RMEligibility.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[565/949] Compiling StudentKit E1RMExtendedRPETableMigration.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[566/949] Compiling StudentKit E1RMHistoryReplayService.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[567/949] Compiling StudentKit E1RMImportedBaselineRepair.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[568/949] Compiling StudentKit E1RMPolicy.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[569/949] Compiling StudentKit E1RMRecorder.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[570/949] Compiling StudentKit E1RMSeries.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[571/949] Compiling StudentKit ImportedHistoryBackfill.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[572/949] Compiling StudentKit ImportedHistoryReviewQueue.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[573/949] Emitting module CoachKit
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[574/967] Compiling StudentKit StudentChatTimeline.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[575/967] Compiling StudentKit StudentCoachTab.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[576/967] Compiling StudentKit StudentNotificationComponents.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[577/967] Compiling StudentKit EvaluationPeriodView.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[578/967] Compiling StudentKit EvaluationPeriodViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[579/967] Compiling StudentKit EvaluationSummaryReadStore.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[580/967] Compiling StudentKit BodyWeightDay.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[581/967] Compiling StudentKit BodyWeightInput.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[582/967] Compiling StudentKit AccessoryDemoScenario.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[583/967] Compiling StudentKit CompletedVideoDemoRepository.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[584/967] Compiling StudentKit PlanHandoffDemoScenario.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[585/967] Compiling StudentKit ProfileDemoScene.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[586/967] Compiling StudentKit ProgressDemoScenario.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[587/967] Compiling StudentKit StudentAddedDemoScenario.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[588/967] Compiling StudentKit StudentDemoEmptyStateSeed.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[589/967] Compiling StudentKit StudentDemoFeedbackVideo.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[590/967] Compiling StudentKit StudentDemoSeed.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[591/967] Compiling StudentKit StudentRootDemoPlanStore.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[592/967] Compiling StudentKit TrainingFlowDemoScenario.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+[593/967] Compiling StudentKit InviteCodeEntry.swift
+[594/967] Compiling StudentKit PendingBindCodeStore.swift
+[595/967] Compiling StudentKit PendingBindReminderCard.swift
+[596/967] Compiling StudentKit PendingBindView.swift
+[597/967] Compiling StudentKit PendingBindViewModel.swift
+[598/967] Compiling StudentKit BodyWeightChartCard.swift
+[599/967] Compiling StudentKit BodyWeightEntryModel.swift
+[600/967] Compiling StudentKit BodyWeightNumberPad.swift
+[601/967] Compiling StudentKit BodyWeightPage.swift
+[602/967] Compiling StudentKit BodyWeightPresentation.swift
+[603/967] Compiling StudentKit BodyWeightRecordsList.swift
+[604/967] Compiling StudentKit BodyWeightViewModel.swift
+[605/967] Compiling StudentKit DashboardProfileMetrics.swift
+[606/967] Compiling StudentKit MeetWeightStrip.swift
+[607/967] Compiling StudentKit MeetWeightStripPresentation.swift
+[608/967] Compiling StudentKit DashboardNotificationsViewModel.swift
+[609/967] Compiling StudentKit StudentBlackGoldChatView.swift
+[610/967] Compiling StudentKit StudentChatCamera.swift
+[611/967] Compiling StudentKit StudentChatImage.swift
+[612/967] Compiling StudentKit TrainingDayProgress.swift
+[613/967] Compiling StudentKit TrainingEmptyStatePresentation.swift
+[614/967] Compiling StudentKit TrainingEmptyStateView.swift
+[615/967] Compiling StudentKit TrainingExerciseProgress.swift
+[616/967] Compiling StudentKit TrainingFlowPresentation.swift
+[617/967] Compiling StudentKit TrainingFlowScroll.swift
+[618/967] Compiling StudentKit TrainingSequenceCalendarCell.swift
+[619/967] Compiling StudentKit TrainingSetProgress.swift
+[620/967] Compiling StudentKit TrainingSetProgressBar.swift
+[621/967] Compiling StudentKit ProfileIdentity.swift
+[622/967] Compiling StudentKit ProfileIdentityCard.swift
+[623/967] Compiling StudentKit ProfileMenuValues.swift
+[624/967] Compiling StudentKit ProfileNavigation.swift
+[625/967] Compiling StudentKit ProfilePageRows.swift
+[626/967] Compiling StudentKit ProfileSettingsContent.swift
+[627/967] Compiling StudentKit RestTimerPreferenceRow.swift
+[628/967] Compiling StudentKit RestTimerSettingsView.swift
+[629/967] Compiling StudentKit StudentRestTimerSettings.swift
+[630/967] Compiling StudentKit TrainingLogCSVExporter.swift
+[631/967] Compiling StudentKit TrainingReminderPreferenceRow.swift
+[632/967] Compiling StudentKit TrainingReminderScheduling.swift
+[633/967] Compiling StudentKit TrainingReminderSettings.swift
+[634/967] Compiling StudentKit TrainingReminderSettingsView.swift
+[635/967] Compiling StudentKit TrainingReminderSettingsViewModel.swift
+[636/967] Compiling StudentKit BodyWeightField.swift
+[637/967] Compiling StudentKit DateOnlyField.swift
+[638/967] Compiling StudentKit EquipmentCatalog.swift
+[639/967] Compiling StudentKit LocalOnboardingDraftStore.swift
+[640/967] Compiling StudentKit MeetFieldsSection.swift
+[641/967] Compiling StudentKit OnboardingDraft.swift
+[642/967] Compiling StudentKit OnboardingFieldComponents.swift
+[643/967] Compiling StudentKit OnboardingLabels.swift
+[644/967] Compiling StudentKit OnboardingWizardView.swift
+[645/967] Compiling StudentKit OnboardingWizardViewModel.swift
+[646/967] Compiling StudentKit OneRMEstimator.swift
+[647/967] Compiling StudentKit Step1BasicsSection.swift
+[648/967] Compiling StudentKit Step2BackgroundSection.swift
+[649/967] Compiling StudentKit Step3StrengthSection.swift
+[650/967] Compiling StudentKit EffortExplainerCard.swift
+[651/967] Compiling StudentKit ExerciseNoteSheet.swift
+[652/967] Compiling StudentKit ExtraSetControls.swift
+[653/967] Compiling StudentKit FlexibleTrainingDay.swift
+[654/967] Compiling StudentKit HoldToCompleteGestureState.swift
+[655/967] Compiling StudentKit LoadTypeLogRow.swift
+[656/967] Compiling StudentKit LoadTypePrescriptionHeader.swift
+[657/967] Compiling StudentKit LoadTypeWeightInput.swift
+[658/967] Compiling StudentKit PctAnchorResolver.swift
+[659/967] Compiling StudentKit PlanHandoffPresentation.swift
+[660/967] Compiling StudentKit QuickLogPlan.swift
+[661/967] Compiling StudentKit QuickLogSheet.swift
+[662/967] Compiling StudentKit RemoveStudentSetButton.swift
+[663/967] Compiling StudentKit RestTimerActivityControlling.swift
+[664/967] Compiling StudentKit RestTimerExplanationPresentation.swift
+[665/967] Compiling StudentKit RestTimerExplanationView.swift
+[666/967] Compiling StudentKit RestTimerOverlay.swift
+[667/967] Compiling StudentKit EvaluationSummaryView.swift
+[668/967] Compiling StudentKit StudentEvaluationSummaryViewModel.swift
+[669/967] Compiling StudentKit OnboardingSummaryFormatter.swift
+[670/967] Compiling StudentKit ProfileCardsSection.swift
+[671/967] Compiling StudentKit ProfileDetailPage.swift
+[672/967] Compiling StudentKit ProfileHomeContent.swift
+[673/967] Compiling StudentKit TodayWorkoutExerciseSection.swift
+[674/967] Compiling StudentKit TodayWorkoutPlanHandoff.swift
+[675/967] Compiling StudentKit TodayWorkoutPresentation.swift
+[676/967] Compiling StudentKit TodayWorkoutScreen.swift
+[677/967] Compiling StudentKit TodayWorkoutSelectionResolver.swift
+[678/967] Compiling StudentKit TodayWorkoutTypes.swift
+[679/967] Compiling StudentKit TodayWorkoutV3Previews.swift
+[680/967] Compiling StudentKit TodayWorkoutView.swift
+[681/967] Compiling StudentKit TodayWorkoutViewModel+DraftBuilding.swift
+[682/967] Compiling StudentKit TodayWorkoutViewModel+RecordingError.swift
+[683/967] Compiling StudentKit TodayWorkoutViewModel.swift
+[684/967] Compiling StudentKit TrainingCalendarLogic.swift
+[685/967] Compiling StudentKit TrainingCompletionAvailability.swift
+[686/967] Compiling StudentKit TrainingDayPresentation.swift
+[687/967] Compiling StudentKit TrainingDayPreview.swift
+[688/967] Compiling StudentKit FeedbackArchiveCoverModifier.swift
+[689/967] Compiling StudentKit FeedbackDetailView.swift
+[690/967] Compiling StudentKit FeedbackInboxView.swift
+[691/967] Compiling StudentKit FeedbackInboxViewModel.swift
+[692/967] Compiling StudentKit FeedbackVideoPlaybackModel.swift
+[693/967] Compiling StudentKit FeedbackVideoPresentation.swift
+[694/967] Compiling StudentKit ImportedHistoryReviewAlert.swift
+[695/967] Compiling StudentKit AccessoryRestSettings.swift
+[696/967] Compiling StudentKit AccountSecuritySheets.swift
+[697/967] Compiling StudentKit AccountSecurityViewModels.swift
+[698/967] Compiling StudentKit AppearancePreferenceRow.swift
+[699/967] Compiling StudentKit DailyBodyWeightPreference.swift
+[700/967] Compiling StudentKit ExportDataSheet.swift
+[701/967] Compiling StudentKit GrowthCurveView.swift
+[702/967] Compiling StudentKit GrowthCurveViewModel.swift
+[703/967] Compiling StudentKit MainLiftExerciseFamilyResolver.swift
+[704/967] Compiling StudentKit MyProfileV3Presentation.swift
+[705/967] Compiling StudentKit MyProfileView.swift
+[706/967] Compiling StudentKit MyProfileViewModel.swift
+[707/967] Compiling StudentKit TrainingStripDemoScenario.swift
+[708/967] Compiling StudentKit VideoDeliveryDemoScenario.swift
+[709/967] Compiling StudentKit BindEnterCodeSubviews.swift
+[710/967] Compiling StudentKit BindFirstRunExperience.swift
+[711/967] Compiling StudentKit BindGateView.swift
+[712/967] Compiling StudentKit BindGateViewModel+Notice.swift
+[713/967] Compiling StudentKit BindGateViewModel.swift
+[714/967] Compiling StudentKit BindOfflineRecovery.swift
+[715/967] Compiling StudentKit BindWelcomeView.swift
+[716/967] Compiling StudentKit BindWelcomeViewModel.swift
+[717/967] Compiling StudentKit EnterCodeView.swift
+[718/967] Compiling StudentKit EnterCodeViewModel.swift
+[719/967] Compiling StudentKit CompletedTrainingExercise.swift
+[720/967] Compiling StudentKit CompletedVideoHitRouting.swift
+[721/967] Compiling StudentKit CompletedVideoReplayHost.swift
+[722/967] Compiling StudentKit CompletedVideoReplayModel.swift
+[723/967] Compiling StudentKit CompletedVideoReplayView.swift
+[724/967] Compiling StudentKit DayCompletionBanner.swift
+[725/967] Compiling StudentKit EffortExplainer.swift
+[726/967] Emitting module StudentKit
+[750/967] Compiling CoachKit PlanningDisplay.swift
+[751/967] Compiling CoachKit PlanningNumberField.swift
+[754/1015] Compiling CoachKit PlanningPreviewFactory.swift
+[755/1015] Compiling CoachKit PlanningStudentHeaderView.swift
+[756/1015] Compiling CoachKit ProgressionRuleEditorCard.swift
+[757/1015] Compiling CoachKit Step0SelectStudentView.swift
+[758/1015] Compiling CoachKit Step1SelectDurationView.swift
+[759/1015] Compiling CoachKit Step2AssignFrequencyView.swift
+[760/1015] Compiling CoachKit Step3SelectMainLiftsView.swift
+[761/1015] Compiling CoachKit Step4SelectAccessoriesView.swift
+[762/1015] Compiling CoachKit Step6ProgressionRulesView.swift
+[763/1015] Compiling CoachKit Step7WeekCardSwipeView.swift
+[764/1015] Compiling CoachKit StudentProfileSummary.swift
+[765/1015] Compiling CoachKit WeekCardView.swift
+[766/1015] Compiling CoachKit WeightEntryPanel.swift
+[767/1015] Compiling CoachKit WeightInputField.swift
+[768/1015] Compiling CoachKit WeightPercentSection.swift
+[769/1015] Compiling CoachKit resource_bundle_accessor.swift
+[770/1015] Compiling StudentKit GrowthProfileV3Previews.swift
+[771/1015] Compiling StudentKit GrowthScreenHeader.swift
+[772/1015] Compiling StudentKit GrowthScreenPresentation.swift
+[773/1015] Compiling StudentKit GrowthTotalCard.swift
+[774/1015] Compiling StudentKit GrowthTotalPresentation.swift
+[775/1015] Compiling StudentKit GrowthWindowSparseTrendState.swift
+[776/1015] Compiling StudentKit HistoryEntriesView.swift
+[777/1015] Compiling StudentKit HistorySetRow.swift
+[778/1015] Compiling StudentKit ProgressDashboardView.swift
+[779/1015] Compiling StudentKit ProgressDataModel.swift
+[780/1015] Compiling StudentKit ProgressDetailPage.swift
+[781/1015] Compiling StudentKit ProgressE1RMPage.swift
+[782/1015] Compiling StudentKit ProgressE1RMSelection.swift
+[783/1015] Compiling StudentKit ProgressMenuContent.swift
+[784/1015] Compiling StudentKit ProgressMenuValues.swift
+[785/1015] Compiling StudentKit ProgressMetrics.swift
+[786/1015] Compiling StudentKit StudentAddedDerivedHistory.swift
+[787/1015] Compiling StudentKit StudentAddedHistory.swift
+[788/1015] Compiling StudentKit StudentAddedHistoryRows.swift
+[789/1015] Compiling StudentKit StudentAddedLedgerRepair.swift
+[790/1015] Compiling StudentKit TrainingHistoryVideoPresentation.swift
+[791/1015] Compiling StudentKit TrainingHistoryView.swift
+[792/1015] Compiling StudentKit TrainingHistoryViewModel.swift
+[793/1015] Compiling StudentKit VolumeIntensityChart.swift
+[794/1039] Compiling StudentKit TrainingWeekCalendarRow.swift
+[795/1039] Compiling StudentKit TrainingWeekHeaderLayout.swift
+[796/1039] Compiling StudentKit TrainingWeekPresentation.swift
+[797/1039] Compiling StudentKit TrainingWeekStrip.swift
+[798/1039] Compiling StudentKit VideoCompletionControl.swift
+[799/1039] Compiling StudentKit W4V3Previews.swift
+[800/1039] Compiling StudentKit WorkoutCompletionFlowModel.swift
+[801/1039] Compiling StudentKit WorkoutCompletionFlowView.swift
+[802/1039] Compiling StudentKit WorkoutCompletionPresentation.swift
+[803/1039] Compiling StudentKit WorkoutCompletionRequest.swift
+[804/1039] Compiling StudentKit WorkoutDatePolicy.swift
+[805/1039] Compiling StudentKit WorkoutKeypadCell.swift
+[806/1039] Compiling StudentKit WorkoutKeypadEditing.swift
+[807/1039] Compiling StudentKit WorkoutKeypadOverlay.swift
+[808/1039] Compiling StudentKit WorkoutKeypadScrollAvoidance.swift
+[809/1039] Compiling StudentKit WorkoutKeypadSession.swift
+[810/1039] Compiling StudentKit AllHistoryScreen.swift
+[811/1039] Compiling StudentKit DayDetailView.swift
+[812/1039] Compiling StudentKit GrowthComparisonCard.swift
+[813/1039] Compiling StudentKit GrowthE1RMCard.swift
+[814/1039] Compiling StudentKit GrowthE1RMDetail.swift
+[815/1039] Compiling StudentKit GrowthE1RMDetailSheet.swift
+[816/1039] Compiling StudentKit GrowthEmptyStates.swift
+[817/1039] Compiling StudentKit GrowthHistoryStatsCard.swift
+[818/1063] Compiling StudentKit AVAssetMainVideoTrack.swift
+[819/1063] Compiling StudentKit AVFoundationVideoExporter+Color.swift
+[820/1063] Compiling StudentKit AVFoundationVideoExporter+Passthrough.swift
+[821/1063] Compiling StudentKit AVFoundationVideoExporter.swift
+[822/1063] Compiling StudentKit AssetWriterCoordinator.swift
+[823/1063] Compiling StudentKit BackgroundUploadCompletionRegistry.swift
+[824/1063] Compiling StudentKit BackgroundUploadWakeInput.swift
+[825/1063] Compiling StudentKit BackgroundUploadWakePlanner.swift
+[826/1063] Compiling StudentKit BackgroundVideoPartUploader.swift
+[827/1063] Compiling StudentKit CameraPreviewView.swift
+[828/1063] Compiling StudentKit CameraRecorderComponents.swift
+[829/1063] Compiling StudentKit CameraRecorderView.swift
+[830/1063] Compiling StudentKit LoopingVideoPlayer.swift
+[831/1063] Compiling StudentKit RecorderAssetWriter.swift
+[832/1063] Compiling StudentKit RecorderCapturePipeline.swift
+[833/1063] Compiling StudentKit RecorderEncodingConfiguration.swift
+[834/1063] Compiling StudentKit RecorderSessionController.swift
+[835/1063] Compiling StudentKit RecorderSessionWorker.swift
+[836/1063] Compiling StudentKit RecorderStateMachine.swift
+[837/1063] Compiling StudentKit RecorderTrimSuggestionPreference.swift
+[838/1063] Compiling StudentKit RecorderVideoTrimFiles.swift
+[839/1063] Compiling StudentKit CompletedVideoPlayerHeader.swift
+[840/1063] Compiling StudentKit LocalVideoCleanupStore.swift
+[841/1063] Compiling StudentKit PassthroughVideoTrimExporter.swift
+[842/1087] Compiling StudentKit RemoteAttachmentCleanupStore.swift
+[843/1087] Compiling StudentKit RestoredBackgroundRecord.swift
+[844/1087] Compiling StudentKit RetainedVideoCleanupPolicy.swift
+[845/1087] Compiling StudentKit SetEntryVideoDetails.swift
+[846/1087] Compiling StudentKit SetEntryVideoPlaybackState.swift
+[847/1087] Compiling StudentKit SetEntryVideoPlayer.swift
+[848/1087] Compiling StudentKit SetEntryVideoPlayerView.swift
+[849/1087] Compiling StudentKit SetEntryVideoProgress.swift
+[850/1087] Compiling StudentKit SetVideoPlaybackView.swift
+[851/1087] Compiling StudentKit UploadFailureNavigation.swift
+[852/1087] Compiling StudentKit UploadFailureNotifier+Completion.swift
+[853/1087] Compiling StudentKit UploadFailureNotifier.swift
+[854/1087] Compiling StudentKit UploadNetworkMonitor.swift
+[855/1087] Compiling StudentKit UploadNotificationDeliveryQueue.swift
+[856/1087] Compiling StudentKit UploadRetryScheduler.swift
+[857/1087] Compiling StudentKit VideoAttachmentPlaybackSource.swift
+[858/1087] Compiling StudentKit VideoAttachmentSection.swift
+[859/1087] Compiling StudentKit VideoAttachmentV3Controls.swift
+[860/1087] Compiling StudentKit VideoAttachmentV3Previews.swift
+[861/1087] Compiling StudentKit VideoAttachmentViewModel+Delivery.swift
+[862/1087] Compiling StudentKit VideoAttachmentViewModel+PendingSet.swift
+[863/1087] Compiling StudentKit VideoAttachmentViewModel.swift
+[864/1087] Compiling StudentKit VideoCompletionPresentation.swift
+[865/1087] Compiling StudentKit VideoDeliveryPresentation.swift
+[866/1111] Compiling StudentKit VideoFailureBanner.swift
+[867/1111] Compiling StudentKit VideoFileChunker.swift
+[868/1111] Compiling StudentKit VideoLibrarySaver.swift
+[869/1111] Compiling StudentKit VideoMainTrackSelection.swift
+[870/1111] Compiling StudentKit VideoMissingFileHost.swift
+[871/1111] Compiling StudentKit VideoPassthroughEligibility.swift
+[872/1111] Compiling StudentKit VideoPrivacyCopy.swift
+[873/1111] Compiling StudentKit VideoProcessingDiagnostics.swift
+[874/1111] Compiling StudentKit VideoTrimCompletion.swift
+[875/1111] Compiling StudentKit VideoTrimSelection.swift
+[876/1111] Compiling StudentKit VideoTrimThumbnailGenerator.swift
+[877/1111] Compiling StudentKit VideoTrimTimeline.swift
+[878/1111] Compiling StudentKit VideoTrimView.swift
+[879/1111] Compiling StudentKit VideoUploadManager+BackgroundEventDrain.swift
+[880/1111] Compiling StudentKit VideoUploadManager+Cleanup.swift
+[881/1111] Compiling StudentKit VideoUploadManager+Completion.swift
+[882/1111] Compiling StudentKit VideoUploadManager+Generation.swift
+[883/1111] Compiling StudentKit VideoUploadManager+PendingSet.swift
+[884/1111] Compiling StudentKit VideoUploadManager+Pipeline.swift
+[885/1111] Compiling StudentKit VideoUploadManager+Playback.swift
+[886/1111] Compiling StudentKit VideoUploadManager+Recovery.swift
+[887/1111] Compiling StudentKit VideoUploadManager+Replacement.swift
+[888/1111] Compiling StudentKit VideoUploadManager+Restore.swift
+[889/1111] Compiling StudentKit VideoUploadManager+Retry.swift
+[890/1135] Compiling StudentKit VideoUploadManager.swift
+[891/1135] Compiling StudentKit VideoUploadServiceLive.swift
+[892/1135] Compiling StudentKit VideoUploadServices.swift
+[893/1135] Compiling StudentKit VideoUploadTypes.swift
+[894/1135] Compiling StudentKit WeekOverviewViewModel.swift
+[895/1135] Compiling StudentKit AccountRepositories.swift
+[896/1135] Compiling StudentKit BackendBindRepository.swift
+[897/1135] Compiling StudentKit BackendOnboardingRepository.swift
+[898/1135] Compiling StudentKit BackendReadinessRepository.swift
+[899/1135] Compiling StudentKit BackendStudentEvaluationRepositories.swift
+[900/1135] Compiling StudentKit BackendStudentFeedbackRepository.swift
+[901/1135] Compiling StudentKit BackendStudentPlanRepository.swift
+[902/1135] Compiling StudentKit BackendStudentTrainingLogRepository.swift
+[903/1135] Compiling StudentKit BackendVideoAttachmentRepository.swift
+[904/1135] Compiling StudentKit BodyWeightRepository.swift
+[905/1135] Compiling StudentKit ImportedHistoryReviewStore.swift
+[906/1135] Compiling StudentKit InMemoryBindRepository.swift
+[907/1135] Compiling StudentKit InMemoryE1RMRepository.swift
+[908/1135] Compiling StudentKit InMemoryOnboardingRepository.swift
+[909/1135] Compiling StudentKit InMemoryReadinessRepository.swift
+[910/1135] Compiling StudentKit InMemoryStudentEvaluationRepositories.swift
+[911/1135] Compiling StudentKit InMemoryStudentFeedbackRepository.swift
+[912/1135] Compiling StudentKit InMemoryStudentPlanRepository.swift
+[913/1135] Compiling StudentKit InMemoryStudentTrainingLogRepository.swift
+[914/1135] Compiling StudentKit InMemoryVideoAttachmentRepository.swift
+[915/1135] Compiling StudentKit LocalE1RMRepository.swift
+[916/1135] Compiling StudentKit PlanCalendarDayIdentity.swift
+[917/1135] Compiling StudentKit PendingSetRecord.swift
+[918/1135] Compiling StudentKit SetSyncQueue.swift
+[919/1135] Compiling StudentKit SetSyncSender.swift
+[920/1135] Compiling StudentKit SetSyncStorage.swift
+[921/1135] Compiling StudentKit StudentSetSyncRuntime.swift
+[922/1135] Compiling StudentKit StudentSetSyncSession.swift
+[923/1135] Compiling StudentKit VideoCompletionCoordinator.swift
+[924/1135] Compiling StudentKit WorkoutCompletionGate.swift
+[925/1135] Compiling StudentKit StudentAddedLogError.swift
+[926/1135] Compiling StudentKit StudentAddedLogRepository.swift
+[927/1135] Compiling StudentKit StudentPlanProjection.swift
+[928/1135] Compiling StudentKit StudentReplayVideoRepository.swift
+[929/1135] Compiling StudentKit StudentExerciseName.swift
+[930/1135] Compiling StudentKit StudentFormatting.swift
+[931/1135] Compiling StudentKit StudentNotificationRouting.swift
+[932/1135] Compiling StudentKit StudentRootView.swift
+[933/1135] Compiling StudentKit StudentSetSyncHost.swift
+[934/1135] Compiling StudentKit StudentStrings.swift
+[935/1135] Compiling StudentKit StudentTabAccessibilityHost.swift
+[936/1135] Compiling StudentKit StudentTrainingPlanRefreshTrigger.swift
+[937/1135] Compiling StudentKit resource_bundle_accessor.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[1004/1135] Compiling StudentKit StudentAddedInlineRows.swift
+[1005/1135] Compiling StudentKit StudentAddedPreviousSession.swift
+[1006/1135] Compiling StudentKit StudentAddedRows.swift
+[1007/1135] Compiling StudentKit StudentExercisePicker.swift
+[1008/1135] Compiling StudentKit StudentExerciseTag.swift
+[1009/1135] Compiling StudentKit StudentSessionSummary.swift
+[1010/1135] Compiling StudentKit StudentTodayRefreshThrottle.swift
+[1011/1135] Compiling StudentKit TodaySetRefSharingSource.swift
+[1012/1135] Compiling StudentKit StudentMenuRow.swift
+[1013/1135] Compiling StudentKit StudentSelectionBlock.swift
+[1014/1135] Compiling StudentKit AccessoryClassification.swift
+[1015/1135] Compiling StudentKit AccessoryHistory.swift
+[1016/1135] Compiling StudentKit AccessoryLogCard.swift
+[1017/1135] Compiling StudentKit AccessoryLogRow.swift
+[1018/1135] Compiling StudentKit AccessoryRow.swift
+[1019/1135] Compiling StudentKit AccessoryWeightHistory.swift
+[1020/1135] Compiling StudentKit AccessoryWorkoutHero.swift
+[1021/1135] Compiling StudentKit AllDayEffortMode.swift
+[1022/1135] Compiling StudentKit AllDayExercise.swift
+[1023/1135] Compiling StudentKit AllDayExerciseBlock.swift
+[1024/1135] Compiling StudentKit AllDayExerciseSummary.swift
+[1025/1135] Compiling StudentKit AllDayKeypadEditing.swift
+[1026/1135] Compiling StudentKit AllDaySetRow.swift
+[1027/1135] Compiling StudentKit AllDaySetVideoButton.swift
+[1028/1135] Compiling StudentKit AllDaySheetView.swift
+[1029/1135] Compiling StudentKit AllDayTimelineNode.swift
+[1030/1135] Compiling StudentKit AllDayVideoSheet.swift
+[1031/1135] Compiling StudentKit CoachNoteDisplay.swift
+[1032/1135] Compiling StudentKit CompletedDayOverviewCard.swift
+[1033/1135] Compiling StudentKit CompletedDayPresentation.swift
+[1034/1135] Compiling StudentKit CompletedSetVideo.swift
+[1035/1135] Compiling StudentKit CompletedSetVideoButton.swift
+[1134/1172] Compiling AppShell DemoTokenStore.swift
+[1135/1172] Compiling AppShell DemoUserSeed.swift
+[1136/1172] Compiling AppShell AuthFormScrollView.swift
+[1137/1172] Compiling AppShell AuthRepository+Global.swift
+[1138/1176] Compiling AppShell SignupView.swift
+[1139/1176] Compiling AppShell TimezoneStore.swift
+[1140/1176] Compiling AppShell TokenStore.swift
+[1141/1176] Compiling AppShell AuthFlowView.swift
+[1142/1176] Compiling AppShell AuthPhoneField.swift
+[1143/1176] Compiling AppShell AuthRepository.swift
+[1144/1176] Compiling AppShell AuthSecureField.swift
+[1145/1176] Compiling AppShell DemoAuthRepository.swift
+[1146/1176] Compiling AppShell AnalyticsPrivacyNotice.swift
+[1147/1176] Compiling AppShell AnalyticsRootModifier.swift
+[1148/1176] Compiling AppShell AppShellStrings.swift
+[1149/1176] Compiling AppShell AuthFormViewModel.swift
+[1150/1176] Emitting module AppShell
+[1151/1176] Compiling AppShell Session+GlobalAuth.swift
+[1152/1176] Compiling AppShell SignupCodeField.swift
+[1153/1176] Compiling AppShell LoginView.swift
+[1154/1176] Compiling AppShell Session+PhoneAuth.swift
+[1155/1176] Compiling AppShell MinimumVersionGate.swift
+[1156/1176] Compiling AppShell MinimumVersionGateModel.swift
+[1157/1176] Compiling AppShell PushRegistrar.swift
+[1158/1176] Compiling AppShell PushRegistrationStateMachine.swift
+[1159/1176] Compiling AppShell ChatSessionController.swift
+[1160/1176] Compiling AppShell DemoChatSeed.swift
+[1161/1176] Compiling AppShell InMemoryPlanStore.swift
+[1162/1176] Compiling AppShell RootViewDemoDefaults.swift
+[1163/1176] Compiling AppShell GlobalForgotPasswordView.swift
+[1164/1176] Compiling AppShell GlobalLoginView.swift
+[1165/1176] Compiling AppShell GlobalRegisterView.swift
+[1166/1176] Compiling AppShell GoogleOAuthService.swift
+[1167/1176] Compiling AppShell EmailAuthStrings.swift
+[1168/1176] Compiling AppShell GlobalAuthComponents.swift
+[1169/1176] Compiling AppShell GlobalAuthCrypto.swift
+[1170/1176] Compiling AppShell GlobalAuthViewModels.swift
+[1171/1176] Compiling AppShell RootView+Push.swift
+[1172/1176] Compiling AppShell RootView.swift
+[1173/1176] Compiling AppShell Session.swift
+[1174/1176] Compiling AppShell resource_bundle_accessor.swift
+[1175/1201] Compiling AppShellTests AuthRepositoryTests.swift
+[1176/1201] Compiling AppShellTests AuthTestSupport.swift
+[1177/1201] Compiling AppShellTests ChinaEmailRegistrationTests.swift
+[1178/1201] Emitting module AppShellTests
+[1179/1201] Compiling AppShellTests AnalyticsPrivacyNoticeTests.swift
+[1180/1201] Compiling AppShellTests AuthFlowSnapshotTests.swift
+[1181/1201] Compiling AppShellTests AuthFormViewModelTests.swift
+[1182/1203] Compiling AppShellTests ChatSessionRealtimeLifecycleTests.swift
+[1183/1203] Compiling AppShellTests DemoChatSeedTests.swift
+[1184/1203] Compiling AppShellTests MinimumVersionGateTests.swift
+[1185/1203] Compiling AppShellTests PushRegistrarTests.swift
+[1186/1203] Compiling AppShellTests DemoAuthRepositoryTests.swift
+[1187/1203] Compiling AppShellTests DemoSessionBootstrapTests.swift
+[1188/1203] Compiling AppShellTests DemoTokenStoreTests.swift
+[1189/1203] Compiling AppShellTests GlobalSessionTests.swift
+[1190/1203] Compiling AppShellTests SessionBackgroundBootstrapTests.swift
+[1191/1203] Compiling AppShellTests SessionRefreshHardFailureTests.swift
+[1192/1203] Compiling AppShellTests GlobalAuthViewModelTests.swift
+[1193/1203] Compiling AppShellTests GlobalAuthViewTests.swift
+[1194/1203] Compiling AppShellTests GlobalOAuthTests.swift
+[1195/1203] Compiling AppShellTests PlanProjectionIntegrationTests.swift
+[1196/1203] Compiling AppShellTests LocalizationCatalogTestSupport.swift
+[1197/1203] Compiling AppShellTests SessionTests.swift
+[1198/1203] Compiling AppShellTests TokenStoreTests.swift
+[1199/1203] Compiling AppShellTests ChatSessionControllerTests.swift
+[1200/1203] Compiling AppShellTests PushRegistrationStateMachineTests.swift
+[1201/1203] Compiling AppShellTests StudentE1RMMigrationGateTests.swift
+[1202/1205] Compiling AppShellPackageTests runner.swift
+[1203/1205] Emitting module AppShellPackageTests
+[1203/1205] Write Objects.LinkFileList
+[1204/1205] Linking AppShellPackageTests
+Build complete! (49.22s)
+Test Suite 'All tests' started at 2026-11-16 15:29:45.239.
+Test Suite 'All tests' passed at 2026-11-16 15:29:45.240.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test demoTokenStoreCachesInjectedUser() started.
+◇ Test authFlowStartsAtLogin() started.
+◇ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() started.
+◇ Test mapsValidationErrorIssues() started.
+◇ Test globalRegistrationUsesFixedCoachedStudentRole() started.
+◇ Test demoTokenStoreSaveDoesNotOverrideSeededValues() started.
+◇ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() started.
+◇ Test coachBindingInvalidationRouteIsNoOp() started.
+◇ Test reminderCannotRequestWithoutAnAuthenticatedSession() started.
+◇ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() started.
+◇ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() started.
+◇ Test loginAuthenticatesAndPersistsTokens() started.
+◇ Test activationWithoutRealtimeFactoryProducesNoClient() started.
+◇ Test changingSignupEmailClearsCodeReceiptAndCooldown() started.
+◇ Test globalEmailLoginAuthenticatesCoachedStudent() started.
+◇ Test passwordStartsMaskedWithAReachableRevealButton() started.
+◇ Test backgroundIntentRecordedBeforeActivationBlocksConnect() started.
+◇ Test rejectedAccessTokenRefreshesWithoutLoggingOut() started.
+◇ Test demoTokenStoreStartsWithCachedCoach() started.
+◇ Test refreshMapsTokenPair() started.
+◇ Test forgotPasswordInvalidCodeRendersToast() started.
+◇ Test inMemoryTokenStoreClearRemovesTokensAndUser() started.
+◇ Test emailTakenOffersSignInAndEditingEmailClearsIt() started.
+◇ Test mapsAuthErrorsToChineseToastMessages() started.
+◇ Test minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test coachedStudentWaitsForAnExplicitNotificationRequest() started.
+◇ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() started.
+◇ Test inMemoryTokenStoreSavesAndLoadsTokens() started.
+◇ Test concurrentBackgroundBootstrapWaitsForForegroundAuthentication() started.
+◇ Test loginSubmitIsDisabledForEmptyForm() started.
+◇ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test lateStudentActivationCannotPublishAfterLogout() started.
+◇ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() started.
+◇ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() started.
+◇ Test demoTokenStoreStartsWithRefreshToken() started.
+◇ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() started.
+◇ Test keychainTokenStoreRoundTripsCachedUser() started.
+◇ Test inMemoryTokenStoreOverwritesTokens() started.
+◇ Test chinaRegistrationPassesCodeThroughSessionAndRepository() started.
+◇ Test resetCodeAcceptsOnlySixASCIIDigits() started.
+◇ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() started.
+◇ Test demoLoginReturnsSeededCoachAndTokens() started.
+◇ Test forgotPasswordStartsAtEmailStep() started.
+◇ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() started.
+◇ Test logoutRunsCleanupBeforeClearingAccessToken() started.
+◇ Test coachedStudentCanRequestNotificationsOnceFromAReminderButton() started.
+◇ Test submitFailureStopsLoadingAndStoresToast() started.
+◇ Test globalGoogleLoginPassesIDTokenThroughSession() started.
+◇ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() started.
+◇ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test demoLoginReturnsInjectedUser() started.
+◇ Test forgotPasswordMovesToCodeThenMapsInvalidCode() started.
+◇ Test mapsPhoneTakenErrorCode() started.
+◇ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() started.
+◇ Test deviceTokenConvertsToLowercaseTwoDigitHex() started.
+◇ Test signupPrependsChinaCodeAndMapsUserDefaults() started.
+◇ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() started.
+◇ Test demoSessionRefreshDoesNotThrow() started.
+◇ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() started.
+◇ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() started.
+◇ Test signupRequiresRoleButLoginDoesNot() started.
+◇ Test globalRegistrationHasNoRolePicker() started.
+◇ Test mapsRateLimitedErrorCode() started.
+◇ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() started.
+◇ Test otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+◇ Test bootstrapReportsTimezoneOnlyWhenItDrifts() started.
+◇ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() started.
+◇ Test reloginUploadsAnUnchangedTokenForTheNewSession() started.
+◇ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() started.
+◇ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() started.
+◇ Test failedUploadRetriesOnNextActivation() started.
+◇ Test authorizedCoachedStudentStillRegistersAndUploadsDeviceToken() started.
+◇ Test appleChallengeIsHashedBeforeAuthorizationRequest() started.
+◇ Test demoTokenStoreStartsWithAccessToken() started.
+◇ Test authFlowRoutesGlobalTrackToGlobalLogin() started.
+◇ Test loginViewOmitsDeferredAndDeadEndActions() started.
+◇ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test inMemoryTokenStoreSavesAndLoadsCachedUser() started.
+◇ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() started.
+◇ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test validationErrorToastUsesFirstBackendIssue() started.
+◇ Test appleNonceHashUsesLowercaseSHA256Hex() started.
+◇ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() started.
+◇ Test keychainTokenStoreSavesReadsAndClearsTokens() started.
+◇ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() started.
+◇ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() started.
+◇ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() started.
+◇ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() started.
+◇ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() started.
+◇ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test signupAuthenticatesAndPersistsTokens() started.
+◇ Test submitSuccessAuthenticatesThroughSession() started.
+◇ Test loginViewRendersPhonePasswordAndSubmitButton() started.
+◇ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() started.
+◇ Test demoRefreshReturnsSeededTokenPair() started.
+◇ Test chinaBootstrapNeverReportsTimezone() started.
+◇ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test failedForegroundTimezoneReportRetriesAtNextActivation() started.
+◇ Test demoSignupReturnsSeededCoachAndTokens() started.
+◇ Test forgotPasswordResetStepRendersCodeAndNewPassword() started.
+◇ Test demoRefreshIsDeterministic() started.
+◇ Test demoSessionBootstrapAuthenticatesSeededCoach() started.
+◇ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() started.
+◇ Test globalAuthErrorsHaveHumanReadableMessages() started.
+◇ Test signupPreservesGlobalE164PhoneNumber() started.
+◇ Test validatesPasswordLengthAndBcryptByteLimit() started.
+◇ Test validatesChineseNationalPhoneNumbers() started.
+◇ Test logoutClearsStoreAndCallsLogoutHookOnce() started.
+◇ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() started.
+◇ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() started.
+◇ Test signupCooldownExpiresAndNeverBecomesNegative() started.
+◇ Test chinaRegistrationLocksAllInputsDuringSubmission() started.
+◇ Test deniedAuthorizationDoesNotRequestAgain() started.
+◇ Test loginPrependsChinaCodeAndMapsTokens() started.
+◇ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() started.
+◇ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() started.
+◇ Test forgotPasswordSuccessInvokesLoginMessageCallback() started.
+◇ Test mapsInvalidCredentialsErrorCode() started.
+◇ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() started.
+◇ Test bindAcceptedPushRefreshesTheGateEvenBeforeAuthentication() started.
+◇ Test changedDeviceTokenUploadsWithinTheSameSession() started.
+◇ Test signupViewRendersThreeRoleOptions() started.
+◇ Test demoTokenStoreClearKeepsSeededValues() started.
+◇ Test case passing 1 argument outcome → "current" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "timeout" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "belowMinimum" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "http" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test cancellingAppleSignInDoesNotShowErrorToast() started.
+◇ Test case passing 1 argument outcome → "malformed" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument outcome → "negative" to minimumVersionGateShowsAppUntilResponse(outcome:) started.
+◇ Test case passing 1 argument error → .network to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument track → .china to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test case passing 1 argument track → .global to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .decoding to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+✔ Test coachBindingInvalidationRouteIsNoOp() passed after 0.004 seconds.
+◇ Test case passing 1 argument role → .coach to otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+◇ Test case passing 1 argument role → .selfTrainStudent to otherRolesStillRequestNotificationPermissionOnActivation(role:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+✔ Test reminderCannotRequestWithoutAnAuthenticatedSession() passed after 0.004 seconds.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument error → .network to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .decoding to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .invalidRefresh to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .refreshExpired to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument role → .coachedStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test case passing 1 argument code → .validationError to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument role → .selfTrainStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+✔ Test inMemoryTokenStoreClearRemovesTokensAndUser() passed after 0.005 seconds.
+◇ Test case passing 1 argument code → .invalidRefresh to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .validationError to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .refreshExpired to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+✔ Test coachedStudentWaitsForAnExplicitNotificationRequest() passed after 0.005 seconds.
+✔ Test inMemoryTokenStoreSavesAndLoadsTokens() passed after 0.005 seconds.
+✔ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() passed after 0.006 seconds.
+✔ Test inMemoryTokenStoreOverwritesTokens() passed after 0.005 seconds.
+✔ Test resetCodeAcceptsOnlySixASCIIDigits() passed after 0.005 seconds.
+✔ Test refreshMapsTokenPair() passed after 0.006 seconds.
+✔ Test coachedStudentCanRequestNotificationsOnceFromAReminderButton() passed after 0.005 seconds.
+✔ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() passed after 0.005 seconds.
+✔ Test demoTokenStoreStartsWithRefreshToken() passed after 0.005 seconds.
+✔ Test mapsPhoneTakenErrorCode() passed after 0.005 seconds.
+✔ Test demoTokenStoreStartsWithCachedCoach() passed after 0.006 seconds.
+✔ Test deviceTokenConvertsToLowercaseTwoDigitHex() passed after 0.005 seconds.
+✔ Test demoLoginReturnsInjectedUser() passed after 0.005 seconds.
+✔ Test demoLoginReturnsSeededCoachAndTokens() passed after 0.005 seconds.
+✔ Test authorizedCoachedStudentStillRegistersAndUploadsDeviceToken() passed after 0.005 seconds.
+✔ Test demoTokenStoreCachesInjectedUser() passed after 0.006 seconds.
+✔ Test mapsRateLimitedErrorCode() passed after 0.005 seconds.
+✔ Test reloginUploadsAnUnchangedTokenForTheNewSession() passed after 0.005 seconds.
+✔ Test mapsValidationErrorIssues() passed after 0.006 seconds.
+✔ Test demoTokenStoreSaveDoesNotOverrideSeededValues() passed after 0.006 seconds.
+✔ Test failedUploadRetriesOnNextActivation() passed after 0.005 seconds.
+✔ Test demoTokenStoreStartsWithAccessToken() passed after 0.005 seconds.
+✔ Test inMemoryTokenStoreSavesAndLoadsCachedUser() passed after 0.005 seconds.
+✔ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() passed after 0.005 seconds.
+✔ Test otherRolesStillRequestNotificationPermissionOnActivation(role:) with 2 test cases passed after 0.005 seconds.
+✔ Test appleNonceHashUsesLowercaseSHA256Hex() passed after 0.005 seconds.
+✔ Test demoRefreshIsDeterministic() passed after 0.004 seconds.
+✔ Test demoSignupReturnsSeededCoachAndTokens() passed after 0.004 seconds.
+✔ Test signupPrependsChinaCodeAndMapsUserDefaults() passed after 0.005 seconds.
+✔ Test deniedAuthorizationDoesNotRequestAgain() passed after 0.004 seconds.
+✔ Test demoRefreshReturnsSeededTokenPair() passed after 0.005 seconds.
+✔ Test mapsInvalidCredentialsErrorCode() passed after 0.004 seconds.
+✔ Test changedDeviceTokenUploadsWithinTheSameSession() passed after 0.004 seconds.
+✔ Test demoTokenStoreClearKeepsSeededValues() passed after 0.004 seconds.
+✔ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() passed after 0.004 seconds.
+✔ Test signupPreservesGlobalE164PhoneNumber() passed after 0.004 seconds.
+✔ Test globalAuthErrorsHaveHumanReadableMessages() passed after 0.004 seconds.
+✔ Test loginPrependsChinaCodeAndMapsTokens() passed after 0.004 seconds.
+✔ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() passed after 0.005 seconds.
+✘ Test keychainTokenStoreRoundTripsCachedUser() recorded an issue at TokenStoreTests.swift:72:3: Expectation failed: await store.cachedUser() == user
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:54:3: Expectation failed: await store.accessToken() == "access-1"
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:55:3: Expectation failed: await store.refreshToken() == "refresh-1"
+✘ Test keychainTokenStoreRoundTripsCachedUser() failed after 0.007 seconds with 1 issue.
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() failed after 0.006 seconds with 2 issues.
+✔ Test authFlowStartsAtLogin() passed after 0.105 seconds.
+✔ Test passwordStartsMaskedWithAReachableRevealButton() passed after 0.122 seconds.
+✔ Test mapsAuthErrorsToChineseToastMessages() passed after 0.122 seconds.
+✔ Test loginSubmitIsDisabledForEmptyForm() passed after 0.126 seconds.
+✔ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() passed after 0.127 seconds.
+✔ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) with 2 test cases passed after 0.169 seconds.
+✔ Test forgotPasswordStartsAtEmailStep() passed after 0.179 seconds.
+✔ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() passed after 0.185 seconds.
+✔ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() passed after 0.269 seconds.
+✔ Test signupRequiresRoleButLoginDoesNot() passed after 0.270 seconds.
+✔ Test globalRegistrationHasNoRolePicker() passed after 0.284 seconds.
+✔ Test authFlowRoutesGlobalTrackToGlobalLogin() passed after 0.339 seconds.
+✔ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() passed after 0.347 seconds.
+✔ Test validationErrorToastUsesFirstBackendIssue() passed after 0.347 seconds.
+✔ Test loginViewOmitsDeferredAndDeadEndActions() passed after 0.361 seconds.
+✔ Test loginViewRendersPhonePasswordAndSubmitButton() passed after 0.426 seconds.
+✔ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() passed after 0.427 seconds.
+✔ Test forgotPasswordResetStepRendersCodeAndNewPassword() passed after 0.444 seconds.
+✔ Test validatesPasswordLengthAndBcryptByteLimit() passed after 0.444 seconds.
+✔ Test validatesChineseNationalPhoneNumbers() passed after 0.444 seconds.
+✔ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) with 2 test cases passed after 0.444 seconds.
+✔ Test chinaRegistrationLocksAllInputsDuringSubmission() passed after 0.461 seconds.
+✔ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() passed after 0.507 seconds.
+✔ Test bindAcceptedPushRefreshesTheGateEvenBeforeAuthentication() passed after 0.678 seconds.
+✔ Test signupViewRendersThreeRoleOptions() passed after 0.752 seconds.
+✔ Test activationWithoutRealtimeFactoryProducesNoClient() passed after 0.760 seconds.
+✔ Test changingSignupEmailClearsCodeReceiptAndCooldown() passed after 0.760 seconds.
+✔ Test forgotPasswordInvalidCodeRendersToast() passed after 0.764 seconds.
+✔ Test demoSessionRefreshDoesNotThrow() passed after 0.763 seconds.
+✔ Test appleChallengeIsHashedBeforeAuthorizationRequest() passed after 0.763 seconds.
+✔ Test signupCooldownExpiresAndNeverBecomesNegative() passed after 0.762 seconds.
+✔ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() passed after 0.762 seconds.
+✔ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() passed after 0.776 seconds.
+✔ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() passed after 0.776 seconds.
+✔ Test forgotPasswordSuccessInvokesLoginMessageCallback() passed after 0.776 seconds.
+✔ Test emailTakenOffersSignInAndEditingEmailClearsIt() passed after 0.783 seconds.
+✔ Test forgotPasswordMovesToCodeThenMapsInvalidCode() passed after 0.783 seconds.
+✔ Test submitFailureStopsLoadingAndStoresToast() passed after 0.783 seconds.
+✔ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() passed after 0.782 seconds.
+✔ Test cancellingAppleSignInDoesNotShowErrorToast() passed after 0.782 seconds.
+✔ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() passed after 0.789 seconds.
+✔ Test minimumVersionGateShowsAppUntilResponse(outcome:) with 6 test cases passed after 0.800 seconds.
+✔ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() passed after 0.800 seconds.
+✔ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() passed after 0.799 seconds.
+✔ Test submitSuccessAuthenticatesThroughSession() passed after 0.799 seconds.
+✔ Test globalRegistrationUsesFixedCoachedStudentRole() passed after 0.801 seconds.
+✔ Test demoSessionBootstrapAuthenticatesSeededCoach() passed after 0.799 seconds.
+✔ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() passed after 0.801 seconds.
+✔ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() passed after 0.799 seconds.
+✔ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() passed after 0.800 seconds.
+✔ Test signupAuthenticatesAndPersistsTokens() passed after 0.799 seconds.
+✔ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) with 3 test cases passed after 0.800 seconds.
+✔ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) with 4 test cases passed after 0.799 seconds.
+✔ Test logoutRunsCleanupBeforeClearingAccessToken() passed after 0.800 seconds.
+✔ Test chinaBootstrapNeverReportsTimezone() passed after 0.799 seconds.
+✔ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() passed after 0.799 seconds.
+✔ Test loginAuthenticatesAndPersistsTokens() passed after 0.801 seconds.
+✔ Test chinaRegistrationPassesCodeThroughSessionAndRepository() passed after 0.800 seconds.
+✔ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() passed after 0.800 seconds.
+✔ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) with 3 test cases passed after 0.800 seconds.
+✔ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() passed after 0.800 seconds.
+✔ Test logoutClearsStoreAndCallsLogoutHookOnce() passed after 0.799 seconds.
+✔ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) with 6 test cases passed after 0.799 seconds.
+✔ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() passed after 0.799 seconds.
+✔ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() passed after 0.799 seconds.
+✔ Test bootstrapReportsTimezoneOnlyWhenItDrifts() passed after 0.800 seconds.
+✔ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() passed after 0.800 seconds.
+✔ Test failedForegroundTimezoneReportRetriesAtNextActivation() passed after 0.799 seconds.
+✔ Test rejectedAccessTokenRefreshesWithoutLoggingOut() passed after 0.801 seconds.
+✔ Test globalEmailLoginAuthenticatesCoachedStudent() passed after 0.801 seconds.
+✔ Test globalGoogleLoginPassesIDTokenThroughSession() passed after 0.801 seconds.
+✔ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() passed after 0.801 seconds.
+✔ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() passed after 0.801 seconds.
+✔ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) with 4 test cases passed after 0.801 seconds.
+✔ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() passed after 0.801 seconds.
+✔ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) with 6 test cases passed after 0.800 seconds.
+✔ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() passed after 0.800 seconds.
+✔ Test concurrentBackgroundBootstrapWaitsForForegroundAuthentication() passed after 0.802 seconds.
+✔ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() passed after 0.802 seconds.
+✔ Test lateStudentActivationCannotPublishAfterLogout() passed after 0.803 seconds.
+✔ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() passed after 0.807 seconds.
+✔ Test backgroundIntentRecordedBeforeActivationBlocksConnect() passed after 0.808 seconds.
+✘ Test run with 126 tests in 0 suites failed after 0.809 seconds with 3 issues.

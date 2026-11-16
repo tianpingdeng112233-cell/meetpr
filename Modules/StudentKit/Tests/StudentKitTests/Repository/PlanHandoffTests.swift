@@ -51,8 +51,8 @@ private struct HandoffSession: SessionStateReader {
   func currentUser() async throws -> User { throw SessionStateReaderError.missingCurrentUser }
 }
 
-@Test(arguments: [404, 500])
-func handoffUnavailableFallsBackToLegacyPublishedList(status: Int) async throws {
+@Test(arguments: [403, 404, 500])
+func handoffUnavailableKeepsCacheAndNeverGuessesLatest(status: Int) async throws {
   let fixture = try Data(
     contentsOf: #require(
       Bundle.module.url(
@@ -80,7 +80,18 @@ func handoffUnavailableFallsBackToLegacyPublishedList(status: Int) async throws 
     api: api, session: HandoffSession(),
     cache: StudentPlanCache(directory: directory),
     catalogCache: ExerciseCatalogCache(directory: directory))
-  #expect(try await repo.fetchCurrentPlan(studentID: plans[0].traineeID)?.cycleID == plans[1].id)
+  let cached = StudentDemoSeed.makePlanView()
+  let cache = StudentPlanCache(directory: directory)
+  try await cache.save(plan: cached, studentID: plans[0].traineeID)
+  #expect(try await repo.fetchCurrentPlan(studentID: plans[0].traineeID) == cached)
+  #expect(await cache.loadPlan(studentID: plans[0].traineeID) == cached)
+  await #expect(throws: APIError.self) {
+    try await repo.refreshCurrentPlan(studentID: plans[0].traineeID)
+  }
+  await cache.removePlan(studentID: plans[0].traineeID)
+  await #expect(throws: APIError.self) {
+    try await repo.fetchCurrentPlan(studentID: plans[0].traineeID)
+  }
 }
 
 @Test func handoffOfflineDecodesOldV3CacheAndKeepsItsOriginalDays() async throws {
@@ -167,4 +178,80 @@ private actor HandoffMutationTransport {
     }
     return APIResponse(data: Data(#"{"exercises":[]}"#.utf8), statusCode: 200)
   }
+}
+
+@Test func handoffPendingDaySurvivesCurrentCacheReplacementAndRepositoryRestart() async throws {
+  let fixture = HandoffWorkoutFixture()
+  let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+  defer { try? FileManager.default.removeItem(at: directory) }
+  let cache = StudentPlanCache(directory: directory)
+  var legacy = fixture.current
+  legacy.handoff = nil
+  try await cache.save(plan: legacy, studentID: StudentDemoSeed.studentID)
+  try await cache.save(plan: fixture.upcoming, studentID: StudentDemoSeed.studentID)
+  let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { _ in
+    throw URLError(.notConnectedToInternet)
+  }
+  let restarted: any StudentPlanRepository = BackendStudentPlanRepository(
+    api: api, session: HandoffSession(), cache: StudentPlanCache(directory: directory))
+  let dayID = try #require(legacy.days.last?.id)
+  #expect(
+    try await restarted.fetchPlan(containing: dayID, studentID: StudentDemoSeed.studentID) == legacy
+  )
+  #expect(
+    try await restarted.fetchDay(studentID: StudentDemoSeed.studentID, dayID: dayID)?.id == dayID)
+  #expect(
+    try await restarted.fetchCurrentPlan(studentID: StudentDemoSeed.studentID)?.cycleID
+      == fixture.upcoming.cycleID)
+  await #expect(throws: URLError.self) {
+    try await restarted.fetchPlan(containing: dayID, studentID: UUID())
+  }
+}
+
+@MainActor
+@Test func handoffRestoredCompletionReadsOldDayOnlineWithoutRepeatingWrite() async throws {
+  let fixture = HandoffWorkoutFixture()
+  let studentID = StudentDemoSeed.studentID
+  let day = try #require(fixture.current.days.last)
+  let completedAt = Date(timeIntervalSince1970: 1_800_000_000)
+  let dto = PlanDTO(
+    id: fixture.current.cycleID, coachID: UUID(), traineeID: studentID, name: "Previous",
+    startDate: fixture.current.startDate, endDate: day.date, planWeeks: 5, source: .coach,
+    status: .published, publishedAt: fixture.current.startDate,
+    createdAt: fixture.current.startDate, updatedAt: completedAt)
+  let tree = PlanWithChildrenDTO(
+    plan: dto,
+    days: [
+      PlanDayDTO(
+        id: day.id, planID: dto.id, dayOfWeek: day.dayOfWeek, weekNumber: day.weekNumber,
+        sortOrder: 0, completedAt: completedAt, completionSource: "manual")
+    ])
+  let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    #expect(request.httpMethod == "GET")
+    if request.url?.path == "/plans/\(dto.id)" {
+      return APIResponse(data: try MeetPRCodec.encoder.encode(tree), statusCode: 200)
+    }
+    #expect(request.url?.path == "/exercises")
+    return APIResponse(data: Data(#"{"exercises":[]}"#.utf8), statusCode: 200)
+  }
+  let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+  defer { try? FileManager.default.removeItem(at: directory) }
+  let cache = StudentPlanCache(directory: directory)
+  try await cache.save(plan: fixture.current, studentID: studentID)
+  try await cache.save(plan: fixture.upcoming, studentID: studentID)
+  let plans = BackendStudentPlanRepository(
+    api: api, session: HandoffSession(), cache: cache,
+    catalogCache: ExerciseCatalogCache(directory: directory))
+  let storage = MemorySetSyncStorage()
+  let gate = try WorkoutCompletionGate(studentID: studentID, storage: storage)
+  try gate.request(dayID: day.id)
+  let queue = try SetSyncQueue(studentID: studentID, storage: storage) { .planned($0.plannedLog) }
+  let harness = VideoUploadHarness()
+  let session = StudentSetSyncSession(
+    queue: queue, plans: plans, videos: harness.manager, onLogout: {})
+  session.start()
+  defer { session.stop() }
+  try await waitForSetSync { queue.completionGate.pendingDays.isEmpty }
+  #expect(try await plans.fetchDay(studentID: studentID, dayID: day.id)?.completedAt == completedAt)
+  #expect(await cache.loadPlan(studentID: studentID)?.cycleID == fixture.upcoming.cycleID)
 }

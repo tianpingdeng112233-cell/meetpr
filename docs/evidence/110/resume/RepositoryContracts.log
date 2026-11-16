@@ -1,0 +1,148 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/16] /Users/david/Projects/apps/MeetPR-wt-110/Modules/RepositoryContracts/.build/arm64-apple-macosx/debug/RepositoryContractsPackageTests.derived/runner.swift
+[1/16] Copying Localizable.xcstrings
+[1/16] Write sources
+[1/16] Copying exercise-names-zh-Hant.json
+[1/16] Copying Info.plist
+[5/16] Copying OpenCC-LICENSE.txt
+[6/16] Write sources
+[9/16] Copying Info.plist
+[9/16] Copying Localizable.xcstrings
+[9/16] Copying OpenCC-NOTICE.txt
+[11/16] Copying exercise-search-zh-Hant.json
+[13/16] Write swift-version--58304C5D6DBC2206.txt
+[15/91] Compiling CoreModels CatalogExerciseName.swift
+[16/91] Compiling CoreModels ActiveCoachContext.swift
+[17/91] Compiling CoreModels ChatConversation.swift
+[18/91] Compiling CoreModels ChatCursor.swift
+[19/91] Compiling CoreModels ChatMessage.swift
+[20/91] Compiling CoreModels ChatMessageKind.swift
+[21/91] Compiling CoreModels ExerciseNoteDayResolver.swift
+[22/91] Compiling CoreModels ExerciseRefV1.swift
+[23/91] Compiling CoreModels SetRefV1.swift
+[24/91] Compiling CoreModels EvaluationSummary.swift
+[25/91] Compiling CoreModels Exercise.swift
+[26/91] Compiling CoreModels OnboardingPatch.swift
+[27/91] Compiling CoreModels OnboardingProfile.swift
+[28/91] Compiling CoreModels E1RMHistoryPoint.swift
+[29/91] Compiling CoreModels E1RMWeightBaseline.swift
+[30/91] Compiling CoreModels LegacyBodyweightProjection.swift
+[31/91] Compiling CoreModels PRBreakthroughEvent.swift
+[32/99] Compiling CoreModels Codec.swift
+[33/99] Compiling CoreModels CoreModelStrings.swift
+[34/99] Compiling CoreModels CompetitionLiftResolver.swift
+[35/99] Compiling CoreModels CompletionHistory.swift
+[36/99] Compiling CoreModels E1RMAnomalyClassifier.swift
+[37/99] Compiling CoreModels E1RMCalculator.swift
+[38/99] Compiling CoreModels E1RMPlateauDetector.swift
+[39/99] Compiling CoreModels InviteCodeFormat.swift
+[40/99] Compiling CoreModels PlateMathCalculator.swift
+[41/99] Compiling CoreModels PercentageAnchor.swift
+[42/99] Compiling CoreModels PlanDay.swift
+[43/99] Compiling CoreModels PlanExercise.swift
+[44/99] Compiling CoreModels PlanLoadMode.swift
+[45/99] Compiling CoreModels PlanSet.swift
+[46/99] Compiling CoreModels PrescribedIntensity.swift
+[47/99] Compiling CoreModels PrescribedSet+LoadType.swift
+[48/99] Compiling CoreModels SetWeightSuggestionRecord.swift
+[49/99] Compiling CoreModels StudentProfile.swift
+[50/99] Compiling CoreModels User.swift
+[51/99] Compiling CoreModels VideoMarker.swift
+[52/99] Compiling CoreModels BenchGrip.swift
+[53/99] Compiling CoreModels BindRequestStatus.swift
+[54/99] Compiling CoreModels CompetitionStance.swift
+[55/99] Compiling CoreModels DeadliftStance.swift
+[56/99] Compiling CoreModels Equipment.swift
+[57/99] Emitting module CoreModels
+[58/99] Compiling CoreModels ExerciseType.swift
+[59/99] Compiling CoreModels Gender.swift
+[60/99] Compiling CoreModels GymTier.swift
+[61/99] Compiling CoreModels InjuryArea.swift
+[62/99] Compiling CoreModels IntensityMode.swift
+[63/99] Compiling CoreModels InviteCodeType.swift
+[64/99] Compiling CoreModels LiftFamily.swift
+[65/99] Compiling CoreModels MovementPattern.swift
+[66/99] Compiling CoreModels MuscleGroup.swift
+[67/99] Compiling CoreModels PlanKind.swift
+[68/99] Compiling CoreModels PlanSource.swift
+[69/99] Compiling CoreModels PlanStatus.swift
+[70/99] Compiling CoreModels SetType.swift
+[71/99] Compiling CoreModels SquatStance.swift
+[72/99] Compiling CoreModels TrainingDay.swift
+[73/99] Compiling CoreModels TrainingMode.swift
+[74/99] Compiling CoreModels RestDefaults.swift
+[75/99] Compiling CoreModels BindFirstRun.swift
+[76/99] Compiling CoreModels BindRequest.swift
+[77/99] Compiling CoreModels InviteCode.swift
+[78/99] Compiling CoreModels CoachFeedback.swift
+[79/99] Compiling CoreModels CoachFeedbackVideo.swift
+[80/99] Compiling CoreModels CoachProfile.swift
+[81/99] Compiling CoreModels EvaluationPeriod.swift
+[82/99] Compiling CoreModels StudentAddedSetLog.swift
+[83/99] Compiling CoreModels StudentPlanHandoff.swift
+[84/99] Compiling CoreModels StudentPlanView.swift
+[85/99] Compiling CoreModels StudentSetLog.swift
+[86/99] Compiling CoreModels StudentVideo.swift
+[87/99] Compiling CoreModels TrainingPlan.swift
+[88/99] Compiling CoreModels VideoAttachment.swift
+[89/99] Compiling CoreModels ReadinessCheckin.swift
+[90/99] Compiling CoreModels UnitPreference.swift
+[91/99] Compiling CoreModels UnitSystem.swift
+[92/99] Compiling CoreModels UserRole.swift
+[93/99] Compiling CoreModels ExerciseSearchText.swift
+[94/99] Compiling CoreModels InterfaceLanguage.swift
+[95/99] Compiling CoreModels PushNotificationRouting.swift
+[96/99] Compiling CoreModels TaskCancellation.swift
+[97/99] Compiling CoreModels resource_bundle_accessor.swift
+[98/118] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[99/118] Compiling RepositoryContracts InviteCodeRepository.swift
+[100/118] Compiling RepositoryContracts StudentPlanRepository.swift
+[101/118] Compiling RepositoryContracts StudentPlanStore.swift
+[102/118] Compiling RepositoryContracts E1RMRepository.swift
+[103/118] Compiling RepositoryContracts EvaluationRepository.swift
+[104/118] Compiling RepositoryContracts OnboardingRepository.swift
+[105/118] Compiling RepositoryContracts ReadinessRepository.swift
+[106/118] Compiling RepositoryContracts RepositoryStrings.swift
+[107/118] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[108/118] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[109/118] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[110/120] Emitting module RepositoryContracts
+[111/120] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[112/120] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[113/120] Compiling RepositoryContracts AccountRepository.swift
+[114/120] Compiling RepositoryContracts BindRepository.swift
+[115/120] Compiling RepositoryContracts ChatRepository.swift
+[116/120] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[117/120] Compiling RepositoryContracts VideoMarkerRepository.swift
+[118/120] Compiling RepositoryContracts resource_bundle_accessor.swift
+[119/124] Compiling RepositoryContractsTests PendingVideoItemTests.swift
+[120/124] Emitting module RepositoryContractsTests
+[121/124] Compiling RepositoryContractsTests VideoMarkerRepositoryTests.swift
+[122/124] Compiling RepositoryContractsTests ChatMessageQueryTests.swift
+[123/126] Compiling RepositoryContractsPackageTests runner.swift
+[124/126] Emitting module RepositoryContractsPackageTests
+[124/126] Write Objects.LinkFileList
+[125/126] Linking RepositoryContractsPackageTests
+Build complete! (5.68s)
+Test Suite 'All tests' started at 2026-11-16 15:27:32.884.
+Test Suite 'All tests' passed at 2026-11-16 15:27:32.886.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test chatMessageQueryRejectsLimitOutsideBackendRange() started.
+◇ Test chatMessageQueryRejectsZeroSequence() started.
+◇ Test "in-memory video markers create, sort, isolate by video, and delete" started.
+◇ Test chatMessageQueryAcceptsPositiveSequence() started.
+◇ Test "pending video carries its optional set-log link" started.
+◇ Test chatMessageQueryAcceptsLimitBoundaries() started.
+✔ Test chatMessageQueryAcceptsLimitBoundaries() passed after 0.001 seconds.
+✔ Test chatMessageQueryAcceptsPositiveSequence() passed after 0.001 seconds.
+✔ Test "pending video carries its optional set-log link" passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsLimitOutsideBackendRange() passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsZeroSequence() passed after 0.001 seconds.
+✔ Test "in-memory video markers create, sort, isolate by video, and delete" passed after 0.001 seconds.
+✔ Test run with 6 tests in 0 suites passed after 0.001 seconds.

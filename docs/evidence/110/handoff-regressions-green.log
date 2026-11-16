@@ -1,0 +1,212 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Compiling StudentKit TodayWorkoutViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift:303:5: warning: result of 'try?' is unused [#no-usage]
+ 301 |     }
+ 302 |     loadGeneration += 1
+ 303 |     try? await applyPlan(
+     |     `- warning: result of 'try?' is unused [#no-usage]
+ 304 |       plan, dayID: dayID, studentID: studentID,
+ 305 |       generation: loadGeneration, recordingGeneration: recordingGeneration)
+[5/7] Emitting module StudentKit
+[6/50] Compiling StudentKit TrainingDayPreview.swift
+[7/50] Compiling StudentKit TrainingExerciseProgress.swift
+[8/50] Compiling StudentKit TrainingFlowPresentation.swift
+[9/50] Compiling StudentKit TrainingSetProgress.swift
+[10/50] Compiling StudentKit VideoAttachmentViewModel+PendingSet.swift
+[11/50] Compiling StudentKit PendingSetRecord.swift
+[12/50] Compiling StudentKit SetSyncQueue.swift
+[13/50] Compiling StudentKit StudentRootView.swift
+[14/50] Compiling StudentKit StudentAddedDemoScenario.swift
+[15/50] Compiling StudentKit EvaluationPeriodView.swift
+[16/50] Compiling StudentKit AccessoryLogCard.swift
+[17/50] Compiling StudentKit AccessoryWorkoutHero.swift
+[18/50] Compiling StudentKit AllDayExerciseBlock.swift
+[19/50] Compiling StudentKit StudentSessionSummary.swift
+[20/50] Compiling StudentKit TodayWorkoutPresentation.swift
+[21/50] Compiling StudentKit TodayWorkoutScreen.swift
+[22/50] Compiling StudentKit TodayWorkoutV3Previews.swift
+[23/50] Compiling StudentKit RemoveStudentSetButton.swift
+[24/50] Compiling StudentKit RestTimerOverlay.swift
+[25/50] Compiling StudentKit SetEntryAnalytics.swift
+[26/50] Compiling StudentKit SetEntryPlateLoadout.swift
+[27/50] Compiling StudentKit SetEntrySheet.swift
+[28/50] Compiling StudentKit StudentAddedExerciseSection.swift
+[29/50] Compiling StudentKit StudentAddedInlineRows.swift
+[30/50] Compiling StudentKit StudentExercisePicker.swift
+[31/50] Compiling StudentKit TrainingSetProgressBar.swift
+[32/50] Compiling StudentKit W4V3Previews.swift
+[33/50] Compiling StudentKit WorkoutCompletionPresentation.swift
+[34/50] Compiling StudentKit VideoAttachmentViewModel+Delivery.swift
+[35/50] Compiling StudentKit AllDayKeypadEditing.swift
+[36/50] Compiling StudentKit AllDaySetRow.swift
+[37/50] Compiling StudentKit AllDaySheetView.swift
+[38/50] Compiling StudentKit AllDayVideoSheet.swift
+[39/50] Compiling StudentKit CompletedDayOverviewCard.swift
+[40/50] Compiling StudentKit CompletedDayPresentation.swift
+[41/50] Compiling StudentKit CompletedTrainingExercise.swift
+[42/50] Compiling StudentKit ExtraSetControls.swift
+[43/50] Compiling StudentKit QuickLogPlan.swift
+[44/50] Compiling StudentKit QuickLogSheet.swift
+[45/50] Compiling StudentKit TodayWorkoutView.swift
+[46/50] Compiling StudentKit TodayWorkoutViewModel+DraftBuilding.swift
+[47/50] Compiling StudentKit TodayWorkoutViewModel+RecordingError.swift
+[48/50] Compiling StudentKit TrainingCompletionAvailability.swift
+[49/119] Compiling StudentKitTests AskCoachVisibilityTests.swift
+[50/119] Compiling StudentKitTests CameraPersistenceFixture.swift
+[51/119] Compiling StudentKitTests CameraReturnDuringPersistenceTests.swift
+[52/119] Compiling StudentKitTests CompletedDayPresentationTests.swift
+[53/119] Compiling StudentKitTests CompletedVideoReplayTests.swift
+[54/119] Compiling StudentKitTests HeroCameraUploadTests.swift
+[55/119] Compiling StudentKitTests IntensityWeightSuggestionTests.swift
+[56/119] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[57/126] Compiling StudentKitTests TodayWorkoutQuickLogTestSupport.swift
+[58/126] Compiling StudentKitTests TodayWorkoutQuickLogTests.swift
+[59/126] Compiling StudentKitTests TodayWorkoutRefreshTests.swift
+[60/126] Compiling StudentKitTests TodayWorkoutRestTimerTests.swift
+[61/126] Compiling StudentKitTests TodayWorkoutSetRefEntryLayoutTests.swift
+[62/126] Compiling StudentKitTests TodayWorkoutSuggestionBaselineTests.swift
+[63/126] Compiling StudentKitTests TodayWorkoutViewModelTests.swift
+[64/126] Compiling StudentKitTests LoadTypePresentationTests.swift
+[65/126] Compiling StudentKitTests OfflineAccessoryTests.swift
+[66/126] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[67/126] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[68/126] Compiling StudentKitTests PlanHandoffRaceTests.swift
+[69/126] Compiling StudentKitTests PlanHandoffWorkoutTests.swift
+[70/126] Compiling StudentKitTests PublishedDayTrainingTests.swift
+[71/126] Compiling StudentKitTests QuickLogPlanTests.swift
+[72/126] Compiling StudentKitTests E1RMCoachRPEReconcilerTests.swift
+[73/126] Compiling StudentKitTests SetNumberSurfaceTests.swift
+[74/126] Compiling StudentKitTests AccessoryColumnsTests.swift
+[75/126] Compiling StudentKitTests AccessoryPresentationTests.swift
+[76/126] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[77/126] Compiling StudentKitTests AccessoryRowTests.swift
+[78/126] Compiling StudentKitTests AccessorySaveTests.swift
+[79/126] Compiling StudentKitTests AccessoryWeightHistoryIntegrationTests.swift
+[80/126] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[81/126] Compiling StudentKitTests VideoDeliveryPresentationTests.swift
+[82/126] Compiling StudentKitTests VideoDeliveryRetryTests.swift
+[83/126] Compiling StudentKitTests AllDayProjectionTests.swift
+[84/126] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[85/126] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[86/126] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[87/126] Compiling StudentKitTests SetSyncDraftTests.swift
+[88/126] Compiling StudentKitTests SetSyncReceiptTests.swift
+[89/126] Compiling StudentKitTests SetSyncRegressionTests.swift
+[90/126] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[91/126] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[92/126] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[93/126] Compiling StudentKitTests SetWeightSuggestionTests.swift
+[94/126] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[95/126] Compiling StudentKitTests TrainingFlowTests.swift
+[96/126] Compiling StudentKitTests VideoCompletionBoundaryTests.swift
+[97/126] Compiling StudentKitTests VideoCompletionIntegrationTests.swift
+[98/126] Compiling StudentKitTests VideoCompletionReviewRegressionTests.swift
+[99/126] Compiling StudentKitTests VideoCompletionRewardRouteTests.swift
+[100/126] Compiling StudentKitTests WorkoutCompletionPresentationTests.swift
+[101/126] Compiling StudentKitTests WorkoutDatePolicyTests.swift
+[102/126] Compiling StudentKitTests StudentAddedErrorTests.swift
+[103/126] Compiling StudentKitTests StudentAddedFailureTests.swift
+[104/126] Compiling StudentKitTests StudentAddedRowsTests.swift
+[105/126] Compiling StudentKitTests StudentAddedWriteTests.swift
+[106/126] Compiling StudentKitTests TodaySetRefSharingSourceTests.swift
+[107/126] Compiling StudentKitTests TodayWorkoutAssumedWriteBackTests.swift
+[108/126] Compiling StudentKitTests TodayWorkoutCompletionInFlightTests.swift
+[109/126] Compiling StudentKitTests AllDayDirectEditingTests.swift
+[110/126] Compiling StudentKitTests AllDayReviewRegressionTests.swift
+[111/126] Compiling StudentKitTests AllDayRevisionTests.swift
+[112/126] Compiling StudentKitTests AllDayScreenTests.swift
+[113/126] Compiling StudentKitTests AllDaySheetTests.swift
+[114/126] Compiling StudentKitTests AllDayVideoReplayTests.swift
+[115/126] Compiling StudentKitTests AllDayWalkthrough3Tests.swift
+[116/126] Compiling StudentKitTests AllDayWalkthroughTests.swift
+[117/126] Emitting module StudentKitTests
+[118/126] Compiling StudentKitTests TodayWorkoutExerciseSectionTests.swift
+[119/126] Compiling StudentKitTests TodayWorkoutHistoryPrefillTests.swift
+[120/126] Compiling StudentKitTests TodayWorkoutPRHookTests.swift
+[121/126] Compiling StudentKitTests TodayWorkoutPersistOrderingTests.swift
+[122/126] Compiling StudentKitTests TodayWorkoutPresentationTests.swift
+[123/126] Compiling StudentKitTests TodayWorkoutQuickLogDateRangeTests.swift
+[124/126] Compiling StudentKitTests TodayWorkoutQuickLogRetryTests.swift
+[124/126] Write Objects.LinkFileList
+[125/126] Linking StudentKitPackageTests
+Build complete! (32.80s)
+Test Suite 'Selected tests' started at 2026-11-16 10:35:01.066.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:35:01.067.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:35:01.067.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:35:01.067.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffInvalidCodeClearsStashAndReportsDisplayName() started.
+◇ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test handoffWaitsForEntryAndNoticeDismissalSurvivesRelaunch() started.
+◇ Test handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test handoffCompletedSetDismissesNoticeWithoutTappingClose() started.
+◇ Test handoffRequestSentLandsOnPending() started.
+◇ Test handoffAlreadyPendingRequestsReload() started.
+◇ Test handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test handoffChatSharingUsesCurrentDayRatherThanUpcomingPrescription() started.
+◇ Test handoffNetworkFailureKeepsStashAndOffersRetry() started.
+◇ Test handoffPendingCompletionKeepsOriginalDayUntilAcknowledged() started.
+◇ Test handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test handoffWithoutStashRequestsReload() started.
+◇ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() started.
+◇ Test handoffGrowthUsesCurrentPlanExerciseFamilyRatherThanUpcoming() started.
+◇ Test handoffNoticeSkipsEmptyPlansBetweenCycles() started.
+◇ Test handoffRechecksVisibleInteractionAfterLogResponse() started.
+◇ Test handoffOfflineDecodesOldV3CacheAndKeepsItsOriginalDays() started.
+◇ Test case passing 1 argument fixtureName → "feedback" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument fixtureName → "three-consecutive" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument browsing → false to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test handoffNotificationSignatureUsesCurrentCycleRatherThanUpcoming() started.
+◇ Test case passing 1 argument browsing → true to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument fixtureName → "abandoned-tail" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument fixtureName → "no-plans" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument action → "enter" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test case passing 1 argument fixtureName → "all-completed" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument action → "browse" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test case passing 1 argument action → "return" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test handoffCompletionAndUndoRefreshUseServerResultWithoutClientSorting() started.
+◇ Test case passing 1 argument historyPrefillEnabled → true to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument previewing → false to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test case passing 1 argument offline → false to handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → false to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument offline → true to handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test case passing 1 argument previewing → true to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test case passing 1 argument status → 403 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 404 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 500 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+✔ Test handoffRequestSentLandsOnPending() passed after 0.052 seconds.
+✔ Test handoffChatSharingUsesCurrentDayRatherThanUpcomingPrescription() passed after 0.053 seconds.
+✔ Test handoffOfflineDecodesOldV3CacheAndKeepsItsOriginalDays() passed after 0.053 seconds.
+✔ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() passed after 0.054 seconds.
+✔ Test handoffNotificationSignatureUsesCurrentCycleRatherThanUpcoming() passed after 0.058 seconds.
+✔ Test handoffGrowthUsesCurrentPlanExerciseFamilyRatherThanUpcoming() passed after 0.059 seconds.
+✔ Test handoffWithoutStashRequestsReload() passed after 0.060 seconds.
+✔ Test handoffInvalidCodeClearsStashAndReportsDisplayName() passed after 0.060 seconds.
+✔ Test handoffAlreadyPendingRequestsReload() passed after 0.060 seconds.
+✔ Test handoffNetworkFailureKeepsStashAndOffersRetry() passed after 0.061 seconds.
+✔ Test handoffNoticeSkipsEmptyPlansBetweenCycles() passed after 0.061 seconds.
+✔ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) with 2 test cases passed after 0.061 seconds.
+✔ Test handoffRechecksVisibleInteractionAfterPlanResponse(action:) with 3 test cases passed after 0.064 seconds.
+✔ Test handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) with 2 test cases passed after 0.067 seconds.
+✔ Test handoffRechecksVisibleInteractionAfterLogResponse() passed after 0.067 seconds.
+✔ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) with 2 test cases passed after 0.067 seconds.
+✔ Test handoffCompletedSetDismissesNoticeWithoutTappingClose() passed after 0.069 seconds.
+✔ Test handoffWaitsForEntryAndNoticeDismissalSurvivesRelaunch() passed after 0.069 seconds.
+✔ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) with 2 test cases passed after 0.070 seconds.
+✔ Test handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) with 5 test cases passed after 0.070 seconds.
+✔ Test handoffPendingCompletionKeepsOriginalDayUntilAcknowledged() passed after 0.070 seconds.
+✔ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) with 3 test cases passed after 0.085 seconds.
+✔ Test handoffCompletionAndUndoRefreshUseServerResultWithoutClientSorting() passed after 0.091 seconds.
+✔ Test run with 23 tests in 0 suites passed after 0.091 seconds.

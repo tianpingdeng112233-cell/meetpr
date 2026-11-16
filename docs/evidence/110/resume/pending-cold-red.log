@@ -1,0 +1,35 @@
+Another instance of SwiftPM (PID: 13579) is already running using '/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/.build', waiting until that process has finished execution...warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Emitting module StudentKit
+[5/7] Compiling StudentKit TodayWorkoutScreen.swift
+[6/7] Compiling StudentKit TodayWorkoutView.swift
+[7/10] Compiling StudentKitTests PlanHandoffWorkoutTests.swift
+[8/10] Emitting module StudentKitTests
+[9/13] Compiling StudentKitTests DashboardNotificationsViewModelTests.swift
+[10/13] Compiling StudentKitTests GrowthCurveViewModelTests.swift
+[11/13] Compiling StudentKitTests PlanHandoffRaceTests.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking StudentKitPackageTests
+Build complete! (27.45s)
+Test Suite 'Selected tests' started at 2026-11-16 15:32:00.005.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 15:32:00.005.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 15:32:00.005.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 15:32:00.005.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+◇ Test case passing 1 argument preloaded → true to handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+◇ Test case passing 1 argument preloaded → false to handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+✘ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) recorded an issue with 1 argument preloaded → false at PlanHandoffWorkoutTests.swift:352:3: Expectation failed: (model.planProjection?.cycleID → DB1134B7-9321-42DE-85AB-628467377B57) == (fixture.current.cycleID → 02400000-0000-0000-0000-000000000301)
+✘ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) recorded an issue with 1 argument preloaded → false at PlanHandoffWorkoutTests.swift:353:3: Expectation failed: (model.currentDay?.id → 3D130861-ECE4-4DB0-8C37-E37C077A3B57) == (dayID → 02400000-0000-0000-0000-000000001007)
+✘ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) recorded an issue with 1 argument preloaded → true at PlanHandoffWorkoutTests.swift:352:3: Expectation failed: (model.planProjection?.cycleID → 3089C28C-0A7F-424D-8362-63545E466B4E) == (fixture.current.cycleID → 02400000-0000-0000-0000-000000000301)
+✘ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) recorded an issue with 1 argument preloaded → true at PlanHandoffWorkoutTests.swift:353:3: Expectation failed: (model.currentDay?.id → 575BD55B-49CF-4865-9042-AA2A3862C658) == (dayID → 02400000-0000-0000-0000-000000001007)
+✘ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) with 2 test cases failed after 0.016 seconds with 4 issues.
+✘ Test run with 1 test in 0 suites failed after 0.016 seconds with 4 issues.

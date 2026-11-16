@@ -387,18 +387,13 @@ private struct CompletionTestSession: SessionStateReader {
   func currentUser() async throws -> User { throw SessionStateReaderError.missingCurrentUser }
 }
 
-@Test func currentTrainingPlanStillRequestsOnlyPublishedPlans() async throws {
+@Test func currentTrainingPlanUsesOnlyServerHandoff() async throws {
   let studentID = UUID()
   let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
-    if request.url?.path.hasSuffix("/plan-handoff") == true {
-      return APIResponse(data: Data(), statusCode: 404)
-    }
-    #expect(
-      request.url?.path.lowercased() == "/students/\(studentID.uuidString.lowercased())/plans")
-    let components = try #require(
-      request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) })
-    #expect(components.queryItems?.first { $0.name == "status" }?.value == "published")
-    return APIResponse(data: Data(#"{"plans":[]}"#.utf8), statusCode: 200)
+    #expect(request.url?.path == "/students/\(studentID)/plan-handoff")
+    #expect(request.httpMethod == "GET")
+    return APIResponse(
+      data: Data(#"{"current_plan_id":null,"plans":[]}"#.utf8), statusCode: 200)
   }
   let repository = BackendStudentPlanRepository(api: api, session: CompletionTestSession())
   #expect(try await repository.refreshCurrentPlan(studentID: studentID) == nil)
