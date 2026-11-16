@@ -4,6 +4,7 @@ import Foundation
 /// Produced by the coach-side publish mapper; the student side never sees the
 /// coach's editing-time draft types (PlanRule / WeeklyVariation).
 public struct StudentPlanView: Codable, Hashable, Sendable {
+  public var handoff: StudentPlanHandoff?
   public let cycleID: UUID
   public let weekIndex: Int
   public let startDate: Date
@@ -20,6 +21,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
 
   public init(
     cycleID: UUID,
+    handoff: StudentPlanHandoff? = nil,
     weekIndex: Int,
     startDate: Date,
     endDate: Date? = nil,
@@ -29,6 +31,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     latestShiftCreatedAt: Date? = nil,
     days: [StudentPlanDay]
   ) {
+    self.handoff = handoff
     self.cycleID = cycleID
     self.weekIndex = weekIndex
     self.startDate = startDate
@@ -42,6 +45,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    handoff = try container.decodeIfPresent(StudentPlanHandoff.self, forKey: .handoff)
     cycleID = try container.decode(UUID.self, forKey: .cycleID)
     weekIndex = try container.decode(Int.self, forKey: .weekIndex)
     startDate = try container.decode(Date.self, forKey: .startDate)
@@ -54,6 +58,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
+    case handoff
     case cycleID = "cycleId"
     case weekIndex
     case startDate

@@ -64,6 +64,10 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var emptyState: TrainingEmptyStatePresentation?
   var showsCoach = true
   var onEditProfile: () -> Void = {}
+  var handoffSummary: StudentPlanHandoff.Entry?
+  var previewDay: StudentPlanDay?
+  var showsHandoffNotice = false
+  var onDismissHandoff: () -> Void = {}
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -109,9 +113,16 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onReadiness: onReadiness,
         onNotifications: onNotifications,
         showsBackToToday: showsBackToToday,
-        onBackToToday: onBackToToday
+        onBackToToday: onBackToToday,
+        isPlanPreview: previewDay != nil
       )
 
+      if let handoffSummary {
+        PlanHandoffSubtitle(summary: handoffSummary, preview: previewDay != nil)
+      }
+      if showsHandoffNotice, previewDay == nil {
+        PlanHandoffNotice(onDismiss: onDismissHandoff)
+      }
       if let weightEntry, let studentID {
         MeetWeightStrip(studentID: studentID, model: weightEntry, onEditMeet: onEditMeet)
       }
@@ -153,32 +164,36 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
 
   @ViewBuilder
   private var screenContent: some View {
-    switch content {
-    case .loading:
-      ProgressView()
+    if let previewDay {
+      PlanHandoffPreview(day: previewDay)
+    } else {
+      switch content {
+      case .loading:
+        ProgressView()
+          .frame(maxWidth: .infinity, minHeight: 220)
+      case .workout(let presentation):
+        if videoFailureCount > 0 {
+          VideoFailureBanner(
+            count: videoFailureCount, historical: !dayState.isEditable, retry: onRetryVideos)
+        }
+        AllDaySheetView(
+          presentation: presentation, viewModel: accessoryViewModel,
+          editable: dayState.isEditable, today: gymDayToday,
+          onVideo: onVideoAction, onNote: onExerciseNote)
+        completionContent(presentation)
+      case .noPlan:
+        TodayWorkoutPlanUnavailableCard(
+          coachName: coachName,
+          onMessageCoach: onMessageCoach
+        )
+      case .error(let message):
+        ContentUnavailableView(
+          StudentStrings.localized(.todayWorkoutScreen001),
+          systemImage: "exclamationmark.triangle",
+          description: Text(message)
+        )
         .frame(maxWidth: .infinity, minHeight: 220)
-    case .workout(let presentation):
-      if videoFailureCount > 0 {
-        VideoFailureBanner(
-          count: videoFailureCount, historical: !dayState.isEditable, retry: onRetryVideos)
       }
-      AllDaySheetView(
-        presentation: presentation, viewModel: accessoryViewModel,
-        editable: dayState.isEditable, today: gymDayToday,
-        onVideo: onVideoAction, onNote: onExerciseNote)
-      completionContent(presentation)
-    case .noPlan:
-      TodayWorkoutPlanUnavailableCard(
-        coachName: coachName,
-        onMessageCoach: onMessageCoach
-      )
-    case .error(let message):
-      ContentUnavailableView(
-        StudentStrings.localized(.todayWorkoutScreen001),
-        systemImage: "exclamationmark.triangle",
-        description: Text(message)
-      )
-      .frame(maxWidth: .infinity, minHeight: 220)
     }
   }
 
@@ -389,11 +404,21 @@ private struct TodayWorkoutHeader: View {
   let showsBackToToday: Bool
   let onBackToToday: () -> Void
 
+  var isPlanPreview = false
+
   var body: some View {
     HStack {
       Text(weekCode)
         .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
+        .foregroundStyle(isPlanPreview ? Color.MeetPR.textSecondary : Color.MeetPR.textPrimary)
+      if isPlanPreview {
+        Text(StudentStrings.localized(.handoffNewCycle))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+          .padding(.horizontal, MeetPRSpacing.space2)
+          .padding(.vertical, MeetPRSpacing.space1)
+          .background(Color.MeetPR.bgStack, in: .capsule)
+      }
       Spacer()
 
     }

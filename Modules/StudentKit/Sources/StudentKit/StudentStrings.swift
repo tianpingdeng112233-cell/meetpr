@@ -33,6 +33,16 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let handoffPlanWeeks = Key("student.handoffPlanWeeks")
+    static let handoffStartsAfterCurrent = Key("student.handoffStartsAfterCurrent")
+    static let handoffStarted = Key("student.handoffStarted")
+    static let handoffDismiss = Key("student.handoffDismiss")
+    static let handoffNewCycle = Key("student.handoffNewCycle")
+    static let handoffPreviewOnly = Key("student.handoffPreviewOnly")
+    static let handoffRemaining = Key("student.handoffRemaining")
+    static let handoffReturn = Key("student.handoffReturn")
+    static let handoffExerciseCount = Key("student.handoffExerciseCount")
+
     static let coachAttachments = Key("student.coachAttachments")
     static let coachComposerPlaceholder = Key("student.coachComposerPlaceholder")
     static let coachPhotoSettings = Key("student.coachPhotoSettings")

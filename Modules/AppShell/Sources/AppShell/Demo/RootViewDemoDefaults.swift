@@ -21,6 +21,7 @@ enum RootViewDemoDefaults {
   }
 
   static func plans() -> any StudentPlanRepository {
+    if let handoff = PlanHandoffDemoScenario.repository() { return handoff }
     let plan = StudentDemoSeed.makePlanView()
     let store = InMemoryPlanStore()
     Task {
@@ -30,7 +31,8 @@ enum RootViewDemoDefaults {
   }
 
   static func logs() -> any StudentTrainingLogRepository {
-    trainingLogs
+    if PlanHandoffDemoScenario.enabled { return InMemoryStudentTrainingLogRepository() }
+    return trainingLogs
   }
 
   static func feedback() -> any StudentFeedbackRepository {

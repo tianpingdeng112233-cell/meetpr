@@ -50,6 +50,7 @@ public struct PlanDayCompletion: Equatable, Sendable {
 public protocol StudentPlanRepository: Sendable {
   func weightSuggestions(studentID: UUID, dayID: UUID) async throws -> [SetWeightSuggestionRecord]
   func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView?
+  func fetchPlanHandoff(studentID: UUID) async throws -> StudentPlanHandoff?
   func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView?
   /// Bypasses stale-while-revalidate cache when completion may have changed.
   func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView?
@@ -62,6 +63,10 @@ public protocol StudentPlanRepository: Sendable {
 }
 
 extension StudentPlanRepository {
+  public func fetchPlanHandoff(studentID: UUID) async throws -> StudentPlanHandoff? {
+    try await fetchCurrentPlan(studentID: studentID)?.handoff
+  }
+
   public func weightSuggestions(studentID: UUID, dayID: UUID) async throws
     -> [SetWeightSuggestionRecord]
   {

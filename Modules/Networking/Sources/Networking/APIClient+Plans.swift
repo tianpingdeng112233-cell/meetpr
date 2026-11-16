@@ -52,18 +52,25 @@ extension APIClient {
   public func studentPlans(
     studentID: UUID,
     status: [PlanStatus] = [],
+    includeAll: Bool = false,
     accessToken: String
   ) async throws -> PlansResponseDTO {
-    let queryItems =
+    var queryItems =
       status.isEmpty
       ? []
       : [URLQueryItem(name: "status", value: status.map(\.rawValue).joined(separator: ","))]
+
+    if includeAll { queryItems.append(URLQueryItem(name: "include_all", value: "true")) }
 
     return try await get(
       path: "/students/\(studentID.uuidString)/plans",
       queryItems: queryItems,
       accessToken: accessToken
     )
+  }
+
+  public func planHandoff(studentID: UUID, accessToken: String) async throws -> PlanHandoffDTO {
+    try await get(path: "/students/\(studentID.uuidString)/plan-handoff", accessToken: accessToken)
   }
 
   public func plan(id: UUID, accessToken: String) async throws -> PlanWithChildrenDTO {

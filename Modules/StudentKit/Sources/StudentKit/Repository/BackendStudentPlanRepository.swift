@@ -44,13 +44,13 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    if let cached = await cache.loadPlan(studentID: studentID) {
-      Task { [weak self] in
-        try? await self?.refreshCurrentPlan(studentID: studentID)
-      }
-      return cached
+    do {
+      return try await refreshCurrentPlan(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { throw error }
+      if let cached = await cache.loadPlan(studentID: studentID) { return cached }
+      throw error
     }
-    return try await refreshCurrentPlan(studentID: studentID)
   }
 
   public func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -131,24 +131,49 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   private func performPlanRefresh(studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
-    let response = try await api.studentPlans(
-      studentID: studentID,
-      status: [.published],
-      accessToken: token
-    )
-    guard
-      let plan = response.plans.max(by: Self.planPrecedes)
-    else {
+    let planID: UUID?
+    let handoff: StudentPlanHandoff?
+    do {
+      let response = try await api.planHandoff(studentID: studentID, accessToken: token)
+      planID = response.currentPlanID
+      handoff = response.handoff
+    } catch {
+      if error.isTaskCancellation { throw error }
+      handoff = nil
+      // Compatibility only, including a server that has not deployed /plan-handoff yet.
+      let response = try await api.studentPlans(
+        studentID: studentID, status: [.published], accessToken: token)
+      planID =
+        response.plans.max {
+          if $0.publishedAt != $1.publishedAt {
+            return ($0.publishedAt ?? .distantPast) < ($1.publishedAt ?? .distantPast)
+          }
+          if $0.createdAt != $1.createdAt { return $0.createdAt < $1.createdAt }
+          return $0.id.uuidString < $1.id.uuidString
+        }?.id
+    }
+    guard let planID else {
+      await cache.removePlan(studentID: studentID)
       return nil
     }
 
-    let tree = try await api.plan(id: plan.id, accessToken: token).toDomain()
+    let tree = try await api.plan(id: planID, accessToken: token).toDomain()
     let exercises = try await exerciseCatalog(accessToken: token)
-    let projection = StudentPlanProjection.project(
+    var projection = StudentPlanProjection.project(
       tree: tree,
       catalog: exercises,
       weekIndex: 1
     )
+    projection.handoff =
+      handoff
+      ?? StudentPlanHandoff(
+        currentPlanID: projection.cycleID,
+        plans: [
+          .init(
+            id: projection.cycleID, name: tree.plan.name, weeks: tree.plan.planWeeks,
+            completedTrainingDays: projection.days.filter { $0.completedAt != nil }.count,
+            totalTrainingDays: projection.days.count, status: .current)
+        ])
     try await cache.save(plan: projection, studentID: studentID)
     return projection
   }
@@ -218,6 +243,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     }
     let updated = StudentPlanView(
       cycleID: plan.cycleID,
+      handoff: plan.handoff,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
       endDate: plan.endDate,
@@ -232,16 +258,6 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   private static func completionError(from error: any Error) -> any Error {
     PlanDayCompletionError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
-  }
-
-  /// Current-plan selection from backend spec 035: max publishedAt, then
-  /// createdAt, then id. The list endpoint's createdAt ordering is legacy only.
-  static func planPrecedes(_ lhs: PlanDTO, _ rhs: PlanDTO) -> Bool {
-    let lhsPublishedAt = lhs.publishedAt ?? .distantPast
-    let rhsPublishedAt = rhs.publishedAt ?? .distantPast
-    if lhsPublishedAt != rhsPublishedAt { return lhsPublishedAt < rhsPublishedAt }
-    if lhs.createdAt != rhs.createdAt { return lhs.createdAt < rhs.createdAt }
-    return lhs.id.uuidString < rhs.id.uuidString
   }
 
 }

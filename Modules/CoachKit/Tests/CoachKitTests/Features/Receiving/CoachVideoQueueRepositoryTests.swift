@@ -263,3 +263,15 @@ import Testing
 
   #expect(try await repo.fetchPendingVideos().isEmpty)
 }
+
+@Test func handoffReceivingNamesVideoFromCurrentPlanRatherThanUpcoming() async throws {
+  let student = CoachStudentFeatureFixtures.studentID
+  let video = VideoInboxFixtures.video(
+    planExerciseID: CoachStudentFeatureFixtures.planExerciseID, createdAt: VideoInboxFixtures.base)
+  let repo = AggregatingCoachVideoQueueRepository(
+    roster: StubCoachPlanRepository(students: [CoachStudentFeatureFixtures.summary()]),
+    videos: PerStudentVideoRepo([student: [video]]), feedback: StubFeedbackRepository(),
+    plans: HandoffCoachPlanRepository(current: CoachStudentFeatureFixtures.plan()))
+  let pending = try await repo.fetchPendingVideos()
+  #expect(pending.first?.exerciseName == "深蹲")
+}

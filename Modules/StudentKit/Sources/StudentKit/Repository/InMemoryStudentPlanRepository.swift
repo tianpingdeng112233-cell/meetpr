@@ -116,6 +116,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
     }
     return StudentPlanView(
       cycleID: plan.cycleID,
+      handoff: plan.handoff,
       weekIndex: days.first(where: { $0.completedAt == nil })?.weekNumber
         ?? days.last?.weekNumber
         ?? plan.weekIndex,

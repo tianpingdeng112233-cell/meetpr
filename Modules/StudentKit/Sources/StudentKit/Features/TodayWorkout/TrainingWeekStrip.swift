@@ -7,19 +7,25 @@ struct TrainingWeekStrip: View {
   @Binding var selectedDayID: UUID?
   var today: Date = WorkoutDatePolicy.gymDayToday()
 
+  var previousPlan: (() -> Void)?
+  var nextPlan: (() -> Void)?
+  var isPlanPreview = false
+
   var body: some View {
     let page = TrainingSequenceLayout.page(days: days, selectedDayID: selectedDayID)
     if let week = page.visibleWeek {
       HStack(spacing: MeetPRSpacing.zero) {
         TrainingWeekArrow(
           systemImage: "chevron.left", label: .trainingWeekPrevious,
-          selection: page.previousWeekSelection, onSelect: select)
+          selection: page.previousWeekSelection, onSelect: select, boundaryAction: previousPlan)
         TrainingWeekCalendarRow(
           cells: week.calendarCells, today: today, onSelect: select,
-          onSwipe: { forward in turnPage(page, forward: forward) })
+          onSwipe: { forward in turnPage(page, forward: forward) }
+        )
+        .environment(\.planHandoffPreview, isPlanPreview)
         TrainingWeekArrow(
           systemImage: "chevron.right", label: .trainingWeekNext,
-          selection: page.nextWeekSelection, onSelect: select)
+          selection: page.nextWeekSelection, onSelect: select, boundaryAction: nextPlan)
       }
       .padding(.vertical, MeetPRSpacing.space2)
     }
@@ -27,7 +33,7 @@ struct TrainingWeekStrip: View {
 
   private func turnPage(_ page: TrainingSequencePage, forward: Bool) {
     let destination = forward ? page.nextWeekSelection : page.previousWeekSelection
-    if let destination { select(destination) }
+    if let destination { select(destination) } else { (forward ? nextPlan : previousPlan)?() }
   }
 
   private func select(_ dayID: UUID) {
@@ -40,19 +46,23 @@ private struct TrainingWeekArrow: View {
   let label: StudentStrings.Key
   let selection: UUID?
   let onSelect: (UUID) -> Void
+  var boundaryAction: (() -> Void)?
 
   var body: some View {
     Button {
-      if let selection { onSelect(selection) }
+      if let selection { onSelect(selection) } else { boundaryAction?() }
     } label: {
       Image(systemName: systemImage)
         .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .bold))
-        .foregroundStyle(selection == nil ? Color.MeetPR.textDim : Color.MeetPR.textPrimary)
+        .foregroundStyle(
+          selection == nil && boundaryAction == nil
+            ? Color.MeetPR.textDim : Color.MeetPR.textPrimary
+        )
         .frame(width: MeetPRSpacing.point28, height: MeetPRSpacing.point64)
         .contentShape(.rect)
     }
     .buttonStyle(PressScaleButtonStyle())
-    .disabled(selection == nil)
+    .disabled(selection == nil && boundaryAction == nil)
     .accessibilityLabel(StudentStrings.localized(label))
   }
 }

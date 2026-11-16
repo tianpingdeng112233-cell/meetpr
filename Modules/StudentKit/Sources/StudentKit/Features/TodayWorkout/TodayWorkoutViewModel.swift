@@ -156,6 +156,153 @@ public final class TodayWorkoutViewModel {
     self.completionSleep = completionSleep
   }
 
+  private(set) var showsHandoffNotice = false
+
+  private var handoffNoticeKey: String? {
+    guard let studentID = currentStudentID, let planID = planProjection?.cycleID else { return nil }
+    return "meetpr.handoff.dismissed.\(studentID).\(planID)"
+  }
+
+  func dismissHandoffNotice() {
+    guard let key = handoffNoticeKey else { return }
+    effortDefaults.set(true, forKey: key)
+    showsHandoffNotice = false
+  }
+
+  private func updateHandoffNotice() {
+    guard let plan = planProjection, let handoff = plan.handoff,
+      handoff.currentPlanID == plan.cycleID,
+      let index = handoff.plans.firstIndex(where: { $0.id == plan.cycleID }), index > 0,
+      let key = handoffNoticeKey
+    else {
+      showsHandoffNotice = false
+      return
+    }
+    let previous = handoff.plans[index - 1]
+    let current = handoff.plans[index]
+    let hasCompletedSet =
+      planLogsSnapshot?.cycleID == plan.cycleID
+      && planLogsSnapshot?.logs.contains(where: \.completed) == true
+    if hasCompletedSet || currentDrafts?.contains(where: \.completed) == true {
+      dismissHandoffNotice()
+      return
+    }
+    showsHandoffNotice =
+      previous.totalTrainingDays > 0
+      && previous.completedTrainingDays == previous.totalTrainingDays
+      && current.completedTrainingDays == 0 && current.totalTrainingDays > 0
+      && !effortDefaults.bool(forKey: key)
+  }
+
+  /// Called only at a safe entry boundary, never by a background refresh.
+  func enterTraining() async {
+    guard canBrowsePlan, let studentID = currentStudentID,
+      setSyncQueue?.pendingCount ?? 0 == 0,
+      setSyncQueue?.completionGate.pendingDays.isEmpty ?? true
+    else { return }
+    let generation = loadGeneration
+    let recording = recordingGeneration
+    do {
+      let plan = try await plans.refreshCurrentPlan(studentID: studentID)
+      guard canBrowsePlan, generation == loadGeneration, recording == recordingGeneration,
+        setSyncQueue?.pendingCount ?? 0 == 0,
+        setSyncQueue?.completionGate.pendingDays.isEmpty ?? true
+      else { return }
+      previewPlan = nil
+      browsingPastPlan = false
+      handoffCurrentPlan = nil
+      loadGeneration += 1
+      try await applyPlan(
+        plan, dayID: nil, studentID: studentID,
+        generation: loadGeneration, recordingGeneration: recordingGeneration,
+        allowsCycleChange: true)
+    } catch {
+      // Offline entries retain the cached current cycle and its pending work.
+    }
+  }
+
+  private(set) var previewPlan: StudentPlanView?
+  private(set) var browsingPastPlan = false
+  private var handoffCurrentPlan: StudentPlanView?
+  var isPreviewingPlan: Bool { previewPlan != nil }
+  var displayedPlan: StudentPlanView? { previewPlan ?? planProjection }
+  var handoff: StudentPlanHandoff? { handoffCurrentPlan?.handoff ?? planProjection?.handoff }
+  var remainingCurrentTrainingDays: Int {
+    guard let current = handoff?.plans.first(where: { $0.id == handoff?.currentPlanID }) else {
+      return planDays.filter { $0.completedAt == nil }.count
+    }
+    return max(0, current.totalTrainingDays - current.completedTrainingDays)
+  }
+
+  func adjacentPlan(forward: Bool) -> StudentPlanHandoff.Entry? {
+    guard let entries = handoff?.plans,
+      let index = entries.firstIndex(where: { $0.id == displayedPlan?.cycleID })
+    else { return nil }
+    let candidates =
+      forward ? Array(entries.dropFirst(index + 1)) : Array(entries.prefix(index).reversed())
+    return candidates.first { $0.totalTrainingDays > 0 }
+  }
+
+  private var canBrowsePlan: Bool {
+    guard !allDayWriting, !isCompletionMutationInFlight, completionPhase == nil,
+      accessorySavingIDs.isEmpty, !accessoryBatchInFlight
+    else { return false }
+    if case .recording = state { return false }
+    return true
+  }
+
+  func browseAdjacentPlan(forward: Bool) async {
+    guard canBrowsePlan, let entry = adjacentPlan(forward: forward),
+      let studentID = currentStudentID
+    else { return }
+    let generation = loadGeneration
+    do {
+      guard var plan = try await plans.fetchPlan(id: entry.id, studentID: studentID),
+        generation == loadGeneration, canBrowsePlan
+      else { return }
+      plan.handoff = handoff
+      if handoffCurrentPlan == nil { handoffCurrentPlan = planProjection }
+      loadGeneration += 1
+      if entry.status == .upcoming {
+        previewPlan = plan
+      } else {
+        previewPlan = nil
+        browsingPastPlan = entry.id != handoff?.currentPlanID
+        let days = StudentPlanSequence.orderedDays(in: plan)
+        try await applyPlan(
+          plan, dayID: forward ? days.first?.id : days.last?.id, studentID: studentID,
+          generation: loadGeneration, recordingGeneration: recordingGeneration,
+          allowsCycleChange: true)
+      }
+    } catch {
+      // A failed preview read leaves the usable current workout in place.
+      actionErrorMessage = Self.loadErrorMessage(for: error)
+    }
+  }
+
+  func loadBrowsingDay(_ dayID: UUID?) async {
+    guard browsingPastPlan, let studentID = currentStudentID, let plan = planProjection else {
+      return
+    }
+    loadGeneration += 1
+    try? await applyPlan(
+      plan, dayID: dayID, studentID: studentID,
+      generation: loadGeneration, recordingGeneration: recordingGeneration)
+  }
+
+  func returnToCurrentPlan() async {
+    guard canBrowsePlan, let studentID = currentStudentID else { return }
+    let cachedCurrent = handoffCurrentPlan ?? planProjection
+    let plan = (try? await plans.fetchCurrentPlan(studentID: studentID)) ?? cachedCurrent
+    previewPlan = nil
+    browsingPastPlan = false
+    handoffCurrentPlan = nil
+    loadGeneration += 1
+    try? await applyPlan(
+      plan, dayID: nil, studentID: studentID,
+      generation: loadGeneration, recordingGeneration: recordingGeneration, allowsCycleChange: true)
+  }
+
   public func load(
     dayID: UUID?,
     studentID: UUID,
@@ -209,6 +356,7 @@ public final class TodayWorkoutViewModel {
   }
 
   func refreshCurrentPlan(dayID: UUID?, studentID: UUID) async {
+    guard !isPreviewingPlan, !browsingPastPlan else { return }
     currentStudentID = studentID
     loadGeneration += 1
     let generation = loadGeneration
@@ -275,12 +423,18 @@ public final class TodayWorkoutViewModel {
     isInitialLoad: Bool
   ) async {
     do {
-      let (plan, profile) = try await fetchPlanAndProfile(
+      let (fetchedPlan, profile) = try await fetchPlanAndProfile(
         preloadedPlan: nil,
         studentID: studentID
       )
       guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
         return
+      }
+      let plan: StudentPlanView?
+      if let existing = planProjection, let fetchedPlan, existing.cycleID != fetchedPlan.cycleID {
+        plan = existing
+      } else {
+        plan = fetchedPlan
       }
       onboardingProfile = profile
       planProjection = plan
@@ -390,9 +544,15 @@ public final class TodayWorkoutViewModel {
     studentID: UUID,
     generation: Int,
     recordingGeneration: Int,
-    onlyIfChanged: Bool = false
+    onlyIfChanged: Bool = false,
+    allowsCycleChange: Bool = false
   ) async throws {
     guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+      return
+    }
+    if !allowsCycleChange, let existing = planProjection, let plan,
+      existing.cycleID != plan.cycleID
+    {
       return
     }
     let nextPlanContext = Self.planContext(
@@ -512,6 +672,7 @@ public final class TodayWorkoutViewModel {
     state = .loaded(
       plan: snapshot.day, drafts: overlaySyncedDrafts(snapshot.drafts, dayID: snapshot.day.id))
     prefillAllDayPercentages()
+    updateHandoffNotice()
   }
 
   private func apply(
@@ -547,6 +708,7 @@ public final class TodayWorkoutViewModel {
     state = .loaded(
       plan: snapshot.day, drafts: overlaySyncedDrafts(mergedDrafts, dayID: snapshot.day.id))
     prefillAllDayPercentages()
+    updateHandoffNotice()
   }
 
   private func handleLoadError(
@@ -690,6 +852,7 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateWeight(rowIndex: Int, weight: Decimal?) {
+    guard !isPreviewingPlan else { return }
     mutateDraft(rowIndex: rowIndex, editedField: .weight) {
       $0.actualWeight = weight
       $0.isHistoryWeightPrefill = false
@@ -697,14 +860,17 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateReps(rowIndex: Int, reps: Int?) {
+    guard !isPreviewingPlan else { return }
     mutateDraft(rowIndex: rowIndex, editedField: .reps) { $0.actualReps = reps }
   }
 
   public func updateRPE(rowIndex: Int, rpe: Decimal?) {
+    guard !isPreviewingPlan else { return }
     updateEffort(rowIndex: rowIndex, rpe: rpe, rir: nil)
   }
 
   func updateEffort(rowIndex: Int, rpe: Decimal?, rir: Int?) {
+    guard !isPreviewingPlan else { return }
     mutateDraft(rowIndex: rowIndex, editedField: .rpe) {
       $0.actualRPE = rpe
       $0.actualRIR = rir
@@ -712,6 +878,7 @@ public final class TodayWorkoutViewModel {
   }
 
   public func toggleComplete(rowIndex: Int) async {
+    guard !isPreviewingPlan else { return }
     guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
       return
     }
@@ -720,11 +887,13 @@ public final class TodayWorkoutViewModel {
 
   @discardableResult
   public func commitSet(rowIndex: Int, failed: Bool = false) async -> Bool {
-    await persist(rowIndex: rowIndex, completed: true, failed: failed)
+    guard !isPreviewingPlan else { return false }
+    return await persist(rowIndex: rowIndex, completed: true, failed: failed)
   }
 
   @discardableResult
   func saveAccessoryRow(_ row: AccessoryRow) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     if setSyncQueue != nil { return await performAccessoryWrite(row, startsRestTimer: true) }
     guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else { return false }
     accessorySavingIDs.insert(row.id)
@@ -733,6 +902,9 @@ public final class TodayWorkoutViewModel {
   }
 
   func completeAccessoryRows(_ rows: [AccessoryRow]) async -> AccessoryBatchResult {
+    guard !isPreviewingPlan else {
+      return AccessoryBatchResult(written: 0, skipped: rows.count, failed: true)
+    }
     let selection = AccessoryRow.selection(rows)
     guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else {
       return AccessoryBatchResult(written: 0, skipped: selection.skipped.count, failed: true)
@@ -805,6 +977,7 @@ public final class TodayWorkoutViewModel {
   }
 
   public func ensureLoggedSetID(rowIndex: Int) async -> UUID? {
+    guard !isPreviewingPlan else { return nil }
     guard let drafts = currentDrafts, drafts.indices.contains(rowIndex) else {
       return nil
     }
@@ -872,6 +1045,7 @@ public final class TodayWorkoutViewModel {
   }
 
   public func completeCurrentDay() async -> Bool {
+    guard !isPreviewingPlan else { return false }
     guard let day = currentDay, !allDayWriting,
       FlexibleTrainingDay.canWrite(day, in: planDays)
     else { return false }
@@ -1043,6 +1217,7 @@ public final class TodayWorkoutViewModel {
   }
 
   func quickLog(plan: QuickLogPlan) async -> QuickLogOutcome {
+    guard !isPreviewingPlan else { return .noIncludedSets }
     guard plan.hasIncludedSets else { return .noIncludedSets }
     guard let studentID = currentStudentID, let day = currentDay else {
       return .partialFailure(writtenCount: 0, failedIndex: 0)
@@ -1100,6 +1275,7 @@ public final class TodayWorkoutViewModel {
   }
 
   func makeQuickLogPlan() -> QuickLogPlan? {
+    guard !isPreviewingPlan else { return nil }
     // A fresh sheet is a fresh attempt: forget the previous attempt's slots.
     quickLogAttemptKey = nil
     quickLogWrittenSlots = []
@@ -1165,6 +1341,7 @@ public final class TodayWorkoutViewModel {
   }
 
   public func undoCurrentDayCompletion() async -> Bool {
+    guard !isPreviewingPlan else { return false }
     guard !isCompletionMutationInFlight,
       let studentID = currentStudentID,
       let day = currentDay
@@ -1179,6 +1356,10 @@ public final class TodayWorkoutViewModel {
         fallback: day.replacingCompletion(completedAt: nil, source: nil),
         studentID: studentID
       )
+      if browsingPastPlan {
+        isCompletionMutationInFlight = false
+        await returnToCurrentPlan()
+      }
       return true
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
@@ -1191,6 +1372,9 @@ public final class TodayWorkoutViewModel {
   /// Applies a completion projection fetched by another mounted student
   /// surface without asking the repository for the same sequence tree again.
   func applyPlanProjection(_ plan: StudentPlanView) {
+    guard !isPreviewingPlan, !browsingPastPlan,
+      planProjection == nil || planProjection?.cycleID == plan.cycleID
+    else { return }
     planProjection = plan
     planDays = plan.days
     updatePlanContextIfNeeded(
@@ -1259,6 +1443,7 @@ public final class TodayWorkoutViewModel {
   private func replacingDay(_ day: StudentPlanDay, in plan: StudentPlanView) -> StudentPlanView {
     StudentPlanView(
       cycleID: plan.cycleID,
+      handoff: plan.handoff,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
       endDate: plan.endDate,
@@ -1347,6 +1532,7 @@ public final class TodayWorkoutViewModel {
         latestDrafts[rowIndex] = draft
       }
       state = .loaded(plan: plan, drafts: latestDrafts)
+      if completed { dismissHandoffNotice() }
 
       if !allDayWriting { await refreshCompletion(for: plan.id, studentID: studentID) }
 
@@ -1716,6 +1902,7 @@ extension TodayWorkoutViewModel {
   fileprivate func persist(
     rowIndex: Int, completed: Bool, failed: Bool = false, startsRestTimer: Bool = true
   ) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     if setSyncQueue != nil {
       return enqueueSet(
         rowIndex: rowIndex, completed: completed, failed: failed,
@@ -1798,6 +1985,7 @@ extension TodayWorkoutViewModel {
   func showAddedVideoError() { actionErrorMessage = StudentStrings.localized(.addedHasVideo) }
 
   func addExtraSet(exerciseID: UUID) {
+    guard !isPreviewingPlan else { return }
     guard case .loaded(let day, var drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays),
       let exercise = day.exercises.first(where: { $0.id == exerciseID }),
@@ -1809,6 +1997,7 @@ extension TodayWorkoutViewModel {
   }
 
   func addStudentExercise(_ exercise: Exercise) {
+    guard !isPreviewingPlan else { return }
     guard case .loaded(let day, var drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays),
       !day.exercises.contains(where: { $0.exercise.id == exercise.id }),
@@ -1825,6 +2014,7 @@ extension TodayWorkoutViewModel {
   }
 
   func addStudentSet(exerciseID: UUID) {
+    guard !isPreviewingPlan else { return }
     guard case .loaded(let day, var drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays),
       let exercise = exerciseCatalog.first(where: { $0.id == exerciseID })
@@ -1854,6 +2044,7 @@ extension TodayWorkoutViewModel {
   }
 
   private func persistAdded(rowIndex: Int, completed: Bool) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     if setSyncQueue != nil {
       return enqueueSet(
         rowIndex: rowIndex, completed: completed, failed: false, startsRestTimer: true)
@@ -1914,6 +2105,7 @@ extension TodayWorkoutViewModel {
   }
 
   func removeStudentRow(id: UUID) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     if setSyncQueue != nil { return enqueueRemoval(id: id) }
     guard case .loaded(let day, let drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays), accessorySavingIDs.isEmpty,
@@ -1960,6 +2152,7 @@ extension TodayWorkoutViewModel {
   }
 
   func removeStudentExercise(exerciseID: UUID) async {
+    guard !isPreviewingPlan else { return }
     let rows = currentDrafts?.filter { $0.isStudentAdded && $0.exerciseID == exerciseID } ?? []
     for row in rows {
       guard await removeStudentRow(id: row.id) else { return }
@@ -2103,6 +2296,7 @@ extension TodayWorkoutViewModel {
     }
     recordingGeneration += 1
     drafts[rowIndex] = draft
+    if completed { dismissHandoffNotice() }
     state = .loaded(plan: day, drafts: drafts)
     actionErrorMessage = nil
     return true
@@ -2215,6 +2409,7 @@ extension TodayWorkoutViewModel {
   }
 
   func toggleAllDayExpansion(_ exerciseID: UUID) {
+    guard !isPreviewingPlan else { return }
     guard let day = currentDay else { return }
     if expandedAllDayExerciseID == exerciseID {
       allDayExpansion.removeValue(forKey: day.id)
@@ -2253,6 +2448,7 @@ extension TodayWorkoutViewModel {
   }
 
   func rememberAllDayEffort(_ mode: ActualEffortMode, for draft: SetRowDraft) {
+    guard !isPreviewingPlan else { return }
     guard let studentID = currentStudentID else { return }
     allDayEffortChoices[draft.exerciseID] = mode
     effortDefaults.set(
@@ -2268,6 +2464,7 @@ extension TodayWorkoutViewModel {
   }
 
   func toggleAllDayExercise(_ exerciseID: UUID) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     guard let day = currentDay, !allDayWriting,
       FlexibleTrainingDay.canWrite(day, in: planDays)
     else { return false }
@@ -2298,6 +2495,7 @@ extension TodayWorkoutViewModel {
 
   @discardableResult
   func saveAllDayRow(rowIndex: Int, completed: Bool = false) async -> Bool {
+    guard !isPreviewingPlan else { return false }
     defer { prefillAllDayPercentages() }
     guard let drafts = currentDrafts, drafts.indices.contains(rowIndex) else { return false }
     if drafts[rowIndex].isStudentAdded {

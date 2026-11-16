@@ -21,6 +21,10 @@ public actor StudentPlanCache {
     await store.load(fileName: fileName(studentID: studentID))
   }
 
+  public func removePlan(studentID: UUID) async {
+    await store.remove(fileName: fileName(studentID: studentID))
+  }
+
   private func fileName(studentID: UUID) -> String {
     "student-\(studentID.uuidString)-plan-v\(Self.fileVersion).json"
   }
