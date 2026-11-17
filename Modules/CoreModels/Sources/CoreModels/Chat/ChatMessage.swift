@@ -12,6 +12,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
   public let imageExpiresIn: Int?
   public let exerciseRef: ExerciseRefV1?
   public let setRef: SetRefV1?
+  public let videoID: UUID?
   public let videoURL: URL?
   public let videoExpiresIn: Int?
   public let posterURL: URL?
@@ -31,6 +32,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     imageExpiresIn: Int?,
     exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
+    videoID: UUID? = nil,
     videoURL: URL? = nil,
     videoExpiresIn: Int? = nil,
     posterURL: URL? = nil,
@@ -49,6 +51,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     self.imageExpiresIn = imageExpiresIn
     self.exerciseRef = exerciseRef
     self.setRef = setRef
+    self.videoID = videoID
     self.videoURL = videoURL
     self.videoExpiresIn = videoExpiresIn
     self.posterURL = posterURL
@@ -70,6 +73,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     imageExpiresIn = try container.decodeIfPresent(Int.self, forKey: .imageExpiresIn)
     exerciseRef = try? container.decode(ExerciseRefV1.self, forKey: .exerciseRef)
     setRef = try? container.decode(SetRefV1ReadValue.self, forKey: .setRef).value
+    videoID = try container.decodeIfPresent(UUID.self, forKey: .videoID)
     videoURL = try container.decodeIfPresent(URL.self, forKey: .videoURL)
     videoExpiresIn = try container.decodeIfPresent(Int.self, forKey: .videoExpiresIn)
     posterURL = try? container.decodeIfPresent(URL.self, forKey: .posterURL)
@@ -77,6 +81,12 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     clientID = try container.decode(String.self, forKey: .clientID)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
+
+  public var isStandaloneVideo: Bool {
+    kind == .text && videoID != nil && setRef == nil && exerciseRef == nil
+  }
+
+  public var hasChatVideo: Bool { isStandaloneVideo || (setRef != nil && videoURL != nil) }
 
   private enum CodingKeys: String, CodingKey {
     case id
@@ -90,6 +100,7 @@ public struct ChatMessage: Codable, Identifiable, Hashable, Sendable {
     case imageExpiresIn
     case exerciseRef
     case setRef
+    case videoID = "videoId"
     case videoURL = "videoUrl"
     case videoExpiresIn
     case posterURL = "posterUrl"

@@ -163,6 +163,11 @@ public final class ConversationViewModel {
   }
 
   @discardableResult
+  public func sendVideo(_ video: ChatVideoFile) -> String? {
+    sendCoordinator.sendVideo(in: conversationID, video: video)
+  }
+
+  @discardableResult
   public func sendStagedSetRef(note: String) -> String? {
     let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
     guard let length = stagedSetRefLength(note: trimmed) else {

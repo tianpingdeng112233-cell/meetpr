@@ -1,0 +1,133 @@
+[0/1] Planning build
+Building for debugging...
+[0/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Compiling CoreModels ChatVideoFile.swift
+[6/8] Emitting module CoreModels
+[7/24] Emitting module RepositoryContracts
+[8/24] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[9/24] Compiling RepositoryContracts E1RMRepository.swift
+[10/24] Compiling RepositoryContracts EvaluationRepository.swift
+[11/24] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[12/24] Compiling RepositoryContracts InviteCodeRepository.swift
+[13/29] Compiling RepositoryContracts OnboardingRepository.swift
+[14/29] Compiling RepositoryContracts ReadinessRepository.swift
+[15/29] Compiling RepositoryContracts RepositoryStrings.swift
+[16/29] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[17/29] Compiling RepositoryContracts StudentPlanRepository.swift
+[18/29] Compiling RepositoryContracts AccountRepository.swift
+[19/29] Compiling RepositoryContracts BindRepository.swift
+[20/29] Compiling RepositoryContracts ChatRepository.swift
+[21/29] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[22/29] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[23/29] Compiling RepositoryContracts StudentPlanStore.swift
+[24/29] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[25/29] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[26/29] Compiling RepositoryContracts VideoMarkerRepository.swift
+[27/29] Compiling RepositoryContracts resource_bundle_accessor.swift
+[28/70] Emitting module Networking
+[29/83] Compiling Networking AuthDTOs.swift
+[30/83] Compiling Networking SessionStateReader.swift
+[31/83] Compiling Networking BackendVideoMarkerRepository.swift
+[32/83] Compiling Networking BuildConfig.swift
+[33/83] Compiling Networking ExerciseCatalogCache.swift
+[34/83] Compiling Networking FeedbackCache.swift
+[35/83] Compiling Networking JSONFileCache.swift
+[36/83] Compiling Networking PlanCache.swift
+[37/83] Compiling Networking StudentPlanCache.swift
+[38/83] Compiling Networking TrainingLogCache.swift
+[39/83] Compiling Networking AllStudentSetLogsDTO.swift
+[40/83] Compiling Networking BindDTOs.swift
+[41/83] Compiling Networking BindQueueDTOs.swift
+[42/83] Compiling Networking APIClient+Account.swift
+[43/83] Compiling Networking APIClient+Bind.swift
+[44/83] Compiling Networking APIClient+BindQueue.swift
+[45/83] Compiling Networking APIClient+BodyWeights.swift
+[46/83] Compiling Networking APIClient+Devices.swift
+[47/83] Compiling Networking APIClient+Exercises.swift
+[48/83] Compiling Networking APIClient+Onboarding.swift
+[49/83] Compiling Networking APIClient+Plans.swift
+[50/83] Compiling Networking APIClient+StudentAddedSets.swift
+[51/83] Compiling Networking APIClient+Uploads.swift
+[52/83] Compiling Networking APIClient+VideoMarkers.swift
+[53/83] Compiling Networking APIClient+WeightSuggestions.swift
+[54/83] Compiling Networking APIClient.swift
+[55/83] Compiling Networking APIClient+Auth.swift
+[56/83] Compiling Networking BodyWeightDTOs.swift
+[57/83] Compiling Networking ChatDTOs.swift
+[58/83] Compiling Networking CoachSetLogDTO.swift
+[59/83] Compiling Networking CoachStudentDTOs.swift
+[60/83] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[61/83] Compiling Networking DecimalCoding.swift
+[62/83] Compiling Networking EvaluationDTOs.swift
+[63/83] Compiling Networking ExerciseDTOs.swift
+[64/83] Compiling Networking ExerciseStatsDTOs.swift
+[65/83] Compiling Networking FeedbackDTOs.swift
+[66/83] Compiling Networking OnboardingDTOs.swift
+[67/83] Compiling Networking OnboardingPatchDTO.swift
+[68/83] Compiling Networking PlanDTOs.swift
+[69/83] Compiling Networking PlanHandoffDTO.swift
+[70/83] Compiling Networking PlanRequestDTOs.swift
+[71/83] Compiling Networking ReadinessDTOs.swift
+[72/83] Compiling Networking SetLogDTOs.swift
+[73/83] Compiling Networking StudentVideoDTOs.swift
+[74/83] Compiling Networking UploadDTOs.swift
+[75/83] Compiling Networking VideoMarkerDTOs.swift
+[76/83] Compiling Networking ErrorEnvelope.swift
+[77/83] Compiling Networking DomainMapping.swift
+[78/83] Compiling Networking NetworkChatRepository.swift
+[79/83] Compiling Networking OSSPartUploader.swift
+[80/83] Compiling Networking RealtimeClient.swift
+[81/83] Compiling Networking RealtimeEvent.swift
+[82/111] Compiling NetworkingTests APIClientDevicesTests.swift
+[83/111] Compiling NetworkingTests APIClientTests.swift
+[84/111] Compiling NetworkingTests AccountEndpointTests.swift
+[85/111] Compiling NetworkingTests AllDayContractTests.swift
+[86/111] Compiling NetworkingTests AuthRefreshRequestEncodingTests.swift
+[87/111] Compiling NetworkingTests BackendContractDecodingTests.swift
+[88/111] Compiling NetworkingTests BindDTOTests.swift
+[89/111] Compiling NetworkingTests BodyWeightDTOTests.swift
+[90/111] Compiling NetworkingTests ChatDTOTests.swift
+[91/119] Compiling NetworkingTests ChatSetRefDTOTests.swift
+[92/119] Compiling NetworkingTests ChatStandaloneVideoTests.swift
+[93/119] Compiling NetworkingTests CoachSetReadTests.swift
+[94/119] Compiling NetworkingTests EvaluationDTOTests.swift
+[95/119] Compiling NetworkingTests ExerciseStatsDTOTests.swift
+[96/119] Compiling NetworkingTests FeedbackVideoDTOTests.swift
+[97/119] Compiling NetworkingTests GlobalAuthEndpointTests.swift
+[98/119] Compiling NetworkingTests MinimumAppVersionTests.swift
+[99/119] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[100/119] Emitting module NetworkingTests
+[101/119] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[102/119] Compiling NetworkingTests NetworkingLayerTests.swift
+[103/119] Compiling NetworkingTests NetworkingTypedEndpointTests.swift
+[104/119] Compiling NetworkingTests OSSPartUploaderTests.swift
+[105/119] Compiling NetworkingTests OnboardingDTOTests.swift
+[106/119] Compiling NetworkingTests PlanCompletionDTOTests.swift
+[107/119] Compiling NetworkingTests PlanIntensityDTOTests.swift
+[108/119] Compiling NetworkingTests PlanLoadTypesTests.swift
+[109/119] Compiling NetworkingTests PlanSetCoachNoteDTOTests.swift
+[110/119] Compiling NetworkingTests RealtimeClientTests.swift
+[111/119] Compiling NetworkingTests RealtimeEventTests.swift
+[112/119] Compiling NetworkingTests SetLogDTOTests.swift
+[113/119] Compiling NetworkingTests StudentAddedSetDTOTests.swift
+[114/119] Compiling NetworkingTests StudentPlanCacheTests.swift
+[115/119] Compiling NetworkingTests UploadsEndpointTests.swift
+[116/119] Compiling NetworkingTests VideoMarkerDTOTests.swift
+[117/119] Compiling NetworkingTests WireFormattingTests.swift
+[117/119] Write Objects.LinkFileList
+[118/119] Linking NetworkingPackageTests
+Build complete! (21.08s)
+Test Suite 'Selected tests' started at 2026-11-17 11:23:48.835.
+Test Suite 'NetworkingPackageTests.xctest' started at 2026-11-17 11:23:48.838.
+Test Suite 'NetworkingPackageTests.xctest' passed at 2026-11-17 11:23:48.838.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-17 11:23:48.838.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test standaloneVideoUploadsInBoundedPartsThenSendsCompatibleMessage() started.
+✘ Test standaloneVideoUploadsInBoundedPartsThenSendsCompatibleMessage() recorded an issue at ChatStandaloneVideoTests.swift:16:2: Caught error: .invalidAttachment
+✘ Test standaloneVideoUploadsInBoundedPartsThenSendsCompatibleMessage() failed after 0.018 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.018 seconds with 1 issue.

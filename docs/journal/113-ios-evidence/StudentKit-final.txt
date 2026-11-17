@@ -1,0 +1,31 @@
+Command: swift test --package-path Modules/StudentKit --jobs 2
+Result: exit 0
+Full output: StudentKit-final.txt.gz
+Uncompressed SHA256: 082e834fdf309a333b876545c0a12019c76c9394965531028296adfb267d68f2
+
+Final output excerpt:
+✔ Test handoffPendingCompletionKeepsOriginalDayUntilAcknowledged() passed after 5.498 seconds.
+✔ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() passed after 5.469 seconds.
+✔ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() passed after 5.531 seconds.
+✔ Test reopeningAlwaysSelectsCursorDespiteRecentWorkInAnotherWeek() passed after 5.462 seconds.
+✔ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() passed after 5.514 seconds.
+✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 5.463 seconds.
+✔ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() passed after 5.468 seconds.
+✔ Test allDayEffortChoiceSurvivesReloadAndIsolatesAccountsAndExercises() passed after 5.464 seconds.
+✔ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() passed after 5.532 seconds.
+✔ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() passed after 5.517 seconds.
+✔ Test loadsAcrossPlansBeyondTwelveWeeksWithoutMatchingRepsOrEffort() passed after 5.254 seconds.
+✔ Suite AccessoryWeightHistoryIntegrationTests passed after 5.543 seconds.
+✔ Test pendingCameraVideoSurvivesRestartAndRetentionBeforeBinding() passed after 5.367 seconds.
+✔ Test extraSetCameraVideoRebindsAfterDraftIdentityChangesOnReload() passed after 5.368 seconds.
+✔ Test anyWeekCanRecordAndCompleteWithoutAdvancingPastUnsettledWeek(daysFromSelected:) with 3 test cases passed after 5.474 seconds.
+✔ Suite PublishedDayTrainingTests passed after 5.555 seconds.
+✔ Test cameraReturnAcrossDayChangeRetainsVideoUntilOriginalDayReturns() passed after 5.379 seconds.
+✔ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) with 9 test cases passed after 5.566 seconds.
+✔ Test cameraReturnOverlappingSetSaveKeepsAllThreeVideos(targetRow:overlapsSave:) with 4 test cases passed after 5.402 seconds.
+✔ Suite CameraReturnDuringPersistenceTests passed after 5.583 seconds.
+✔ Test resizingPlayerSurfacePreservesActualPlaybackTime() passed after 5.729 seconds.
+✔ Suite SetEntryVideoPlayerTests passed after 5.746 seconds.
+✔ Test ledgerReadFailureCannotBeMistakenForACompletedVideoDay() passed after 26.268 seconds.
+✔ Suite VideoCompletionBoundaryTests passed after 26.364 seconds.
+✔ Test run with 1327 tests in 94 suites passed after 26.366 seconds.

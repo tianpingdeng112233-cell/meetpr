@@ -1,0 +1,164 @@
+[0/1] Planning build
+Building for debugging...
+[0/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Compiling CoreModels ChatVideoFile.swift
+[6/8] Emitting module CoreModels
+[7/24] Compiling RepositoryContracts OnboardingRepository.swift
+[8/24] Compiling RepositoryContracts ReadinessRepository.swift
+[9/24] Compiling RepositoryContracts RepositoryStrings.swift
+[10/24] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[11/24] Compiling RepositoryContracts StudentPlanRepository.swift
+[12/24] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[13/24] Compiling RepositoryContracts E1RMRepository.swift
+[14/24] Compiling RepositoryContracts EvaluationRepository.swift
+[15/24] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[16/24] Compiling RepositoryContracts InviteCodeRepository.swift
+[17/29] Emitting module RepositoryContracts
+[18/29] Compiling RepositoryContracts AccountRepository.swift
+[19/29] Compiling RepositoryContracts BindRepository.swift
+[20/29] Compiling RepositoryContracts ChatRepository.swift
+[21/29] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[22/29] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[23/29] Compiling RepositoryContracts StudentPlanStore.swift
+[24/29] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[25/29] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[26/29] Compiling RepositoryContracts VideoMarkerRepository.swift
+[27/29] Compiling RepositoryContracts resource_bundle_accessor.swift
+[28/71] Compiling Networking APIClient+Account.swift
+[29/71] Compiling Networking APIClient+Bind.swift
+[30/71] Compiling Networking APIClient+BindQueue.swift
+[31/71] Compiling Networking APIClient+BodyWeights.swift
+[32/71] Compiling Networking APIClient+Devices.swift
+[33/71] Compiling Networking APIClient+Exercises.swift
+[34/71] Compiling Networking APIClient+Onboarding.swift
+[35/71] Compiling Networking APIClient+Plans.swift
+[36/71] Compiling Networking APIClient+StudentAddedSets.swift
+[37/71] Compiling Networking APIClient+Uploads.swift
+[38/71] Compiling Networking APIClient+VideoMarkers.swift
+[39/71] Compiling Networking APIClient+WeightSuggestions.swift
+[40/71] Compiling Networking APIClient.swift
+[41/71] Compiling Networking APIClient+Auth.swift
+[42/84] Emitting module Networking
+[43/84] Compiling Networking AuthDTOs.swift
+[44/84] Compiling Networking SessionStateReader.swift
+[45/84] Compiling Networking BackendVideoMarkerRepository.swift
+[46/84] Compiling Networking BuildConfig.swift
+[47/84] Compiling Networking ExerciseCatalogCache.swift
+[48/84] Compiling Networking FeedbackCache.swift
+[49/84] Compiling Networking JSONFileCache.swift
+[50/84] Compiling Networking PlanCache.swift
+[51/84] Compiling Networking StudentPlanCache.swift
+[52/84] Compiling Networking TrainingLogCache.swift
+[53/84] Compiling Networking ChatVideoUpload.swift
+[54/84] Compiling Networking AllStudentSetLogsDTO.swift
+[55/84] Compiling Networking BindDTOs.swift
+[56/84] Compiling Networking BindQueueDTOs.swift
+[57/84] Compiling Networking BodyWeightDTOs.swift
+[58/84] Compiling Networking ChatDTOs.swift
+[59/84] Compiling Networking CoachSetLogDTO.swift
+[60/84] Compiling Networking CoachStudentDTOs.swift
+[61/84] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[62/84] Compiling Networking DecimalCoding.swift
+[63/84] Compiling Networking EvaluationDTOs.swift
+[64/84] Compiling Networking ExerciseDTOs.swift
+[65/84] Compiling Networking ExerciseStatsDTOs.swift
+[66/84] Compiling Networking FeedbackDTOs.swift
+[67/84] Compiling Networking OnboardingDTOs.swift
+[68/84] Compiling Networking OnboardingPatchDTO.swift
+[69/84] Compiling Networking PlanDTOs.swift
+[70/84] Compiling Networking PlanHandoffDTO.swift
+[71/84] Compiling Networking PlanRequestDTOs.swift
+[72/84] Compiling Networking ReadinessDTOs.swift
+[73/84] Compiling Networking SetLogDTOs.swift
+[74/84] Compiling Networking StudentVideoDTOs.swift
+[75/84] Compiling Networking UploadDTOs.swift
+[76/84] Compiling Networking VideoMarkerDTOs.swift
+[77/84] Compiling Networking ErrorEnvelope.swift
+[78/84] Compiling Networking DomainMapping.swift
+[79/84] Compiling Networking NetworkChatRepository.swift
+[80/84] Compiling Networking OSSPartUploader.swift
+[81/84] Compiling Networking RealtimeClient.swift
+[82/84] Compiling Networking RealtimeEvent.swift
+[83/114] Compiling ChatUI ChatComposer.swift
+[84/114] Compiling ChatUI ChatDemoSeed.swift
+[85/114] Compiling ChatUI ChatImageDownsampler.swift
+[86/114] Compiling ChatUI ChatInboxViewModel.swift
+[87/114] Compiling ChatUI ChatOutboxItem.swift
+[88/114] Compiling ChatUI ChatPendingVideoCard.swift
+[89/114] Compiling ChatUI ChatPosterLoader.swift
+[90/114] Compiling ChatUI ChatSendCoordinator+SetRef.swift
+[91/114] Compiling ChatUI ChatSendCoordinator.swift
+[92/114] Compiling ChatUI ChatSetCardPresentation.swift
+[93/123] Compiling ChatUI ConversationViewModel+Images.swift
+[94/123] Compiling ChatUI ConversationViewModel+Loading.swift
+[95/123] Compiling ChatUI ConversationViewModel+Videos.swift
+[96/123] Compiling ChatUI ConversationViewModel.swift
+[97/123] Compiling ChatUI ExerciseNoteCard.swift
+[98/123] Compiling ChatUI FeedbackVideoMarkerOverlay.swift
+[99/123] Compiling ChatUI FeedbackVideoPlayerActions.swift
+[100/123] Compiling ChatUI FeedbackVideoPlayerMetrics.swift
+[101/123] Compiling ChatUI FeedbackVideoPlayerView.swift
+[102/123] Compiling ChatUI ChatSetCardView.swift
+[103/123] Compiling ChatUI ChatSetRefDisplayFormatter.swift
+[104/123] Compiling ChatUI ChatStandaloneVideoCard.swift
+[105/123] Compiling ChatUI ChatStrings.swift
+[106/123] Compiling ChatUI ChatTaskCancellation.swift
+[107/123] Compiling ChatUI ChatTimelineItem.swift
+[108/123] Compiling ChatUI ChatVideoStrings.swift
+[109/123] Compiling ChatUI ConversationListSection.swift
+[110/123] Compiling ChatUI ConversationMessageRows.swift
+[111/123] Compiling ChatUI ConversationView.swift
+[112/123] Emitting module ChatUI
+[113/123] Compiling ChatUI FeedbackVideoWorkbenchPlayer.swift
+[114/123] Compiling ChatUI InMemoryChatRepository.swift
+[115/123] Compiling ChatUI SetRefPickerPresentation.swift
+[116/123] Compiling ChatUI SetRefSendIntent.swift
+[117/123] Compiling ChatUI SetRefSharePicker.swift
+[118/123] Compiling ChatUI SetRefSharingContext.swift
+[119/123] Compiling ChatUI VideoBadgeCard.swift
+[120/123] Compiling ChatUI VideoBadgeExporter.swift
+[121/123] Compiling ChatUI resource_bundle_accessor.swift
+[122/144] Compiling ChatUITests ConversationEmptyStateTests.swift
+[123/144] Compiling ChatUITests ConversationImageRenewalTests.swift
+[124/144] Compiling ChatUITests ConversationPollingDirectionTests.swift
+[125/144] Compiling ChatUITests ConversationVideoRenewalTests.swift
+[126/144] Compiling ChatUITests ConversationViewModelSetRefTests.swift
+[127/144] Compiling ChatUITests ConversationViewModelTests.swift
+[128/150] Compiling ChatUITests ChatImageDownsamplerTests.swift
+[129/150] Compiling ChatUITests ChatInboxViewModelTests.swift
+[130/150] Compiling ChatUITests ChatPendingMatchingTests.swift
+[131/150] Compiling ChatUITests ChatRealtimeTests.swift
+[132/150] Compiling ChatUITests ChatSendCoordinatorCleanupTests.swift
+[133/150] Compiling ChatUITests ChatSendCoordinatorSetRefTests.swift
+[134/150] Compiling ChatUITests ChatSendCoordinatorTests.swift
+[135/150] Emitting module ChatUITests
+[136/150] Compiling ChatUITests ChatSetCardPresentationTests.swift
+[137/150] Compiling ChatUITests ChatTestSupport.swift
+[138/150] Compiling ChatUITests ChatTimelineConfirmationTests.swift
+[139/150] Compiling ChatUITests ChatTimestampSeparatorTests.swift
+[140/150] Compiling ChatUITests ChatVideoCoverPresentationTests.swift
+[141/150] Compiling ChatUITests ChatVideoMetadataDecodingTests.swift
+[142/150] Compiling ChatUITests ChatVideoSendTests.swift
+[143/150] Compiling ChatUITests ConversationVisibilityTests.swift
+[144/150] Compiling ChatUITests FeedbackVideoPlayerPresentationTests.swift
+[145/150] Compiling ChatUITests InMemoryChatRepositoryTests.swift
+[146/150] Compiling ChatUITests VideoBadgeExportFixture.swift
+[147/150] Compiling ChatUITests VideoBadgeExporterTests.swift
+[148/150] Compiling ChatUITests VideoBadgePresentationTests.swift
+[148/150] Write Objects.LinkFileList
+[149/150] Linking ChatUIPackageTests
+Build complete! (32.89s)
+Test Suite 'Selected tests' started at 2026-11-17 11:26:22.651.
+Test Suite 'ChatUIPackageTests.xctest' started at 2026-11-17 11:26:22.653.
+Test Suite 'ChatUIPackageTests.xctest' passed at 2026-11-17 11:26:22.653.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-17 11:26:22.653.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test standaloneVideoWithMissingURLCanRenewFromItsMessage() started.
+✘ Test standaloneVideoWithMissingURLCanRenewFromItsMessage() recorded an issue at ChatVideoSendTests.swift:78:2: Caught error: .unavailable
+✘ Test standaloneVideoWithMissingURLCanRenewFromItsMessage() failed after 0.006 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.006 seconds with 1 issue.

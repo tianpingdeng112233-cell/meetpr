@@ -5,6 +5,7 @@ public enum PendingChatMessage: Hashable, Sendable {
   case text(String)
   case exerciseNote(body: String, reference: ExerciseRefV1)
   case image(Data)
+  case video(ChatVideoFile)
 }
 
 public enum ChatSendState: Sendable {
@@ -19,7 +20,13 @@ public struct ChatOutboxItem: Sendable {
   public let senderID: UUID
   public let draft: PendingChatMessage
   public let state: ChatSendState
+  public let uploadProgress: Double?
   public let createdAt: Date
+
+  public var sendingProgress: Double? {
+    if case .sending = state { return uploadProgress ?? 0 }
+    return nil
+  }
 
   public init(
     clientID: String,
@@ -27,7 +34,8 @@ public struct ChatOutboxItem: Sendable {
     senderID: UUID,
     draft: PendingChatMessage,
     state: ChatSendState,
-    createdAt: Date = Date()
+    createdAt: Date = Date(),
+    uploadProgress: Double? = nil
   ) {
     self.clientID = clientID
     self.conversationID = conversationID
@@ -35,5 +43,6 @@ public struct ChatOutboxItem: Sendable {
     self.draft = draft
     self.state = state
     self.createdAt = createdAt
+    self.uploadProgress = uploadProgress
   }
 }

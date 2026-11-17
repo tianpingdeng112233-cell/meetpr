@@ -1,0 +1,280 @@
+Building for debugging...
+[0/17] /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/.build/arm64-apple-macosx/debug/NetworkingPackageTests.derived/runner.swift
+[0/17] Write sources
+[0/17] Copying exercise-search-zh-Hant.json
+[0/17] Write sources
+[0/17] Copying Info.plist
+[0/17] Copying OpenCC-LICENSE.txt
+[0/17] Write sources
+[0/17] Copying Localizable.xcstrings
+[9/17] Copying Info.plist
+[9/17] Copying Localizable.xcstrings
+[9/17] Copying exercise-names-zh-Hant.json
+[9/17] Copying OpenCC-NOTICE.txt
+[13/17] Write sources
+[14/17] Write swift-version--58304C5D6DBC2206.txt
+[16/92] Emitting module CoreModels
+[17/100] Compiling CoreModels EvaluationSummary.swift
+[18/100] Compiling CoreModels Exercise.swift
+[19/100] Compiling CoreModels OnboardingPatch.swift
+[20/100] Compiling CoreModels OnboardingProfile.swift
+[21/100] Compiling CoreModels E1RMHistoryPoint.swift
+[22/100] Compiling CoreModels E1RMWeightBaseline.swift
+[23/100] Compiling CoreModels LegacyBodyweightProjection.swift
+[24/100] Compiling CoreModels PRBreakthroughEvent.swift
+[25/100] Compiling CoreModels MuscleGroup.swift
+[26/100] Compiling CoreModels PlanKind.swift
+[27/100] Compiling CoreModels PlanSource.swift
+[28/100] Compiling CoreModels PlanStatus.swift
+[29/100] Compiling CoreModels SetType.swift
+[30/100] Compiling CoreModels SquatStance.swift
+[31/100] Compiling CoreModels TrainingDay.swift
+[32/100] Compiling CoreModels TrainingMode.swift
+[33/100] Compiling CoreModels ExerciseType.swift
+[34/100] Compiling CoreModels Gender.swift
+[35/100] Compiling CoreModels GymTier.swift
+[36/100] Compiling CoreModels InjuryArea.swift
+[37/100] Compiling CoreModels IntensityMode.swift
+[38/100] Compiling CoreModels InviteCodeType.swift
+[39/100] Compiling CoreModels LiftFamily.swift
+[40/100] Compiling CoreModels MovementPattern.swift
+[41/100] Compiling CoreModels UnitPreference.swift
+[42/100] Compiling CoreModels UnitSystem.swift
+[43/100] Compiling CoreModels UserRole.swift
+[44/100] Compiling CoreModels ExerciseSearchText.swift
+[45/100] Compiling CoreModels InterfaceLanguage.swift
+[46/100] Compiling CoreModels PushNotificationRouting.swift
+[47/100] Compiling CoreModels TaskCancellation.swift
+[48/100] Compiling CoreModels resource_bundle_accessor.swift
+[49/100] Compiling CoreModels StudentProfile.swift
+[50/100] Compiling CoreModels User.swift
+[51/100] Compiling CoreModels VideoMarker.swift
+[52/100] Compiling CoreModels BenchGrip.swift
+[53/100] Compiling CoreModels BindRequestStatus.swift
+[54/100] Compiling CoreModels CompetitionStance.swift
+[55/100] Compiling CoreModels DeadliftStance.swift
+[56/100] Compiling CoreModels Equipment.swift
+[57/100] Compiling CoreModels PercentageAnchor.swift
+[58/100] Compiling CoreModels PlanDay.swift
+[59/100] Compiling CoreModels PlanExercise.swift
+[60/100] Compiling CoreModels PlanLoadMode.swift
+[61/100] Compiling CoreModels PlanSet.swift
+[62/100] Compiling CoreModels PrescribedIntensity.swift
+[63/100] Compiling CoreModels PrescribedSet+LoadType.swift
+[64/100] Compiling CoreModels SetWeightSuggestionRecord.swift
+[65/100] Compiling CoreModels Codec.swift
+[66/100] Compiling CoreModels CoreModelStrings.swift
+[67/100] Compiling CoreModels CompetitionLiftResolver.swift
+[68/100] Compiling CoreModels CompletionHistory.swift
+[69/100] Compiling CoreModels E1RMAnomalyClassifier.swift
+[70/100] Compiling CoreModels E1RMCalculator.swift
+[71/100] Compiling CoreModels E1RMPlateauDetector.swift
+[72/100] Compiling CoreModels InviteCodeFormat.swift
+[73/100] Compiling CoreModels PlateMathCalculator.swift
+[74/100] Compiling CoreModels CatalogExerciseName.swift
+[75/100] Compiling CoreModels ActiveCoachContext.swift
+[76/100] Compiling CoreModels ChatConversation.swift
+[77/100] Compiling CoreModels ChatCursor.swift
+[78/100] Compiling CoreModels ChatMessage.swift
+[79/100] Compiling CoreModels ChatMessageKind.swift
+[80/100] Compiling CoreModels ExerciseNoteDayResolver.swift
+[81/100] Compiling CoreModels ExerciseRefV1.swift
+[82/100] Compiling CoreModels SetRefV1.swift
+[83/100] Compiling CoreModels RestDefaults.swift
+[84/100] Compiling CoreModels BindFirstRun.swift
+[85/100] Compiling CoreModels BindRequest.swift
+[86/100] Compiling CoreModels InviteCode.swift
+[87/100] Compiling CoreModels CoachFeedback.swift
+[88/100] Compiling CoreModels CoachFeedbackVideo.swift
+[89/100] Compiling CoreModels CoachProfile.swift
+[90/100] Compiling CoreModels EvaluationPeriod.swift
+[91/100] Compiling CoreModels StudentAddedSetLog.swift
+[92/100] Compiling CoreModels StudentPlanHandoff.swift
+[93/100] Compiling CoreModels StudentPlanView.swift
+[94/100] Compiling CoreModels StudentSetLog.swift
+[95/100] Compiling CoreModels StudentVideo.swift
+[96/100] Compiling CoreModels TrainingPlan.swift
+[97/100] Compiling CoreModels VideoAttachment.swift
+[98/100] Compiling CoreModels ReadinessCheckin.swift
+[99/119] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[100/119] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[101/121] Compiling RepositoryContracts RepositoryStrings.swift
+[102/121] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[103/121] Compiling RepositoryContracts OnboardingRepository.swift
+[104/121] Compiling RepositoryContracts ReadinessRepository.swift
+[105/121] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[106/121] Compiling RepositoryContracts InviteCodeRepository.swift
+[107/121] Compiling RepositoryContracts E1RMRepository.swift
+[108/121] Compiling RepositoryContracts EvaluationRepository.swift
+[109/121] Emitting module RepositoryContracts
+[110/121] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[111/121] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[112/121] Compiling RepositoryContracts StudentPlanRepository.swift
+[113/121] Compiling RepositoryContracts StudentPlanStore.swift
+[114/121] Compiling RepositoryContracts VideoMarkerRepository.swift
+[115/121] Compiling RepositoryContracts resource_bundle_accessor.swift
+[116/121] Compiling RepositoryContracts AccountRepository.swift
+[117/121] Compiling RepositoryContracts BindRepository.swift
+[118/121] Compiling RepositoryContracts ChatRepository.swift
+[119/121] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[120/178] Compiling Networking APIClient+Exercises.swift
+[121/178] Compiling Networking APIClient+Feedback.swift
+[122/178] Compiling Networking APIClient+Onboarding.swift
+[123/178] Compiling Networking APIClient+Plans.swift
+[124/178] Compiling Networking APIClient+Readiness.swift
+[125/178] Compiling Networking APIClient+Sets.swift
+[126/178] Compiling Networking APIClient+StudentAddedSets.swift
+[127/184] Compiling Networking FeedbackCache.swift
+[128/184] Compiling Networking JSONFileCache.swift
+[129/184] Compiling Networking PlanCache.swift
+[130/184] Compiling Networking StudentPlanCache.swift
+[131/184] Compiling Networking TrainingLogCache.swift
+[132/184] Compiling Networking AllStudentSetLogsDTO.swift
+[133/184] Compiling Networking APIClient+StudentVideos.swift
+[134/184] Compiling Networking APIClient+Students.swift
+[135/184] Compiling Networking APIClient+Uploads.swift
+[136/184] Compiling Networking APIClient+VideoMarkers.swift
+[137/184] Compiling Networking APIClient+WeightSuggestions.swift
+[138/184] Compiling Networking APIClient.swift
+[139/184] Emitting module Networking
+[140/184] Compiling Networking APIClient+Account.swift
+[141/184] Compiling Networking APIClient+Bind.swift
+[142/184] Compiling Networking APIClient+BindQueue.swift
+[143/184] Compiling Networking APIClient+BodyWeights.swift
+[144/184] Compiling Networking APIClient+CoachSets.swift
+[145/184] Compiling Networking APIClient+Devices.swift
+[146/184] Compiling Networking APIClient+Evaluations.swift
+[147/184] Compiling Networking APIClient+Auth.swift
+[148/184] Compiling Networking AuthDTOs.swift
+[149/184] Compiling Networking SessionStateReader.swift
+[150/184] Compiling Networking BackendVideoMarkerRepository.swift
+[151/184] Compiling Networking BuildConfig.swift
+[152/184] Compiling Networking ExerciseCatalogCache.swift
+[153/184] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[154/184] Compiling Networking DecimalCoding.swift
+[155/184] Compiling Networking EvaluationDTOs.swift
+[156/184] Compiling Networking ExerciseDTOs.swift
+[157/184] Compiling Networking ExerciseStatsDTOs.swift
+[158/184] Compiling Networking FeedbackDTOs.swift
+[159/184] Compiling Networking SetLogDTOs.swift
+[160/184] Compiling Networking StudentVideoDTOs.swift
+[161/184] Compiling Networking UploadDTOs.swift
+[162/184] Compiling Networking VideoMarkerDTOs.swift
+[163/184] Compiling Networking WireFormatting.swift
+[164/184] Compiling Networking Endpoints.swift
+[165/184] Compiling Networking OnboardingDTOs.swift
+[166/184] Compiling Networking OnboardingPatchDTO.swift
+[167/184] Compiling Networking PlanDTOs.swift
+[168/184] Compiling Networking PlanHandoffDTO.swift
+[169/184] Compiling Networking PlanRequestDTOs.swift
+[170/184] Compiling Networking ReadinessDTOs.swift
+[171/184] Compiling Networking ErrorEnvelope.swift
+[172/184] Compiling Networking DomainMapping.swift
+[173/184] Compiling Networking NetworkChatRepository.swift
+[174/184] Compiling Networking OSSPartUploader.swift
+[175/184] Compiling Networking RealtimeClient.swift
+[176/184] Compiling Networking RealtimeEvent.swift
+[177/184] Compiling Networking BindDTOs.swift
+[178/184] Compiling Networking BindQueueDTOs.swift
+[179/184] Compiling Networking BodyWeightDTOs.swift
+[180/184] Compiling Networking ChatDTOs.swift
+[181/184] Compiling Networking CoachSetLogDTO.swift
+[182/184] Compiling Networking CoachStudentDTOs.swift
+[183/218] Emitting module NetworkingTests
+[184/218] Compiling NetworkingTests APIClientDevicesTests.swift
+[185/218] Compiling NetworkingTests APIClientTests.swift
+[186/218] Compiling NetworkingTests AccountEndpointTests.swift
+[187/218] Compiling NetworkingTests AllDayContractTests.swift
+[188/218] Compiling NetworkingTests SetLogDTOTests.swift
+[189/218] Compiling NetworkingTests StudentAddedSetDTOTests.swift
+[190/218] Compiling NetworkingTests StudentPlanCacheTests.swift
+[191/221] Compiling NetworkingTests PlanSetCoachNoteDTOTests.swift
+[192/221] Compiling NetworkingTests RealtimeClientTests.swift
+[193/221] Compiling NetworkingTests RealtimeEventTests.swift
+[194/221] Compiling NetworkingTests GlobalAuthEndpointTests.swift
+[195/221] Compiling NetworkingTests MinimumAppVersionTests.swift
+[196/221] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[197/221] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[198/221] Compiling NetworkingTests AuthRefreshRequestEncodingTests.swift
+[199/221] Compiling NetworkingTests BackendContractDecodingTests.swift
+[200/221] Compiling NetworkingTests BindDTOTests.swift
+[201/221] Compiling NetworkingTests BodyWeightDTOTests.swift
+[202/221] Compiling NetworkingTests CoachSetReadTests.swift
+[203/221] Compiling NetworkingTests EvaluationDTOTests.swift
+[204/221] Compiling NetworkingTests ExerciseStatsDTOTests.swift
+[205/221] Compiling NetworkingTests FeedbackVideoDTOTests.swift
+[206/221] Compiling NetworkingTests PlanCompletionDTOTests.swift
+[207/221] Compiling NetworkingTests PlanIntensityDTOTests.swift
+[208/221] Compiling NetworkingTests PlanLoadTypesTests.swift
+[209/221] Compiling NetworkingTests NetworkingLayerTests.swift
+[210/221] Compiling NetworkingTests NetworkingTypedEndpointTests.swift
+[211/221] Compiling NetworkingTests OSSPartUploaderTests.swift
+[212/221] Compiling NetworkingTests OnboardingDTOTests.swift
+[213/221] Compiling NetworkingTests BuildConfigTests.swift
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:11:19: error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+ 9 |   let message = try MeetPRCodec.decoder.decode(ChatMessageDTO.self, from: data).toDomain()
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+   |                   `- error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+13 |   #expect(message.videoURL == nil)
+
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:12:19: error: value of type 'ChatMessage' has no member 'videoID'
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+   |                   `- error: value of type 'ChatMessage' has no member 'videoID'
+13 |   #expect(message.videoURL == nil)
+14 | }
+[214/221] Compiling NetworkingTests ChatDTOTests.swift
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:11:19: error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+ 9 |   let message = try MeetPRCodec.decoder.decode(ChatMessageDTO.self, from: data).toDomain()
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+   |                   `- error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+13 |   #expect(message.videoURL == nil)
+
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:12:19: error: value of type 'ChatMessage' has no member 'videoID'
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+   |                   `- error: value of type 'ChatMessage' has no member 'videoID'
+13 |   #expect(message.videoURL == nil)
+14 | }
+[215/221] Compiling NetworkingTests ChatSetRefDTOTests.swift
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:11:19: error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+ 9 |   let message = try MeetPRCodec.decoder.decode(ChatMessageDTO.self, from: data).toDomain()
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+   |                   `- error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+13 |   #expect(message.videoURL == nil)
+
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:12:19: error: value of type 'ChatMessage' has no member 'videoID'
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+   |                   `- error: value of type 'ChatMessage' has no member 'videoID'
+13 |   #expect(message.videoURL == nil)
+14 | }
+[216/221] Compiling NetworkingTests ChatStandaloneVideoTests.swift
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:11:19: error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+ 9 |   let message = try MeetPRCodec.decoder.decode(ChatMessageDTO.self, from: data).toDomain()
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+   |                   `- error: value of type 'ChatMessage' has no member 'isStandaloneVideo'
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+13 |   #expect(message.videoURL == nil)
+
+/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release/Modules/Networking/Tests/NetworkingTests/ChatStandaloneVideoTests.swift:12:19: error: value of type 'ChatMessage' has no member 'videoID'
+10 |   #expect(message.kind == .text)
+11 |   #expect(message.isStandaloneVideo)
+12 |   #expect(message.videoID == UUID(uuidString: "00000000-0000-0000-0000-000000000004"))
+   |                   `- error: value of type 'ChatMessage' has no member 'videoID'
+13 |   #expect(message.videoURL == nil)
+14 | }
+[217/221] Compiling NetworkingTests UploadsEndpointTests.swift
+[218/221] Compiling NetworkingTests VideoMarkerDTOTests.swift
+[219/221] Compiling NetworkingTests WireFormattingTests.swift
+error: fatalError

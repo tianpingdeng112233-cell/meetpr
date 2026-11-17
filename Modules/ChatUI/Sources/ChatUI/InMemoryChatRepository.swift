@@ -10,6 +10,7 @@ public enum InMemoryChatRepositoryError: Error, Equatable, Sendable {
 public actor InMemoryChatRepository: ChatRepository {
   private let currentUserID: UUID
   private let otherPartyNames: [UUID: String]
+  private var videoCopies: [URL] = []
   private var conversations: [ChatConversation]
   private var messagesByConversationID: [UUID: [ChatMessage]]
 
@@ -18,6 +19,10 @@ public actor InMemoryChatRepository: ChatRepository {
     otherPartyNames = seed.otherPartyNames
     conversations = seed.conversations
     messagesByConversationID = seed.messagesByConversationID
+  }
+
+  deinit {
+    for url in videoCopies { try? FileManager.default.removeItem(at: url) }
   }
 
   public func fetchConversations() async throws -> [ChatConversation] {
@@ -172,6 +177,9 @@ public actor InMemoryChatRepository: ChatRepository {
     attachmentID: UUID?,
     exerciseRef: ExerciseRefV1? = nil,
     setRef: SetRefV1? = nil,
+    videoID: UUID? = nil,
+    videoURL: URL? = nil,
+    durationSeconds: Int? = nil,
     clientID: String
   ) throws -> ChatMessage {
     guard let conversationIndex = conversations.firstIndex(where: { $0.id == conversationID })
@@ -199,6 +207,9 @@ public actor InMemoryChatRepository: ChatRepository {
       imageExpiresIn: nil,
       exerciseRef: exerciseRef,
       setRef: setRef,
+      videoID: videoID,
+      videoURL: videoURL,
+      durationSeconds: durationSeconds,
       clientID: clientID,
       createdAt: createdAt
     )
@@ -254,6 +265,37 @@ public actor InMemoryChatRepository: ChatRepository {
       .count
   }
 
+}
+
+extension InMemoryChatRepository {
+  public func sendVideo(
+    in conversationID: UUID, video: ChatVideoFile, clientID: String,
+    progress: @escaping @Sendable (Double) async -> Void
+  ) async throws -> ChatMessage {
+    if let existing = messagesByConversationID[conversationID]?.first(where: {
+      $0.senderID == currentUserID && $0.clientID == clientID
+    }) {
+      return existing
+    }
+    let copy = FileManager.default.temporaryDirectory
+      .appendingPathComponent("demo-chat-video-\(UUID().uuidString).\(video.fileURL.pathExtension)")
+    try FileManager.default.copyItem(at: video.fileURL, to: copy)
+    do {
+      let message = try appendMessage(
+        in: conversationID, kind: .text, text: "[视频]", attachmentID: nil,
+        videoID: UUID(), videoURL: copy, durationSeconds: video.durationSeconds, clientID: clientID)
+      videoCopies.append(copy)
+      await progress(1)
+      return message
+    } catch {
+      try? FileManager.default.removeItem(at: copy)
+      throw error
+    }
+  }
+
+}
+
+extension InMemoryChatRepository {
   private static func conversationOrder(
     _ lhs: ChatConversation,
     _ rhs: ChatConversation

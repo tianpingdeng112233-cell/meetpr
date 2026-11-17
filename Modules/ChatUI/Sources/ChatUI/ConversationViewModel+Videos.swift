@@ -10,7 +10,7 @@ enum ChatVideoPlaybackError: Error, Equatable, Sendable {
 extension ConversationViewModel {
   public func refreshVideosIfNeeded() async {
     let videoIDs = messages.compactMap { message -> UUID? in
-      guard message.setRef != nil, message.videoURL != nil else {
+      guard message.hasChatVideo else {
         return nil
       }
       return videoNeedsRenewal(message) ? message.id : nil
@@ -26,19 +26,18 @@ extension ConversationViewModel {
   ) async throws -> URL {
     guard
       let target = message(withID: messageID),
-      target.setRef != nil,
-      target.videoURL != nil
+      target.hasChatVideo
     else {
       throw ChatVideoPlaybackError.unavailable
     }
 
-    if forceRenewal || videoNeedsRenewal(target) {
+    if forceRenewal || target.videoURL == nil || videoNeedsRenewal(target) {
       try await renewVideo(messageID: messageID, force: forceRenewal)
     }
 
     guard
       let refreshed = message(withID: messageID),
-      refreshed.setRef != nil,
+      refreshed.hasChatVideo,
       let url = refreshed.videoURL,
       !url.absoluteString.isEmpty
     else {
@@ -49,7 +48,7 @@ extension ConversationViewModel {
 
   private func videoNeedsRenewal(_ message: ChatMessage) -> Bool {
     guard
-      message.setRef != nil,
+      message.hasChatVideo,
       message.videoURL != nil,
       let expiresIn = message.videoExpiresIn,
       let obtainedAt = videoURLObtainedAt[message.id]
@@ -63,9 +62,8 @@ extension ConversationViewModel {
     guard
       !videoRenewalsInFlight.contains(messageID),
       let target = message(withID: messageID),
-      target.setRef != nil,
-      target.videoURL != nil,
-      force || videoNeedsRenewal(target)
+      target.hasChatVideo,
+      force || target.videoURL == nil || videoNeedsRenewal(target)
     else {
       return
     }
@@ -132,8 +130,11 @@ extension ConversationViewModel {
       imageExpiresIn: message.imageExpiresIn,
       exerciseRef: message.exerciseRef,
       setRef: message.setRef,
+      videoID: message.videoID,
       videoURL: nil,
       videoExpiresIn: nil,
+      posterURL: message.posterURL,
+      durationSeconds: message.durationSeconds,
       clientID: message.clientID,
       createdAt: message.createdAt
     )

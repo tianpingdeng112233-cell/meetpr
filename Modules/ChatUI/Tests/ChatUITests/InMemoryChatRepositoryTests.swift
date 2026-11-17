@@ -222,3 +222,22 @@ private func chatFixtureMessages(ids: ChatFixtureIDs) -> ChatFixtureMessages {
 private func testUUID(_ suffix: UInt8) -> UUID {
   UUID(uuid: (0, 0, 0, 0, 0, 0, 0x40, 0, 0x80, 0, 0, 0, 0, 0, 0x59, suffix))
 }
+
+@Test func inMemoryVideoKeepsPlayableCopyAfterOutboxCleanup() async throws {
+  let fixture = chatFixture()
+  let repository = InMemoryChatRepository(currentUserID: fixture.currentUserID, seed: fixture.seed)
+  let source = FileManager.default.temporaryDirectory.appendingPathComponent(
+    UUID().uuidString + ".mov")
+  try Data([1, 2, 3]).write(to: source)
+  defer { try? FileManager.default.removeItem(at: source) }
+  let video = ChatVideoFile(fileURL: source, contentType: "video/quicktime", byteCount: 3)
+  let message = try await repository.sendVideo(
+    in: fixture.conversationID, video: video, clientID: "demo-video", progress: { _ in })
+  try FileManager.default.removeItem(at: source)
+  let duplicate = try await repository.sendVideo(
+    in: fixture.conversationID, video: video, clientID: "demo-video", progress: { _ in })
+  #expect(message.isStandaloneVideo)
+  #expect(message.id == duplicate.id)
+  let url = try #require(message.videoURL)
+  #expect(try Data(contentsOf: url) == Data([1, 2, 3]))
+}

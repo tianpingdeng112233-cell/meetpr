@@ -274,7 +274,7 @@ private let chatCleanupLogger = Logger(
   category: "chat-cleanup"
 )
 
-private func cleanupChatAttachment(
+func cleanupChatAttachment(
   _ attachmentID: UUID,
   completed: Bool,
   apiClient: APIClient,
@@ -349,6 +349,38 @@ extension NetworkChatRepository {
         accessToken: token)
       return response.message.toDomain()
     } catch {
+      throw Self.mapped(error)
+    }
+  }
+
+}
+
+extension NetworkChatRepository {
+  public func sendVideo(
+    in conversationID: UUID, video: ChatVideoFile, clientID: String,
+    progress: @escaping @Sendable (Double) async -> Void
+  ) async throws -> ChatMessage {
+    let token = try await session.accessToken()
+    let attachmentID: UUID
+    do {
+      attachmentID = try await ChatVideoUpload(apiClient: apiClient, uploader: uploader).upload(
+        video, clientID: clientID, accessToken: token, progress: progress)
+    } catch { throw Self.mapped(error) }
+    do {
+      try Task.checkCancellation()
+      let response: ChatMessageResponseDTO = try await apiClient.post(
+        path: "/conversations/\(conversationID.uuidString)/messages",
+        body: ChatSendMessageRequestDTO(
+          kind: .text, body: "[视频]", clientID: clientID, videoID: attachmentID),
+        accessToken: token)
+      if response.message.videoID != attachmentID {
+        await cleanupChatAttachment(
+          attachmentID, completed: true, apiClient: apiClient, accessToken: token)
+      }
+      return response.message.toDomain()
+    } catch {
+      await cleanupChatAttachment(
+        attachmentID, completed: true, apiClient: apiClient, accessToken: token)
       throw Self.mapped(error)
     }
   }
