@@ -9,6 +9,7 @@ public enum AttachmentKindDTO: String, Codable, Equatable, Sendable {
   case onboardingVideo = "onboarding_video"
   case onboardingDoc = "onboarding_doc"
   case chatImage = "chat_image"
+  case chatVideo = "chat_video"
 }
 
 public enum AttachmentStatusDTO: String, Codable, Equatable, Sendable {

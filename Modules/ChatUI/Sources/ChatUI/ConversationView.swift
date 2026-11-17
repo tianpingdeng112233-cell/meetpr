@@ -245,6 +245,7 @@ private struct ConversationTimeline: View {
   let outgoingBubbleColor: Color
   let incomingBubbleColor: Color
   let bubbleLayout: ChatBubbleLayout
+  @State private var videoPlaybackUnavailable = false
   @State private var scrollPosition: String?
   @Environment(\.locale) private var locale
 
@@ -317,6 +318,7 @@ private struct ConversationTimeline: View {
                     guard
                       let url = try? await viewModel.videoPlaybackURL(messageID: message.id)
                     else {
+                      videoPlaybackUnavailable = true
                       return
                     }
                     selectedVideo = SelectedChatVideo(id: message.id, url: url)
@@ -347,6 +349,7 @@ private struct ConversationTimeline: View {
       .padding(MeetPRSpacing.base)
       .scrollTargetLayout()
     }
+    .alert(ChatVideoStrings.unavailable, isPresented: $videoPlaybackUnavailable) {}
     .scrollIndicators(.hidden)
     .scrollPosition(id: $scrollPosition, anchor: .top)
     .defaultScrollAnchor(.bottom)

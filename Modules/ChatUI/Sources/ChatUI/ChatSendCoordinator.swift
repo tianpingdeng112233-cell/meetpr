@@ -21,7 +21,7 @@ public final class ChatSendCoordinator {
   @ObservationIgnored private let now: @Sendable () -> Date
   @ObservationIgnored private let repository: any ChatRepository
   @ObservationIgnored private let onBindingInvalidated: @Sendable () async -> Void
-  private var outboxesByConversationID: [UUID: [ChatOutboxItem]] = [:]
+  var outboxesByConversationID: [UUID: [ChatOutboxItem]] = [:]
   @ObservationIgnored private var tasks: [ChatSendOperationKey: Task<Void, Never>] = [:]
   @ObservationIgnored private var itemGenerations: [ChatSendOperationKey: UInt64] = [:]
   @ObservationIgnored var setRefOperations: [ChatSendOperationKey: SetRefSendOperation] =
@@ -32,7 +32,7 @@ public final class ChatSendCoordinator {
   @ObservationIgnored private var invalidationGeneration: UInt64?
   /// True while `cancelAllAndWaitForCleanup()` is draining; `enqueue` refuses
   /// new work for the duration so nothing outlives the cleanup.
-  @ObservationIgnored private var isDraining = false
+  @ObservationIgnored var isDraining = false
 
   public init(
     repository: any ChatRepository,
@@ -254,6 +254,7 @@ public final class ChatSendCoordinator {
       } else {
         message = try await sendDraft(item)
       }
+      cleanupLocalVideo(item)
       unregister(key)
       guard canApplyResult(for: key, generation: capturedGeneration) else {
         return
@@ -271,26 +272,6 @@ public final class ChatSendCoordinator {
       if error as? ChatRepositoryError == .bindRequired {
         reportBindingInvalidation()
       }
-    }
-  }
-
-  private func sendDraft(_ item: ChatOutboxItem) async throws -> ChatMessage {
-    switch item.draft {
-    case .text(let text):
-      return try await repository.sendText(
-        in: item.conversationID,
-        text: text,
-        clientID: item.clientID
-      )
-    case .exerciseNote(let body, let reference):
-      return try await repository.sendExerciseNote(
-        in: item.conversationID, body: body, exerciseRef: reference, clientID: item.clientID)
-    case .image(let imageData):
-      return try await repository.sendImage(
-        in: item.conversationID,
-        imageData: imageData,
-        clientID: item.clientID
-      )
     }
   }
 
@@ -318,10 +299,9 @@ extension ChatSendCoordinator {
     else {
       return
     }
-    outboxesByConversationID[item.conversationID]?[index] = replacingState(
-      of: item,
-      with: state
-    )
+    let current = outboxesByConversationID[item.conversationID]?[index] ?? item
+    let replacement = replacingState(of: current, with: state)
+    outboxesByConversationID[item.conversationID]?[index] = replacement
   }
 
   fileprivate func replacingState(of item: ChatOutboxItem, with state: ChatSendState)
@@ -333,7 +313,8 @@ extension ChatSendCoordinator {
       senderID: item.senderID,
       draft: item.draft,
       state: state,
-      createdAt: item.createdAt
+      createdAt: item.createdAt,
+      uploadProgress: item.uploadProgress
     )
   }
 
@@ -342,6 +323,10 @@ extension ChatSendCoordinator {
     clientID: String,
     markSettled: Bool
   ) {
+    if let item = outboxesByConversationID[conversationID]?.first(where: { $0.clientID == clientID }
+    ) {
+      cleanupLocalVideo(item)
+    }
     outboxesByConversationID[conversationID]?.removeAll { $0.clientID == clientID }
     if outboxesByConversationID[conversationID]?.isEmpty == true {
       outboxesByConversationID[conversationID] = nil
@@ -381,4 +366,33 @@ extension ChatSendCoordinator {
       .exerciseNote(body: reference.body(note: note, english: english), reference: reference),
       in: conversationID, clientID: Self.makeClientID())
   }
+}
+
+extension ChatSendCoordinator {
+  private func sendDraft(_ item: ChatOutboxItem) async throws -> ChatMessage {
+    switch item.draft {
+    case .text(let text):
+      return try await repository.sendText(
+        in: item.conversationID,
+        text: text,
+        clientID: item.clientID
+      )
+    case .exerciseNote(let body, let reference):
+      return try await repository.sendExerciseNote(
+        in: item.conversationID, body: body, exerciseRef: reference, clientID: item.clientID)
+    case .video(let video):
+      return try await repository.sendVideo(
+        in: item.conversationID, video: video, clientID: item.clientID,
+        progress: { [weak self] progress in
+          await self?.updateVideoProgress(item, progress: progress)
+        })
+    case .image(let imageData):
+      return try await repository.sendImage(
+        in: item.conversationID,
+        imageData: imageData,
+        clientID: item.clientID
+      )
+    }
+  }
+
 }

@@ -1,0 +1,63 @@
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/8] Compiling Networking ChatVideoUpload.swift
+[4/8] Compiling Networking UploadDTOs.swift
+[5/8] Compiling Networking NetworkChatRepository.swift
+[6/9] Compiling Networking APIClient+Uploads.swift
+[7/9] Emitting module Networking
+[8/37] Compiling NetworkingTests ChatDTOTests.swift
+[9/37] Compiling NetworkingTests ChatSetRefDTOTests.swift
+[10/37] Compiling NetworkingTests ChatStandaloneVideoTests.swift
+[11/37] Compiling NetworkingTests CoachSetReadTests.swift
+[12/37] Compiling NetworkingTests EvaluationDTOTests.swift
+[13/37] Compiling NetworkingTests ExerciseStatsDTOTests.swift
+[14/37] Compiling NetworkingTests FeedbackVideoDTOTests.swift
+[15/37] Compiling NetworkingTests GlobalAuthEndpointTests.swift
+[16/37] Compiling NetworkingTests MinimumAppVersionTests.swift
+[17/46] Emitting module NetworkingTests
+[18/46] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[19/46] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[20/46] Compiling NetworkingTests NetworkingLayerTests.swift
+[21/46] Compiling NetworkingTests NetworkingTypedEndpointTests.swift
+[22/46] Compiling NetworkingTests OSSPartUploaderTests.swift
+[23/46] Compiling NetworkingTests OnboardingDTOTests.swift
+[24/46] Compiling NetworkingTests PlanCompletionDTOTests.swift
+[25/46] Compiling NetworkingTests PlanIntensityDTOTests.swift
+[26/46] Compiling NetworkingTests PlanLoadTypesTests.swift
+[27/46] Compiling NetworkingTests APIClientDevicesTests.swift
+[28/46] Compiling NetworkingTests APIClientTests.swift
+[29/46] Compiling NetworkingTests AccountEndpointTests.swift
+[30/46] Compiling NetworkingTests AllDayContractTests.swift
+[31/46] Compiling NetworkingTests AuthRefreshRequestEncodingTests.swift
+[32/46] Compiling NetworkingTests BackendContractDecodingTests.swift
+[33/46] Compiling NetworkingTests BindDTOTests.swift
+[34/46] Compiling NetworkingTests BodyWeightDTOTests.swift
+[35/46] Compiling NetworkingTests BuildConfigTests.swift
+[36/46] Compiling NetworkingTests PlanSetCoachNoteDTOTests.swift
+[37/46] Compiling NetworkingTests RealtimeClientTests.swift
+[38/46] Compiling NetworkingTests RealtimeEventTests.swift
+[39/46] Compiling NetworkingTests SetLogDTOTests.swift
+[40/46] Compiling NetworkingTests StudentAddedSetDTOTests.swift
+[41/46] Compiling NetworkingTests StudentPlanCacheTests.swift
+[42/46] Compiling NetworkingTests UploadsEndpointTests.swift
+[43/46] Compiling NetworkingTests VideoMarkerDTOTests.swift
+[44/46] Compiling NetworkingTests WireFormattingTests.swift
+[44/46] Write Objects.LinkFileList
+[45/46] Linking NetworkingPackageTests
+Build complete! (38.26s)
+Test Suite 'Selected tests' started at 2026-11-17 11:25:09.586.
+Test Suite 'NetworkingPackageTests.xctest' started at 2026-11-17 11:25:09.589.
+Test Suite 'NetworkingPackageTests.xctest' passed at 2026-11-17 11:25:09.589.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-17 11:25:09.589.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test standaloneVideoDecodesWithoutChangingLegacyMessageKind() started.
+◇ Test standaloneVideoUploadsInBoundedPartsThenSendsCompatibleMessage() started.
+✔ Test standaloneVideoDecodesWithoutChangingLegacyMessageKind() passed after 0.019 seconds.
+✔ Test standaloneVideoUploadsInBoundedPartsThenSendsCompatibleMessage() passed after 0.039 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.040 seconds.

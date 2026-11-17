@@ -36,6 +36,8 @@ struct StudentBlackGoldChatView: View {
 
   @State private var viewModel: ConversationViewModel
   @State private var draft = ""
+  @State private var showsVideoPicker = false
+  @State private var videoPlaybackUnavailable = false
   @State private var showsCamera = false
   @State private var retakesPhoto = false
   @State private var photoData: Data?
@@ -97,6 +99,14 @@ struct StudentBlackGoldChatView: View {
       chatHeader
       timeline
       composer
+    }
+    .modifier(
+      StudentChatVideoPicker(
+        isPresented: $showsVideoPicker, coachName: coachName,
+        send: { viewModel.sendVideo($0) != nil })
+    )
+    .alert(ChatVideoStrings.unavailable, isPresented: $videoPlaybackUnavailable) {
+      Button(StudentStrings.acknowledge) {}
     }
     .foregroundStyle(Color.MeetPR.textPrimary)
     .background(Color.MeetPR.bgBase)
@@ -363,6 +373,8 @@ struct StudentBlackGoldChatView: View {
         maxWidth: .infinity,
         alignment: message.senderID == viewModel.currentUserID ? .trailing : .leading
       )
+    } else if message.isStandaloneVideo {
+      standaloneVideoRow(message)
     } else if message.kind == .image {
       StudentChatImage(message: message, model: viewModel, fullScreen: false) {
         selectedImage = StudentChatImageSelection(id: message.id)
@@ -377,6 +389,26 @@ struct StudentBlackGoldChatView: View {
         deliveryStatus: viewModel.deliveryStatus(for: message)
       )
     }
+  }
+
+  private func standaloneVideoRow(_ message: ChatMessage) -> some View {
+    VStack(
+      alignment: message.senderID == viewModel.currentUserID ? .trailing : .leading,
+      spacing: MeetPRSpacing.xs
+    ) {
+      ChatStandaloneVideoCard(message: message) { openVideo(for: message) }
+      if let status = viewModel.deliveryStatus(for: message) {
+        Text(
+          status == .read
+            ? StudentStrings.localized(.studentBlackGoldChatView016)
+            : StudentStrings.localized(.studentBlackGoldChatView017)
+        )
+        .font(.caption).foregroundStyle(Color.MeetPR.textTertiary)
+      }
+    }
+    .frame(
+      maxWidth: .infinity,
+      alignment: message.senderID == viewModel.currentUserID ? .trailing : .leading)
   }
 
   /// Mockup lines 646-648: a 20pt input capsule containing the 34pt circular
@@ -427,6 +459,10 @@ struct StudentBlackGoldChatView: View {
           Button(StudentStrings.localized(.coachPhotoTake), systemImage: "camera") {
             Task { await openCamera() }
           }
+          Button(ChatVideoStrings.video, systemImage: "film") {
+            showsVideoPicker = true
+          }
+          .accessibilityIdentifier("chat.video.choose")
           Button(StudentStrings.localized(.coachShareSetVideo), systemImage: "video") {
             showsSetRefPicker = true
           }
@@ -568,6 +604,7 @@ struct StudentBlackGoldChatView: View {
   private func openVideo(for message: ChatMessage) {
     Task {
       guard let url = try? await viewModel.videoPlaybackURL(messageID: message.id) else {
+        videoPlaybackUnavailable = true
         return
       }
       selectedVideo = StudentSelectedChatVideo(id: message.id, url: url)
@@ -1036,6 +1073,8 @@ private struct StudentPendingMessageRow: View {
     switch item.draft {
     case .text(let text), .exerciseNote(let text, _):
       Text(text)
+    case .video(let video):
+      ChatPendingVideoCard(video: video, progress: item.sendingProgress)
     case .image(let data):
       StudentChatLocalImage(data: data).frame(maxWidth: 240, maxHeight: 240)
     }
