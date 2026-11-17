@@ -47,7 +47,7 @@ func trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(
     }
 
   var expectedPaths: [String] = []
-  for dayID in [nil, days[1].id, days[0].id] {
+  for (index, dayID) in [nil, days[1].id, days[0].id].enumerated() {
     await model.load(dayID: dayID, studentID: StudentDemoSeed.studentID, preloadedPlan: plan)
     #expect(model.currentDay?.id == (dayID ?? days[0].id))
     let row = try #require(model.allDaySheet.first?.rows.first)
@@ -60,13 +60,14 @@ func trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(
       )
     }
     #expect(await stub.suggestionPaths == expectedPaths)
-    if !historyPrefillEnabled { #expect(await stub.suggestionPaths.isEmpty) }
+    #expect(await stub.handoffRequests == index + 1)
   }
 }
 
 private actor HistoryPrefillAPIStub {
   let plan: StudentPlanView
   private(set) var suggestionPaths: [String] = []
+  private(set) var handoffRequests = 0
 
   init(plan: StudentPlanView) { self.plan = plan }
 
@@ -84,8 +85,11 @@ private actor HistoryPrefillAPIStub {
       return APIResponse(
         data: try MeetPRCodec.encoder.encode(["suggestions": suggestions]), statusCode: 200)
     }
-    if path.hasSuffix("/plans") {
-      return APIResponse(data: Data(#"{"plans":[]}"#.utf8), statusCode: 200)
+    if path == "/students/\(StudentDemoSeed.studentID)/plan-handoff" {
+      #expect(request.httpMethod == "GET")
+      handoffRequests += 1
+      return APIResponse(
+        data: Data(#"{"current_plan_id":null,"plans":[]}"#.utf8), statusCode: 200)
     }
     #expect(path == "/exercises")
     return APIResponse(data: Data(#"{"exercises":[]}"#.utf8), statusCode: 200)

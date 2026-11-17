@@ -1,0 +1,31 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling StudentKitTests PlanHandoffRaceTests.swift
+[4/6] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (10.95s)
+Test Suite 'Selected tests' started at 2026-11-16 10:29:27.803.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:29:27.803.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:29:27.803.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:29:27.803.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument browsing → true to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument browsing → false to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) recorded an issue with 1 argument browsing → true at PlanHandoffRaceTests.swift:26:3: Expectation failed: (model.displayedPlan?.cycleID → E54B8716-1C25-4C6C-9646-A0E2BAC91BAA) == (fixture.current.cycleID → 02400000-0000-0000-0000-000000000301)
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) recorded an issue with 1 argument browsing → true at PlanHandoffRaceTests.swift:29:3: Expectation failed: !((model → StudentKit.TodayWorkoutViewModel).isPreviewingPlan → true → true)
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) recorded an issue with 1 argument browsing → false at PlanHandoffRaceTests.swift:26:3: Expectation failed: (model.displayedPlan?.cycleID → 07D1D420-8025-4930-942F-1483BBEAF43B) == (fixture.current.cycleID → 02400000-0000-0000-0000-000000000301)
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) recorded an issue with 1 argument browsing → false at PlanHandoffRaceTests.swift:27:3: Expectation failed: (model.currentDay?.id → 05F5B12F-0602-494F-8CDE-E6A87038FD0E) == (dayID → 02400000-0000-0000-0000-000000001002)
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) recorded an issue with 1 argument browsing → false at PlanHandoffRaceTests.swift:28:3: Expectation failed: (model.currentDrafts?.first?.actualWeight → 142.5) == 123
+✘ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) with 2 test cases failed after 0.105 seconds with 5 issues.
+✘ Test run with 1 test in 0 suites failed after 0.105 seconds with 5 issues.

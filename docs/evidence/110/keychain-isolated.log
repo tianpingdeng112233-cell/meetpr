@@ -1,0 +1,23 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.37s)
+Test Suite 'Selected tests' started at 2026-11-16 10:44:49.360.
+Test Suite 'AppShellPackageTests.xctest' started at 2026-11-16 10:44:49.361.
+Test Suite 'AppShellPackageTests.xctest' passed at 2026-11-16 10:44:49.361.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:44:49.361.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test keychainTokenStoreRoundTripsCachedUser() started.
+◇ Test keychainTokenStoreSavesReadsAndClearsTokens() started.
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:54:3: Expectation failed: await store.accessToken() == "access-1"
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:55:3: Expectation failed: await store.refreshToken() == "refresh-1"
+✘ Test keychainTokenStoreRoundTripsCachedUser() recorded an issue at TokenStoreTests.swift:72:3: Expectation failed: await store.cachedUser() == user
+✘ Test keychainTokenStoreRoundTripsCachedUser() failed after 0.005 seconds with 1 issue.
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() failed after 0.005 seconds with 2 issues.
+✘ Test run with 2 tests in 0 suites failed after 0.005 seconds with 3 issues.

@@ -40,6 +40,8 @@ public struct TodayWorkoutView: View {
   @State private var handledUploadFailureToken = 0
   @State private var pendingUploadRetryDate: Date?
   @State private var selectedDayID: UUID?
+  @State private var previewDayID: UUID?
+  @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var editing: EditingTarget?
   @State private var quickLogRoute: QuickLogRoute?
   @State private var quickLogToastWeekCode: String?
@@ -198,6 +200,9 @@ public struct TodayWorkoutView: View {
             }
         }
       }
+      .onChange(of: safeHandoffBoundary) { _, _ in
+        viewModel.invalidatePlanNavigation()
+      }
       .onChange(of: exerciseNavigation?.reference) { _, reference in
         guard let reference else { return }
         Task {
@@ -218,72 +223,89 @@ public struct TodayWorkoutView: View {
       }
   }
 
-  private var workoutContent: some View {
-    NavigationStack {
-      TodayWorkoutScreen(
-        content: screenContent,
-        weekCode: weekCode,
-        dayState: selectedDayState,
-        reviewCompleted: reviewCompleted,
-        unreadCount: notifications?.totalUnreadCount ?? 0,
-        showsNotifications: false,
-        coachName: notifications?.activeCoach?.coachDisplayName
-          ?? StudentStrings.localized(.todayWorkoutView001),
-        showsAskCoach: showsSetRefEntry,
-        isPreparingAskCoach: isPreparingSetRefPicker,
-        collapsedExercises: $collapsedExercises,
-        sequenceContent: TrainingWeekStrip(
-          days: viewModel.planDays, selectedDayID: $selectedDayID, today: gymDayToday),
-        showsBackToToday: sequencePage.showsBackToToday,
-        onBackToToday: returnToCurrentDay,
-        onRefresh: {
-          Task { await reloadCurrentDay() }
-        },
-        onHistory: { showingHistory = true },
-        onReadiness: {
-          showingReadinessSheet = true
-        },
-        onNotifications: {
-          onOpenCoach()
-        },
-        onMessageCoach: {
-          onOpenCoach()
-        },
-        onAskCoach: openSetRefPicker,
-        onStart: {
-          started = true
-        },
-        onQuickLog: openQuickLog,
-        onEdit: openEditor,
-        onVideoAction: openVideoAction,
-        onComplete: completeTraining,
-        accessoryViewModel: viewModel,
-        accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
-        sequencePage: sequencePage,
-        gymDayToday: gymDayToday,
-        restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
-        completionDockTop: completionDockTop,
-        videoFailureCount: videoFailurePresentation.failureCount,
-        onRetryVideos: retryDayVideos,
-        videoCompletion: videoCompletionPresentation,
-        onExerciseNote: openExerciseNote,
-        onRefreshAsync: { await reloadCurrentDay() },
-        weightEntry: weightEntry, studentID: studentID,
-        onEditMeet: { profileNavigation?.destination = .meet },
-        emptyState: trainingEmptyState,
-        showsCoach: notifications != nil,
-        onEditProfile: { profileNavigation?.destination = .about }
+  // One initializer keeps all existing screen bindings and callbacks together.
+  // swiftlint:disable:next function_body_length
+  private func makeWorkoutScreen() -> TodayWorkoutScreen<TrainingWeekStrip> {
+    TodayWorkoutScreen(
+      content: screenContent,
+      weekCode: weekCode,
+      dayState: selectedDayState,
+      reviewCompleted: reviewCompleted,
+      unreadCount: notifications?.totalUnreadCount ?? 0,
+      showsNotifications: false,
+      coachName: notifications?.activeCoach?.coachDisplayName
+        ?? StudentStrings.localized(.todayWorkoutView001),
+      showsAskCoach: showsSetRefEntry,
+      isPreparingAskCoach: isPreparingSetRefPicker,
+      collapsedExercises: $collapsedExercises,
+      sequenceContent: TrainingWeekStrip(
+        days: viewModel.displayedPlan?.days ?? [], selectedDayID: displayedDayBinding,
+        today: gymDayToday,
+        previousPlan: viewModel.adjacentPlan(forward: false) == nil
+          ? nil : { turnPlan(forward: false) },
+        nextPlan: viewModel.adjacentPlan(forward: true) == nil ? nil : { turnPlan(forward: true) },
+        isPlanPreview: viewModel.isPreviewingPlan),
+      showsBackToToday: sequencePage.showsBackToToday,
+      onBackToToday: returnToCurrentDay,
+      onRefresh: {
+        Task { await reloadCurrentDay() }
+      },
+      onHistory: { showingHistory = true },
+      onReadiness: {
+        showingReadinessSheet = true
+      },
+      onNotifications: {
+        onOpenCoach()
+      },
+      onMessageCoach: {
+        onOpenCoach()
+      },
+      onAskCoach: openSetRefPicker,
+      onStart: {
+        started = true
+      },
+      onQuickLog: openQuickLog,
+      onEdit: openEditor,
+      onVideoAction: openVideoAction,
+      onComplete: completeTraining,
+      accessoryViewModel: viewModel,
+      accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
+      sequencePage: sequencePage,
+      gymDayToday: gymDayToday,
+      restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
+      completionDockTop: completionDockTop,
+      videoFailureCount: videoFailurePresentation.failureCount,
+      onRetryVideos: retryDayVideos,
+      videoCompletion: videoCompletionPresentation,
+      onExerciseNote: openExerciseNote,
+      onRefreshAsync: { await reloadCurrentDay() },
+      weightEntry: weightEntry, studentID: studentID,
+      onEditMeet: { profileNavigation?.destination = .meet },
+      emptyState: trainingEmptyState,
+      showsCoach: notifications != nil,
+      onEditProfile: { profileNavigation?.destination = .about },
+      handoffSummary: viewModel.handoff?.plans.first { $0.id == viewModel.displayedPlan?.cycleID },
+      previewDay: previewDay,
+      showsHandoffNotice: viewModel.showsHandoffNotice && !viewModel.browsingPastPlan,
+      onDismissHandoff: { viewModel.dismissHandoffNotice() }
 
-      )
-      #if os(iOS)
-        .toolbar(.hidden, for: .navigationBar)
-      #endif
-      .onChange(of: videoCompletionRevision) { _, _ in
-        Task { await viewModel.receiveVideoCompletion() }
-      }
-      .navigationDestination(isPresented: $showingHistory) {
-        AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
-      }
+    )
+  }
+
+  // A separate opaque result bounds SwiftUI type checking of the presentation chain.
+  // swiftlint:disable:next function_body_length
+  private func workoutBase() -> some View {
+    NavigationStack {
+      makeWorkoutScreen()
+        #if os(iOS)
+          .toolbar(.hidden, for: .navigationBar)
+        #endif
+        .onChange(of: videoCompletionRevision) { _, _ in
+          Task { await viewModel.receiveVideoCompletion() }
+        }
+        .navigationDestination(isPresented: $showingHistory) {
+          AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
+        }
 
     }
     .environment(replay)
@@ -301,7 +323,14 @@ public struct TodayWorkoutView: View {
     .task { await replay.load(studentID: studentID) }
     .safeAreaInset(edge: .bottom) {
       VStack(spacing: 0) {
-        if case .workout(let presentation) = screenContent {
+        if viewModel.isPreviewingPlan {
+          PlanHandoffReturnDock(remaining: viewModel.remainingCurrentTrainingDays) {
+            Task {
+              await viewModel.returnToCurrentPlan(isSafe: { safeHandoffBoundary })
+              selectedDayID = viewModel.currentDay?.id
+            }
+          }
+        } else if case .workout(let presentation) = screenContent {
           let dockContent = presentation.completionDock(
             dayState: selectedDayState, showingHistory: showingHistory,
             waitingForVideos: videoCompletionPresentation?.waiting == true)
@@ -329,58 +358,64 @@ public struct TodayWorkoutView: View {
 
       }
     }
-    #if os(iOS)
-      .fullScreenCover(item: $editing) { target in
-        setEntry(for: target)
-      }
-    #else
-      .sheet(item: $editing) { target in
-        setEntry(for: target)
-      }
-    #endif
-    #if os(iOS)
-      .fullScreenCover(item: $quickLogRoute) { route in
-        quickLogSheet(for: route)
-      }
-    #else
-      .sheet(item: $quickLogRoute) { route in
-        quickLogSheet(for: route)
-      }
-    #endif
-    #if os(iOS)
-      .fullScreenCover(item: $viewModel.completionPhase) { phase in
-        completionFlow(phase: phase)
-      }
-    #else
-      .sheet(item: $viewModel.completionPhase) { phase in
-        completionFlow(phase: phase)
-      }
-    #endif
-    .sheet(
-      isPresented: restTimerExplanationPresented,
-      onDismiss: {
-        if opensRestSettingsAfterExplanation {
-          opensRestSettingsAfterExplanation = false
-          restPreference = restTimerSettings.preference(for: studentID)
-          accessoryRestSeconds = restTimerSettings.accessorySeconds(for: studentID)
-          showingRestSettings = true
+  }
+
+  private var workoutContent: some View {
+    workoutBase()
+      #if os(iOS)
+        .fullScreenCover(item: $editing) { target in
+          setEntry(for: target)
         }
-      },
-      content: {
-        RestTimerExplanationView(
-          onAcknowledge: { viewModel.acknowledgeRestTimerExplanation() },
-          onOpenSettings: {
-            opensRestSettingsAfterExplanation = true
-            viewModel.acknowledgeRestTimerExplanation()
+      #else
+        .sheet(item: $editing) { target in
+          setEntry(for: target)
+        }
+      #endif
+      #if os(iOS)
+        .fullScreenCover(item: $quickLogRoute) { route in
+          quickLogSheet(for: route)
+        }
+      #else
+        .sheet(item: $quickLogRoute) { route in
+          quickLogSheet(for: route)
+        }
+      #endif
+      #if os(iOS)
+        .fullScreenCover(item: $viewModel.completionPhase) { phase in
+          completionFlow(phase: phase)
+        }
+      #else
+        .sheet(item: $viewModel.completionPhase) { phase in
+          completionFlow(phase: phase)
+        }
+      #endif
+      .sheet(
+        isPresented: restTimerExplanationPresented,
+        onDismiss: {
+          if opensRestSettingsAfterExplanation {
+            opensRestSettingsAfterExplanation = false
+            restPreference = restTimerSettings.preference(for: studentID)
+            accessoryRestSeconds = restTimerSettings.accessorySeconds(for: studentID)
+            showingRestSettings = true
           }
-        )
-        .presentationDetents([.medium, .large])
-        .interactiveDismissDisabled()
-      }
-    )
-    .sheet(isPresented: $showingRestSettings) {
-      NavigationStack {
-        RestTimerSettingsView(preference: $restPreference, accessorySeconds: $accessoryRestSeconds)
+        },
+        content: {
+          RestTimerExplanationView(
+            onAcknowledge: { viewModel.acknowledgeRestTimerExplanation() },
+            onOpenSettings: {
+              opensRestSettingsAfterExplanation = true
+              viewModel.acknowledgeRestTimerExplanation()
+            }
+          )
+          .presentationDetents([.medium, .large])
+          .interactiveDismissDisabled()
+        }
+      )
+      .sheet(isPresented: $showingRestSettings) {
+        NavigationStack {
+          RestTimerSettingsView(
+            preference: $restPreference, accessorySeconds: $accessoryRestSeconds
+          )
           .onChange(of: accessoryRestSeconds) { _, seconds in
             restTimerSettings.setAccessorySeconds(seconds, for: studentID)
           }
@@ -393,77 +428,78 @@ public struct TodayWorkoutView: View {
                 .font(.MeetPR.body)
             }
           }
+        }
       }
-    }
-    .sheet(isPresented: $showingReadinessSheet) {
-      ReadinessCheckinSheet(
-        studentID: studentID,
-        viewModel: readinessViewModel,
-        prefill: readinessPrefill,
-        onClose: { showingReadinessSheet = false }
-      )
-      .presentationDetents([.large])
-    }
-    .alert(StudentStrings.localized(.todayWorkoutView002), isPresented: actionErrorPresented) {
-      Button(StudentStrings.localized(.todayWorkoutView003), role: .cancel) {
-        viewModel.clearActionError()
-      }
-    } message: {
-      Text(viewModel.actionErrorMessage ?? "")
-    }
-    .alert(StudentStrings.trainingShareFailed, isPresented: setRefEntryErrorPresented) {
-      Button(StudentStrings.acknowledge, role: .cancel) {
-        setRefEntryErrorMessage = nil
-      }
-    } message: {
-      Text(setRefEntryErrorMessage ?? "")
-    }
-    .sheet(item: $setRefPickerRoute) { route in
-      if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
-        SetRefSharePicker(
-          context: setRefSharing,
-          conversationID: route.conversationID,
-          coordinator: chat.sendCoordinator,
-          initialSetLogID: route.initialSetID,
-          onStaged: {
-            setRefPickerRoute = nil
-            conversationID = route.conversationID
-          }
+      .sheet(isPresented: $showingReadinessSheet) {
+        ReadinessCheckinSheet(
+          studentID: studentID,
+          viewModel: readinessViewModel,
+          prefill: readinessPrefill,
+          onClose: { showingReadinessSheet = false }
         )
+        .presentationDetents([.large])
       }
-    }
-    .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
-      Button(VideoPrivacyCopy.consentAgree) {
-        videoViewModel.recordConsent()
-        directCameraTarget = pendingDirectCameraTarget
-        pendingDirectCameraTarget = nil
+      .alert(StudentStrings.localized(.todayWorkoutView002), isPresented: actionErrorPresented) {
+        Button(StudentStrings.localized(.todayWorkoutView003), role: .cancel) {
+          viewModel.clearActionError()
+        }
+      } message: {
+        Text(viewModel.actionErrorMessage ?? "")
       }
-      Button(VideoPrivacyCopy.consentDecline, role: .cancel) {
-        pendingDirectCameraTarget = nil
+      .alert(StudentStrings.trainingShareFailed, isPresented: setRefEntryErrorPresented) {
+        Button(StudentStrings.acknowledge, role: .cancel) {
+          setRefEntryErrorMessage = nil
+        }
+      } message: {
+        Text(setRefEntryErrorMessage ?? "")
       }
-    } message: {
-      Text(VideoPrivacyCopy.consentBody)
-    }
-    .confirmationDialog(
-      StudentStrings.localized(.todayWorkoutView004),
-      isPresented: retryDialogPresented,
-      titleVisibility: .visible
-    ) {
-      Button(StudentStrings.localized(.todayWorkoutView005)) {
-        if let setLogID = retryTargetSetLogID {
-          Task { await videoViewModel.retry(setLogID: setLogID) }
+      .sheet(item: $setRefPickerRoute) { route in
+        if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
+          SetRefSharePicker(
+            context: setRefSharing,
+            conversationID: route.conversationID,
+            coordinator: chat.sendCoordinator,
+            initialSetLogID: route.initialSetID,
+            onStaged: {
+              setRefPickerRoute = nil
+              conversationID = route.conversationID
+            }
+          )
         }
       }
-      Button(StudentStrings.localized(.todayWorkoutView006), role: .destructive) {
-        if let setLogID = retryTargetSetLogID {
-          Task { await videoViewModel.remove(setLogID: setLogID) }
+      .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
+        Button(VideoPrivacyCopy.consentAgree) {
+          videoViewModel.recordConsent()
+          directCameraTarget = pendingDirectCameraTarget
+          pendingDirectCameraTarget = nil
         }
+        Button(VideoPrivacyCopy.consentDecline, role: .cancel) {
+          pendingDirectCameraTarget = nil
+        }
+      } message: {
+        Text(VideoPrivacyCopy.consentBody)
       }
-      Button(StudentStrings.localized(.todayWorkoutView007), role: .cancel) {}
-    } message: {
-      Text(StudentStrings.localized(.todayWorkoutView008))
-    }
-    .alert(StudentStrings.localized(.todayWorkoutView009), isPresented: videoRetryErrorPresented) {
+      .confirmationDialog(
+        StudentStrings.localized(.todayWorkoutView004),
+        isPresented: retryDialogPresented,
+        titleVisibility: .visible
+      ) {
+        Button(StudentStrings.localized(.todayWorkoutView005)) {
+          if let setLogID = retryTargetSetLogID {
+            Task { await videoViewModel.retry(setLogID: setLogID) }
+          }
+        }
+        Button(StudentStrings.localized(.todayWorkoutView006), role: .destructive) {
+          if let setLogID = retryTargetSetLogID {
+            Task { await videoViewModel.remove(setLogID: setLogID) }
+          }
+        }
+        Button(StudentStrings.localized(.todayWorkoutView007), role: .cancel) {}
+      } message: {
+        Text(StudentStrings.localized(.todayWorkoutView008))
+      }
+      .alert(StudentStrings.localized(.todayWorkoutView009), isPresented: videoRetryErrorPresented)
+    {
       Button(StudentStrings.localized(.todayWorkoutView003), role: .cancel) {
         videoViewModel.clearRetryError()
       }
@@ -502,9 +538,17 @@ public struct TodayWorkoutView: View {
       viewModel.accessoryVideosLoaded = loaded
     }
     .onChange(of: isVisible) { _, visible in
-      if !visible { viewModel.setSyncCompletion?.reset() }
+      if !visible {
+        viewModel.setSyncCompletion?.reset()
+      } else {
+        Task { await enterTrainingIfSafe() }
+      }
+    }
+    .onChange(of: viewModel.previewPlan?.cycleID) { _, _ in
+      previewDayID = viewModel.previewPlan?.days.first?.id
     }
     .onChange(of: selectedDayID) { _, newDayID in
+      guard !viewModel.isPreviewingPlan else { return }
       viewModel.setSyncCompletion?.reset()
       editing = nil
       started = false
@@ -548,7 +592,7 @@ public struct TodayWorkoutView: View {
     }
     .onChange(of: planRevision) { _, _ in
       editing = nil
-      Task { await loadWorkout(for: selectedDayID) }
+      Task { if safeHandoffBoundary { await loadWorkout(for: selectedDayID) } }
     }
     .onChange(of: planProjectionUpdate) { _, plan in
       guard let plan else { return }
@@ -624,6 +668,7 @@ public struct TodayWorkoutView: View {
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
+          Task { await enterTrainingIfSafe() }
 
         }
       )
@@ -633,6 +678,7 @@ public struct TodayWorkoutView: View {
   }
 
   private var trainingEmptyState: TrainingEmptyStatePresentation? {
+    if viewModel.isPreviewingPlan { return nil }
     guard viewModel.state != .idle, viewModel.state != .loading else { return nil }
     if case .error = viewModel.state { return nil }
     // Pending video/set delivery continues to own the visible day until acknowledged.
@@ -708,7 +754,9 @@ public struct TodayWorkoutView: View {
   }
 
   private var isEditable: Bool {
-    guard let currentDay else { return false }
+    guard !viewModel.browsingPastPlan, !viewModel.isPreviewingPlan, let currentDay else {
+      return false
+    }
     return FlexibleTrainingDay.canWrite(currentDay, in: viewModel.planDays)
   }
 
@@ -729,7 +777,14 @@ public struct TodayWorkoutView: View {
   }
 
   private func returnToCurrentDay() {
-    selectedDayID = sequencePage.currentSelection
+    if viewModel.browsingPastPlan || viewModel.isPreviewingPlan {
+      Task {
+        await viewModel.returnToCurrentPlan(isSafe: { safeHandoffBoundary })
+        selectedDayID = viewModel.currentDay?.id
+      }
+    } else {
+      selectedDayID = sequencePage.currentSelection
+    }
   }
 
   private func reloadCurrentDay() async {
@@ -742,6 +797,8 @@ public struct TodayWorkoutView: View {
   }
 
   private var weekCode: String {
+    if let previewDay { return "W\(previewDay.weekNumber)" }
+    if viewModel.handoff != nil, let currentDay { return "W\(currentDay.weekNumber)" }
     if viewModel.state == .noPlan {
       return "W—"
     }
@@ -1077,10 +1134,51 @@ public struct TodayWorkoutView: View {
     }
   }
 
+  private var previewDay: StudentPlanDay? {
+    viewModel.previewPlan?.days.first { $0.id == previewDayID } ?? viewModel.previewPlan?.days.first
+  }
+
+  private var displayedDayBinding: Binding<UUID?> {
+    Binding(
+      get: { viewModel.isPreviewingPlan ? previewDay?.id : selectedDayID },
+      set: { if viewModel.isPreviewingPlan { previewDayID = $0 } else { selectedDayID = $0 } })
+  }
+
+  private var safeHandoffBoundary: Bool {
+    editing == nil && quickLogRoute == nil && directCameraTarget == nil
+      && pendingDirectCameraTarget == nil && preparingVideoSetID == nil
+      && weightEntry?.isPresented != true
+      && viewModel.completionPhase == nil && keypad?.current == nil
+      && !videoViewModel.rowStates.values.contains { $0.attachment.status == .uploading }
+  }
+
+  private func turnPlan(forward: Bool) {
+    guard safeHandoffBoundary else { return }
+    Task {
+      await viewModel.browseAdjacentPlan(forward: forward, isSafe: { safeHandoffBoundary })
+      if viewModel.isPreviewingPlan {
+        previewDayID = viewModel.previewPlan?.days.first?.id
+      } else {
+        selectedDayID = viewModel.currentDay?.id
+      }
+    }
+  }
+
+  private func enterTrainingIfSafe() async {
+    guard safeHandoffBoundary else { return }
+    await viewModel.enterTraining(isSafe: { safeHandoffBoundary })
+    selectedDayID = viewModel.currentDay?.id
+  }
+
   private func loadWorkout(
     for dayID: UUID?,
     preloadedPlan: StudentPlanView? = nil
   ) async {
+    if viewModel.isPreviewingPlan { return }
+    if viewModel.browsingPastPlan {
+      await viewModel.loadBrowsingDay(dayID)
+      return
+    }
     let plan: StudentPlanView?
     if dayID == nil, preloadedPlan == nil {
       plan = try? await plans.fetchCurrentPlan(studentID: studentID)
@@ -1115,6 +1213,7 @@ public struct TodayWorkoutView: View {
   }
 
   private func refreshWorkoutPlan() async {
+    guard safeHandoffBoundary else { return }
     await viewModel.refreshCurrentPlanIfAllowed(
       dayID: selectedDayID,
       studentID: studentID,

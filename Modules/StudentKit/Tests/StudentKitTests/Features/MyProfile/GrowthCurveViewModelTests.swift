@@ -245,3 +245,23 @@ extension StudentPlanView {
   #expect(detail.point.e1RMKg == 150)
   #expect(viewModel.headlinePoint(for: .squat)?.e1RMKg == 155)
 }
+
+@MainActor
+@Test func handoffGrowthUsesCurrentPlanExerciseFamilyRatherThanUpcoming() async throws {
+  let fixture = HandoffWorkoutFixture()
+  let current = fixture.current
+  let future = StudentPlanView(
+    cycleID: fixture.upcoming.cycleID, weekIndex: 1,
+    startDate: fixture.upcoming.startDate, publishedAt: Date.distantFuture, days: [])
+  let plans = HandoffWorkoutRepository(current: current, upcoming: future)
+  let squatID = try #require(current.mainLiftIDForGrowthTests(for: .squat))
+  let now = Date()
+  let point = growthPoint(
+    studentID: StudentDemoSeed.studentID,
+    exerciseID: squatID, daysAgo: 1, e1RM: 150, now: now)
+  let model = GrowthCurveViewModel(
+    plans: plans,
+    e1rm: InMemoryE1RMRepository(seedPoints: [point]), now: { now })
+  await model.load(studentID: StudentDemoSeed.studentID)
+  #expect(model.headlinePoint(for: .squat)?.id == point.id)
+}

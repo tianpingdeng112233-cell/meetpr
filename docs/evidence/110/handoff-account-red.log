@@ -1,0 +1,34 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module StudentKitTests
+[4/5] Compiling StudentKitTests PlanHandoffWorkoutTests.swift
+[5/7] Compiling StudentKitTests GrowthCurveViewModelTests.swift
+[6/7] Compiling StudentKitTests DashboardNotificationsViewModelTests.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking StudentKitPackageTests
+Build complete! (12.26s)
+Test Suite 'Selected tests' started at 2026-11-16 10:28:37.832.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:28:37.833.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:28:37.833.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:28:37.833.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test case passing 1 argument previewing → true to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test case passing 1 argument previewing → false to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → true at PlanHandoffWorkoutTests.swift:219:3: Expectation failed: (model.planProjection?.cycleID → 02400000-0000-0000-0000-000000000301) == (fixture.upcoming.cycleID → 3909410A-0303-4EB9-B2E3-3CD6E9323658)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → true at PlanHandoffWorkoutTests.swift:220:3: Expectation failed: (model.currentDay?.id → 02400000-0000-0000-0000-000000001002) == (fixture.upcoming.days.first?.id → F3D26A4E-14DA-4F2D-AD3A-487EA8ABE702)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → true at PlanHandoffWorkoutTests.swift:221:3: Expectation failed: !((model → StudentKit.TodayWorkoutViewModel).isPreviewingPlan → true → true)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → true at PlanHandoffWorkoutTests.swift:223:3: Expectation failed: (model.handoff?.currentPlanID → 02400000-0000-0000-0000-000000000301) == (fixture.upcoming.cycleID → 3909410A-0303-4EB9-B2E3-3CD6E9323658)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → false at PlanHandoffWorkoutTests.swift:219:3: Expectation failed: (model.planProjection?.cycleID → 02400000-0000-0000-0000-000000000301) == (fixture.upcoming.cycleID → ECD10360-278A-424D-B8A0-54BFBA8B7241)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → false at PlanHandoffWorkoutTests.swift:220:3: Expectation failed: (model.currentDay?.id → 02400000-0000-0000-0000-000000001002) == (fixture.upcoming.days.first?.id → C87B3F2D-EF42-4CA4-89A9-C7F98051C423)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) recorded an issue with 1 argument previewing → false at PlanHandoffWorkoutTests.swift:223:3: Expectation failed: (model.handoff?.currentPlanID → 02400000-0000-0000-0000-000000000301) == (fixture.upcoming.cycleID → ECD10360-278A-424D-B8A0-54BFBA8B7241)
+✘ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) with 2 test cases failed after 0.127 seconds with 7 issues.
+✘ Test run with 1 test in 0 suites failed after 0.127 seconds with 7 issues.

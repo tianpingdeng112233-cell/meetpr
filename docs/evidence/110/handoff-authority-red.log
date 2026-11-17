@@ -1,0 +1,50 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKitTests PlanHandoffTests.swift
+macro expansion #expect:1:22: warning: no calls to throwing functions occur within 'try' expression
+`- /Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Tests/StudentKitTests/Repository/PlanHandoffTests.swift:87:77: note: expanded code originates here
+ 85 |   try await cache.save(plan: cached, studentID: plans[0].traineeID)
+ 86 |   #expect(try await repo.fetchCurrentPlan(studentID: plans[0].traineeID) == cached)
+ 87 |   #expect(try await cache.loadPlan(studentID: plans[0].traineeID) == cached)
+    |   `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try await cache.loadPlan(studentID: plans[0].traineeID) == cached,expression: .__fromSyntaxNode("try await cache.loadPlan(studentID: plans[0].traineeID) == cached"),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- warning: no calls to throwing functions occur within 'try' expression
+    +-------------------------------------------------------------------
+ 88 |   await #expect(throws: APIError.self) {
+ 89 |     try await repo.refreshCurrentPlan(studentID: plans[0].traineeID)
+[4/5] Emitting module StudentKitTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking StudentKitPackageTests
+Build complete! (28.59s)
+Test Suite 'Selected tests' started at 2026-11-16 10:27:45.873.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:27:45.873.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:27:45.873.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:27:45.874.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 403 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 404 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 500 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 500 at PlanHandoffTests.swift:86:3: Expectation failed: try await repo.fetchCurrentPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 403 at PlanHandoffTests.swift:86:3: Expectation failed: try await repo.fetchCurrentPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 404 at PlanHandoffTests.swift:86:3: Expectation failed: try await repo.fetchCurrentPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 500 at PlanHandoffTests.swift:87:3: Expectation failed: try await cache.loadPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 403 at PlanHandoffTests.swift:87:3: Expectation failed: try await cache.loadPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 404 at PlanHandoffTests.swift:87:3: Expectation failed: try await cache.loadPlan(studentID: plans[0].traineeID) == cached
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 403 at PlanHandoffTests.swift:88:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 404 at PlanHandoffTests.swift:88:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 500 at PlanHandoffTests.swift:88:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 403 at PlanHandoffTests.swift:92:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 500 at PlanHandoffTests.swift:92:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) recorded an issue with 1 argument status → 404 at PlanHandoffTests.swift:92:9: Expectation failed: an error was expected but none was thrown and "Optional(CoreModels.StudentPlanView(handoff: Optional(CoreModels.StudentPlanHandoff(currentPlanID: Optional(10000000-0000-4000-8000-000000000002), plans: [CoreModels.StudentPlanHandoff.Entry(id: 10000000-0000-4000-8000-000000000002, name: "Cycle 2", weeks: 4, completedTrainingDays: 0, totalTrainingDays: 0, status: CoreModels.StudentPlanHandoff.Status.current)])), cycleID: 10000000-0000-4000-8000-000000000002, weekIndex: 1, startDate: 2026-11-23 00:00:00 +0000, endDate: Optional(2026-12-20 00:00:00 +0000), planKind: CoreModels.PlanKind.regular, publishedAt: Optional(2026-10-02 10:00:00 +0000), totalShiftDays: 0, latestShiftCreatedAt: nil, days: []))" was returned
+✘ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) with 3 test cases failed after 0.055 seconds with 12 issues.
+✘ Test run with 1 test in 0 suites failed after 0.055 seconds with 12 issues.

@@ -1,0 +1,29 @@
+{
+  "demoFirst": {
+    "content": [
+      {
+        "type": "text",
+        "text": "tool call error: tool call failed for `XcodeBuildMCP/build_sim`\n\nCaused by:\n    timed out awaiting tools/call after 300s"
+      }
+    ],
+    "isError": true
+  },
+  "demoFinal": {
+    "content": [
+      {
+        "type": "text",
+        "text": "tool call error: tool call failed for `XcodeBuildMCP/build_sim`\n\nCaused by:\n    timed out awaiting tools/call after 300s"
+      }
+    ],
+    "isError": true
+  },
+  "meetpr": {
+    "content": [
+      {
+        "type": "text",
+        "text": "tool call error: tool call failed for `XcodeBuildMCP/build_sim`\n\nCaused by:\n    timed out awaiting tools/call after 300s"
+      }
+    ],
+    "isError": true
+  }
+}

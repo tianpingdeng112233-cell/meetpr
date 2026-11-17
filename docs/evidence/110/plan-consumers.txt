@@ -1,0 +1,51 @@
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:54:  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView?
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:59:  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay]
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:67:    try await fetchCurrentPlan(studentID: studentID)?.handoff
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:84:    try await fetchCurrentPlan(studentID: studentID)
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:88:    try await fetchCurrentPlan(studentID: studentID)?.days.first { $0.id == dayID }
+Modules/RepositoryContracts/Sources/RepositoryContracts/StudentPlanRepository.swift:95:    return try await fetchCurrentPlan(studentID: studentID)?.days.first {
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift:314:      do { fetched = try await plans.fetchCurrentPlan(studentID: studentID) } catch {
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift:438:      plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift:780:    return try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ExportDataSheet.swift:41:      async let cycleDays = try? plans.fetchCycleDays(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/MyProfile/GrowthCurveViewModel.swift:83:      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodaySetRefSharingSource.swift:39:    let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/Networking/Sources/Networking/APIClient+Plans.swift:52:  public func studentPlans(
+Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryViewModel.swift:48:      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryViewModel.swift:49:      let days = try await plans.fetchCycleDays(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/StudentRootView.swift:428:        plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift:211:            guard let plan = try await plans.fetchCurrentPlan(studentID: studentID),
+Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift:1180:      plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Repository/BackendStudentPlanRepository.swift:46:  public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+Modules/StudentKit/Sources/StudentKit/Repository/BackendStudentPlanRepository.swift:61:    guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
+Modules/StudentKit/Sources/StudentKit/Repository/BackendStudentPlanRepository.swift:67:  public func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+Modules/StudentKit/Sources/StudentKit/Repository/BackendStudentPlanRepository.swift:68:    guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
+Modules/CoachKit/Sources/CoachKit/Features/PlanningWorkspace/PlanningWorkspaceViewModel.swift:176:      plan = try await studentPlans.fetchCurrentPlan(studentID: student.id)
+Modules/CoachKit/Sources/CoachKit/Features/PlanningWorkspace/PlanningWorkspaceViewModel.swift:191:      cycleDays = try await studentPlans.fetchCycleDays(studentID: student.id)
+Modules/StudentKit/Sources/StudentKit/Features/Evaluation/EvaluationPeriodViewModel.swift:65:      adaptationPlan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/CoachKit/Sources/CoachKit/Features/PlanningWorkspace/CoachPlanningHomeView.swift:396:    func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+Modules/CoachKit/Sources/CoachKit/Features/PlanningWorkspace/CoachPlanningHomeView.swift:406:    func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+Modules/StudentKit/Sources/StudentKit/Features/Evaluation/StudentEvaluationSummaryViewModel.swift:63:      loadedPlan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/CoachKit/Sources/CoachKit/Features/StudentDetail/StudentDetailViewModel.swift:207:      let loadedPlan = try await plans.fetchCurrentPlan(studentID: summary.id)
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:19:  public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:24:    try await fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:28:    try await fetchCurrentPlan(studentID: studentID)?.days.first { $0.id == dayID }
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:31:  public func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:32:    guard let plan = try await fetchCurrentPlan(studentID: studentID) else { return [] }
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:37:    guard let plan = try await fetchCurrentPlan(studentID: studentID),
+Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift:70:    guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
+Modules/CoachKit/Sources/CoachKit/Features/StudentRoster/StudentRosterViewModel.swift:184:      let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
+Modules/StudentKit/Sources/StudentKit/Demo/PlanHandoffDemoScenario.swift:59:  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? { current }
+Modules/StudentKit/Sources/StudentKit/Demo/PlanHandoffDemoScenario.swift:60:  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] { current.days }
+Modules/CoachKit/Sources/CoachKit/Features/StudentDetail/Execution/CoachExerciseNoteLoader.swift:10:    let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/Coach/DashboardNotificationsViewModel.swift:204:      guard let plan = try await plans.fetchCurrentPlan(studentID: studentID) else {
+Modules/CoachKit/Sources/CoachKit/Features/Receiving/AggregatingCoachVideoQueueRepository.swift:77:      plan = try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/Shared/E1RMCompetitionLiftMigration.swift:163:    let days = try await plans.fetchCycleDays(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/WeekOverview/WeekOverviewViewModel.swift:93:      return try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/WeekOverview/WeekOverviewViewModel.swift:101:      return try await plans.fetchCurrentPlan(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/Shared/E1RMCoachRPEReconciler.swift:201:    let days = try await plans.fetchCycleDays(studentID: studentID)
+Modules/StudentKit/Sources/StudentKit/Features/Shared/ImportedHistoryBackfill.swift:370:    let days = try await plans.fetchCycleDays(studentID: studentID)
+Modules/CoachKit/Sources/CoachKit/Features/Shared/EmptyStudentRepositories.swift:8:  public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+Modules/CoachKit/Sources/CoachKit/Features/Shared/EmptyStudentRepositories.swift:16:  public func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+Modules/CoachKit/Sources/CoachKit/Features/Shared/CoachFlexibleDayDemoView.swift:108:  func fetchCurrentPlan(studentID: UUID) -> StudentPlanView? { plans[studentID] }
+Modules/CoachKit/Sources/CoachKit/Features/Shared/CoachFlexibleDayDemoView.swift:112:  func fetchCycleDays(studentID: UUID) -> [StudentPlanDay] { plans[studentID]?.days ?? [] }

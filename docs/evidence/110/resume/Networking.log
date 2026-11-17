@@ -1,0 +1,581 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/17] /Users/david/Projects/apps/MeetPR-wt-110/Modules/Networking/.build/arm64-apple-macosx/debug/NetworkingPackageTests.derived/runner.swift
+[1/17] Copying exercise-search-zh-Hant.json
+[1/17] Write sources
+[1/17] Copying exercise-names-zh-Hant.json
+[1/17] Copying Localizable.xcstrings
+[1/17] Copying Info.plist
+[1/17] Write sources
+[3/17] Copying OpenCC-NOTICE.txt
+[10/17] Copying OpenCC-LICENSE.txt
+[11/17] Write sources
+[12/17] Copying Info.plist
+[13/17] Copying Localizable.xcstrings
+[14/17] Write swift-version--58304C5D6DBC2206.txt
+[16/92] Compiling CoreModels RestDefaults.swift
+[17/92] Compiling CoreModels BindFirstRun.swift
+[18/92] Compiling CoreModels BindRequest.swift
+[19/92] Compiling CoreModels InviteCode.swift
+[20/92] Compiling CoreModels CoachFeedback.swift
+[21/92] Compiling CoreModels CoachFeedbackVideo.swift
+[22/92] Compiling CoreModels CoachProfile.swift
+[23/92] Compiling CoreModels EvaluationPeriod.swift
+[24/92] Compiling CoreModels PercentageAnchor.swift
+[25/92] Compiling CoreModels PlanDay.swift
+[26/92] Compiling CoreModels PlanExercise.swift
+[27/92] Compiling CoreModels PlanLoadMode.swift
+[28/92] Compiling CoreModels PlanSet.swift
+[29/92] Compiling CoreModels PrescribedIntensity.swift
+[30/92] Compiling CoreModels PrescribedSet+LoadType.swift
+[31/92] Compiling CoreModels SetWeightSuggestionRecord.swift
+[32/100] Compiling CoreModels CatalogExerciseName.swift
+[33/100] Compiling CoreModels ActiveCoachContext.swift
+[34/100] Compiling CoreModels ChatConversation.swift
+[35/100] Compiling CoreModels ChatCursor.swift
+[36/100] Compiling CoreModels ChatMessage.swift
+[37/100] Compiling CoreModels ChatMessageKind.swift
+[38/100] Compiling CoreModels ExerciseNoteDayResolver.swift
+[39/100] Compiling CoreModels ExerciseRefV1.swift
+[40/100] Compiling CoreModels SetRefV1.swift
+[41/100] Compiling CoreModels Codec.swift
+[42/100] Compiling CoreModels CoreModelStrings.swift
+[43/100] Compiling CoreModels CompetitionLiftResolver.swift
+[44/100] Compiling CoreModels CompletionHistory.swift
+[45/100] Compiling CoreModels E1RMAnomalyClassifier.swift
+[46/100] Compiling CoreModels E1RMCalculator.swift
+[47/100] Compiling CoreModels E1RMPlateauDetector.swift
+[48/100] Compiling CoreModels InviteCodeFormat.swift
+[49/100] Compiling CoreModels PlateMathCalculator.swift
+[50/100] Compiling CoreModels StudentAddedSetLog.swift
+[51/100] Compiling CoreModels StudentPlanHandoff.swift
+[52/100] Compiling CoreModels StudentPlanView.swift
+[53/100] Compiling CoreModels StudentSetLog.swift
+[54/100] Compiling CoreModels StudentVideo.swift
+[55/100] Compiling CoreModels TrainingPlan.swift
+[56/100] Compiling CoreModels VideoAttachment.swift
+[57/100] Compiling CoreModels ReadinessCheckin.swift
+[58/100] Compiling CoreModels ExerciseType.swift
+[59/100] Compiling CoreModels Gender.swift
+[60/100] Compiling CoreModels GymTier.swift
+[61/100] Compiling CoreModels InjuryArea.swift
+[62/100] Compiling CoreModels IntensityMode.swift
+[63/100] Compiling CoreModels InviteCodeType.swift
+[64/100] Compiling CoreModels LiftFamily.swift
+[65/100] Compiling CoreModels MovementPattern.swift
+[66/100] Compiling CoreModels MuscleGroup.swift
+[67/100] Compiling CoreModels PlanKind.swift
+[68/100] Compiling CoreModels PlanSource.swift
+[69/100] Compiling CoreModels PlanStatus.swift
+[70/100] Compiling CoreModels SetType.swift
+[71/100] Compiling CoreModels SquatStance.swift
+[72/100] Compiling CoreModels TrainingDay.swift
+[73/100] Compiling CoreModels TrainingMode.swift
+[74/100] Compiling CoreModels StudentProfile.swift
+[75/100] Compiling CoreModels User.swift
+[76/100] Compiling CoreModels VideoMarker.swift
+[77/100] Compiling CoreModels BenchGrip.swift
+[78/100] Compiling CoreModels BindRequestStatus.swift
+[79/100] Compiling CoreModels CompetitionStance.swift
+[80/100] Compiling CoreModels DeadliftStance.swift
+[81/100] Compiling CoreModels Equipment.swift
+[82/100] Compiling CoreModels EvaluationSummary.swift
+[83/100] Compiling CoreModels Exercise.swift
+[84/100] Compiling CoreModels OnboardingPatch.swift
+[85/100] Compiling CoreModels OnboardingProfile.swift
+[86/100] Compiling CoreModels E1RMHistoryPoint.swift
+[87/100] Compiling CoreModels E1RMWeightBaseline.swift
+[88/100] Compiling CoreModels LegacyBodyweightProjection.swift
+[89/100] Compiling CoreModels PRBreakthroughEvent.swift
+[90/100] Emitting module CoreModels
+[91/100] Compiling CoreModels UnitPreference.swift
+[92/100] Compiling CoreModels UnitSystem.swift
+[93/100] Compiling CoreModels UserRole.swift
+[94/100] Compiling CoreModels ExerciseSearchText.swift
+[95/100] Compiling CoreModels InterfaceLanguage.swift
+[96/100] Compiling CoreModels PushNotificationRouting.swift
+[97/100] Compiling CoreModels TaskCancellation.swift
+[98/100] Compiling CoreModels resource_bundle_accessor.swift
+[99/119] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[100/119] Compiling RepositoryContracts InviteCodeRepository.swift
+[101/119] Compiling RepositoryContracts E1RMRepository.swift
+[102/119] Compiling RepositoryContracts EvaluationRepository.swift
+[103/119] Compiling RepositoryContracts RepositoryStrings.swift
+[104/119] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[105/119] Compiling RepositoryContracts StudentPlanRepository.swift
+[106/119] Compiling RepositoryContracts StudentPlanStore.swift
+[107/119] Compiling RepositoryContracts OnboardingRepository.swift
+[108/119] Compiling RepositoryContracts ReadinessRepository.swift
+[109/119] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[110/119] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[111/121] Compiling RepositoryContracts AccountRepository.swift
+[112/121] Compiling RepositoryContracts BindRepository.swift
+[113/121] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[114/121] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[115/121] Compiling RepositoryContracts ChatRepository.swift
+[116/121] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[117/121] Emitting module RepositoryContracts
+[118/121] Compiling RepositoryContracts VideoMarkerRepository.swift
+[119/121] Compiling RepositoryContracts resource_bundle_accessor.swift
+[120/178] Compiling Networking APIClient+StudentVideos.swift
+[121/178] Compiling Networking APIClient+Students.swift
+[122/178] Compiling Networking APIClient+Uploads.swift
+[123/178] Compiling Networking APIClient+VideoMarkers.swift
+[124/178] Compiling Networking APIClient+WeightSuggestions.swift
+[125/178] Compiling Networking APIClient.swift
+[126/178] Compiling Networking FeedbackCache.swift
+[127/178] Compiling Networking JSONFileCache.swift
+[128/178] Compiling Networking PlanCache.swift
+[129/178] Compiling Networking StudentPlanCache.swift
+[130/178] Compiling Networking TrainingLogCache.swift
+[131/178] Compiling Networking AllStudentSetLogsDTO.swift
+[132/184] Emitting module Networking
+[133/184] Compiling Networking APIClient+Exercises.swift
+[134/184] Compiling Networking APIClient+Feedback.swift
+[135/184] Compiling Networking APIClient+Onboarding.swift
+[136/184] Compiling Networking APIClient+Plans.swift
+[137/184] Compiling Networking APIClient+Readiness.swift
+[138/184] Compiling Networking APIClient+Sets.swift
+[139/184] Compiling Networking APIClient+StudentAddedSets.swift
+[140/184] Compiling Networking APIClient+Account.swift
+[141/184] Compiling Networking APIClient+Bind.swift
+[142/184] Compiling Networking APIClient+BindQueue.swift
+[143/184] Compiling Networking APIClient+BodyWeights.swift
+[144/184] Compiling Networking APIClient+CoachSets.swift
+[145/184] Compiling Networking APIClient+Devices.swift
+[146/184] Compiling Networking APIClient+Evaluations.swift
+[147/184] Compiling Networking SetLogDTOs.swift
+[148/184] Compiling Networking StudentVideoDTOs.swift
+[149/184] Compiling Networking UploadDTOs.swift
+[150/184] Compiling Networking VideoMarkerDTOs.swift
+[151/184] Compiling Networking WireFormatting.swift
+[152/184] Compiling Networking Endpoints.swift
+[153/184] Compiling Networking OnboardingDTOs.swift
+[154/184] Compiling Networking OnboardingPatchDTO.swift
+[155/184] Compiling Networking PlanDTOs.swift
+[156/184] Compiling Networking PlanHandoffDTO.swift
+[157/184] Compiling Networking PlanRequestDTOs.swift
+[158/184] Compiling Networking ReadinessDTOs.swift
+[159/184] Compiling Networking CreateStudentAddedSetRequestDTO.swift
+[160/184] Compiling Networking DecimalCoding.swift
+[161/184] Compiling Networking EvaluationDTOs.swift
+[162/184] Compiling Networking ExerciseDTOs.swift
+[163/184] Compiling Networking ExerciseStatsDTOs.swift
+[164/184] Compiling Networking FeedbackDTOs.swift
+[165/184] Compiling Networking APIClient+Auth.swift
+[166/184] Compiling Networking AuthDTOs.swift
+[167/184] Compiling Networking SessionStateReader.swift
+[168/184] Compiling Networking BackendVideoMarkerRepository.swift
+[169/184] Compiling Networking BuildConfig.swift
+[170/184] Compiling Networking ExerciseCatalogCache.swift
+[171/184] Compiling Networking BindDTOs.swift
+[172/184] Compiling Networking BindQueueDTOs.swift
+[173/184] Compiling Networking BodyWeightDTOs.swift
+[174/184] Compiling Networking ChatDTOs.swift
+[175/184] Compiling Networking CoachSetLogDTO.swift
+[176/184] Compiling Networking CoachStudentDTOs.swift
+[177/184] Compiling Networking ErrorEnvelope.swift
+[178/184] Compiling Networking DomainMapping.swift
+[179/184] Compiling Networking NetworkChatRepository.swift
+[180/184] Compiling Networking OSSPartUploader.swift
+[181/184] Compiling Networking RealtimeClient.swift
+[182/184] Compiling Networking RealtimeEvent.swift
+[183/217] Compiling NetworkingTests PlanSetCoachNoteDTOTests.swift
+[184/217] Compiling NetworkingTests RealtimeClientTests.swift
+[185/217] Compiling NetworkingTests RealtimeEventTests.swift
+[186/217] Compiling NetworkingTests SetLogDTOTests.swift
+[187/217] Compiling NetworkingTests StudentAddedSetDTOTests.swift
+[188/217] Compiling NetworkingTests StudentPlanCacheTests.swift
+[189/220] Compiling NetworkingTests APIClientDevicesTests.swift
+[190/220] Compiling NetworkingTests APIClientTests.swift
+[191/220] Compiling NetworkingTests AccountEndpointTests.swift
+[192/220] Compiling NetworkingTests AllDayContractTests.swift
+[193/220] Compiling NetworkingTests AuthRefreshRequestEncodingTests.swift
+[194/220] Compiling NetworkingTests BackendContractDecodingTests.swift
+[195/220] Compiling NetworkingTests BindDTOTests.swift
+[196/220] Compiling NetworkingTests BodyWeightDTOTests.swift
+[197/220] Compiling NetworkingTests PlanCompletionDTOTests.swift
+[198/220] Compiling NetworkingTests PlanIntensityDTOTests.swift
+[199/220] Compiling NetworkingTests PlanLoadTypesTests.swift
+[200/220] Compiling NetworkingTests BuildConfigTests.swift
+[201/220] Compiling NetworkingTests ChatDTOTests.swift
+[202/220] Compiling NetworkingTests ChatSetRefDTOTests.swift
+[203/220] Compiling NetworkingTests CoachSetReadTests.swift
+[204/220] Compiling NetworkingTests NetworkingTypedEndpointTests.swift
+[205/220] Compiling NetworkingTests OSSPartUploaderTests.swift
+[206/220] Compiling NetworkingTests OnboardingDTOTests.swift
+[207/220] Compiling NetworkingTests EvaluationDTOTests.swift
+[208/220] Compiling NetworkingTests ExerciseStatsDTOTests.swift
+[209/220] Compiling NetworkingTests FeedbackVideoDTOTests.swift
+[210/220] Compiling NetworkingTests GlobalAuthEndpointTests.swift
+[211/220] Emitting module NetworkingTests
+[212/220] Compiling NetworkingTests MinimumAppVersionTests.swift
+[213/220] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[214/220] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[215/220] Compiling NetworkingTests NetworkingLayerTests.swift
+[216/220] Compiling NetworkingTests UploadsEndpointTests.swift
+[217/220] Compiling NetworkingTests VideoMarkerDTOTests.swift
+[218/220] Compiling NetworkingTests WireFormattingTests.swift
+[219/222] Compiling NetworkingPackageTests runner.swift
+[220/222] Emitting module NetworkingPackageTests
+[220/222] Write Objects.LinkFileList
+[221/222] Linking NetworkingPackageTests
+Build complete! (8.21s)
+Test Suite 'All tests' started at 2026-11-16 15:27:41.833.
+Test Suite 'All tests' passed at 2026-11-16 15:27:41.834.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RealtimeEventTests started.
+◇ Suite RealtimeClientTests started.
+◇ Suite SetLogDTOTests started.
+◇ Test accountEndpointsSendAuthenticatedRequests() started.
+◇ Test buildConfigSelectsGlobalTrack() started.
+◇ Test apiClientPostsJSONToConfiguredEndpoint() started.
+◇ Test feedbackDTODecodesAndMapsLinkedVideoRPE() started.
+◇ Test chatConversationFixtureDecodesEveryWireField() started.
+◇ Test studentAddedRequestUsesDayAndAllScopeWithoutChangingPlanDefault() started.
+◇ Test networkChatRepositoryMapsBackendChatErrors() started.
+◇ Test apiRequestsNegotiateLocaleAndPreserveSessionLanguageHeader() started.
+◇ Test planLoadTypesDecodeNullLegacyTargets(mode:) started.
+◇ Test emptyPatchEncodesEmptyBody() started.
+◇ Test planDTODecodesKindWithRegularDefault() started.
+◇ Test createPlanSetRequestEncodesCoachNoteAsSnakeCase() started.
+◇ Test exerciseStatsDecodesLegacyResponseWithoutE1RMSeries() started.
+◇ Test acceptResponseDecodesEvaluationPeriod() started.
+◇ Test networkChatRepositoryUploadsJPEGThenSendsImage() started.
+◇ Test inviteCodesResponseDecodesListEnvelope() started.
+◇ Test oneRMLockedAndNotFoundEnvelopesMap() started.
+◇ Test bindErrorIsNilForUnknownCodeAndTransportErrors() started.
+◇ Test exclusiveEndRollsOverMonthAndYear() started.
+◇ Test chatSetRefFixtureDecodesCardAndVideoFields() started.
+◇ Test createFeedbackRequestEncodesVideoIDAsSnakeCase() started.
+◇ Test authContractDecodesSnakeCaseTokensAndFractionalCreatedAt() started.
+◇ Test studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test globalAuthEndpointsExposeBackendPaths() started.
+◇ Test networkChatRepositoryAbortsAttachmentWhenImageUploadIsCancelled() started.
+◇ Test rejectBodyEncodesStrictEmptyObject() started.
+◇ Test feedbackCacheDropsInvalidJSON() started.
+◇ Test planSetDTODecodesMissingCoachNoteAsNil() started.
+◇ Test onboardingProfileDecodesEmptyShellWithNullArrays() started.
+◇ Test coachBindRequestItemDecodesDegradedNullOnboarding() started.
+◇ Test decimalsEncodeAsStringsRoundedToColumnScale() started.
+◇ Test myBindRequestResponseDecodesNullAndValue() started.
+◇ Test planTreeDTODecodesAndMapsToCoreModels() started.
+◇ Test partUploaderThrowsOnHTTPFailure() started.
+◇ Test valueFieldsEncodeBackendKeyNamesVerbatim() started.
+◇ Test chinaEmailRegistrationSendsVerificationCodeWithoutChangingGlobalPayload() started.
+◇ Test acceptResponseDecodesNullEvaluationPeriodOnSkip() started.
+◇ Test coachStudentsContractDecodesBackendSummaryShape() started.
+◇ Test chatMessageFixtureRejectsMissingClientIDAndWrongSequenceType() started.
+◇ Test createBindRequestBodyEncodesSnakeCaseFieldNames() started.
+◇ Test networkChatRepositoryEncodesSetRefPostWithoutImageCleanupRequests() started.
+◇ Test setLogDTOPreservesAssumedTrueAndMapsToDomain() started.
+◇ Test allDayBackend065SharedFixtureDecodesNullableLogAndExerciseNote() started.
+◇ Test createPlanRequestAlwaysCarriesExplicitKind() started.
+◇ Test dateOnlyStringUsesUTCDay() started.
+◇ Test evaluationSummaryPutBodyOmitsBlankWords() started.
+◇ Test coachStudentsContractFallsBackToFlatLegacyShape() started.
+◇ Test minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test planIntensityDTOFieldsRoundTripWithWireTypes() started.
+◇ Test typedEndpointsUseWireContractPaths() started.
+◇ Test coachReadDecodesUnplannedAndLegacyLogs() started.
+◇ Test networkChatRepositoryDeletesCompletedAttachmentWhenMessageFails() started.
+◇ Test planSetDTOsDecodeSixFormsSparseDualAndLegacyRows() started.
+◇ Test bodyWeightWireRecordsDecodeDecimalStringsAndCalendarDates() started.
+◇ Test plansContractDecodesNullCoachID() started.
+◇ Test emailAndTimezoneEndpointsPinBackendContracts() started.
+◇ Test onboardingProfileDecodesFullWireFixture() started.
+◇ Test apiClientInjectsBearerTokenOnTypedEndpoint() started.
+◇ Test oneRMKeysSpellOutDigitBlocks() started.
+◇ Test partUploaderThrowsOnMissingETag() started.
+◇ Test feedbackDTODecodesVideoWithNoSetLogMetadata() started.
+◇ Test networkChatRepositoryEncodesOpenTextAndReadRequests() started.
+◇ Test plannedLogDecodesOptionalDayOwnership() started.
+◇ Test createInviteCodeBodyOmitsAbsentOptionals() started.
+◇ Test feedbackDTODecodesDateOnlyAndISOTimestamps() started.
+◇ Test initiateUploadEncodesSnakeCaseWireBody() started.
+◇ Test planSetDTOUnknownPercentageAnchorDecodesAsNil() started.
+◇ Test abortUploadSendsStrictlyEmptyObjectBody() started.
+◇ Test onboardingIncompleteEnvelopeCarriesMissingFields() started.
+◇ Test authRefreshRequestEncodesSnakeCaseRefreshTokenKey() started.
+◇ Test sharedClientHasDefaultBaseURL() started.
+◇ Test networkChatRepositoryEncodesBeforeAndLatestQueriesExactly() started.
+◇ Test studentPlanCacheInvalidatesPreSequenceProjectionFiles() started.
+◇ Test readSideSetRefWithMissingNullableFieldDegradesToText() started.
+◇ Test onboardingProfileDecodeEncodeDecodeIsStable() started.
+◇ Test apiClientRefreshesAndRetriesAuthenticatedRequestAfter401() started.
+◇ Test firstRunDecodesServerPlanSummary() started.
+◇ Test registerDeviceTokenPostsAuthenticatedIOSPayload() started.
+◇ Test "legacy video marker wire DTO decodes when annotation fields are absent" started.
+◇ Test setLogDTODecodesMissingCoachRPEAsNil() started.
+◇ Test chatMessagesFixtureDecodesKindsAndNullableMatrix() started.
+◇ Test bodyWeightMutationDecodesCurrentWeightAndDeletionNull() started.
+◇ Test planAndDayDecodeSequenceCompletionFields() started.
+◇ Test studentVideosContractDecodesLinkedAndUnlinkedItems() started.
+◇ Test studentPlanCacheDefaultsMissingPercentageAnchorToRegisteredOneRM() started.
+◇ Test buildConfigUsesEnvironmentBaseURLWhenPresent() started.
+◇ Test inviteCodeDTODecodesBackendWireShape() started.
+◇ Test acceptBindRequestBodyOmitsSkipReasonWhenNil() started.
+◇ Test feedbackCacheLoadsLegacyEntriesWithoutVideoFields() started.
+◇ Test "marker repository maps 404 and transport errors to unavailable, everything else to failed" started.
+◇ Test exclusiveEndKeepsClosedUpperBoundDayInWindow() started.
+◇ Test completeUploadEncodesPartsAsSnakeCase() started.
+◇ Test identityProvidersPinCamelCaseWireContracts() started.
+◇ Test coachReadRequestsAllLogs() started.
+◇ Test bindRequestDTODecodesNullableJoinFields() started.
+◇ Test readSideSetRefIgnoresUnknownV1FieldsWithoutLooseningStrictCodec() started.
+◇ Test networkChatRepositoryDeletesNewAttachmentOnIdempotentOldMessage() started.
+◇ Test bindRequestDTOPreservesEndedAt() started.
+◇ Test coachBindRequestItemDecodesNineItemSummary() started.
+◇ Test studentPlanCacheLoadsPre072LegacyPayload() started.
+◇ Test "video marker wire DTO decodes snake-case and maps to the domain" started.
+◇ Test studentAddedResponseKeepsNullablePlanSlotAndOptionalDay() started.
+◇ Test setLogDTODecodesDecimalStringsAndMapsToDomain() started.
+◇ Test chatReadFixtureDecodesCursorObject() started.
+◇ Test minimumVersionUsesBuildNumberAndConfiguredDistributionURL() started.
+◇ Test partUploaderSendsPUTAndStripsETagQuotes() started.
+◇ Test partUploaderReadsCaseInsensitiveETagHeader() started.
+◇ Test emptyChatConversationFixtureDecodesNullableFields() started.
+◇ Test completionResponseDecodesWireIdentity() started.
+◇ Test apiClientPublishesAuthInvalidOn401() started.
+◇ Test feedbackDTODecodesAndMapsLinkedVideo() started.
+◇ Test planDTOAnchorWeekdayDecodesAndLegacyAbsenceDefaultsNil() started.
+◇ Test firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test allDayExerciseRequestPreservesCanonicalContractWithoutVideoOrSetRef() started.
+◇ Test planSetDTODecodesCoachNoteAndPassesItToDomain() started.
+◇ Test uploadEndpointsUseBackendWirePaths() started.
+◇ Test evaluationPeriodDTODecodesAndMapsToDomain() started.
+◇ Test createPlanSetRequestOmitsCoachNoteWhenNil() started.
+◇ Test absentFieldsNeverAppearInBody() started.
+◇ Test requestDTOsEncodeSnakeCaseDecimalStringsAndDateOnlyFields() started.
+◇ Test chatRequestDTOsEncodeExactSnakeCaseBodies() started.
+◇ Test minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test networkChatRepositoryEncodesMessageQueryExactly() started.
+◇ Test endpointsExposeExpectedPaths() started.
+◇ Test bindRequestDTODecodesWithoutEndedAt() started.
+◇ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test feedbackDTODecodesDeletedLinkedVideo() started.
+◇ Test setLogDTODecodesFailedTrueAndMapsToDomain() started.
+◇ Test bindErrorMapsAllFiveMachineCodes() started.
+◇ Test malformedSetRefsInsideMessageArrayDegradeOnlyThoseCardsToText() started.
+◇ Test plannedDTOAcceptsMissingPlanDayID() started.
+◇ Test allDayRequestsAdvertiseNullableWeightCapability() started.
+◇ Test initiateUploadOmitsNilFilename() started.
+◇ Test buildConfigDefaultsToChinaTrack() started.
+◇ Test "video marker request and response encode through MeetPRCodec snake-case" started.
+◇ Test studentPlanCacheRoundTripsNewIntensityPayload() started.
+◇ Test attachmentKindChatImageRoundTripsWireValue() started.
+◇ Test nullEncodesJSONNullForNullableColumns() started.
+◇ Test studentPlanCacheRoundTripsCompletionForOfflineCursor() started.
+◇ Test exerciseStatsDecodesOptionalSeriesAndUnknownTrend() started.
+◇ Test case passing 1 argument mode → "free_weight" to planLoadTypesDecodeNullLegacyTargets(mode:) started.
+◇ Test case passing 1 argument mode → "bodyweight" to planLoadTypesDecodeNullLegacyTargets(mode:) started.
+◇ Test case passing 1 argument code → "SETS_PLAN_DAY_NOT_PUBLISHED" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SETS_ADHOC_DAY_CONFLICT" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_NOT_STUDENT_ADDED" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_ATTACHMENT" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_COACH_FEEDBACK" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument code → "SET_NOT_FOUND" to studentAddedErrorCodesSurviveTransport(code:) started.
+◇ Test case passing 1 argument minimum → 0 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test case passing 1 argument minimum → 27 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test case passing 1 argument minimum → 28 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test case passing 1 argument minimum → 29 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test case passing 1 argument minimum → 100 to minimumVersionBlocksOnlyOlderBuilds(minimum:) started.
+◇ Test decodesKnownEvents() started.
+◇ Test unknownAndMalformedEventsAreSkipped() started.
+◇ Test helloResetsBackoffBeforeTheNextFailure() started.
+◇ Test staleRunCannotOverwriteStateAfterReconnect() started.
+◇ Test failuresUseCappedExponentialBackoffAndDisconnectStopsReconnects() started.
+◇ Test disconnectPublishesDisconnectedBeforeItsSuspensionEvenWhenConnectRaces() started.
+◇ Test helloConnectsWithBearerHeaderAndTokenNeverEntersURL() started.
+◇ Test sendsProtocolPingEveryTwentySeconds() started.
+◇ Test case passing 1 argument field → "" to firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test case passing 1 argument field → ","first_run":null" to firstRunMissingOrNullKeepsLegacyContract(field:) started.
+◇ Test case passing 1 argument failure → "timeout" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "http" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "malformed" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test case passing 1 argument failure → "negative" to minimumVersionFailureAllowsLaunch(failure:) started.
+◇ Test fetchedLogWithoutLoggedDateKeepsServerTimestamp() started.
+◇ Test case passing 2 arguments localization → "zh-Hant", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hant-TW", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh_TW", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test nilLoggedDateOmitsWireKey() started.
+◇ Test case passing 2 arguments localization → "zh-HK", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-MO", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hans", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hans-TW", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-Hant-CN", expected → "zh-Hant" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh-CN", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "zh", expected → "zh-Hans" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test explicitEmptyActualRIRClearsPreviouslyRecordedEffort() started.
+◇ Test case passing 2 arguments localization → "en-GB", expected → "en" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test case passing 2 arguments localization → "fr", expected → "en" to apiRequestsUseOneNegotiatedLanguage(localization:expected:) started.
+◇ Test actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() started.
+◇ Test fetchedLogDecodesLoggedDateAndAnchorsBackfilledLogsOnTheirTrainingDay() started.
+◇ Test backfilledLogOnADSTTransitionDayStillAnchorsAtLocalNoon() started.
+◇ Test loggedDateUsesSnakeCaseWireKey() started.
+◇ Test fetchedLogOnItsOwnGymDayKeepsServerTimestamp() started.
+✔ Test buildConfigSelectsGlobalTrack() passed after 0.037 seconds.
+✔ Test chatConversationFixtureDecodesEveryWireField() passed after 0.037 seconds.
+✔ Test emptyPatchEncodesEmptyBody() passed after 0.037 seconds.
+✔ Test exerciseStatsDecodesLegacyResponseWithoutE1RMSeries() passed after 0.037 seconds.
+✔ Test createPlanSetRequestEncodesCoachNoteAsSnakeCase() passed after 0.037 seconds.
+✔ Test planLoadTypesDecodeNullLegacyTargets(mode:) with 2 test cases passed after 0.037 seconds.
+✔ Test feedbackDTODecodesAndMapsLinkedVideoRPE() passed after 0.037 seconds.
+✔ Test oneRMLockedAndNotFoundEnvelopesMap() passed after 0.037 seconds.
+✔ Test bindErrorIsNilForUnknownCodeAndTransportErrors() passed after 0.037 seconds.
+✔ Test planDTODecodesKindWithRegularDefault() passed after 0.037 seconds.
+✔ Test createFeedbackRequestEncodesVideoIDAsSnakeCase() passed after 0.037 seconds.
+✔ Test exclusiveEndRollsOverMonthAndYear() passed after 0.037 seconds.
+✔ Test apiClientPostsJSONToConfiguredEndpoint() passed after 0.038 seconds.
+✔ Test apiRequestsNegotiateLocaleAndPreserveSessionLanguageHeader() passed after 0.038 seconds.
+✔ Test studentAddedRequestUsesDayAndAllScopeWithoutChangingPlanDefault() passed after 0.038 seconds.
+✔ Test inviteCodesResponseDecodesListEnvelope() passed after 0.037 seconds.
+✔ Test accountEndpointsSendAuthenticatedRequests() passed after 0.038 seconds.
+✔ Test globalAuthEndpointsExposeBackendPaths() passed after 0.037 seconds.
+✔ Test studentAddedErrorCodesSurviveTransport(code:) with 6 test cases passed after 0.037 seconds.
+✔ Test networkChatRepositoryMapsBackendChatErrors() passed after 0.038 seconds.
+✔ Test rejectBodyEncodesStrictEmptyObject() passed after 0.037 seconds.
+✔ Test decimalsEncodeAsStringsRoundedToColumnScale() passed after 0.037 seconds.
+✔ Test authContractDecodesSnakeCaseTokensAndFractionalCreatedAt() passed after 0.038 seconds.
+✔ Test chatSetRefFixtureDecodesCardAndVideoFields() passed after 0.038 seconds.
+✔ Test valueFieldsEncodeBackendKeyNamesVerbatim() passed after 0.037 seconds.
+✔ Test partUploaderThrowsOnHTTPFailure() passed after 0.037 seconds.
+✔ Test feedbackCacheDropsInvalidJSON() passed after 0.038 seconds.
+✔ Test acceptResponseDecodesEvaluationPeriod() passed after 0.038 seconds.
+✔ Test planSetDTODecodesMissingCoachNoteAsNil() passed after 0.038 seconds.
+✔ Test createBindRequestBodyEncodesSnakeCaseFieldNames() passed after 0.037 seconds.
+✔ Test chinaEmailRegistrationSendsVerificationCodeWithoutChangingGlobalPayload() passed after 0.038 seconds.
+✔ Test onboardingProfileDecodesEmptyShellWithNullArrays() passed after 0.038 seconds.
+✔ Test coachBindRequestItemDecodesDegradedNullOnboarding() passed after 0.038 seconds.
+✔ Test networkChatRepositoryUploadsJPEGThenSendsImage() passed after 0.038 seconds.
+✔ Test createPlanRequestAlwaysCarriesExplicitKind() passed after 0.037 seconds.
+✔ Test evaluationSummaryPutBodyOmitsBlankWords() passed after 0.038 seconds.
+✔ Test chatMessageFixtureRejectsMissingClientIDAndWrongSequenceType() passed after 0.038 seconds.
+✔ Test networkChatRepositoryEncodesSetRefPostWithoutImageCleanupRequests() passed after 0.038 seconds.
+✔ Test minimumVersionBlocksOnlyOlderBuilds(minimum:) with 5 test cases passed after 0.037 seconds.
+✔ Test coachStudentsContractFallsBackToFlatLegacyShape() passed after 0.038 seconds.
+✔ Test myBindRequestResponseDecodesNullAndValue() passed after 0.038 seconds.
+✔ Test dateOnlyStringUsesUTCDay() passed after 0.038 seconds.
+✔ Test coachReadDecodesUnplannedAndLegacyLogs() passed after 0.037 seconds.
+✔ Test acceptResponseDecodesNullEvaluationPeriodOnSkip() passed after 0.038 seconds.
+✔ Test bodyWeightWireRecordsDecodeDecimalStringsAndCalendarDates() passed after 0.038 seconds.
+✔ Test setLogDTOPreservesAssumedTrueAndMapsToDomain() passed after 0.038 seconds.
+✔ Test apiClientInjectsBearerTokenOnTypedEndpoint() passed after 0.038 seconds.
+✔ Test oneRMKeysSpellOutDigitBlocks() passed after 0.038 seconds.
+✔ Test allDayBackend065SharedFixtureDecodesNullableLogAndExerciseNote() passed after 0.038 seconds.
+✔ Test coachStudentsContractDecodesBackendSummaryShape() passed after 0.038 seconds.
+✔ Test partUploaderThrowsOnMissingETag() passed after 0.038 seconds.
+✔ Test emailAndTimezoneEndpointsPinBackendContracts() passed after 0.038 seconds.
+✔ Test createInviteCodeBodyOmitsAbsentOptionals() passed after 0.038 seconds.
+✔ Test feedbackDTODecodesVideoWithNoSetLogMetadata() passed after 0.038 seconds.
+✔ Test initiateUploadEncodesSnakeCaseWireBody() passed after 0.038 seconds.
+✔ Test planTreeDTODecodesAndMapsToCoreModels() passed after 0.038 seconds.
+✔ Test onboardingIncompleteEnvelopeCarriesMissingFields() passed after 0.038 seconds.
+✔ Test networkChatRepositoryEncodesOpenTextAndReadRequests() passed after 0.038 seconds.
+✔ Test abortUploadSendsStrictlyEmptyObjectBody() passed after 0.038 seconds.
+✔ Test sharedClientHasDefaultBaseURL() passed after 0.038 seconds.
+✔ Test plansContractDecodesNullCoachID() passed after 0.038 seconds.
+✔ Test authRefreshRequestEncodesSnakeCaseRefreshTokenKey() passed after 0.038 seconds.
+✔ Test onboardingProfileDecodesFullWireFixture() passed after 0.038 seconds.
+✔ Test readSideSetRefWithMissingNullableFieldDegradesToText() passed after 0.038 seconds.
+✔ Test plannedLogDecodesOptionalDayOwnership() passed after 0.038 seconds.
+✔ Test registerDeviceTokenPostsAuthenticatedIOSPayload() passed after 0.038 seconds.
+✔ Test feedbackDTODecodesDateOnlyAndISOTimestamps() passed after 0.038 seconds.
+✔ Test apiClientRefreshesAndRetriesAuthenticatedRequestAfter401() passed after 0.038 seconds.
+✔ Test "legacy video marker wire DTO decodes when annotation fields are absent" passed after 0.038 seconds.
+✔ Test setLogDTODecodesMissingCoachRPEAsNil() passed after 0.038 seconds.
+✔ Test networkChatRepositoryEncodesBeforeAndLatestQueriesExactly() passed after 0.038 seconds.
+✔ Test planSetDTOsDecodeSixFormsSparseDualAndLegacyRows() passed after 0.038 seconds.
+✔ Test bodyWeightMutationDecodesCurrentWeightAndDeletionNull() passed after 0.038 seconds.
+✔ Test buildConfigUsesEnvironmentBaseURLWhenPresent() passed after 0.038 seconds.
+✔ Test acceptBindRequestBodyOmitsSkipReasonWhenNil() passed after 0.038 seconds.
+✔ Test studentPlanCacheDefaultsMissingPercentageAnchorToRegisteredOneRM() passed after 0.038 seconds.
+✔ Test studentPlanCacheInvalidatesPreSequenceProjectionFiles() passed after 0.038 seconds.
+✔ Test "marker repository maps 404 and transport errors to unavailable, everything else to failed" passed after 0.038 seconds.
+✔ Test inviteCodeDTODecodesBackendWireShape() passed after 0.038 seconds.
+✔ Test chatMessagesFixtureDecodesKindsAndNullableMatrix() passed after 0.038 seconds.
+✔ Test exclusiveEndKeepsClosedUpperBoundDayInWindow() passed after 0.038 seconds.
+✔ Test completeUploadEncodesPartsAsSnakeCase() passed after 0.038 seconds.
+✔ Test readSideSetRefIgnoresUnknownV1FieldsWithoutLooseningStrictCodec() passed after 0.038 seconds.
+✔ Test firstRunDecodesServerPlanSummary() passed after 0.038 seconds.
+✔ Test onboardingProfileDecodeEncodeDecodeIsStable() passed after 0.038 seconds.
+✔ Test identityProvidersPinCamelCaseWireContracts() passed after 0.038 seconds.
+✔ Test coachReadRequestsAllLogs() passed after 0.038 seconds.
+✔ Test feedbackCacheLoadsLegacyEntriesWithoutVideoFields() passed after 0.038 seconds.
+✔ Test studentVideosContractDecodesLinkedAndUnlinkedItems() passed after 0.038 seconds.
+✔ Test coachBindRequestItemDecodesNineItemSummary() passed after 0.038 seconds.
+✔ Test planAndDayDecodeSequenceCompletionFields() passed after 0.038 seconds.
+✔ Test planSetDTOUnknownPercentageAnchorDecodesAsNil() passed after 0.038 seconds.
+✔ Test chatReadFixtureDecodesCursorObject() passed after 0.038 seconds.
+✔ Test minimumVersionUsesBuildNumberAndConfiguredDistributionURL() passed after 0.038 seconds.
+✔ Test bindRequestDTODecodesNullableJoinFields() passed after 0.038 seconds.
+✔ Test emptyChatConversationFixtureDecodesNullableFields() passed after 0.038 seconds.
+✔ Test partUploaderReadsCaseInsensitiveETagHeader() passed after 0.038 seconds.
+✔ Test completionResponseDecodesWireIdentity() passed after 0.038 seconds.
+✔ Test apiClientPublishesAuthInvalidOn401() passed after 0.038 seconds.
+✔ Test studentAddedResponseKeepsNullablePlanSlotAndOptionalDay() passed after 0.038 seconds.
+✔ Test "video marker wire DTO decodes snake-case and maps to the domain" passed after 0.038 seconds.
+✔ Test partUploaderSendsPUTAndStripsETagQuotes() passed after 0.038 seconds.
+✔ Test allDayExerciseRequestPreservesCanonicalContractWithoutVideoOrSetRef() passed after 0.038 seconds.
+✔ Test bindRequestDTOPreservesEndedAt() passed after 0.038 seconds.
+✔ Test setLogDTODecodesDecimalStringsAndMapsToDomain() passed after 0.038 seconds.
+✔ Test createPlanSetRequestOmitsCoachNoteWhenNil() passed after 0.038 seconds.
+✔ Test planSetDTODecodesCoachNoteAndPassesItToDomain() passed after 0.038 seconds.
+✔ Test absentFieldsNeverAppearInBody() passed after 0.038 seconds.
+✔ Test feedbackDTODecodesAndMapsLinkedVideo() passed after 0.038 seconds.
+✔ Test chatRequestDTOsEncodeExactSnakeCaseBodies() passed after 0.038 seconds.
+✔ Test minimumVersionFailureAllowsLaunch(failure:) with 4 test cases passed after 0.038 seconds.
+✔ Test requestDTOsEncodeSnakeCaseDecimalStringsAndDateOnlyFields() passed after 0.038 seconds.
+✔ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) with 12 test cases passed after 0.038 seconds.
+✔ Test firstRunMissingOrNullKeepsLegacyContract(field:) with 2 test cases passed after 0.038 seconds.
+✔ Test endpointsExposeExpectedPaths() passed after 0.038 seconds.
+✔ Test evaluationPeriodDTODecodesAndMapsToDomain() passed after 0.038 seconds.
+✔ Test uploadEndpointsUseBackendWirePaths() passed after 0.038 seconds.
+✔ Test bindRequestDTODecodesWithoutEndedAt() passed after 0.038 seconds.
+✔ Test networkChatRepositoryEncodesMessageQueryExactly() passed after 0.038 seconds.
+✔ Test bindErrorMapsAllFiveMachineCodes() passed after 0.038 seconds.
+✔ Test setLogDTODecodesFailedTrueAndMapsToDomain() passed after 0.038 seconds.
+✔ Test buildConfigDefaultsToChinaTrack() passed after 0.038 seconds.
+✔ Test allDayRequestsAdvertiseNullableWeightCapability() passed after 0.038 seconds.
+✔ Test initiateUploadOmitsNilFilename() passed after 0.038 seconds.
+✔ Test attachmentKindChatImageRoundTripsWireValue() passed after 0.038 seconds.
+✔ Test nullEncodesJSONNullForNullableColumns() passed after 0.038 seconds.
+✔ Test "video marker request and response encode through MeetPRCodec snake-case" passed after 0.038 seconds.
+✔ Test exerciseStatsDecodesOptionalSeriesAndUnknownTrend() passed after 0.038 seconds.
+✔ Test feedbackDTODecodesDeletedLinkedVideo() passed after 0.038 seconds.
+✔ Test decodesKnownEvents() passed after 0.028 seconds.
+✔ Test unknownAndMalformedEventsAreSkipped() passed after 0.028 seconds.
+✔ Test plannedDTOAcceptsMissingPlanDayID() passed after 0.038 seconds.
+✔ Test studentPlanCacheLoadsPre072LegacyPayload() passed after 0.039 seconds.
+✔ Test malformedSetRefsInsideMessageArrayDegradeOnlyThoseCardsToText() passed after 0.039 seconds.
+✔ Test nilLoggedDateOmitsWireKey() passed after 0.004 seconds.
+✔ Test explicitEmptyActualRIRClearsPreviouslyRecordedEffort() passed after 0.003 seconds.
+✔ Test loggedDateUsesSnakeCaseWireKey() passed after 0.003 seconds.
+✔ Test typedEndpointsUseWireContractPaths() passed after 0.040 seconds.
+✔ Test networkChatRepositoryAbortsAttachmentWhenImageUploadIsCancelled() passed after 0.040 seconds.
+✔ Test planDTOAnchorWeekdayDecodesAndLegacyAbsenceDefaultsNil() passed after 0.039 seconds.
+✔ Test backfilledLogOnADSTTransitionDayStillAnchorsAtLocalNoon() passed after 0.003 seconds.
+✔ Test fetchedLogWithoutLoggedDateKeepsServerTimestamp() passed after 0.005 seconds.
+✔ Test actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() passed after 0.003 seconds.
+✔ Test fetchedLogDecodesLoggedDateAndAnchorsBackfilledLogsOnTheirTrainingDay() passed after 0.003 seconds.
+✔ Test networkChatRepositoryDeletesNewAttachmentOnIdempotentOldMessage() passed after 0.039 seconds.
+✔ Suite RealtimeEventTests passed after 0.041 seconds.
+✔ Test networkChatRepositoryDeletesCompletedAttachmentWhenMessageFails() passed after 0.040 seconds.
+✔ Test fetchedLogOnItsOwnGymDayKeepsServerTimestamp() passed after 0.003 seconds.
+✔ Suite SetLogDTOTests passed after 0.041 seconds.
+✔ Test helloConnectsWithBearerHeaderAndTokenNeverEntersURL() passed after 0.028 seconds.
+✔ Test studentPlanCacheRoundTripsNewIntensityPayload() passed after 0.040 seconds.
+✔ Test planIntensityDTOFieldsRoundTripWithWireTypes() passed after 0.041 seconds.
+✔ Test studentPlanCacheRoundTripsCompletionForOfflineCursor() passed after 0.040 seconds.
+✔ Test sendsProtocolPingEveryTwentySeconds() passed after 0.030 seconds.
+✔ Test helloResetsBackoffBeforeTheNextFailure() passed after 0.032 seconds.
+✔ Test disconnectPublishesDisconnectedBeforeItsSuspensionEvenWhenConnectRaces() passed after 0.032 seconds.
+✔ Test staleRunCannotOverwriteStateAfterReconnect() passed after 0.032 seconds.
+✔ Test failuresUseCappedExponentialBackoffAndDisconnectStopsReconnects() passed after 0.039 seconds.
+✔ Suite RealtimeClientTests passed after 0.052 seconds.
+✔ Test run with 156 tests in 3 suites passed after 0.053 seconds.

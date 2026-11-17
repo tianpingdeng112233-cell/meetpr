@@ -538,3 +538,12 @@ private actor CountingPlanRepository: StudentPlanRepository {
   #expect(await coordinator.openExerciseNoteConversation() == .opened(conversation.id))
   #expect(await coordinator.openCoachConversation() == .failed)
 }
+
+@MainActor
+@Test func handoffNotificationSignatureUsesCurrentCycleRatherThanUpcoming() async {
+  let fixture = HandoffWorkoutFixture()
+  let model = makeNotifications(plans: fixture.repository)
+  await model.loadIfNeeded(studentID: StudentDemoSeed.studentID)
+  #expect(model.planNotice?.signature == DashboardPlanSignature(plan: fixture.current))
+  #expect(model.planNotice?.signature != DashboardPlanSignature(plan: fixture.upcoming))
+}

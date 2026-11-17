@@ -1,0 +1,107 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/5] Write sources
+[3/5] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling Networking StudentPlanCache.swift
+[6/7] Emitting module Networking
+[7/12] Compiling StudentKit BackendStudentPlanRepository.swift
+[8/12] Emitting module StudentKit
+[9/12] Compiling StudentKit TodayWorkoutViewModel.swift
+[10/12] Compiling StudentKit TodayWorkoutView.swift
+[11/14] Emitting module StudentKitTests
+[12/14] Compiling StudentKitTests PlanHandoffTests.swift
+[12/14] Write Objects.LinkFileList
+[13/14] Linking StudentKitPackageTests
+Build complete! (72.13s)
+Test Suite 'Selected tests' started at 2026-11-16 15:37:29.568.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 15:37:29.569.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 15:37:29.569.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 15:37:29.569.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test handoffChatSharingUsesCurrentDayRatherThanUpcomingPrescription() started.
+◇ Test handoffInvalidCodeClearsStashAndReportsDisplayName() started.
+◇ Test handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() started.
+◇ Test handoffPendingDaySurvivesCurrentCacheReplacementAndRepositoryRestart() started.
+◇ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test handoffOfflineDecodesOldV3CacheAndKeepsItsOriginalDays() started.
+◇ Test handoffCompletionAndUndoRefreshUseServerResultWithoutClientSorting() started.
+◇ Test handoffNotificationSignatureUsesCurrentCycleRatherThanUpcoming() started.
+◇ Test handoffReturnHonorsAuthoritativeNoPlan() started.
+◇ Test handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test handoffWaitsForEntryAndNoticeDismissalSurvivesRelaunch() started.
+◇ Test handoffAbandonedPastTailCannotBeRecorded() started.
+◇ Test handoffNoticeIgnoresCompletedLogsFromOtherCycles() started.
+◇ Test handoffReturnWhilePendingUsesCachedCurrent(completionPending:) started.
+◇ Test handoffRechecksVisibleInteractionAfterLogResponse() started.
+◇ Test handoffNoticeSkipsEmptyPlansBetweenCycles() started.
+◇ Test handoffNetworkFailureKeepsStashAndOffersRetry() started.
+◇ Test handoffCompletedSetDismissesNoticeWithoutTappingClose() started.
+◇ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+◇ Test handoffWithoutStashRequestsReload() started.
+◇ Test handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test handoffRequestSentLandsOnPending() started.
+◇ Test handoffPendingCompletionKeepsOriginalDayUntilAcknowledged() started.
+◇ Test case passing 1 argument browsing → false to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test handoffAlreadyPendingRequestsReload() started.
+◇ Test case passing 1 argument fixtureName → "three-consecutive" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument fixtureName → "feedback" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test handoffGrowthUsesCurrentPlanExerciseFamilyRatherThanUpcoming() started.
+◇ Test case passing 1 argument fixtureName → "abandoned-tail" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument browsing → true to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument fixtureName → "no-plans" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument fixtureName → "all-completed" to handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) started.
+◇ Test case passing 1 argument status → 403 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test handoffRestoredCompletionReadsOldDayOnlineWithoutRepeatingWrite() started.
+◇ Test case passing 1 argument status → 404 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument status → 500 to handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) started.
+◇ Test case passing 1 argument action → "enter" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test case passing 1 argument action → "browse" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test case passing 1 argument action → "return" to handoffRechecksVisibleInteractionAfterPlanResponse(action:) started.
+◇ Test case passing 1 argument completionPending → false to handoffReturnWhilePendingUsesCachedCurrent(completionPending:) started.
+◇ Test case passing 1 argument completionPending → true to handoffReturnWhilePendingUsesCachedCurrent(completionPending:) started.
+◇ Test case passing 1 argument preloaded → false to handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+◇ Test case passing 1 argument preloaded → true to handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) started.
+◇ Test case passing 1 argument offline → false to handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test case passing 1 argument offline → true to handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) started.
+◇ Test case passing 1 argument previewing → false to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+◇ Test case passing 1 argument previewing → true to handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) started.
+✔ Test handoffOfflineDecodesOldV3CacheAndKeepsItsOriginalDays() passed after 0.072 seconds.
+✔ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() passed after 0.072 seconds.
+✔ Test handoffChatSharingUsesCurrentDayRatherThanUpcomingPrescription() passed after 0.072 seconds.
+✔ Test handoffRequestSentLandsOnPending() passed after 0.095 seconds.
+✔ Test handoffNotificationSignatureUsesCurrentCycleRatherThanUpcoming() passed after 0.099 seconds.
+✔ Test handoffUnavailableKeepsCacheAndNeverGuessesLatest(status:) with 3 test cases passed after 0.101 seconds.
+✔ Test handoffGrowthUsesCurrentPlanExerciseFamilyRatherThanUpcoming() passed after 0.100 seconds.
+✔ Test handoffInvalidCodeClearsStashAndReportsDisplayName() passed after 0.101 seconds.
+✔ Test handoffAlreadyPendingRequestsReload() passed after 0.101 seconds.
+✔ Test handoffWithoutStashRequestsReload() passed after 0.102 seconds.
+✔ Test handoffNoticeIgnoresCompletedLogsFromOtherCycles() passed after 0.104 seconds.
+✔ Test handoffNoticeSkipsEmptyPlansBetweenCycles() passed after 0.104 seconds.
+✔ Test handoffNetworkFailureKeepsStashAndOffersRetry() passed after 0.105 seconds.
+✔ Test handoffReturnHonorsAuthoritativeNoPlan() passed after 0.105 seconds.
+✔ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) with 2 test cases passed after 0.107 seconds.
+✔ Test handoffRechecksVisibleInteractionAfterPlanResponse(action:) with 3 test cases passed after 0.107 seconds.
+✔ Test handoffReturnWhilePendingUsesCachedCurrent(completionPending:) with 2 test cases passed after 0.108 seconds.
+✔ Test handoffColdStartKeepsPendingCycleUntilAcknowledged(preloaded:) with 2 test cases passed after 0.108 seconds.
+✔ Test handoffPreviewNeverCreatesDraftsOrWritesAndReturnUsesCursor(offline:) with 2 test cases passed after 0.109 seconds.
+✔ Test handoffRechecksVisibleInteractionAfterLogResponse() passed after 0.110 seconds.
+✔ Test handoffAbandonedPastTailCannotBeRecorded() passed after 0.110 seconds.
+✔ Test handoffAccountChangeDiscardsPreviousAccountPlan(previewing:) with 2 test cases passed after 0.110 seconds.
+✔ Test handoffCompletedSetDismissesNoticeWithoutTappingClose() passed after 0.111 seconds.
+✔ Test handoffWaitsForEntryAndNoticeDismissalSurvivesRelaunch() passed after 0.111 seconds.
+✔ Test handoffPendingCompletionKeepsOriginalDayUntilAcknowledged() passed after 0.111 seconds.
+✔ Test handoffColdStartUsesServerCurrentInsteadOfLatestPublished(fixtureName:) with 5 test cases passed after 0.128 seconds.
+✔ Test handoffCompletionAndUndoRefreshUseServerResultWithoutClientSorting() passed after 0.152 seconds.
+✔ Test handoffPendingDaySurvivesCurrentCacheReplacementAndRepositoryRestart() passed after 0.276 seconds.
+✘ Test handoffRestoredCompletionReadsOldDayOnlineWithoutRepeatingWrite() recorded an issue at PlanHandoffTests.swift:255:3: Expectation failed: try await plans.fetchDay(studentID: studentID, dayID: day.id)?.completedAt == completedAt
+✘ Test handoffRestoredCompletionReadsOldDayOnlineWithoutRepeatingWrite() failed after 0.292 seconds with 1 issue.
+✘ Test run with 29 tests in 0 suites failed after 0.293 seconds with 1 issue.

@@ -1,0 +1,105 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling StudentKit TodayWorkoutView.swift
+[5/6] Emitting module StudentKit
+[6/75] Compiling StudentKitTests TodayWorkoutExerciseSectionTests.swift
+[7/75] Compiling StudentKitTests TodayWorkoutHistoryPrefillTests.swift
+[8/75] Compiling StudentKitTests TodayWorkoutPRHookTests.swift
+[9/75] Compiling StudentKitTests TodayWorkoutPersistOrderingTests.swift
+[10/75] Compiling StudentKitTests TodayWorkoutPresentationTests.swift
+[11/75] Compiling StudentKitTests TodayWorkoutQuickLogDateRangeTests.swift
+[12/75] Compiling StudentKitTests TodayWorkoutQuickLogRetryTests.swift
+[13/82] Compiling StudentKitTests TrainingFlowTests.swift
+[14/82] Compiling StudentKitTests VideoCompletionBoundaryTests.swift
+[15/82] Compiling StudentKitTests VideoCompletionIntegrationTests.swift
+[16/82] Compiling StudentKitTests VideoCompletionReviewRegressionTests.swift
+[17/82] Compiling StudentKitTests VideoCompletionRewardRouteTests.swift
+[18/82] Compiling StudentKitTests WorkoutCompletionPresentationTests.swift
+[19/82] Compiling StudentKitTests WorkoutDatePolicyTests.swift
+[20/82] Compiling StudentKitTests TodayWorkoutQuickLogTestSupport.swift
+[21/82] Compiling StudentKitTests TodayWorkoutQuickLogTests.swift
+[22/82] Compiling StudentKitTests TodayWorkoutRefreshTests.swift
+[23/82] Compiling StudentKitTests TodayWorkoutRestTimerTests.swift
+[24/82] Compiling StudentKitTests TodayWorkoutSetRefEntryLayoutTests.swift
+[25/82] Compiling StudentKitTests TodayWorkoutSuggestionBaselineTests.swift
+[26/82] Compiling StudentKitTests TodayWorkoutViewModelTests.swift
+[27/82] Compiling StudentKitTests AskCoachVisibilityTests.swift
+[28/82] Compiling StudentKitTests CameraPersistenceFixture.swift
+[29/82] Compiling StudentKitTests CameraReturnDuringPersistenceTests.swift
+[30/82] Compiling StudentKitTests CompletedDayPresentationTests.swift
+[31/82] Compiling StudentKitTests CompletedVideoReplayTests.swift
+[32/82] Compiling StudentKitTests HeroCameraUploadTests.swift
+[33/82] Compiling StudentKitTests IntensityWeightSuggestionTests.swift
+[34/82] Compiling StudentKitTests LoadTypeLoggingTests.swift
+[35/82] Compiling StudentKitTests E1RMCoachRPEReconcilerTests.swift
+[36/82] Compiling StudentKitTests SetNumberSurfaceTests.swift
+[37/82] Compiling StudentKitTests AccessoryColumnsTests.swift
+[38/82] Compiling StudentKitTests AccessoryPresentationTests.swift
+[39/82] Compiling StudentKitTests AccessoryRIRKeypadTests.swift
+[40/82] Compiling StudentKitTests AccessoryRowTests.swift
+[41/82] Compiling StudentKitTests AccessorySaveTests.swift
+[42/82] Compiling StudentKitTests AccessoryWeightHistoryIntegrationTests.swift
+[43/82] Compiling StudentKitTests WorkoutKeypadSessionTests.swift
+[44/82] Compiling StudentKitTests VideoDeliveryPresentationTests.swift
+[45/82] Compiling StudentKitTests VideoDeliveryRetryTests.swift
+[46/82] Compiling StudentKitTests AllDayProjectionTests.swift
+[47/82] Compiling StudentKitTests StudentPlanIntensityProjectionTests.swift
+[48/82] Compiling StudentKitTests StudentIntensityFormattingTests.swift
+[49/82] Compiling StudentKitTests TraditionalChinesePresentationTests.swift
+[50/82] Compiling StudentKitTests AllDayDirectEditingTests.swift
+[51/82] Compiling StudentKitTests AllDayReviewRegressionTests.swift
+[52/82] Compiling StudentKitTests AllDayRevisionTests.swift
+[53/82] Compiling StudentKitTests AllDayScreenTests.swift
+[54/82] Compiling StudentKitTests AllDaySheetTests.swift
+[55/82] Compiling StudentKitTests AllDayVideoReplayTests.swift
+[56/82] Compiling StudentKitTests AllDayWalkthrough3Tests.swift
+[57/82] Compiling StudentKitTests AllDayWalkthroughTests.swift
+[58/82] Compiling StudentKitTests SetSyncDraftTests.swift
+[59/82] Compiling StudentKitTests SetSyncReceiptTests.swift
+[60/82] Compiling StudentKitTests SetSyncRegressionTests.swift
+[61/82] Compiling StudentKitTests SetSyncSuspendedRequestTests.swift
+[62/82] Compiling StudentKitTests SetSyncViewInjectionTests.swift
+[63/82] Compiling StudentKitTests SetWeightSuggestionOutcomeTests.swift
+[64/82] Compiling StudentKitTests SetWeightSuggestionTests.swift
+[65/82] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[66/82] Compiling StudentKitTests LoadTypePresentationTests.swift
+[67/82] Compiling StudentKitTests OfflineAccessoryTests.swift
+[68/82] Compiling StudentKitTests OfflineCompletionDeviceRegressionTests.swift
+[69/82] Compiling StudentKitTests OfflineSetRecordingTests.swift
+[70/82] Compiling StudentKitTests PlanHandoffRaceTests.swift
+[71/82] Compiling StudentKitTests PlanHandoffWorkoutTests.swift
+[72/82] Compiling StudentKitTests PublishedDayTrainingTests.swift
+[73/82] Compiling StudentKitTests QuickLogPlanTests.swift
+[74/82] Compiling StudentKitTests StudentAddedErrorTests.swift
+[75/82] Compiling StudentKitTests StudentAddedFailureTests.swift
+[76/82] Compiling StudentKitTests StudentAddedRowsTests.swift
+[77/82] Compiling StudentKitTests StudentAddedWriteTests.swift
+[78/82] Compiling StudentKitTests TodaySetRefSharingSourceTests.swift
+[79/82] Compiling StudentKitTests TodayWorkoutAssumedWriteBackTests.swift
+[80/82] Compiling StudentKitTests TodayWorkoutCompletionInFlightTests.swift
+[81/82] Emitting module StudentKitTests
+[81/83] Write Objects.LinkFileList
+[82/83] Linking StudentKitPackageTests
+Build complete! (31.30s)
+Test Suite 'Selected tests' started at 2026-11-16 10:31:44.721.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:31:44.722.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:31:44.722.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:31:44.722.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → false to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument browsing → true to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → true to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument browsing → false to handoffLateResponseCannotReplaceEditedWorkout(browsing:) started.
+✔ Test handoffLateResponseCannotReplaceEditedWorkout(browsing:) with 2 test cases passed after 0.019 seconds.
+✔ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) with 2 test cases passed after 0.022 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.022 seconds.

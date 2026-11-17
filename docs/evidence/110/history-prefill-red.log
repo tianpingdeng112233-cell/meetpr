@@ -1,0 +1,24 @@
+Another instance of SwiftPM (PID: 42155) is already running using '/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/.build', waiting until that process has finished execution...warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-11-16 10:26:35.683.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-16 10:26:35.683.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-16 10:26:35.683.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-16 10:26:35.684.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → true to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+◇ Test case passing 1 argument historyPrefillEnabled → false to trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) started.
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → false at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → true at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → false at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → true at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → false at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) recorded an issue with 1 argument historyPrefillEnabled → true at TodayWorkoutHistoryPrefillTests.swift:90:5: Expectation failed: (path → "/students/02400000-0000-0000-0000-000000000101/plan-handoff") == "/exercises"
+✘ Test trainingHistoryPrefillSwitchControlsRequestsOnOpenAndDayChange(historyPrefillEnabled:) with 2 test cases failed after 0.012 seconds with 6 issues.
+✘ Test run with 1 test in 0 suites failed after 0.012 seconds with 6 issues.

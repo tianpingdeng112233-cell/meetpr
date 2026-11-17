@@ -1,0 +1,1635 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+[1/4] Write sources
+[4/6] Compiling RepositoryContracts StudentPlanRepository.swift
+[5/6] Emitting module RepositoryContracts
+[6/8] Emitting module Networking
+[7/8] Compiling Networking StudentPlanCache.swift
+[8/23] Compiling CoachKit CoachFlexibleDayDemoView.swift
+[9/23] Compiling CoachKit CoachStudentDetailContext.swift
+[10/23] Compiling CoachKit StudentRosterView.swift
+[11/23] Compiling CoachKit CoachExerciseNoteLoader.swift
+[12/23] Emitting module CoachKit
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+/Users/david/Projects/apps/MeetPR-wt-110/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[13/23] Compiling CoachKit CoachPlanningHomeView.swift
+[14/23] Compiling CoachKit PlanningWorkspaceSections.swift
+[15/23] Compiling CoachKit EmptyStudentRepositories.swift
+[16/23] Compiling CoachKit EvaluationSummaryEditorView.swift
+[17/23] Compiling CoachKit StudentDetailView.swift
+[18/23] Compiling CoachKit PlanningWorkspaceViewModel.swift
+[19/23] Compiling CoachKit AggregatingCoachVideoQueueRepository.swift
+[20/23] Compiling CoachKit StudentDetailViewModel.swift
+[21/23] Compiling CoachKit CoachRootView.swift
+[22/23] Compiling CoachKit CoachDashboardView.swift
+[23/24] Compiling CoachKit StudentRosterViewModel.swift
+[24/38] Compiling CoachKitTests PlanningWorkspaceViewModelTests.swift
+[25/38] Compiling CoachKitTests CoachStudentFeatureTestSupport.swift
+[26/38] Compiling CoachKitTests PlanHandoffConsumerTests.swift
+[27/38] Compiling CoachKitTests CoachVideoQueueRepositoryTests.swift
+[28/38] Compiling CoachKitTests StudentDetailViewModelTests.swift
+[29/38] Compiling CoachKitTests CoachDetailRefreshTests.swift
+[30/38] Compiling CoachKitTests StudentRosterCancellationTests.swift
+[31/38] Compiling CoachKitTests CoachRootViewTests.swift
+[32/38] Compiling CoachKitTests CoachChatWiringTests.swift
+[33/38] Compiling CoachKitTests CoachEvaluationSealTests.swift
+[34/38] Compiling CoachKitTests CoachRefreshCancellationTests.swift
+[35/38] Compiling CoachKitTests CoachSecondaryCancellationTests.swift
+[36/39] Compiling CoachKitTests StudentRosterViewModelTests.swift
+[37/39] Emitting module CoachKitTests
+[37/39] Write Objects.LinkFileList
+[38/39] Linking CoachKitPackageTests
+Build complete! (8.96s)
+Test Suite 'All tests' started at 2026-11-16 15:41:32.611.
+Test Suite 'All tests' passed at 2026-11-16 15:41:32.612.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CoachSecondaryCancellationTests started.
+◇ Suite "CoachKit localization runtime" started.
+◇ Test amrapDefersRepsAndKeepsCue() started.
+◇ Test legacyMarkerCoachProjectionKeepsCanonicalIntensity() started.
+◇ Test planningCountPickerDecrementButtonSubtractsStep() started.
+◇ Test draftExercisesMapToDomainExercises() started.
+◇ Test planningNumberFieldEmptyInputResetsToZero() started.
+◇ Test acceptSheetSealsEvaluationChoice() started.
+◇ Test growthLoadingRendersProgressWithoutFlashingEmptyState() started.
+◇ Suite "Coach self-added detail" started.
+◇ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() started.
+◇ Suite "Coach chat status subtitle" started.
+◇ Suite "Coach week overview · completion" started.
+◇ Suite "Coach today formatting" started.
+◇ Test expiringSoonOnlyWithin24Hours() started.
+◇ Test notTrainedSignalStaysSilentBelowThreshold() started.
+◇ Test inMemoryListIsNewestFirst() started.
+◇ Test step5OneRMOnlyAvailableForMainLiftFamily() started.
+◇ Test step6ToggleAppliedWeekNeverAddsW1() started.
+◇ Test aggregatorCarriesStudentVideoSetLogID() started.
+◇ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() started.
+◇ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() started.
+◇ Test plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test exerciseUsageTrackerTracksMultipleIDsIndependently() started.
+◇ Test inMemoryReturnsSeedNewestFirst() started.
+◇ Test rejectRemovesItemSilently() started.
+◇ Test sharedRPE() started.
+◇ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() started.
+◇ Test daySectionsGroupByTrainingDayNewestFirst() started.
+◇ Test accessorySearchFoldsBarCharacterAcrossSpellings() started.
+◇ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test skipEvaluationStudentChainSkipsCompleteStep() started.
+◇ Test inviteURLUsesBackendBaseAndUngroupedCode() started.
+◇ Suite "Coach week overview" started.
+◇ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() started.
+◇ Test step1ShowsOnlyFourWeekCardForRegularStudent() started.
+◇ Suite "Coach video feedback workbench presentation" started.
+◇ Test trainingDayTokensMapToWeekdayInts() started.
+◇ Test step6AddRuleAppendsWithDisplayOrder() started.
+◇ Test triageSignalsCanCoexistForOneStudent() started.
+◇ Test loadEntersFirstSaveModeWithoutExistingSummary() started.
+◇ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() started.
+◇ Test incompleteSelectionThrows() started.
+◇ Test noSignalWhenRecentLogAlreadyHasFeedback() started.
+◇ Test composerClearsExerciseWhenLinkedDayChanges() started.
+◇ Test profileSummaryReturnsNilForEmptyFields() started.
+◇ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() started.
+◇ Test step5ToggleIntensityModePreservesPreviousValues() started.
+◇ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() started.
+◇ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() started.
+◇ Test videoQueueLoadsItemsNewestFirst() started.
+◇ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() started.
+◇ Test step6DeleteRuleRemovesAndReorders() started.
+◇ Test everyAliasCanonicalResolvesUniquely() started.
+◇ Test step7SetCurrentPreviewWeekClampsToPlanBounds() started.
+◇ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() started.
+◇ Test trailingAndRepeatedOperatorsAreForgiving() started.
+◇ Test blankSkipReasonIsDroppedNotSentEmpty() started.
+◇ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() started.
+◇ Suite "CoachKit localization" started.
+◇ Test perSetRPEFromFloatDigits() started.
+◇ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() started.
+◇ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() started.
+◇ Test planningCountPickerIncrementDisabledAtUpperBound() started.
+◇ Test step5RPEValueIsClampedIntoRange() started.
+◇ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() started.
+◇ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() started.
+◇ Suite CoachRefreshCancellationTests started.
+◇ Test accessoryMatchListSectionAddButtonTriggersCallback() started.
+◇ Test handoffWorkspaceUsesCurrentCycleRatherThanUpcomingEmptyPlan() started.
+◇ Test accessoryRepositoryFiltersSingleFacetSingleValue() started.
+◇ Test finishWritesDraftAndMarksFlowFinished() started.
+◇ Test exerciseUsageTrackerStartsAtZero() started.
+◇ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() started.
+◇ Test step7DerivedPreviewReflectsWeightRule() started.
+◇ Test bannerHiddenWhenNoEvaluationOrCompleted() started.
+◇ Test previewCatalogAllExercisesHaveValidEnums() started.
+◇ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() started.
+◇ Test planningCountPickerEnumeratesTagsByStepWithinRange() started.
+◇ Test blankFlowOneRMStaysNil() started.
+◇ Test draftMappingEncodesRulesEmptyAndNonEmpty() started.
+◇ Test statusCountsRemainingDaysForTimeLimited() started.
+◇ Test coachRootViewInitializes() started.
+◇ Test step5TargetRepsIsClampedToAtLeastOne() started.
+◇ Test markStudentActiveDropsInEvaluationBadgeInPlace() started.
+◇ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() started.
+◇ Test composerSurfacesSendFailure() started.
+◇ Test "student detail replaces the zero-progress plan shell with guidance" started.
+◇ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() started.
+◇ Test percentTopLeftEmptyWithCue() started.
+◇ Test messageBadgeIncludesVideosAndChatUnread() started.
+◇ Test queueLoadsPendingItemsAndExposesCount() started.
+◇ Test planningCountPickerTagValueRoundTrips() started.
+◇ Test regenerateRevokesOldPersonalCode() started.
+◇ Test divideByZeroShowsPlaceholderAndCommitsZero() started.
+◇ Test step2RendersDisabledTemplateEntrypoints() started.
+◇ Test projectionMapsSingleWeekSingleExerciseHappyPath() started.
+◇ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() started.
+◇ Test handoffReceivingNamesVideoFromCurrentPlanRatherThanUpcoming() started.
+◇ Test timeLimitedCreationCarriesExpiry() started.
+◇ Test accessoryFiltersEmptyStaticHasNoFacetSelections() started.
+◇ Test exerciseUsageTrackerIncrementsCount() started.
+◇ Test "roster shows loading before empty and distinguishes search misses" started.
+◇ Test demoSeedHasPersonalPlusTwoSecondaryCodes() started.
+◇ Test "markers resolved for a previous video never render under a newer one" started.
+◇ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() started.
+◇ Test previewCatalogCompetitionStancesMatchBackendMetadata() started.
+◇ Test previewCatalogCoversAllExerciseTypes() started.
+◇ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() started.
+◇ Test muscleGroupTextCoversAllEightAllowedGroups() started.
+◇ Test repickingAnotherStudentDropsPreviousStudentSlots() started.
+◇ Test draftSetSpecRoundTripsRestFields() started.
+◇ Test restDayHasNoExercises() started.
+◇ Test step6RuleIncrementRoundsToPlanningIncrement() started.
+◇ Suite StudentRosterCancellationTests started.
+◇ Test step5W1SetSpecRestoresFromDraftStore() started.
+◇ Test readinessFatigueTextHandlesNoFatigue() started.
+◇ Test asPrescribedEmptyWeightStillShowsDash(mode:) started.
+◇ Test completeNotifiesCompletionCallback() started.
+◇ Test step6ViewRendersEmptyRulesState() started.
+◇ Test projectionWeightModeSetHasWeightAndNilRPE() started.
+◇ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() started.
+◇ Test coachPercentageTargetKeepsItsAnchorAlongsideConvertedWeight() started.
+◇ Test prefillProfileMissReturnsNilWithNotice() started.
+◇ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() started.
+◇ Test draftSetSpecPreservesNonNilRepsMax() started.
+◇ Test profileSummaryFormatsKeyFields() started.
+◇ Test composerSendsTrimmedTextWithOptionalLinks() started.
+◇ Test "marker actions update the current item and marker load failures stay hidden" started.
+◇ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() started.
+◇ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() started.
+◇ Test step5SetCountIsClampedToAtLeastOne() started.
+◇ Test padDigitsAppendWithTwoDecimalPlaces() started.
+◇ Test "single-student video list renders loading, failure, and empty distinctly" started.
+◇ Test exerciseMustBeBoundAndAllSetsComplete() started.
+◇ Test ladderHandlesFractionalStep() started.
+◇ Test adaptationIntentLoadsSlotsOnBootstrap() started.
+◇ Suite "Coach day detail set numbers" started.
+◇ Test step4ScreenRendersSelectedSectionAndLibraryButton() started.
+◇ Test perSetWeightList() started.
+◇ Test profileSharesOnlyOnChinaTrack() started.
+◇ Test projectionSkipsExerciseMissingFromCatalog() started.
+◇ Test traditionalSetInputMatchesSimplifiedParsing() started.
+◇ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() started.
+◇ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() started.
+◇ Test weightInputFieldNegativeOneRMReturnsZero() started.
+◇ Test step4ViewRendersMainLiftAndAccessoryCards() started.
+◇ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() started.
+◇ Test tempoSuffixStrippedFromName() started.
+◇ Test adaptationIntentPresetsStudentDurationAndKind() started.
+◇ Test "dashboard with zero students shows invitation guidance" started.
+◇ Test inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test coachProfileUsesBackendNameWhenPresent() started.
+◇ Test operationsEvaluateWithMultiplicationPrecedence() started.
+◇ Test assembledTreeIsInternallyLinked() started.
+◇ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() started.
+◇ Test weekDerivationAppliesWeightIncrease() started.
+◇ Test weekCardRendersDerivedWeekFooter() started.
+◇ Test draftStartsEmptyForZeroAndFormattedOtherwise() started.
+◇ Test weightInputFieldZeroOneRMReturnsZero() started.
+◇ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() started.
+◇ Test draftStoreSavesAndLoadsDraft() started.
+◇ Test statusTextFlipsToOverdueCopyPastExpectedEnd() started.
+◇ Test newCatalogExercisesBindExactly(name:) started.
+◇ Test planNeedReasonDetectsEndedCycle() started.
+◇ Test projectionExpandsMultipleSetsSortedBySetNumber() started.
+◇ Test sealedStudentDetailDoesNotRenderEvaluationBanner() started.
+◇ Test projectionSortsDaysChronologicallyByDayOfWeek() started.
+◇ Test videoQueueRejectsBlankFeedbackWithoutDropping() started.
+◇ Suite "Coach day ownership" started.
+◇ Test rosterMovesToFailedStateWhenStudentsCannotLoad() started.
+◇ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() started.
+◇ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() started.
+◇ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() started.
+◇ Test barCharacterFoldsBothWays() started.
+◇ Suite "Coach today todo ordering" started.
+◇ Test prefilledEquipmentSeedsDefaultAccessoryFilters() started.
+◇ Test step7PublishOfCompletePlanFinishesWithoutIssues() started.
+◇ Test accessorySearchMatchesEnglishNameCaseInsensitively() started.
+◇ Test planningNumberFieldDecrementButtonSubtractsStep() started.
+◇ Test inMemoryRevokeUnknownIdThrowsNotFound() started.
+◇ Test progressionRuleTypeRawValuesStaySnakeCase() started.
+◇ Test noEvaluationIsNotALoadFailure() started.
+◇ Test navigationMovesForwardAndBackWithoutDroppingFields() started.
+◇ Test coachProfileLogoutRunsInjectedAction() started.
+◇ Test weightInputFieldRoundsRawInputBeforeConverting() started.
+◇ Test previewRepositoryStudentIDsAreStableAcrossLaunches() started.
+◇ Test percentStyleMathViaMultiply() started.
+◇ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() started.
+◇ Test draftStoreDeleteAllRemovesEveryDraft() started.
+◇ Test adaptationDraftNameUsesAdaptationTemplate() started.
+◇ Test case passing 1 argument rir → 0 to plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test draftStoreDeleteDraftRemovesMatchingTrainee() started.
+◇ Test endDateSpansSelectedWeeks() started.
+◇ Test step3RendersPerDayMainLiftPickers() started.
+◇ Test case passing 1 argument rir → 2 to plannedCoachProjectionKeepsActualRIR(_:) started.
+◇ Test percentPresetsNormalizeClampDedupeSortCap() started.
+◇ Test revokedWinsOverEverything() started.
+◇ Test rosterLoadsStudentsAndComputesAttentionBadge() started.
+◇ Test requiredFieldsGateSaving() started.
+◇ Test previewCatalogContainsFourSyntheticCompetitionLifts() started.
+◇ Test inMemoryPlaybackURLHitAndMiss() started.
+◇ Test workspaceChildCancellationKeepsRows(urlCancellation:) started.
+◇ Test draftSetSpecPreservesNilRepsMax() started.
+◇ Test case passing 2 arguments query → "臥推", canonical → "杠铃卧推" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test aggregatorResolvesExerciseNameFromPlan() started.
+◇ Test "receiving inbox never renders empty before its initial load finishes" started.
+◇ Test rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+◇ Test detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test case passing 2 arguments query → "硬舉", canonical → "传统硬拉" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test weightInputFieldShowsPercentConversionWhenOneRMExists() started.
+◇ Test degradedSummaryReportsIncomplete() started.
+◇ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() started.
+◇ Test notTrainedSignalDoesNotCountShiftedOriginalDates() started.
+◇ Test case passing 2 arguments query → "相撲硬舉", canonical → "相扑硬拉" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test case passing 2 arguments query → "二頭彎舉", canonical → "二头弯举" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() started.
+◇ Test planningNumberFieldTextFieldClampsAboveRange() started.
+◇ Test draftMappingEncodesAndDecodesSetSpec() started.
+◇ Test studentGroupsAreOnePerStudentNewestUploadFirst() started.
+◇ Test traditionalDemoVideoNamesUseCatalogProvenance() started.
+◇ Test completionChainRunsPutThenCompleteThenSoftRecommendation() started.
+◇ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() started.
+◇ Test case passing 2 arguments query → "槓鈴", canonical → "杠铃卧推" to accessorySearchAcceptsTraditionalChinese(query:canonical:) started.
+◇ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() started.
+◇ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() started.
+◇ Test step6UpdateRuleMutatesByID() started.
+◇ Test domainPlanDaysAndExercisesRebuildDraft() started.
+◇ Test planningNumberFieldDecrementDisabledAtLowerBound() started.
+◇ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() started.
+◇ Test intentResumesExistingDraftInsteadOfOverwriting() started.
+◇ Test draftProgressionRuleEncodesDecimalAsString() started.
+◇ Test dayColumnsUseFiveColumnStride() started.
+◇ Test planNeedReasonSkipsRunningCycle() started.
+◇ Test transportFailureOnCompleteKeepsBannerWithError() started.
+◇ Test step5ZeroOneRMIsTreatedAsUnavailable() started.
+◇ Test detailAppendPostedFeedbackRefreshesLatestOverview() started.
+◇ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() started.
+◇ Test inMemoryRepositoryFiltersMainLiftCatalog() started.
+◇ Test assemblesPerSetTargetsAndRenumbersWeeks() started.
+◇ Test inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() started.
+◇ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() started.
+◇ Test percentPresetStoreRoundTripsNormalized() started.
+◇ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() started.
+◇ Test tempoFloatBecomesCoachNote() started.
+◇ Test exactFoldBindsLowBarSquat() started.
+◇ Test step7CurrentPreviewWeekDefaultsToOne() started.
+◇ Test weightInputFieldExplainsMissingOneRM() started.
+◇ Test coachInboxPrioritizesVideosThenUnreadThenRecency() started.
+◇ Test accessoryLibrarySheetRendersFilterAndMatchSections() started.
+◇ Test failedCompleteDoesNotNotifyCompletionCallback() started.
+◇ Test growthMissingSeriesLoadsAsExistingEmptyState() started.
+◇ Test step4KeepsFiltersAndSelectionsIndependentPerDay() started.
+◇ Test singleWeightAppliesToEverySet() started.
+◇ Test singleLegDeadliftAndSingleLegRDLStayDistinct() started.
+◇ Test blankFlowKeepsAllSevenSlots() started.
+◇ Test workspaceViewModelEmptyCoachFallsBackToNoSections() started.
+◇ Test dayChipBarRendersAssignedDayChips() started.
+◇ Test customProgressionRuleRoundTripsSequenceAndDimension() started.
+◇ Test "native interpolation preserves byte-exact Chinese rendering" started.
+◇ Test ageDerivesFromBirthDateClientSide() started.
+◇ Test inMemoryRepositoryStoresPublishedPlans() started.
+◇ Test projectionMatchesStudentGoldenMatrixForAllForms() started.
+◇ Test "native plural interpolation selects English variants at runtime" started.
+◇ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() started.
+◇ Test editModeSaveUsesNotifyCheckbox() started.
+◇ Test waitingTextScalesWithElapsedTime() started.
+◇ Test "video set information distinguishes unlinked videos from load failures" started.
+◇ Test aggregatorSkipsStudentsWithNoVideos() started.
+◇ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() started.
+◇ Test coachCompleteRequiresRealLoad() started.
+◇ Test planningNumberFieldFormattedDisplayFormatsValue() started.
+◇ Test draftMappingExpandsSetSpecToPlanSets() started.
+◇ Test defaultStartDateIsNextMonday() started.
+◇ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() started.
+◇ Test previewCatalogHasNoDuplicateChineseNames() started.
+◇ Test previewCatalogCoversAllLiftFamilies() started.
+◇ Test percentOfBaseLandsOnPlateGrid() started.
+◇ Test deselectingFirstWeekRenumbersRemainingToOne() started.
+◇ Test step6CustomSequenceLengthTracksAppliedWeeks() started.
+◇ Test legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test chinaInvitationActionsPutShareBeforeCopy() started.
+◇ Test detailLoadsVideoWallAndTodayReadiness() started.
+◇ Test evaluationStudentCannotSelectFourWeeks() started.
+◇ Test emptyStateHasNoPersonalCode() started.
+◇ Test weekStartClampsToCycleBounds() started.
+◇ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() started.
+◇ Test oneRMTrioStripsTrailingZeros() started.
+◇ Test blankFlowLoadsSlotsFromSelectedStudentProfile() started.
+◇ Test retryAfterTransportFailureRecoversBanner() started.
+◇ Test notTrainedSignalFiresAtThreshold() started.
+◇ Test draftMappingDecodeSetSpecReturnsNilForNilData() started.
+◇ Test weekStartAnchorsToPlanWeekContainingToday() started.
+◇ Test oneRMsMapPerFamilyDroppingMissing() started.
+◇ Test intensityModeToggleRendersBothModes() started.
+◇ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() started.
+◇ Test step0RendersThreeStudentSections() started.
+◇ Test corruptDateRowSecondWeekStillParses() started.
+◇ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() started.
+◇ Test generatePersonalCodeShowsUpAfterReload() started.
+◇ Test weightInputFieldPercentToKgRoundsResultToHalfKg() started.
+◇ Test draftProgressSummaryMapsStepNameAndWeeks() started.
+◇ Test personalPermanentNeverExpiresOrExhausts() started.
+◇ Test inMemoryRevokeIsIdempotent() started.
+◇ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() started.
+◇ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() started.
+◇ Test planningNumberFieldTextFieldClampsBelowRange() started.
+◇ Test handoffRosterUsesCurrentTrainingDaysRatherThanLatestPublished() started.
+◇ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() started.
+◇ Test bootstrapRestoresSavedDraftStepAndAssignments() started.
+◇ Test legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test weightInputFieldRoundTripStableAtCommonBenchmark() started.
+◇ Test statusIsActiveForUnusedSingleUse() started.
+◇ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() started.
+◇ Test unchangedPlannedOnlyDetailHasNoAddedCaption() started.
+◇ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() started.
+◇ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() started.
+◇ Test composerRejectsEmptyText() started.
+◇ Test loadPrefillsEditModeFromExistingSummary() started.
+◇ Test previewCatalogTotalCountIsTwelveSixteen() started.
+◇ Test corruptDateRowStillOpensABlock() started.
+◇ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() started.
+◇ Test planningNumberFieldIncrementButtonAddsStep() started.
+◇ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() started.
+◇ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() started.
+◇ Test "active and in-evaluation students read as 活跃" started.
+◇ Test equipmentFilterFollowsGymTierTable() started.
+◇ Test traditionalAmbiguousNamesRemainUnbound() started.
+◇ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() started.
+◇ Test "abnormal students read as 待关注, not 活跃" started.
+◇ Test videoGridPlayExchangesIDForPresignedURL() started.
+◇ Test inMemoryRepositoryFetchesAllStudents() started.
+◇ Test "unknown status shows no subtitle instead of claiming active" started.
+◇ Test directMessageEntryReopensTheSameConversation() started.
+◇ Test "planning step zero replaces empty student sections with guidance" started.
+◇ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() started.
+◇ Test weightInputFieldKgToPercentBasicConversion() started.
+◇ Test bootstrapLoadsStudentsAndCatalog() started.
+◇ Test weekDerivationDispatchesCustomRuleToEachDimension() started.
+◇ Test accessoryFiltersAreEquatableAndHashable() started.
+◇ Test restoredConfigureRulesPathDoesNotDuplicateStep4() started.
+◇ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() started.
+◇ Test blankFlowWithEvaluationStudentForcesAdaptationKind() started.
+◇ Test weekDerivationReturnsW1Baseline() started.
+◇ Test videoQueueLoadFailureMovesToFailed() started.
+◇ Test draftSetSpecRoundTripsWeightMode() started.
+◇ Test blankFlowLoadsOneRMAndEquipmentFromProfile() started.
+◇ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() started.
+◇ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() started.
+◇ Test planningCountPickerClampsExternalValueAboveUpperBound() started.
+◇ Test draftDaysMapToDomainDays() started.
+◇ Test "a log outside the pairing window never counts as completion" started.
+◇ Test step6ProceedAllowsEmptyRules() started.
+◇ Test detailDefinesFiveSectionsInSpecOrder() started.
+◇ Test "completion is re-decided per calendar, not frozen at fetch time" started.
+◇ Test exactMatchWinsOverAlias() started.
+◇ Test step5ProceedRoutesFourWeekPlanToRules() started.
+◇ Test completionChainDegradesWhenCompleteFailsButSummarySaved() started.
+◇ Test rejectExpiredBannerAndRefresh() started.
+◇ Test traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test videoQueueSendFeedbackDropsRowAndToasts() started.
+◇ Test step6RuleRequiresExerciseBeforeShowingValues() started.
+◇ Test step6ViewRendersUncoveredSummary() started.
+◇ Test "formats the mockup month-day and weekday with an explicit calendar" started.
+◇ Test ladderClampsAtCap() started.
+◇ Test statusIsUsedWhenSingleUseBudgetExhausted() started.
+◇ Test case passing 1 argument mode → .rpe to asPrescribedEmptyWeightStillShowsDash(mode:) started.
+◇ Test case passing 1 argument mode → .freeWeight to asPrescribedEmptyWeightStillShowsDash(mode:) started.
+◇ Test executionDaysShowCurrentPlanWeekRows() started.
+◇ Test statusFlipsToExpiredAtBoundary() started.
+◇ Test aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test notTrainedSignalIgnoresTodayAndCompletedDays() started.
+◇ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() started.
+◇ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() started.
+◇ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() started.
+◇ Test weekDerivationAppliesRPEIncrease() started.
+◇ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() started.
+◇ Test parsesTwoWeekFixtureStructure() started.
+✔ Test legacyMarkerCoachProjectionKeepsCanonicalIntensity() passed after 0.014 seconds.
+◇ Test rosterTriageSignalsStayScopedPerStudent() started.
+◇ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() started.
+◇ Test planningStepCodableRoundTripsEveryCase() started.
+◇ Test weekDerivationUsesHigherDisplayOrderForSameDimension() started.
+◇ Test chinaInviteCopyIncludesLinkGroupedCodeAndCoachWhileGlobalCopiesCode() started.
+◇ Test previewCatalogHasNoDuplicateIDs() started.
+◇ Test insertingBaseReplacesCurrentOperand() started.
+◇ Test planNeedReasonDetectsMissingCurrentPlan() started.
+◇ Test weekDerivationAppliesRPEDecreaseAndClamps() started.
+◇ Test demoSeedPendingVideosAreWellFormed() started.
+◇ Test assemblerMaterializesEveryWeekFromTheW1Draft() started.
+◇ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() started.
+◇ Test planningNumberFieldEditingValueCanPersistBeforeBlur() started.
+◇ Test steppersClampAtZeroAndStayOnHalfGrid() started.
+◇ Test draftSetSpecRoundTripsRPEMode() started.
+◇ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() started.
+◇ Test detailReadinessDistinguishesNotFiledFromFetchFailure() started.
+◇ Test coachInboxCountAddsPendingVideosAndUnreadMessages() started.
+◇ Test weekCardRendersOneWeekTitle() started.
+◇ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() started.
+◇ Test exerciseUsageTrackerResetClearsCounts() started.
+◇ Test statusTextCountsDownFromExpectedEnd() started.
+◇ Test detectsDateRowsAndSplitsBlocks() started.
+◇ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() started.
+◇ Test revokeMovesCodeToDefunctSection() started.
+◇ Test unmatchedNameFallsThroughToCandidates() started.
+◇ Test detailLoadsExecutionAndFeedbackSummaries() started.
+◇ Test "rapid item changes reject stale playback and set-log results" started.
+◇ Test handoffDetailUsesCurrentExercisesRatherThanLatestPublished() started.
+◇ Test parsesSetsAndRepsForms() started.
+◇ Test editorCompletionChainNotifiesCompletionCallback() started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test draftTrainingPlanMapsToDomainPlan() started.
+◇ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() started.
+◇ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() started.
+◇ Test legacyFillW1IntensityDraftRestoresToSingleStep4() started.
+◇ Test growthFailureRendersRetryAndRetrySuccessShowsData() started.
+◇ Test videoQueueSendFailureKeepsRowAndBanners() started.
+◇ Test unmatchedNameDoesNotBind() started.
+◇ Test notTrainedSignalCountsMissesAboveThreshold() started.
+◇ Test "marker write failures surface instead of silently dropping the action" started.
+◇ Test readinessScalesTextShowsRawValuesWithoutInversion() started.
+◇ Test setNeedsRepsAndAValidTarget() started.
+◇ Test draftProgressionRulePreservesExerciseIDSet() started.
+◇ Test completeHidesBannerOnSuccess() started.
+◇ Test case passing 1 argument name → "离心卧推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "弹力带窄推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "安全杠节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "低杠位暂停深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() started.
+◇ Test case passing 1 argument name → "低杠位节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test allDayCoachShowsActualAndTargetEvenWhenTheyMatch() started.
+✔ Test expiringSoonOnlyWithin24Hours() passed after 0.052 seconds.
+◇ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() started.
+◇ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() started.
+◇ Test completionChainIgnoresConcurrentCompleteConflict() started.
+◇ Test weekDerivationCarriesRestFieldsUnchanged() started.
+◇ Test bundledAliasSeedIncludesTaiwanVocabulary() started.
+✔ Test notTrainedSignalStaysSilentBelowThreshold() passed after 0.055 seconds.
+◇ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() started.
+◇ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() started.
+◇ Test step5WeightValueRoundsToHalfKilogramIncrement() started.
+◇ Test weightInputFieldPercentToKgBasicConversion() started.
+◇ Test prefilledOneRMFeedsOneRMLookupForMainLifts() started.
+◇ Test multiLineCellSplitsIntoAccessories() started.
+◇ Test weekDerivationCombinesDifferentDimensions() started.
+◇ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() started.
+◇ Test step5UpdateW1SetSpecWritesDraftData() started.
+◇ Test planningCountPickerSnapsValueOutsideGrid() started.
+◇ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() started.
+◇ Test step5RestSecondsPerSetClampsToSetCount() started.
+◇ Test planningCountPickerDecrementDisabledAtLowerBound() started.
+◇ Test saveDraftNeverNotifiesInFirstSaveMode() started.
+◇ Test aliasBindsWhenNoExactMatch() started.
+◇ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() started.
+◇ Test readinessFatigueTextOrdersByAllowedChipOrder() started.
+◇ Test trainingYearsNotchLabels() started.
+◇ Test step4ProceedAllowsEmptyAccessoryDays() started.
+◇ Test planningNumberFieldIncrementDisabledAtUpperBound() started.
+◇ Test acceptMachineCodeErrorsBannerAndForceRefresh() started.
+◇ Test weekDerivationAppliesWeightDecrease() started.
+◇ Test localDayStringMatchesCheckinDateWireShape() started.
+✔ Test plannedCoachProjectionKeepsActualRIR(_:) with 2 test cases passed after 0.072 seconds.
+◇ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() started.
+◇ Test weekCardRendersDaySectionsAndRows() started.
+◇ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() started.
+◇ Test planningCountPickerIncrementButtonAddsStep() started.
+◇ Test draftStoreLoadDraftKeepsOtherStudents() started.
+◇ Test weekDerivationIgnoresRulesForOtherExercises() started.
+◇ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() started.
+◇ Test bannerVisibleOnlyForLiveEvaluation() started.
+◇ Test step7ViewRendersFourWeekTabTitles() started.
+✔ Test aggregatorCarriesStudentVideoSetLogID() passed after 0.073 seconds.
+◇ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() started.
+◇ Test aggregatorLinkedClipDropsAfterSendAndRefetch() started.
+◇ Test step6ViewRendersSingleRuleChips() started.
+◇ Test publishesThroughRepository() started.
+◇ Test staleAssignmentOutsidePreferredSlotsStaysVisible() started.
+◇ Test backoffKeepsCueAndType() started.
+◇ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() started.
+◇ Test planNeedReasonDetectsCycleEndingThisWeek() started.
+◇ Test step4UpdateFiltersReloadsMatchesForDay() started.
+✔ Test inMemoryReturnsSeedNewestFirst() passed after 0.073 seconds.
+◇ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() started.
+◇ Test case passing 1 argument urlCancellation → true to workspaceChildCancellationKeepsRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to workspaceChildCancellationKeepsRows(urlCancellation:) started.
+✔ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() passed after 0.074 seconds.
+◇ Test case passing 1 argument urlCancellation → true to rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to rosterChildCancellationKeepsCompleteRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to detailCatalogCancellationKeepsServerNames(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to detailSecondaryCancellationKeepsSections(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) started.
+◇ Test "column mapping uses the supplied positive or negative time zone" started.
+◇ Test "aggregates real plan dates into Monday through Sunday cells" started.
+◇ Test "ISO week and columns stay correct across a calendar-year boundary" started.
+◇ Test "current-week training days produce the expected progress and cells" started.
+✔ Test inMemoryListIsNewestFirst() passed after 0.075 seconds.
+◇ Test "an empty current week never falls back to whole-plan totals" started.
+◇ Test "the same retained dates remap when Sunday rolls into Monday" started.
+✔ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() passed after 0.075 seconds.
+◇ Test "global queue advances across students and wraps after its final item" started.
+◇ Test "post-send navigation resolves from the latest remaining queue" started.
+◇ Test "empty student list stays alive while the global workbench advances" started.
+◇ Test "zero-based set index displays as one-based" started.
+◇ Test "missing RPE stays absent instead of becoming zero" started.
+◇ Test "RPE formats whole and half values without decimal noise" started.
+◇ Test "unlinked video resolves no set-info card" started.
+◇ Test "pending video badge reuses resolved set data and display-ready ordinal" started.
+◇ Test "missing RPE card renders the localized em dash" started.
+◇ Test "empty queue has no position or post-send next item" started.
+✔ Test trainingDayTokensMapToWeekdayInts() passed after 0.076 seconds.
+✔ Test triageSignalsCanCoexistForOneStudent() passed after 0.075 seconds.
+✔ Test incompleteSelectionThrows() passed after 0.076 seconds.
+✔ Test noSignalWhenRecentLogAlreadyHasFeedback() passed after 0.076 seconds.
+✔ Test profileSummaryReturnsNilForEmptyFields() passed after 0.076 seconds.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+✔ Test inviteURLUsesBackendBaseAndUngroupedCode() passed after 0.086 seconds.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 0.086 seconds.
+✔ Test accessorySearchFoldsBarCharacterAcrossSpellings() passed after 0.086 seconds.
+✔ Test amrapDefersRepsAndKeepsCue() passed after 0.087 seconds.
+✔ Test sharedRPE() passed after 0.087 seconds.
+✔ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() passed after 0.088 seconds.
+✔ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() passed after 0.092 seconds.
+✔ Test trailingAndRepeatedOperatorsAreForgiving() passed after 0.095 seconds.
+◇ Test "exercise display uses catalog English without changing the canonical name" started.
+◇ Test "logout message does not prescribe a login identity" started.
+◇ Test "every countable English value is plural-aware" started.
+◇ Test "every string has complete Chinese and English translations" started.
+◇ Test "English catalog does not contain generated placeholder labels" started.
+◇ Test "critical Chinese source strings stay byte-exact" started.
+◇ Test "count strings provide an English singular variation" started.
+✔ Test perSetRPEFromFloatDigits() passed after 0.097 seconds.
+◇ Test growthCancellation(urlCancellation:) started.
+◇ Test videoQueueCancellation(urlCancellation:) started.
+◇ Test bindQueueCancellation(urlCancellation:) started.
+◇ Test detailCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument mode → .weight to legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test workspaceCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument mode → .rpe to legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) started.
+◇ Test inviteCodesCancellation(urlCancellation:) started.
+✔ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() passed after 0.102 seconds.
+✔ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() passed after 0.102 seconds.
+◇ Test case passing 1 argument note → "自重" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test case passing 1 argument note → "自重 慢下放" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+◇ Test case passing 1 argument note → "BODYWEIGHT" to legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) started.
+✔ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() passed after 0.103 seconds.
+✔ Test statusCountsRemainingDaysForTimeLimited() passed after 0.103 seconds.
+✔ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() passed after 0.108 seconds.
+✔ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() passed after 0.108 seconds.
+✔ Test messageBadgeIncludesVideosAndChatUnread() passed after 0.108 seconds.
+✔ Test percentTopLeftEmptyWithCue() passed after 0.108 seconds.
+✔ Test divideByZeroShowsPlaceholderAndCommitsZero() passed after 0.108 seconds.
+✔ Test projectionMapsSingleWeekSingleExerciseHappyPath() passed after 0.109 seconds.
+✔ Test handoffReceivingNamesVideoFromCurrentPlanRatherThanUpcoming() passed after 0.109 seconds.
+✔ Test accessoryFiltersEmptyStaticHasNoFacetSelections() passed after 0.109 seconds.
+✔ Test muscleGroupTextCoversAllEightAllowedGroups() passed after 0.109 seconds.
+✔ Test draftSetSpecRoundTripsRestFields() passed after 0.109 seconds.
+◇ Test case passing 2 arguments query → "滑輪下拉", canonical → "高位下拉" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴窄臥推", canonical → "窄握卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "不碰胸暫停1秒槓鈴臥推（3cm)", canonical → "spoto 卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "保護槓重啟槓鈴深蹲", canonical → "架上(PIN)深蹲" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "彈力繩臥推", canonical → "弹力带卧推" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "彈力繩相撲硬舉", canonical → "弹力带辅助相扑硬拉" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴屈體划船", canonical → "杠铃划船" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "槓鈴早安", canonical → "早安式" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test case passing 2 arguments query → "啞鈴後腳抬高蹲", canonical → "后脚抬高分腿蹲" to traditionalTaiwanAliasesResolveAndSearch(query:canonical:) started.
+◇ Test realRefreshFailureStillFails() started.
+◇ Test loadedRosterStaysVisibleUntilRefreshIsCancelled() started.
+◇ Test cancelledInitialLoadReturnsToIdle() started.
+◇ Test cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+✔ Test readinessFatigueTextHandlesNoFatigue() passed after 0.189 seconds.
+✔ Test restDayHasNoExercises() passed after 0.190 seconds.
+✔ Test projectionWeightModeSetHasWeightAndNilRPE() passed after 0.189 seconds.
+◇ Test case passing 2 arguments rawName → "低杆深蹲", canonical → "低杠位深蹲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "卧推", canonical → "杠铃卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "传统硬拉", canonical → "比赛式传统硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑硬拉", canonical → "比赛式相扑硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "窄推", canonical → "窄握卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "长暂停卧推", canonical → "暂停卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带绕髋RDL", canonical → "弹力带绕髋罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "抓举握距RDL", canonical → "抓举握距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "前后站单腿罗拉", canonical → "前后站单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑RDL", canonical → "相扑罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "节奏RDL", canonical → "节奏罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿RDL", canonical → "单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(纯单腿)", canonical → "单腿罗马尼亚硬拉(纯单腿)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "B 站距 RDL", canonical → "B 站距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(B 站距)", canonical → "单腿罗马尼亚硬拉(B 站距)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "臀推", canonical → "杠铃臀冲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "器械胸推", canonical → "器械推胸" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "绳索夹胸", canonical → "绳索飞鸟" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带-腿外展", canonical → "弹力带髋外展" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单侧射手俯卧撑", canonical → "射手俯卧撑" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "坐姿推肩", canonical → "坐姿哑铃推举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "两头起", canonical → "V字上举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library/Application Support/default.store
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		90112 bytes
+CoreData: error:   File inode: 		434287
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+✔ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() passed after 0.384 seconds.
+CoreData: error: -
+CoreData: error:   644
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Information for file system
+CoreData: error: ---------------------------
+CoreData: error:   File system type: 		0x1a
+CoreData: error:   File system flags: 		0x4909080
+CoreData: error:   MNT_JOURNALED
+CoreData: error:   Total data blocks: 		120686613
+CoreData: error:   Free data blocks: 		5953263
+◇ Test case passing 2 arguments rawName → "帕洛夫推", canonical → "弹力带 pallof 推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+CoreData: error:   Free blocks for nonsuperuser:	5953263
+CoreData: error:   Total i-nodes: 			243427131
+CoreData: error:   File system ID: 		0x1000010, 0x1a
+CoreData: error:   Free i-nodes: 			238130520
+CoreData: error:   Owner UID: 			0
+CoreData: error:   Filesystem type name: 		apfs
+CoreData: error:   Mount on name: 			/System/Volumes/Data
+CoreData: error:   Mount from name: 		/dev/disk3s5
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library/Application Support
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		2624 bytes
+CoreData: error:   File inode: 		381341
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   700
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		3072 bytes
+CoreData: error:   File inode: 		381340
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   700
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		2176 bytes
+CoreData: error:   File inode: 		381333
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   750
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		160 bytes
+CoreData: error:   File inode: 		18416
+CoreData: error:   File user ID: 		0
+CoreData: error:   File group ID: 		80
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   755
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777232
+CoreData: error:   File Size: 		704 bytes
+CoreData: error:   File inode: 		2
+CoreData: error:   File user ID: 		0
+CoreData: error:   File group ID: 		0
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   755
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+◇ Test case passing 2 arguments rawName → "对握弯举", canonical → "绳索锤式弯举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+✔ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() passed after 0.411 seconds.
+✔ Test draftSetSpecPreservesNonNilRepsMax() passed after 0.411 seconds.
+◇ Test case passing 1 argument displayName → nil to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test case passing 1 argument displayName → "" to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test case passing 1 argument displayName → "   " to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+✔ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() passed after 0.412 seconds.
+✔ Test profileSummaryFormatsKeyFields() passed after 0.418 seconds.
+✔ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() passed after 0.423 seconds.
+✔ Test padDigitsAppendWithTwoDecimalPlaces() passed after 0.423 seconds.
+✔ Test exerciseMustBeBoundAndAllSetsComplete() passed after 0.424 seconds.
+✔ Test ladderHandlesFractionalStep() passed after 0.424 seconds.
+◇ Test "planned first set log renders hash one" started.
+◇ Test "free first set log renders hash one" started.
+✔ Test projectionSkipsExerciseMissingFromCatalog() passed after 0.424 seconds.
+✔ Test perSetWeightList() passed after 0.425 seconds.
+✔ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() passed after 0.425 seconds.
+✔ Test traditionalSetInputMatchesSimplifiedParsing() passed after 0.425 seconds.
+✔ Test tempoSuffixStrippedFromName() passed after 0.427 seconds.
+✔ Test weightInputFieldNegativeOneRMReturnsZero() passed after 0.427 seconds.
+✔ Test operationsEvaluateWithMultiplicationPrecedence() passed after 0.427 seconds.
+✔ Test assembledTreeIsInternallyLinked() passed after 0.431 seconds.
+✔ Test weekDerivationAppliesWeightIncrease() passed after 0.431 seconds.
+✔ Test draftStartsEmptyForZeroAndFormattedOtherwise() passed after 0.431 seconds.
+✔ Test weightInputFieldZeroOneRMReturnsZero() passed after 0.431 seconds.
+✔ Test inviteShareTitleUsesLocalizedFallback(language:) with 2 test cases passed after 0.432 seconds.
+✔ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() passed after 0.432 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() passed after 0.434 seconds.
+✔ Test planNeedReasonDetectsEndedCycle() passed after 0.432 seconds.
+✔ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() passed after 0.434 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetSingleValue() passed after 0.435 seconds.
+✔ Test projectionExpandsMultipleSetsSortedBySetNumber() passed after 0.433 seconds.
+✔ Test projectionSortsDaysChronologicallyByDayOfWeek() passed after 0.434 seconds.
+◇ Test sameWeekJumpDoesNotCompleteEarlierDay() started.
+◇ Test adhocOwnershipUsesTheSameWeekRule() started.
+◇ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() started.
+◇ Test unfinishedTrainingSettlementAndLegacyFallback() started.
+◇ Test detailOverviewRosterAndReminderShareCompletion() started.
+◇ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() started.
+◇ Test crossWeekOwnershipFallsBackToCalendarDate() started.
+✔ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() passed after 0.434 seconds.
+✔ Test barCharacterFoldsBothWays() passed after 0.434 seconds.
+◇ Test "orders videos, unread, missed training, then applications" started.
+◇ Test "returns no rows when every source is empty or non-actionable" started.
+✔ Test accessorySearchMatchesEnglishNameCaseInsensitively() passed after 0.434 seconds.
+✔ Test inMemoryRevokeUnknownIdThrowsNotFound() passed after 0.434 seconds.
+✔ Test progressionRuleTypeRawValuesStaySnakeCase() passed after 0.434 seconds.
+✔ Test weightInputFieldRoundsRawInputBeforeConverting() passed after 0.434 seconds.
+✔ Test previewCatalogCompetitionStancesMatchBackendMetadata() passed after 0.436 seconds.
+✔ Test percentStyleMathViaMultiply() passed after 0.435 seconds.
+✔ Test endDateSpansSelectedWeeks() passed after 0.435 seconds.
+✔ Test revokedWinsOverEverything() passed after 0.435 seconds.
+✔ Test percentPresetsNormalizeClampDedupeSortCap() passed after 0.435 seconds.
+✔ Test previewCatalogCoversAllExerciseTypes() passed after 0.437 seconds.
+✔ Test inMemoryPlaybackURLHitAndMiss() passed after 0.435 seconds.
+✔ Test draftSetSpecPreservesNilRepsMax() passed after 0.435 seconds.
+✔ Test aggregatorResolvesExerciseNameFromPlan() passed after 0.435 seconds.
+✔ Test degradedSummaryReportsIncomplete() passed after 0.435 seconds.
+✔ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() passed after 0.435 seconds.
+✔ Test notTrainedSignalDoesNotCountShiftedOriginalDates() passed after 0.436 seconds.
+✔ Test traditionalDemoVideoNamesUseCatalogProvenance() passed after 0.436 seconds.
+✔ Test draftProgressionRuleEncodesDecimalAsString() passed after 0.436 seconds.
+✔ Test planNeedReasonSkipsRunningCycle() passed after 0.436 seconds.
+✔ Test dayColumnsUseFiveColumnStride() passed after 0.436 seconds.
+✔ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() passed after 0.436 seconds.
+✔ Test assemblesPerSetTargetsAndRenumbersWeeks() passed after 0.436 seconds.
+✔ Test inMemoryRepositoryFiltersMainLiftCatalog() passed after 0.436 seconds.
+✔ Test inviteShareTitleUsesTrimmedCoachName(language:) with 2 test cases passed after 0.435 seconds.
+✔ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() passed after 0.435 seconds.
+✔ Test tempoFloatBecomesCoachNote() passed after 0.435 seconds.
+✔ Test exactFoldBindsLowBarSquat() passed after 0.435 seconds.
+✔ Test percentPresetStoreRoundTripsNormalized() passed after 0.435 seconds.
+✔ Test singleWeightAppliesToEverySet() passed after 0.433 seconds.
+✔ Test coachInboxPrioritizesVideosThenUnreadThenRecency() passed after 0.434 seconds.
+✔ Test customProgressionRuleRoundTripsSequenceAndDimension() passed after 0.433 seconds.
+✔ Test ageDerivesFromBirthDateClientSide() passed after 0.433 seconds.
+✔ Test "native interpolation preserves byte-exact Chinese rendering" passed after 0.433 seconds.
+✔ Test inMemoryRepositoryStoresPublishedPlans() passed after 0.433 seconds.
+✔ Test previewCatalogAllExercisesHaveValidEnums() passed after 0.440 seconds.
+✔ Test projectionMatchesStudentGoldenMatrixForAllForms() passed after 0.433 seconds.
+✔ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() passed after 0.433 seconds.
+✔ Test "native plural interpolation selects English variants at runtime" passed after 0.433 seconds.
+✔ Test waitingTextScalesWithElapsedTime() passed after 0.449 seconds.
+✔ Test aggregatorSkipsStudentsWithNoVideos() passed after 0.449 seconds.
+✔ Test newCatalogExercisesBindExactly(name:) with 5 test cases passed after 0.455 seconds.
+✔ Test coachCompleteRequiresRealLoad() passed after 0.449 seconds.
+✔ Test defaultStartDateIsNextMonday() passed after 0.449 seconds.
+✔ Test percentOfBaseLandsOnPlateGrid() passed after 0.449 seconds.
+✔ Test deselectingFirstWeekRenumbersRemainingToOne() passed after 0.449 seconds.
+◇ Test case passing 1 argument urlCancellation → true to growthCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to growthCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to videoQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to videoQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to bindQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to bindQueueCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to detailCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to detailCancellation(urlCancellation:) started.
+✔ Test legacyRealCoachPrescriptionKeepsLoadAndNote(mode:) with 2 test cases passed after 0.449 seconds.
+◇ Test case passing 1 argument urlCancellation → true to workspaceCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to workspaceCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → true to inviteCodesCancellation(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to inviteCodesCancellation(urlCancellation:) started.
+✔ Test oneRMTrioStripsTrailingZeros() passed after 0.449 seconds.
+✔ Test notTrainedSignalFiresAtThreshold() passed after 0.449 seconds.
+✔ Test oneRMsMapPerFamilyDroppingMissing() passed after 0.449 seconds.
+✔ Test corruptDateRowSecondWeekStillParses() passed after 0.449 seconds.
+✔ Test weightInputFieldPercentToKgRoundsResultToHalfKg() passed after 0.449 seconds.
+✔ Test draftProgressSummaryMapsStepNameAndWeeks() passed after 0.449 seconds.
+✔ Test personalPermanentNeverExpiresOrExhausts() passed after 0.449 seconds.
+✔ Test inMemoryRevokeIsIdempotent() passed after 0.449 seconds.
+✔ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() passed after 0.449 seconds.
+✔ Test previewRepositoryStudentIDsAreStableAcrossLaunches() passed after 0.456 seconds.
+✔ Test legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note:) with 3 test cases passed after 0.449 seconds.
+✔ Test weightInputFieldRoundTripStableAtCommonBenchmark() passed after 0.449 seconds.
+✔ Test statusIsActiveForUnusedSingleUse() passed after 0.449 seconds.
+✔ Test corruptDateRowStillOpensABlock() passed after 0.448 seconds.
+✔ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() passed after 0.448 seconds.
+✔ Test "active and in-evaluation students read as 活跃" passed after 0.448 seconds.
+✔ Test equipmentFilterFollowsGymTierTable() passed after 0.448 seconds.
+✔ Test "abnormal students read as 待关注, not 活跃" passed after 0.448 seconds.
+✔ Test inMemoryRepositoryFetchesAllStudents() passed after 0.448 seconds.
+✔ Test "unknown status shows no subtitle instead of claiming active" passed after 0.448 seconds.
+✔ Test weightInputFieldKgToPercentBasicConversion() passed after 0.448 seconds.
+✔ Test weekDerivationDispatchesCustomRuleToEachDimension() passed after 0.448 seconds.
+✔ Test accessoryFiltersAreEquatableAndHashable() passed after 0.448 seconds.
+✔ Test weekDerivationReturnsW1Baseline() passed after 0.448 seconds.
+✔ Test draftSetSpecRoundTripsWeightMode() passed after 0.448 seconds.
+✔ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() passed after 0.448 seconds.
+✔ Test "a log outside the pairing window never counts as completion" passed after 0.448 seconds.
+✔ Test "completion is re-decided per calendar, not frozen at fetch time" passed after 0.447 seconds.
+✔ Test exactMatchWinsOverAlias() passed after 0.447 seconds.
+✔ Test planningCountPickerDecrementButtonSubtractsStep() passed after 0.460 seconds.
+✔ Test previewCatalogContainsFourSyntheticCompetitionLifts() passed after 0.456 seconds.
+✔ Test singleLegDeadliftAndSingleLegRDLStayDistinct() passed after 0.451 seconds.
+✔ Test previewCatalogHasNoDuplicateChineseNames() passed after 0.450 seconds.
+✔ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() passed after 0.449 seconds.
+✔ Test previewCatalogCoversAllLiftFamilies() passed after 0.451 seconds.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 0.451 seconds.
+✔ Test previewCatalogTotalCountIsTwelveSixteen() passed after 0.449 seconds.
+✔ Test traditionalTaiwanAliasesResolveAndSearch(query:canonical:) with 9 test cases passed after 0.447 seconds.
+◇ Test case passing 1 argument urlCancellation → true to cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+◇ Test case passing 1 argument urlCancellation → false to cancelledRefreshKeepsLoadedRows(urlCancellation:) started.
+✔ Test "formats the mockup month-day and weekday with an explicit calendar" passed after 0.447 seconds.
+✔ Test ladderClampsAtCap() passed after 0.447 seconds.
+✔ Test statusIsUsedWhenSingleUseBudgetExhausted() passed after 0.447 seconds.
+✔ Test statusFlipsToExpiredAtBoundary() passed after 0.446 seconds.
+✔ Test notTrainedSignalIgnoresTodayAndCompletedDays() passed after 0.446 seconds.
+✔ Test traditionalAmbiguousNamesRemainUnbound() passed after 0.449 seconds.
+✔ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() passed after 0.446 seconds.
+✔ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() passed after 0.446 seconds.
+✔ Test weekDerivationAppliesRPEIncrease() passed after 0.446 seconds.
+✔ Test parsesTwoWeekFixtureStructure() passed after 0.446 seconds.
+✔ Test planningStepCodableRoundTripsEveryCase() passed after 0.446 seconds.
+✔ Test weekDerivationUsesHigherDisplayOrderForSameDimension() passed after 0.446 seconds.
+✔ Test chinaInviteCopyIncludesLinkGroupedCodeAndCoachWhileGlobalCopiesCode() passed after 0.446 seconds.
+✔ Test insertingBaseReplacesCurrentOperand() passed after 0.446 seconds.
+✔ Test planNeedReasonDetectsMissingCurrentPlan() passed after 0.446 seconds.
+✔ Test weekDerivationAppliesRPEDecreaseAndClamps() passed after 0.446 seconds.
+✔ Test demoSeedPendingVideosAreWellFormed() passed after 0.446 seconds.
+✔ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() passed after 0.446 seconds.
+✔ Test steppersClampAtZeroAndStayOnHalfGrid() passed after 0.445 seconds.
+✔ Test draftSetSpecRoundTripsRPEMode() passed after 0.445 seconds.
+✔ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() passed after 0.445 seconds.
+✔ Test coachInboxCountAddsPendingVideosAndUnreadMessages() passed after 0.445 seconds.
+✔ Test detectsDateRowsAndSplitsBlocks() passed after 0.445 seconds.
+✔ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() passed after 0.445 seconds.
+✔ Test parsesSetsAndRepsForms() passed after 0.444 seconds.
+✔ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() passed after 0.443 seconds.
+✔ Test unmatchedNameDoesNotBind() passed after 0.443 seconds.
+✔ Test notTrainedSignalCountsMissesAboveThreshold() passed after 0.443 seconds.
+✔ Test readinessScalesTextShowsRawValuesWithoutInversion() passed after 0.443 seconds.
+✔ Test setNeedsRepsAndAValidTarget() passed after 0.443 seconds.
+✔ Test draftExercisesMapToDomainExercises() passed after 0.462 seconds.
+✔ Test draftProgressionRulePreservesExerciseIDSet() passed after 0.436 seconds.
+✔ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() passed after 0.409 seconds.
+✔ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() passed after 0.409 seconds.
+✔ Test weekDerivationCarriesRestFieldsUnchanged() passed after 0.407 seconds.
+✔ Test bundledAliasSeedIncludesTaiwanVocabulary() passed after 0.407 seconds.
+✔ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() passed after 0.407 seconds.
+✔ Test weightInputFieldPercentToKgBasicConversion() passed after 0.406 seconds.
+✔ Test multiLineCellSplitsIntoAccessories() passed after 0.404 seconds.
+✔ Test weekDerivationCombinesDifferentDimensions() passed after 0.403 seconds.
+✔ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() passed after 0.403 seconds.
+✔ Test aliasBindsWhenNoExactMatch() passed after 0.403 seconds.
+✔ Test readinessFatigueTextOrdersByAllowedChipOrder() passed after 0.402 seconds.
+✔ Test trainingYearsNotchLabels() passed after 0.402 seconds.
+✔ Test acceptSheetSealsEvaluationChoice() passed after 0.463 seconds.
+✔ Test planningNumberFieldEmptyInputResetsToZero() passed after 0.463 seconds.
+✔ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() passed after 0.463 seconds.
+✔ Test weekDerivationAppliesWeightDecrease() passed after 0.390 seconds.
+✔ Test localDayStringMatchesCheckinDateWireShape() passed after 0.390 seconds.
+✔ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() passed after 0.390 seconds.
+✔ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() passed after 0.445 seconds.
+✔ Test weekDerivationIgnoresRulesForOtherExercises() passed after 0.390 seconds.
+✔ Test aggregatorLinkedClipDropsAfterSendAndRefetch() passed after 0.390 seconds.
+✔ Test publishesThroughRepository() passed after 0.390 seconds.
+✔ Test backoffKeepsCueAndType() passed after 0.390 seconds.
+✔ Test planNeedReasonDetectsCycleEndingThisWeek() passed after 0.390 seconds.
+✔ Test "column mapping uses the supplied positive or negative time zone" passed after 0.388 seconds.
+✔ Test "aggregates real plan dates into Monday through Sunday cells" passed after 0.388 seconds.
+✔ Test "ISO week and columns stay correct across a calendar-year boundary" passed after 0.388 seconds.
+✔ Test "current-week training days produce the expected progress and cells" passed after 0.388 seconds.
+✔ Test "an empty current week never falls back to whole-plan totals" passed after 0.388 seconds.
+✔ Test "the same retained dates remap when Sunday rolls into Monday" passed after 0.388 seconds.
+✔ Test "global queue advances across students and wraps after its final item" passed after 0.388 seconds.
+✔ Test "post-send navigation resolves from the latest remaining queue" passed after 0.388 seconds.
+✔ Test "zero-based set index displays as one-based" passed after 0.388 seconds.
+✔ Test "missing RPE stays absent instead of becoming zero" passed after 0.388 seconds.
+✔ Test "unlinked video resolves no set-info card" passed after 0.388 seconds.
+✔ Test "pending video badge reuses resolved set data and display-ready ordinal" passed after 0.388 seconds.
+✔ Test "empty queue has no position or post-send next item" passed after 0.388 seconds.
+✔ Test "RPE formats whole and half values without decimal noise" passed after 0.388 seconds.
+✔ Test exerciseUsageTrackerTracksMultipleIDsIndependently() passed after 0.464 seconds.
+✔ Test daySectionsGroupByTrainingDayNewestFirst() passed after 0.464 seconds.
+✔ Test composerClearsExerciseWhenLinkedDayChanges() passed after 0.464 seconds.
+✔ Test "exercise display uses catalog English without changing the canonical name" passed after 0.368 seconds.
+✔ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() passed after 0.450 seconds.
+✔ Test previewCatalogHasNoDuplicateIDs() passed after 0.449 seconds.
+✔ Test "logout message does not prescribe a login identity" passed after 0.368 seconds.
+✔ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() passed after 0.464 seconds.
+✔ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() passed after 0.464 seconds.
+✔ Test planningCountPickerIncrementDisabledAtUpperBound() passed after 0.464 seconds.
+✔ Test accessoryMatchListSectionAddButtonTriggersCallback() passed after 0.464 seconds.
+✔ Test exerciseUsageTrackerStartsAtZero() passed after 0.464 seconds.
+✔ Test planningCountPickerEnumeratesTagsByStepWithinRange() passed after 0.464 seconds.
+✔ Test draftMappingEncodesRulesEmptyAndNonEmpty() passed after 0.464 seconds.
+✔ Test coachRootViewInitializes() passed after 0.463 seconds.
+✔ Test "student detail replaces the zero-progress plan shell with guidance" passed after 0.464 seconds.
+✔ Test planningCountPickerTagValueRoundTrips() passed after 0.463 seconds.
+✔ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() passed after 0.463 seconds.
+✔ Test exerciseUsageTrackerIncrementsCount() passed after 0.463 seconds.
+✔ Test "roster shows loading before empty and distinguishes search misses" passed after 0.463 seconds.
+✔ Test sameWeekJumpDoesNotCompleteEarlierDay() passed after 0.028 seconds.
+✔ Test adhocOwnershipUsesTheSameWeekRule() passed after 0.028 seconds.
+✔ Test unfinishedTrainingSettlementAndLegacyFallback() passed after 0.028 seconds.
+✔ Test crossWeekOwnershipFallsBackToCalendarDate() passed after 0.028 seconds.
+✔ Test "orders videos, unread, missed training, then applications" passed after 0.028 seconds.
+✔ Test "returns no rows when every source is empty or non-actionable" passed after 0.028 seconds.
+✔ Test asPrescribedEmptyWeightStillShowsDash(mode:) with 2 test cases passed after 0.464 seconds.
+✔ Suite "CoachKit localization runtime" passed after 0.466 seconds.
+✔ Test coachPercentageTargetKeepsItsAnchorAlongsideConvertedWeight() passed after 0.464 seconds.
+✔ Suite "Coach chat status subtitle" passed after 0.466 seconds.
+✔ Suite "Coach week overview · completion" passed after 0.466 seconds.
+✔ Suite "Coach today formatting" passed after 0.466 seconds.
+✔ Test "single-student video list renders loading, failure, and empty distinctly" passed after 0.464 seconds.
+✔ Suite "Coach week overview" passed after 0.466 seconds.
+✔ Suite "Coach today todo ordering" passed after 0.463 seconds.
+✔ Test aliasSeedRowsBindToCanonical(rawName:canonical:) with 24 test cases passed after 0.455 seconds.
+✔ Test "every string has complete Chinese and English translations" passed after 0.373 seconds.
+✔ Test "critical Chinese source strings stay byte-exact" passed after 0.375 seconds.
+✔ Test "every countable English value is plural-aware" passed after 0.375 seconds.
+✔ Test "count strings provide an English singular variation" passed after 0.375 seconds.
+✔ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() passed after 0.429 seconds.
+✔ Test "dashboard with zero students shows invitation guidance" passed after 0.476 seconds.
+✔ Test coachProfileUsesBackendNameWhenPresent() passed after 0.476 seconds.
+✔ Test "English catalog does not contain generated placeholder labels" passed after 0.383 seconds.
+✔ Suite "CoachKit localization" passed after 0.478 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test draftStoreSavesAndLoadsDraft() passed after 0.486 seconds.
+✔ Test unmatchedNameFallsThroughToCandidates() passed after 0.489 seconds.
+✔ Test sealedStudentDetailDoesNotRenderEvaluationBanner() passed after 0.516 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() passed after 0.519 seconds.
+✔ Test planningNumberFieldDecrementButtonSubtractsStep() passed after 0.531 seconds.
+✔ Test coachProfileLogoutRunsInjectedAction() passed after 0.532 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test draftStoreDeleteAllRemovesEveryDraft() passed after 0.537 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test draftStoreDeleteDraftRemovesMatchingTrainee() passed after 0.540 seconds.
+✔ Test "receiving inbox never renders empty before its initial load finishes" passed after 0.544 seconds.
+✔ Test weightInputFieldShowsPercentConversionWhenOneRMExists() passed after 0.549 seconds.
+✔ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() passed after 0.550 seconds.
+✔ Test planningNumberFieldTextFieldClampsAboveRange() passed after 0.550 seconds.
+✔ Test draftMappingEncodesAndDecodesSetSpec() passed after 0.550 seconds.
+✔ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() passed after 0.550 seconds.
+✔ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() passed after 0.550 seconds.
+✔ Test domainPlanDaysAndExercisesRebuildDraft() passed after 0.552 seconds.
+✔ Test planningNumberFieldDecrementDisabledAtLowerBound() passed after 0.556 seconds.
+✔ Test weightInputFieldExplainsMissingOneRM() passed after 0.561 seconds.
+✔ Test dayChipBarRendersAssignedDayChips() passed after 0.568 seconds.
+✔ Test planningNumberFieldFormattedDisplayFormatsValue() passed after 0.568 seconds.
+✔ Test draftMappingExpandsSetSpecToPlanSets() passed after 0.568 seconds.
+✔ Test chinaInvitationActionsPutShareBeforeCopy() passed after 0.570 seconds.
+✔ Test weekStartClampsToCycleBounds() passed after 0.571 seconds.
+✔ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() passed after 0.580 seconds.
+✔ Test draftMappingDecodeSetSpecReturnsNilForNilData() passed after 0.581 seconds.
+✔ Test weekStartAnchorsToPlanWeekContainingToday() passed after 0.581 seconds.
+✔ Test intensityModeToggleRendersBothModes() passed after 0.584 seconds.
+✔ Test planningNumberFieldTextFieldClampsBelowRange() passed after 0.587 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() passed after 0.589 seconds.
+✔ Test planningNumberFieldIncrementButtonAddsStep() passed after 0.593 seconds.
+✔ Test "planning step zero replaces empty student sections with guidance" passed after 0.596 seconds.
+✔ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() passed after 0.596 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test planningCountPickerClampsExternalValueAboveUpperBound() passed after 0.602 seconds.
+✔ Test draftDaysMapToDomainDays() passed after 0.602 seconds.
+✔ Test detailDefinesFiveSectionsInSpecOrder() passed after 0.603 seconds.
+✔ Test executionDaysShowCurrentPlanWeekRows() passed after 0.605 seconds.
+✔ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() passed after 0.604 seconds.
+✔ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) with 3 test cases passed after 0.604 seconds.
+✔ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() passed after 0.604 seconds.
+✔ Test assemblerMaterializesEveryWeekFromTheW1Draft() passed after 0.603 seconds.
+✔ Test planningNumberFieldEditingValueCanPersistBeforeBlur() passed after 0.603 seconds.
+✔ Test exerciseUsageTrackerResetClearsCounts() passed after 0.606 seconds.
+✔ Test draftTrainingPlanMapsToDomainPlan() passed after 0.605 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test allDayCoachShowsActualAndTargetEvenWhenTheyMatch() passed after 0.581 seconds.
+✔ Test planningCountPickerSnapsValueOutsideGrid() passed after 0.578 seconds.
+✔ Test planningCountPickerDecrementDisabledAtLowerBound() passed after 0.580 seconds.
+✔ Test planningNumberFieldIncrementDisabledAtUpperBound() passed after 0.584 seconds.
+✔ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() passed after 0.572 seconds.
+✔ Test planningCountPickerIncrementButtonAddsStep() passed after 0.575 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test draftStoreLoadDraftKeepsOtherStudents() passed after 0.578 seconds.
+✔ Test "empty student list stays alive while the global workbench advances" passed after 0.583 seconds.
+✔ Test "missing RPE card renders the localized em dash" passed after 0.597 seconds.
+✔ Suite "Coach video feedback workbench presentation" passed after 0.673 seconds.
+✔ Test loadEntersFirstSaveModeWithoutExistingSummary() passed after 0.673 seconds.
+✔ Test videoQueueLoadsItemsNewestFirst() passed after 0.675 seconds.
+✔ Test queueLoadsPendingItemsAndExposesCount() passed after 0.675 seconds.
+✔ Test demoSeedHasPersonalPlusTwoSecondaryCodes() passed after 0.675 seconds.
+✔ Test composerSurfacesSendFailure() passed after 0.675 seconds.
+✔ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() passed after 0.239 seconds.
+✔ Test detailOverviewRosterAndReminderShareCompletion() passed after 0.239 seconds.
+✔ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() passed after 0.239 seconds.
+✔ Suite "Coach day ownership" passed after 0.674 seconds.
+✔ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() passed after 0.676 seconds.
+✔ Test profileSharesOnlyOnChinaTrack() passed after 0.714 seconds.
+✔ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() passed after 0.714 seconds.
+✔ Test videoQueueRejectsBlankFeedbackWithoutDropping() passed after 0.714 seconds.
+✔ Test rosterMovesToFailedStateWhenStudentsCannotLoad() passed after 0.714 seconds.
+✔ Test requiredFieldsGateSaving() passed after 0.713 seconds.
+✔ Test studentGroupsAreOnePerStudentNewestUploadFirst() passed after 0.713 seconds.
+✔ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() passed after 0.711 seconds.
+✔ Test growthMissingSeriesLoadsAsExistingEmptyState() passed after 0.715 seconds.
+✔ Test emptyStateHasNoPersonalCode() passed after 0.712 seconds.
+✔ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() passed after 0.712 seconds.
+✔ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() passed after 0.747 seconds.
+✔ Test loadPrefillsEditModeFromExistingSummary() passed after 0.747 seconds.
+✔ Test composerRejectsEmptyText() passed after 0.747 seconds.
+✔ Test everyAliasCanonicalResolvesUniquely() passed after 0.794 seconds.
+✔ Test videoGridPlayExchangesIDForPresignedURL() passed after 0.821 seconds.
+✔ Test videoQueueLoadFailureMovesToFailed() passed after 0.821 seconds.
+✔ Test cancelledInitialLoadReturnsToIdle() passed after 0.646 seconds.
+✔ Test prefillProfileMissReturnsNilWithNotice() passed after 0.847 seconds.
+✔ Test composerSendsTrimmedTextWithOptionalLinks() passed after 0.847 seconds.
+✔ Test statusTextFlipsToOverdueCopyPastExpectedEnd() passed after 0.846 seconds.
+✔ Test noEvaluationIsNotALoadFailure() passed after 0.846 seconds.
+✔ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() passed after 0.839 seconds.
+✔ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() passed after 0.838 seconds.
+✔ Test unchangedPlannedOnlyDetailHasNoAddedCaption() passed after 0.839 seconds.
+✔ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() passed after 0.839 seconds.
+✔ Test videoQueueSendFeedbackDropsRowAndToasts() passed after 0.836 seconds.
+✔ Suite "Coach self-added detail" passed after 0.849 seconds.
+✔ Test statusTextCountsDownFromExpectedEnd() passed after 0.833 seconds.
+✔ Test editorCompletionChainNotifiesCompletionCallback() passed after 0.832 seconds.
+✔ Test videoQueueSendFailureKeepsRowAndBanners() passed after 0.831 seconds.
+✔ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() passed after 0.790 seconds.
+✔ Test bannerVisibleOnlyForLiveEvaluation() passed after 0.776 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() passed after 0.853 seconds.
+✔ Test rejectRemovesItemSilently() passed after 0.853 seconds.
+✔ Test step1ShowsOnlyFourWeekCardForRegularStudent() passed after 0.877 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test skipEvaluationStudentChainSkipsCompleteStep() passed after 0.879 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test blankSkipReasonIsDroppedNotSentEmpty() passed after 0.881 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() passed after 0.882 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test finishWritesDraftAndMarksFlowFinished() passed after 0.885 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test timeLimitedCreationCarriesExpiry() passed after 0.889 seconds.
+✔ Test step2RendersDisabledTemplateEntrypoints() passed after 0.949 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test blankFlowOneRMStaysNil() passed after 0.952 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test completeNotifiesCompletionCallback() passed after 0.953 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test "free first set log renders hash one" passed after 0.528 seconds.
+✔ Test "planned first set log renders hash one" passed after 0.528 seconds.
+✔ Suite "Coach day detail set numbers" passed after 0.953 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test adaptationIntentPresetsStudentDurationAndKind() passed after 0.962 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test navigationMovesForwardAndBackWithoutDroppingFields() passed after 0.963 seconds.
+✔ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() passed after 0.980 seconds.
+✔ Test step3RendersPerDayMainLiftPickers() passed after 1.016 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test adaptationDraftNameUsesAdaptationTemplate() passed after 1.017 seconds.
+✔ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() passed after 1.016 seconds.
+✔ Test videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) with 2 test cases passed after 1.017 seconds.
+✔ Test transportFailureOnCompleteKeepsBannerWithError() passed after 1.015 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test failedCompleteDoesNotNotifyCompletionCallback() passed after 1.018 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test editModeSaveUsesNotifyCheckbox() passed after 1.021 seconds.
+✔ Test blankFlowKeepsAllSevenSlots() passed after 1.021 seconds.
+✔ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() passed after 1.020 seconds.
+✔ Test workspaceViewModelEmptyCoachFallsBackToNoSections() passed after 1.021 seconds.
+✔ Test evaluationStudentCannotSelectFourWeeks() passed after 1.021 seconds.
+✔ Test step0RendersThreeStudentSections() passed after 1.066 seconds.
+✔ Test generatePersonalCodeShowsUpAfterReload() passed after 1.067 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test bootstrapLoadsStudentsAndCatalog() passed after 1.069 seconds.
+✔ Test restoredConfigureRulesPathDoesNotDuplicateStep4() passed after 1.071 seconds.
+✔ Test bootstrapRestoresSavedDraftStepAndAssignments() passed after 1.075 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test blankFlowWithEvaluationStudentForcesAdaptationKind() passed after 1.077 seconds.
+✔ Test rejectExpiredBannerAndRefresh() passed after 1.076 seconds.
+✔ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() passed after 1.079 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test legacyFillW1IntensityDraftRestoresToSingleStep4() passed after 1.082 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test prefilledOneRMFeedsOneRMLookupForMainLifts() passed after 1.049 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test saveDraftNeverNotifiesInFirstSaveMode() passed after 1.046 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() passed after 1.035 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test staleAssignmentOutsidePreferredSlotsStaysVisible() passed after 1.047 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() passed after 1.052 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ToggleAppliedWeekNeverAddsW1() passed after 1.132 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5OneRMOnlyAvailableForMainLiftFamily() passed after 1.134 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6AddRuleAppendsWithDisplayOrder() passed after 1.138 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5ToggleIntensityModePreservesPreviousValues() passed after 1.142 seconds.
+✔ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() passed after 1.142 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6DeleteRuleRemovesAndReorders() passed after 1.152 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5RPEValueIsClampedIntoRange() passed after 1.155 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7SetCurrentPreviewWeekClampsToPlanBounds() passed after 1.161 seconds.
+✔ Test bannerHiddenWhenNoEvaluationOrCompleted() passed after 1.161 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() passed after 1.166 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5TargetRepsIsClampedToAtLeastOne() passed after 1.167 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7DerivedPreviewReflectsWeightRule() passed after 1.181 seconds.
+✔ Test handoffWorkspaceUsesCurrentCycleRatherThanUpcomingEmptyPlan() passed after 1.181 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() passed after 1.184 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6RuleIncrementRoundsToPlanningIncrement() passed after 1.193 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ViewRendersEmptyRulesState() passed after 1.229 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5SetCountIsClampedToAtLeastOne() passed after 1.231 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() passed after 1.233 seconds.
+✔ Test adaptationIntentLoadsSlotsOnBootstrap() passed after 1.233 seconds.
+✔ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() passed after 1.233 seconds.
+✔ Test step4ScreenRendersSelectedSectionAndLibraryButton() passed after 1.363 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step4ViewRendersMainLiftAndAccessoryCards() passed after 1.367 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() passed after 1.372 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test weekCardRendersDerivedWeekFooter() passed after 1.389 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test prefilledEquipmentSeedsDefaultAccessoryFilters() passed after 1.398 seconds.
+✔ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() passed after 1.397 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6UpdateRuleMutatesByID() passed after 1.410 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5ZeroOneRMIsTreatedAsUnavailable() passed after 1.412 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() passed after 1.419 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7CurrentPreviewWeekDefaultsToOne() passed after 1.425 seconds.
+✔ Test accessoryLibrarySheetRendersFilterAndMatchSections() passed after 1.440 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6CustomSequenceLengthTracksAppliedWeeks() passed after 1.451 seconds.
+✔ Test retryAfterTransportFailureRecoversBanner() passed after 1.451 seconds.
+✔ Test blankFlowLoadsSlotsFromSelectedStudentProfile() passed after 1.451 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() passed after 1.457 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() passed after 1.462 seconds.
+✔ Test directMessageEntryReopensTheSameConversation() passed after 1.461 seconds.
+✔ Test blankFlowLoadsOneRMAndEquipmentFromProfile() passed after 1.466 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5ProceedRoutesFourWeekPlanToRules() passed after 1.479 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ProceedAllowsEmptyRules() passed after 1.491 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6RuleRequiresExerciseBeforeShowingValues() passed after 1.597 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ViewRendersUncoveredSummary() passed after 1.630 seconds.
+✔ Test completionChainDegradesWhenCompleteFailsButSummarySaved() passed after 1.631 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test weekCardRendersOneWeekTitle() passed after 1.644 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() passed after 1.646 seconds.
+✔ Test completeHidesBannerOnSuccess() passed after 1.637 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5WeightValueRoundsToHalfKilogramIncrement() passed after 1.608 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() passed after 1.618 seconds.
+✔ Test completionChainIgnoresConcurrentCompleteConflict() passed after 1.621 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5UpdateW1SetSpecWritesDraftData() passed after 1.616 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5RestSecondsPerSetClampsToSetCount() passed after 1.619 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step4ProceedAllowsEmptyAccessoryDays() passed after 1.619 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7ViewRendersFourWeekTabTitles() passed after 1.642 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step6ViewRendersSingleRuleChips() passed after 1.777 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test weekCardRendersDaySectionsAndRows() passed after 1.846 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() passed after 1.956 seconds.
+✔ Test repickingAnotherStudentDropsPreviousStudentSlots() passed after 2.028 seconds.
+✔ Test regenerateRevokesOldPersonalCode() passed after 2.029 seconds.
+✔ Test growthFailureRendersRetryAndRetrySuccessShowsData() passed after 2.012 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test step7PublishOfCompletePlanFinishesWithoutIssues() passed after 2.029 seconds.
+✔ Test completionChainRunsPutThenCompleteThenSoftRecommendation() passed after 2.027 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test revokeMovesCodeToDefunctSection() passed after 2.016 seconds.
+✔ Test step4UpdateFiltersReloadsMatchesForDay() passed after 1.960 seconds.
+✔ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() passed after 2.033 seconds.
+✔ Test growthCancellation(urlCancellation:) with 2 test cases passed after 1.931 seconds.
+✔ Test detailAppendPostedFeedbackRefreshesLatestOverview() passed after 2.029 seconds.
+✔ Test intentResumesExistingDraftInsteadOfOverwriting() passed after 2.029 seconds.
+✔ Test step4KeepsFiltersAndSelectionsIndependentPerDay() passed after 2.026 seconds.
+✔ Test detailLoadsVideoWallAndTodayReadiness() passed after 2.025 seconds.
+✔ Test handoffDetailUsesCurrentExercisesRatherThanLatestPublished() passed after 2.017 seconds.
+✔ Test detailLoadsExecutionAndFeedbackSummaries() passed after 2.018 seconds.
+✔ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() passed after 1.961 seconds.
+✔ Test videoQueueCancellation(urlCancellation:) with 2 test cases passed after 1.932 seconds.
+✔ Test bindQueueCancellation(urlCancellation:) with 2 test cases passed after 1.932 seconds.
+✔ Test inviteCodesCancellation(urlCancellation:) with 2 test cases passed after 1.932 seconds.
+✔ Test step5W1SetSpecRestoresFromDraftStore() passed after 2.033 seconds.
+✔ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() passed after 2.033 seconds.
+✔ Test handoffRosterUsesCurrentTrainingDaysRatherThanLatestPublished() passed after 2.025 seconds.
+✔ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() passed after 2.024 seconds.
+✔ Test markStudentActiveDropsInEvaluationBadgeInPlace() passed after 2.041 seconds.
+✔ Test rosterLoadsStudentsAndComputesAttentionBadge() passed after 2.039 seconds.
+✔ Test workspaceChildCancellationKeepsRows(urlCancellation:) with 2 test cases passed after 2.039 seconds.
+✔ Test rosterTriageSignalsStayScopedPerStudent() passed after 2.028 seconds.
+✔ Test "marker write failures surface instead of silently dropping the action" passed after 2.030 seconds.
+✔ Test workspaceCancellation(urlCancellation:) with 2 test cases passed after 1.946 seconds.
+✔ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() passed after 2.038 seconds.
+✔ Test realRefreshFailureStillFails() passed after 1.859 seconds.
+✔ Test cancelledRefreshKeepsLoadedRows(urlCancellation:) with 2 test cases passed after 1.859 seconds.
+✔ Test detailCancellation(urlCancellation:) with 2 test cases passed after 1.947 seconds.
+✔ Suite CoachRefreshCancellationTests passed after 2.049 seconds.
+✔ Test "video set information distinguishes unlinked videos from load failures" passed after 2.042 seconds.
+✔ Test "markers resolved for a previous video never render under a newer one" passed after 2.050 seconds.
+✔ Test "rapid item changes reject stale playback and set-log results" passed after 2.034 seconds.
+✔ Test "marker actions update the current item and marker load failures stay hidden" passed after 2.049 seconds.
+✔ Test detailReadinessDistinguishesNotFiledFromFetchFailure() passed after 2.036 seconds.
+✔ Test loadedRosterStaysVisibleUntilRefreshIsCancelled() passed after 1.862 seconds.
+✔ Test rosterChildCancellationKeepsCompleteRows(urlCancellation:) with 2 test cases passed after 2.048 seconds.
+✔ Test detailSecondaryCancellationKeepsSections(urlCancellation:) with 2 test cases passed after 2.048 seconds.
+✔ Suite StudentRosterCancellationTests passed after 2.052 seconds.
+✔ Test detailCatalogCancellationKeepsServerNames(urlCancellation:) with 2 test cases passed after 2.050 seconds.
+✔ Suite CoachSecondaryCancellationTests passed after 2.054 seconds.
+✔ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() passed after 1.993 seconds.
+✔ Test acceptMachineCodeErrorsBannerAndForceRefresh() passed after 1.993 seconds.
+✔ Test growthLoadingRendersProgressWithoutFlashingEmptyState() passed after 2.066 seconds.
+✔ Test run with 496 tests in 14 suites passed after 2.067 seconds.

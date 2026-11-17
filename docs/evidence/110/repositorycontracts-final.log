@@ -1,0 +1,36 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Removing https://github.com/nalexn/ViewInspector
+Building for debugging...
+[0/5] /Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/.build/arm64-apple-macosx/debug/RepositoryContractsPackageTests.derived/runner.swift
+[1/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/10] Compiling RepositoryContractsTests PendingVideoItemTests.swift
+[6/10] Emitting module RepositoryContractsTests
+[7/10] Compiling RepositoryContractsTests ChatMessageQueryTests.swift
+[8/10] Compiling RepositoryContractsTests VideoMarkerRepositoryTests.swift
+[9/12] Emitting module RepositoryContractsPackageTests
+[10/12] Compiling RepositoryContractsPackageTests runner.swift
+[10/12] Write Objects.LinkFileList
+[11/12] Linking RepositoryContractsPackageTests
+Build complete! (0.78s)
+Test Suite 'All tests' started at 2026-11-16 10:42:12.558.
+Test Suite 'All tests' passed at 2026-11-16 10:42:12.560.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test chatMessageQueryRejectsZeroSequence() started.
+◇ Test chatMessageQueryRejectsLimitOutsideBackendRange() started.
+◇ Test "in-memory video markers create, sort, isolate by video, and delete" started.
+◇ Test chatMessageQueryAcceptsPositiveSequence() started.
+◇ Test "pending video carries its optional set-log link" started.
+◇ Test chatMessageQueryAcceptsLimitBoundaries() started.
+✔ Test chatMessageQueryAcceptsPositiveSequence() passed after 0.001 seconds.
+✔ Test chatMessageQueryAcceptsLimitBoundaries() passed after 0.001 seconds.
+✔ Test "pending video carries its optional set-log link" passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsLimitOutsideBackendRange() passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsZeroSequence() passed after 0.001 seconds.
+✔ Test "in-memory video markers create, sort, isolate by video, and delete" passed after 0.001 seconds.
+✔ Test run with 6 tests in 0 suites passed after 0.001 seconds.

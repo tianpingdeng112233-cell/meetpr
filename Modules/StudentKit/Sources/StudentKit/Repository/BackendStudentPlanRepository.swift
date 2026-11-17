@@ -36,21 +36,48 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
-    let token = try await session.accessToken()
-    let tree = try await api.plan(id: id, accessToken: token).toDomain()
-    guard tree.plan.traineeID == studentID else { return nil }
-    let exercises = try await exerciseCatalog(accessToken: token)
-    return StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+    do {
+      let token = try await session.accessToken()
+      let tree = try await api.plan(id: id, accessToken: token).toDomain()
+      guard tree.plan.traineeID == studentID else { return nil }
+      let exercises = try await exerciseCatalog(accessToken: token)
+      var plan = StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+      plan.handoff = await cache.loadPlan(studentID: studentID)?.handoff
+      try await cache.saveSnapshot(plan: plan, studentID: studentID)
+      return plan
+    } catch {
+      if error.isTaskCancellation { throw error }
+      if error is URLError, let cached = await cache.loadPlan(id: id, studentID: studentID) {
+        return cached
+      }
+      throw error
+    }
+  }
+
+  public func fetchPlan(containing dayID: UUID, studentID: UUID) async throws -> StudentPlanView? {
+    if let cached = await cache.loadPlan(containing: dayID, studentID: studentID) {
+      return try await fetchPlan(id: cached.cycleID, studentID: studentID)
+    }
+    guard let current = try await fetchCurrentPlan(studentID: studentID) else { return nil }
+    if current.days.contains(where: { $0.id == dayID }) { return current }
+    for entry in current.handoff?.plans ?? [] where entry.id != current.cycleID {
+      if let plan = try await fetchPlan(id: entry.id, studentID: studentID),
+        plan.days.contains(where: { $0.id == dayID })
+      {
+        return plan
+      }
+    }
+    return nil
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    if let cached = await cache.loadPlan(studentID: studentID) {
-      Task { [weak self] in
-        try? await self?.refreshCurrentPlan(studentID: studentID)
-      }
-      return cached
+    do {
+      return try await refreshCurrentPlan(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { throw error }
+      if let cached = await cache.loadPlan(studentID: studentID) { return cached }
+      throw error
     }
-    return try await refreshCurrentPlan(studentID: studentID)
   }
 
   public func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -58,7 +85,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func fetchDay(studentID: UUID, dayID: UUID) async throws -> StudentPlanDay? {
-    guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
+    guard let plan = try await fetchPlan(containing: dayID, studentID: studentID) else {
       return nil
     }
     return plan.days.first { $0.id == dayID }
@@ -131,24 +158,21 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   private func performPlanRefresh(studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
-    let response = try await api.studentPlans(
-      studentID: studentID,
-      status: [.published],
-      accessToken: token
-    )
-    guard
-      let plan = response.plans.max(by: Self.planPrecedes)
-    else {
+    let response = try await api.planHandoff(studentID: studentID, accessToken: token)
+    let planID = response.currentPlanID
+    guard let planID else {
+      await cache.removePlan(studentID: studentID)
       return nil
     }
 
-    let tree = try await api.plan(id: plan.id, accessToken: token).toDomain()
+    let tree = try await api.plan(id: planID, accessToken: token).toDomain()
     let exercises = try await exerciseCatalog(accessToken: token)
-    let projection = StudentPlanProjection.project(
+    var projection = StudentPlanProjection.project(
       tree: tree,
       catalog: exercises,
       weekIndex: 1
     )
+    projection.handoff = response.handoff
     try await cache.save(plan: projection, studentID: studentID)
     return projection
   }
@@ -218,6 +242,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     }
     let updated = StudentPlanView(
       cycleID: plan.cycleID,
+      handoff: plan.handoff,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
       endDate: plan.endDate,
@@ -232,16 +257,6 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   private static func completionError(from error: any Error) -> any Error {
     PlanDayCompletionError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
-  }
-
-  /// Current-plan selection from backend spec 035: max publishedAt, then
-  /// createdAt, then id. The list endpoint's createdAt ordering is legacy only.
-  static func planPrecedes(_ lhs: PlanDTO, _ rhs: PlanDTO) -> Bool {
-    let lhsPublishedAt = lhs.publishedAt ?? .distantPast
-    let rhsPublishedAt = rhs.publishedAt ?? .distantPast
-    if lhsPublishedAt != rhsPublishedAt { return lhsPublishedAt < rhsPublishedAt }
-    if lhs.createdAt != rhs.createdAt { return lhs.createdAt < rhs.createdAt }
-    return lhs.id.uuidString < rhs.id.uuidString
   }
 
 }

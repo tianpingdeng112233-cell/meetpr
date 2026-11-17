@@ -229,3 +229,17 @@ private enum PlanningWorkspaceTestFixtures {
   #expect(viewModel.selectedStudent?.id == student.id)
   #expect(viewModel.currentStep == .selectMainLifts)
 }
+
+@MainActor
+@Test func handoffWorkspaceUsesCurrentCycleRatherThanUpcomingEmptyPlan() async throws {
+  let current = PlanningWorkspaceTestFixtures.plan(startOffset: -7, weeks: 2)
+  let student = PlanningWorkspaceTestFixtures.student(id: UUID(), name: "学员")
+  let model = PlanningWorkspaceViewModel(
+    repository: StubCoachPlanRepository(students: [student]),
+    studentPlans: HandoffCoachPlanRepository(current: current),
+    draftStore: try DraftStore.inMemory(),
+    now: { PlanningWorkspaceTestFixtures.now }, calendar: PlanningWorkspaceTestFixtures.calendar)
+  await model.refresh()
+  #expect(model.needsPlanningRows.first?.reason == .endsThisWeek)
+  #expect(model.recentPublishedRows.first?.id == student.id)
+}

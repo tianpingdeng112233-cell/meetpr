@@ -275,48 +275,6 @@ func undoRejectsCompletionAtOrBeyondSevenDays(elapsed: TimeInterval) async throw
   )
 }
 
-@Test func currentPlanSelectionPrefersPublishedThenCreatedThenIdentity() throws {
-  let studentID = UUID()
-  let createdAt = Date(timeIntervalSince1970: 1_800_000_000)
-  let older = planDTO(
-    id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001")),
-    studentID: studentID,
-    publishedAt: createdAt,
-    createdAt: createdAt.addingTimeInterval(100)
-  )
-  let newer = planDTO(
-    id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002")),
-    studentID: studentID,
-    publishedAt: createdAt.addingTimeInterval(1),
-    createdAt: createdAt
-  )
-
-  #expect([newer, older].max(by: BackendStudentPlanRepository.planPrecedes)?.id == newer.id)
-
-  let publishedAt = try #require(newer.publishedAt)
-  let laterCreated = planDTO(
-    id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000003")),
-    studentID: studentID,
-    publishedAt: publishedAt,
-    createdAt: newer.createdAt.addingTimeInterval(1)
-  )
-  #expect(
-    [newer, laterCreated].max(by: BackendStudentPlanRepository.planPrecedes)?.id
-      == laterCreated.id
-  )
-
-  let higherIdentity = planDTO(
-    id: try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000004")),
-    studentID: studentID,
-    publishedAt: try #require(laterCreated.publishedAt),
-    createdAt: laterCreated.createdAt
-  )
-  #expect(
-    [laterCreated, higherIdentity].max(by: BackendStudentPlanRepository.planPrecedes)?.id
-      == higherIdentity.id
-  )
-}
-
 @Test(arguments: [
   ("NOT_LATEST_COMPLETION", PlanDayCompletionError.notLatestCompletion),
   ("UNDO_WINDOW_PASSED", PlanDayCompletionError.undoWindowPassed),
@@ -429,15 +387,13 @@ private struct CompletionTestSession: SessionStateReader {
   func currentUser() async throws -> User { throw SessionStateReaderError.missingCurrentUser }
 }
 
-@Test func currentTrainingPlanStillRequestsOnlyPublishedPlans() async throws {
+@Test func currentTrainingPlanUsesOnlyServerHandoff() async throws {
   let studentID = UUID()
   let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
-    #expect(
-      request.url?.path.lowercased() == "/students/\(studentID.uuidString.lowercased())/plans")
-    let components = try #require(
-      request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) })
-    #expect(components.queryItems?.first { $0.name == "status" }?.value == "published")
-    return APIResponse(data: Data(#"{"plans":[]}"#.utf8), statusCode: 200)
+    #expect(request.url?.path == "/students/\(studentID)/plan-handoff")
+    #expect(request.httpMethod == "GET")
+    return APIResponse(
+      data: Data(#"{"current_plan_id":null,"plans":[]}"#.utf8), statusCode: 200)
   }
   let repository = BackendStudentPlanRepository(api: api, session: CompletionTestSession())
   #expect(try await repository.refreshCurrentPlan(studentID: studentID) == nil)

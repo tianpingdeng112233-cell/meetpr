@@ -1,0 +1,12 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Compiling StudentKit TodayWorkoutView.swift
+[5/7] Emitting module StudentKit
+[6/7] Compiling StudentKit TodayWorkoutViewModel.swift
+error: input file '/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift' was modified during the build
+error: input file '/Users/david/Projects/apps/MeetPR-wt-110/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift' was modified during the build
+error: fatalError

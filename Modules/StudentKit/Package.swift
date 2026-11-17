@@ -40,6 +40,7 @@ let package = Package(
         .product(name: "ChatUI", package: "ChatUI"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],
+      resources: [.copy("Resources/PlanHandoff")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]

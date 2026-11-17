@@ -96,12 +96,22 @@ private struct TrainingWeekCalendarLayout: Layout {
   }
 }
 
+private struct PlanHandoffPreviewKey: EnvironmentKey { static let defaultValue = false }
+
+extension EnvironmentValues {
+  var planHandoffPreview: Bool {
+    get { self[PlanHandoffPreviewKey.self] }
+    set { self[PlanHandoffPreviewKey.self] = newValue }
+  }
+}
+
 private struct TrainingWeekDayCell: View {
   let item: TrainingSequenceDay
   let today: Date
   let onSelect: () -> Void
   @Environment(\.locale) private var locale
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.planHandoffPreview) private var planPreview
 
   var body: some View {
     let display = TrainingWeekCellPresentation(cell: .training(item), today: today, locale: locale)
@@ -110,21 +120,31 @@ private struct TrainingWeekDayCell: View {
         Text(display.weekday)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
           .tracking(1)
-          .foregroundStyle(item.isSelected ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
+          .foregroundStyle(
+            item.isSelected && !planPreview ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
         Text(String(Calendar.current.component(.day, from: item.day.date)))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
-          .foregroundStyle(colorScheme == .dark ? Color.MeetPR.bgBase : Color.MeetPR.gold900)
+          .foregroundStyle(
+            planPreview
+              ? Color.MeetPR.textPrimary
+              : (colorScheme == .dark ? Color.MeetPR.bgBase : Color.MeetPR.gold900)
+          )
           .frame(width: 36, height: 36)
           .background(
-            colorScheme == .dark ? Color.MeetPR.textPrimary : Color.MeetPR.gold200, in: .circle
+            planPreview
+              ? Color.MeetPR.bgStack
+              : (colorScheme == .dark ? Color.MeetPR.textPrimary : Color.MeetPR.gold200),
+            in: .circle
           )
           .overlay {
             if item.isSelected {
-              Circle().stroke(Color.MeetPR.gold500, lineWidth: 2).padding(-3)
+              Circle().stroke(
+                planPreview ? Color.MeetPR.textMuted : Color.MeetPR.gold500, lineWidth: 2
+              ).padding(-3)
             }
           }
           .overlay(alignment: .bottomTrailing) {
-            if item.state == .completed {
+            if item.state == .completed && !planPreview {
               Image(systemName: "checkmark")
                 .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .bold))
                 .foregroundStyle(Color.MeetPR.inkOnCTAFill)
