@@ -10,6 +10,8 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
   @Environment(StudentSetSyncSession.self) private var setSyncSession: StudentSetSyncSession?
+  @Environment(\.isStudentPresentationBlocked) private var ancestorPresentationBlocked
+  @Environment(\.bindFirstRun) private var bindFirstRun
   private let loginIdentifier: String
   private let profileCoach: ActiveCoachContext?
   @State private var profileNavigation = ProfileNavigation()
@@ -252,6 +254,13 @@ extension StudentRootView {
       .environment(workoutKeypad)
       .environment(weightEntry)
       .environment(profileNavigation)
+      // Each tab owns a UIHostingController; explicitly carry ancestor state across that boundary.
+      .environment(\.bindFirstRun, bindFirstRun)
+      .environment(
+        \.isStudentPresentationBlocked,
+        ancestorPresentationBlocked || pendingImportedHistoryReview != nil
+          || !importedHistoryReviewQueue.isEmpty
+      )
       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
 
       TrainingHistoryView(

@@ -7,6 +7,7 @@ struct VideoMissingFileHost: ViewModifier {
   let model: VideoAttachmentViewModel
   var enabled = true
   let context: (VideoAttachment) -> String
+  var onDismiss: () -> Void = {}
   var onRestored: () async -> Void = {}
 
   func body(content: Content) -> some View {
@@ -14,7 +15,8 @@ struct VideoMissingFileHost: ViewModifier {
       item: Binding(
         get: { enabled ? model.missingAttachment : nil },
         set: { if $0 == nil { model.missingAttachment = nil } }
-      )
+      ),
+      onDismiss: onDismiss
     ) { record in
       VideoMissingFileSheet(
         record: record, context: context(record), model: model, onRestored: onRestored)

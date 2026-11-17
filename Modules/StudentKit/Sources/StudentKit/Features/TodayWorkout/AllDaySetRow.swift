@@ -55,6 +55,7 @@ struct AllDaySetRow: View {
         Task { _ = await viewModel?.removeStudentRow(id: draft.id) }
       }
     }
+    .preference(key: TrainingPresentationBlockedKey.self, value: showsRemoval)
     .padding(.horizontal, MeetPRSpacing.space2)
     .padding(.vertical, editing ? MeetPRSpacing.space2 : 0)
     .background(

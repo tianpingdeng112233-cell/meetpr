@@ -1,0 +1,43 @@
+✘ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() recorded an issue at VideoUploadGenerationRaceTests.swift:47:2: Caught error: TimeoutError()
+✘ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:53:2: Caught error: TimeoutError()
+✘ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() failed after 8.636 seconds with 1 issue.
+✘ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() failed after 8.673 seconds with 1 issue.
+✘ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:57:2: Caught error: TimeoutError()
+✘ Test productionUploaderPairsContinuationWithBackgroundEvents() recorded an issue at BackgroundVideoPartUploaderTests.swift:20:2: Caught error: TimeoutError()
+✘ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:22:2: Caught error: TimeoutError()
+✘ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() recorded an issue at VideoUploadRecoveryTests.swift:322:2: Caught error: TimeoutError()
+✘ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() recorded an issue at VideoUploadGenerationRecoveryTests.swift:33:2: Caught error: TimeoutError()
+✘ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() recorded an issue at VideoUploadFailureRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test completionRegistryInvokesHandlerExactlyOnceOnMainThread() recorded an issue at BackgroundUploadCompletionRegistryTests.swift:74:2: Caught error: TimeoutError()
+✘ Test completionRegistrySerializesManualClaimAgainstHandlerStorage() recorded an issue at BackgroundUploadCompletionRegistryTests.swift:93:2: Caught error: TimeoutError()
+✘ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() failed after 8.670 seconds with 1 issue.
+✘ Test productionUploaderPairsContinuationWithBackgroundEvents() failed after 8.669 seconds with 1 issue.
+✘ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() failed after 8.655 seconds with 1 issue.
+✘ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() failed after 8.616 seconds with 1 issue.
+✘ Test osWakeAfterManualClaimCannotStartASecondWriter() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:80:2: Caught error: TimeoutError()
+✘ Test osWakeAfterManualClaimCannotStartASecondWriter() failed after 8.620 seconds with 1 issue.
+✘ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() failed after 8.606 seconds with 1 issue.
+✘ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() failed after 8.685 seconds with 1 issue.
+✘ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() failed after 8.678 seconds with 1 issue.
+✘ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:7:2: Caught error: TimeoutError()
+✘ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() failed after 8.674 seconds with 1 issue.
+✘ Test completionRegistryInvokesHandlerExactlyOnceOnMainThread() failed after 8.671 seconds with 1 issue.
+✘ Test completionRegistrySerializesManualClaimAgainstHandlerStorage() failed after 8.656 seconds with 1 issue.
+✘ Test exportCompletingAfterCancellationDiscardsItsOutput() recorded an issue at VideoTrimCompletionTests.swift:264:2: Caught error: TimeoutError()
+✘ Test exportCompletingAfterCancellationDiscardsItsOutput() failed after 8.628 seconds with 1 issue.
+✘ Test sameGenerationSiblingCallbacksCompleteAcrossSeparateWakes() recorded an issue at VideoUploadGenerationRecoveryTests.swift:7:2: Caught error: TimeoutError()
+✘ Test sameGenerationSiblingCallbacksCompleteAcrossSeparateWakes() failed after 8.653 seconds with 1 issue.
+✘ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() recorded an issue at VideoUploadHarvestClaimRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() failed after 8.703 seconds with 1 issue.
+✘ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() recorded an issue at VideoUploadGenerationRaceTests.swift:8:2: Caught error: TimeoutError()
+✘ Test overlappingSessionFinishCallbacksShareOneDrainWriter() recorded an issue at VideoUploadDrainSingleFlightTests.swift:6:2: Caught error: TimeoutError()
+✘ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() failed after 8.673 seconds with 1 issue.
+✘ Test productionUploaderDefersFailureToRestoredEventOwner() recorded an issue at BackgroundVideoPartUploaderTests.swift:69:2: Caught error: TimeoutError()
+✘ Test backgroundCompletionWaitsForRestoredETagPersistenceAndComplete() recorded an issue at VideoUploadRecoveryTests.swift:199:2: Caught error: TimeoutError()
+✘ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() recorded an issue at VideoUploadRecoveryTests.swift:240:2: Caught error: TimeoutError()
+✘ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() failed after 8.734 seconds with 1 issue.
+✘ Test productionUploaderDefersFailureToRestoredEventOwner() failed after 8.718 seconds with 1 issue.
+✘ Test backgroundCompletionWaitsForRestoredETagPersistenceAndComplete() failed after 8.725 seconds with 1 issue.
+✘ Test overlappingSessionFinishCallbacksShareOneDrainWriter() failed after 8.702 seconds with 1 issue.
+✘ Test suspendedRequestDoesNotBlockOtherRowsOrCommit() recorded an issue at SetSyncSuspendedRequestTests.swift:62:4: Time limit was exceeded: 60.000 seconds

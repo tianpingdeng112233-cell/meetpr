@@ -133,6 +133,12 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
           onCoach: onMessageCoach, onProfile: onEditProfile, onMeet: onEditMeet)
       } else {
         sequenceContent
+          .background {
+            GeometryReader { proxy in
+              Color.clear.preference(
+                key: RestRingHeaderBottomKey.self, value: proxy.frame(in: .global).maxY)
+            }
+          }
         screenContent
       }
     }

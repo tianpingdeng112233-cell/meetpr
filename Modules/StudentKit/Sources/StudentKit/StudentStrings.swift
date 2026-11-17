@@ -33,6 +33,25 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let restRingTimer = Key("student.restRingTimer")
+    static let restRingSettings = Key("student.restRingSettings")
+    static let restRingMain = Key("student.restRingMain")
+    static let restRingAccessory = Key("student.restRingAccessory")
+    static let restRingVibration = Key("student.restRingVibration")
+    static let restRingSound = Key("student.restRingSound")
+    static let restRingOn = Key("student.restRingOn")
+    static let restRingOff = Key("student.restRingOff")
+    static let restRingExerciseRest = Key("student.restRingExerciseRest")
+    static let restRingMinus = Key("student.restRingMinus")
+    static let restRingPlus = Key("student.restRingPlus")
+    static let restRingEnd = Key("student.restRingEnd")
+    static let restRingDone = Key("student.restRingDone")
+    static let restRingHint = Key("student.restRingHint")
+    static let restRingDismiss = Key("student.restRingDismiss")
+    static let restRingSave = Key("student.restRingSave")
+    static let restRingStart = Key("student.restRingStart")
+    static let restRingNotification = Key("student.restRingNotification")
+
     static let handoffPlanWeeks = Key("student.handoffPlanWeeks")
     static let handoffStartsAfterCurrent = Key("student.handoffStartsAfterCurrent")
     static let handoffStarted = Key("student.handoffStarted")

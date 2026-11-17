@@ -69,6 +69,8 @@ enum StudentRestTimerCopy {
 /// matching preference in this release, so both the fallback and the one-time
 /// explanation flag live in UserDefaults and remain injectable for tests.
 public protocol StudentRestTimerSettingsStoring: Sendable {
+  func ringSettings(for studentID: UUID) -> RestRingSettings
+  func saveRingSettings(_ settings: RestRingSettings, for studentID: UUID)
   func accessorySeconds(for studentID: UUID) -> Int
   func setAccessorySeconds(_ seconds: Int, for studentID: UUID)
   func preference(for studentID: UUID) -> StudentRestTimerPreference
@@ -82,6 +84,32 @@ public struct UserDefaultsRestTimerSettingsStore: StudentRestTimerSettingsStorin
 
   public init(defaults: UserDefaults = .standard) {
     self.defaults = defaults
+  }
+
+  public func ringSettings(for studentID: UUID) -> RestRingSettings {
+    let key = "meetpr.student.rest_ring.v1.\(studentID.uuidString)"
+    if let data = defaults.data(forKey: key),
+      let settings = try? JSONDecoder().decode(RestRingSettings.self, from: data),
+      RestRingSettings.validDuration(settings.mainSeconds),
+      RestRingSettings.validDuration(settings.accessorySeconds)
+    {
+      return settings
+    }
+    let oldKey = preferenceKey(for: studentID)
+    let settings = RestRingSettings.migrate(
+      bands: defaults.data(forKey: oldKey), fixed: defaults.object(forKey: oldKey) as? Int,
+      accessory: defaults.object(
+        forKey: "meetpr.student.rest_timer.accessory_seconds.\(studentID.uuidString)") as? Int)
+    saveRingSettings(settings, for: studentID)
+    return settings
+  }
+
+  public func saveRingSettings(_ settings: RestRingSettings, for studentID: UUID) {
+    guard RestRingSettings.validDuration(settings.mainSeconds),
+      RestRingSettings.validDuration(settings.accessorySeconds),
+      let data = try? JSONEncoder().encode(settings)
+    else { return }
+    defaults.set(data, forKey: "meetpr.student.rest_ring.v1.\(studentID.uuidString)")
   }
 
   public func accessorySeconds(for studentID: UUID) -> Int {
@@ -186,4 +214,10 @@ private struct PersistedPreference: Codable {
   var preference: StudentRestTimerPreference {
     .custom(lowSeconds: lowSeconds, midSeconds: midSeconds, highSeconds: highSeconds)
   }
+}
+
+// Compatibility for existing preview stores; production uses the versioned ring record above.
+extension StudentRestTimerSettingsStoring {
+  public func ringSettings(for studentID: UUID) -> RestRingSettings { RestRingSettings() }
+  public func saveRingSettings(_ settings: RestRingSettings, for studentID: UUID) {}
 }

@@ -59,6 +59,7 @@ struct ExerciseNoteSheet: View {
 /// A transparent full-screen presentation centers the dialog and blocks the tab bar behind it.
 struct ExerciseNotePresentation<Dialog: View>: ViewModifier {
   @Binding var reference: ExerciseRefV1?
+  var onDismiss: () -> Void = {}
   @ViewBuilder let dialog: (ExerciseRefV1) -> Dialog
 
   private struct Item: Identifiable {
@@ -74,11 +75,11 @@ struct ExerciseNotePresentation<Dialog: View>: ViewModifier {
 
   func body(content: Content) -> some View {
     #if os(iOS)
-      content.fullScreenCover(item: item) { item in
+      content.fullScreenCover(item: item, onDismiss: onDismiss) { item in
         dialog(item.reference).presentationBackground(.clear)
       }
     #else
-      content.sheet(item: item) { item in dialog(item.reference) }
+      content.sheet(item: item, onDismiss: onDismiss) { item in dialog(item.reference) }
     #endif
   }
 }
