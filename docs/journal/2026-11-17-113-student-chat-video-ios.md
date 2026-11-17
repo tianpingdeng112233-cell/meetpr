@@ -96,3 +96,5 @@ Final local result: native build passed; 159 Networking + 100 ChatUI + 1327 Stud
 ## 合并与真实联调准备（2026-11-17）
 
 David已批准合并、后端备份/0089/部署及双端真实联调。#478已squash到release/1.0@c3c1b34ef705deeb25ffe2971fbb633d02de0528；合并前CI三项全绿（44080694507）。以合并SHA准备Debug真实网络构建，目标iPhone17e；不使用Demo作为持久化证明。后端控制台连续连接超时，真实备份/迁移/部署及已绑定测试登录会话尚缺。没有Archive/上传，build号保持41，候选仍为42。
+
+Debug真实网络构建通过（282.9s，XcodeBuildMCP build_sim）；独立QA产物bundleId `com.meetpr.chatvideoliveqa`，只修改复制产物的Info.plist并adhoc签名，源码与正式签名配置未改。MeetPR.debug.dylib SHA256保持 `180462259a42120d4fe626ce13b6758533c6099ccfdab709f62b7b78d8a7dd3f`。已在iPhone17e安装/启动，显式API base为国内staging；尚待已绑定测试师生登录与0089部署。
