@@ -1,0 +1,461 @@
+--- a/Modules/AppShell/Sources/AppShell/AnalyticsRootModifier.swift
++++ b/Modules/AppShell/Sources/AppShell/AnalyticsRootModifier.swift
+@@ -1,6 +1,7 @@
+ import Analytics
+ import Foundation
+ import Networking
++import StudentKit
+ import SwiftUI
+
+ @available(iOS 17.0, macOS 14.0, *)
+@@ -11,16 +12,22 @@
+   @Environment(\.scenePhase) private var scenePhase
+   @State private var didConfigure = false
+   @State private var showingNotice: Bool
++  @State private var noticeDismissed: Bool
+
+   init(session: Session, mode: AnalyticsMode) {
+     self.session = session
+     self.mode = mode
+     _showingNotice = State(initialValue: Self.shouldShowNotice(mode: mode))
++    _noticeDismissed = State(initialValue: !Self.shouldShowNotice(mode: mode))
+   }
+
+   func body(content: Content) -> some View {
+     content
+-      .sheet(isPresented: $showingNotice) {
++      .environment(
++        \.isStudentPresentationBlocked,
++        showingNotice || !noticeDismissed || FrictionFeedbackController.shared.pendingPrompt != nil
++      )
++      .sheet(isPresented: $showingNotice, onDismiss: noticeDidDismiss) {
+         AnalyticsPrivacyNotice {
+           UserDefaults.standard.set(true, forKey: Self.noticeKey)
+           Analytics.shared.confirmPrivacyNotice()
+@@ -56,6 +63,8 @@
+       }
+   }
+
++  private func noticeDidDismiss() { noticeDismissed = true }
++
+   private static let noticeKey = "meetpr.analytics.privacy_notice_confirmed"
+
+   private static func shouldShowNotice(mode: AnalyticsMode) -> Bool {
+--- a/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift
+@@ -10,6 +10,8 @@
+ @available(iOS 17.0, macOS 14.0, *)
+ public struct StudentRootView: View {
+   @Environment(StudentSetSyncSession.self) private var setSyncSession: StudentSetSyncSession?
++  @Environment(\.isStudentPresentationBlocked) private var ancestorPresentationBlocked
++  @Environment(\.bindFirstRun) private var bindFirstRun
+   private let loginIdentifier: String
+   private let profileCoach: ActiveCoachContext?
+   @State private var profileNavigation = ProfileNavigation()
+@@ -252,6 +254,13 @@
+       .environment(workoutKeypad)
+       .environment(weightEntry)
+       .environment(profileNavigation)
++      // Each tab owns a UIHostingController; explicitly carry ancestor state across that boundary.
++      .environment(\.bindFirstRun, bindFirstRun)
++      .environment(
++        \.isStudentPresentationBlocked,
++        ancestorPresentationBlocked || pendingImportedHistoryReview != nil
++          || !importedHistoryReviewQueue.isEmpty
++      )
+       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
+
+       TrainingHistoryView(
+--- a/Modules/StudentKit/Sources/StudentKit/StudentPresentationBlocking.swift
++++ b/Modules/StudentKit/Sources/StudentKit/StudentPresentationBlocking.swift
+@@ -0,0 +1,22 @@
++import SwiftUI
++
++private struct StudentPresentationBlockedKey: EnvironmentKey {
++  static let defaultValue = false
++}
++
++extension EnvironmentValues {
++  /// Ancestor-owned notices and modals take priority over automatic student setup.
++  public var isStudentPresentationBlocked: Bool {
++    get { self[StudentPresentationBlockedKey.self] }
++    set { self[StudentPresentationBlockedKey.self] = newValue }
++  }
++}
++
++/// Child-owned workout dialogs report their existing presentation state upward.
++struct TrainingPresentationBlockedKey: PreferenceKey {
++  static let defaultValue = false
++
++  static func reduce(value: inout Bool, nextValue: () -> Bool) {
++    value = value || nextValue()
++  }
++}
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RestRingSession.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RestRingSession.swift
+@@ -42,8 +42,14 @@
+     applyAlertSettings()
+   }
+
+-  func enterTrainableDay() {
+-    if settings.needsFirstSettings { presentation = .settings }
++  func updatePresentationContext(isTrainable: Bool, hasOtherPresentation: Bool) {
++    guard settings.needsFirstSettings else { return }
++    guard isTrainable, !hasOtherPresentation else {
++      // Yield an unfinished automatic setup without marking it as seen.
++      if presentation == .settings { presentation = nil }
++      return
++    }
++    if presentation == nil { presentation = .settings }
+   }
+
+   func tap(seconds: Int, exercise: String) {
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RestTimerOverlay.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RestTimerOverlay.swift
+@@ -5,6 +5,7 @@
+   @Bindable var session: RestRingSession
+   let available: Bool
+   let hidden: Bool
++  let hasOtherPresentation: Bool
+   let seconds: Int
+   let exercise: String
+   let headerBottom: CGFloat
+@@ -13,7 +14,7 @@
+
+   var body: some View {
+     ZStack {
+-      if available && !hidden {
++      if available && !hidden && !hasOtherPresentation {
+         RestRingFloatingButton(
+           remaining: session.model.phase == .idle
+             ? seconds : session.model.remaining(at: session.clock),
+@@ -28,8 +29,10 @@
+           })
+       }
+     }
+-    .task(id: available && !hidden) {
+-      if available && !hidden { session.enterTrainableDay() }
++    .onChange(of: canPresentFirstSettings, initial: true) { _, _ in
++      session.updatePresentationContext(
++        isTrainable: available && !hidden,
++        hasOtherPresentation: hasOtherPresentation || scenePhase != .active)
+     }
+     .onChange(of: scenePhase, initial: true) { _, phase in
+       session.setForeground(phase == .active)
+@@ -46,6 +49,10 @@
+       }
+     #endif
+     .transaction { $0.disablesAnimations = true }
++  }
++
++  private var canPresentFirstSettings: Bool {
++    available && !hidden && !hasOtherPresentation && scenePhase == .active
+   }
+ }
+
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
+@@ -29,6 +29,10 @@
+   private let onPlanChanged: (StudentPlanView) -> Void
+   @Environment(BodyWeightEntryModel.self) private var weightEntry: BodyWeightEntryModel?
+   @Environment(ProfileNavigation.self) private var profileNavigation: ProfileNavigation?
++  @Environment(\.isStudentPresentationBlocked) private var ancestorPresentationBlocked
++  @Environment(\.bindFirstRun) private var bindFirstRun
++  @State private var childPresentationBlocked = false
++  @State private var workoutModalIsPresented = false
+   private let onOpenCoach: () -> Void
+
+   @State private var restRingHeaderBottom: CGFloat = 0
+@@ -172,18 +176,25 @@
+
+   public var body: some View {
+     workoutContent
++      .onPreferenceChange(TrainingPresentationBlockedKey.self) { childPresentationBlocked = $0 }
++      .onChange(of: hasRequestedWorkoutModal, initial: true) { _, requested in
++        if requested { workoutModalIsPresented = true }
++      }
+       .onPreferenceChange(RestRingHeaderBottomKey.self) { restRingHeaderBottom = $0 }
+       .overlay {
+         RestTimerOverlay(
+           session: viewModel.restRing,
+           available: isVisible && isEditable && viewModel.currentRestExercise != nil,
+           hidden: keypad?.current != nil || editing != nil,
++          hasOtherPresentation: restRingPresentationBlocked,
+           seconds: viewModel.currentRestSeconds,
+           exercise: viewModel.currentRestExercise?.displayExerciseName ?? "",
+           headerBottom: restRingHeaderBottom, dockTop: completionDockTop)
+       }
+       .modifier(
+-        ExerciseNotePresentation(reference: $exerciseNote) { reference in
++        ExerciseNotePresentation(
++          reference: $exerciseNote, onDismiss: workoutModalDidDismiss
++        ) { reference in
+           ExerciseNoteSheet(reference: reference) { note in
+             guard let notifications, let chat = notifications.chatContext else { return false }
+             let result = await notifications.openExerciseNoteConversation()
+@@ -320,12 +331,13 @@
+       VideoMissingFileHost(
+         model: videoViewModel, enabled: editing == nil,
+         context: missingVideoContext,
++        onDismiss: workoutModalDidDismiss,
+         onRestored: {
+           await videoViewModel.retryFailures(
+             studentID: studentID, workout: viewModel, trainingDate: selectedTrainingDate)
+         })
+     )
+-    .modifier(CompletedVideoReplayHost(model: replay))
++    .modifier(CompletedVideoReplayHost(model: replay, onDismiss: workoutModalDidDismiss))
+     .task { await replay.load(studentID: studentID) }
+     .safeAreaInset(edge: .bottom) {
+       VStack(spacing: 0) {
+@@ -369,33 +381,34 @@
+   private var workoutContent: some View {
+     workoutBase()
+       #if os(iOS)
+-        .fullScreenCover(item: $editing) { target in
++        .fullScreenCover(item: $editing, onDismiss: workoutModalDidDismiss) { target in
+           setEntry(for: target)
+         }
+       #else
+-        .sheet(item: $editing) { target in
++        .sheet(item: $editing, onDismiss: workoutModalDidDismiss) { target in
+           setEntry(for: target)
+         }
+       #endif
+       #if os(iOS)
+-        .fullScreenCover(item: $quickLogRoute) { route in
+-          quickLogSheet(for: route)
+-        }
++        .fullScreenCover(
++          item: $quickLogRoute, onDismiss: workoutModalDidDismiss, content: quickLogSheet)
+       #else
+-        .sheet(item: $quickLogRoute) { route in
++        .sheet(item: $quickLogRoute, onDismiss: workoutModalDidDismiss) { route in
+           quickLogSheet(for: route)
+         }
+       #endif
+       #if os(iOS)
+-        .fullScreenCover(item: $viewModel.completionPhase) { phase in
++        .fullScreenCover(
++          item: $viewModel.completionPhase, onDismiss: workoutModalDidDismiss
++        ) { phase in
+           completionFlow(phase: phase)
+         }
+       #else
+-        .sheet(item: $viewModel.completionPhase) { phase in
+-          completionFlow(phase: phase)
+-        }
++        .sheet(
++          item: $viewModel.completionPhase, onDismiss: workoutModalDidDismiss,
++          content: completionFlow)
+       #endif
+-      .sheet(isPresented: $showingReadinessSheet) {
++      .sheet(isPresented: $showingReadinessSheet, onDismiss: workoutModalDidDismiss) {
+         ReadinessCheckinSheet(
+           studentID: studentID,
+           viewModel: readinessViewModel,
+@@ -418,7 +431,7 @@
+       } message: {
+         Text(setRefEntryErrorMessage ?? "")
+       }
+-      .sheet(item: $setRefPickerRoute) { route in
++      .sheet(item: $setRefPickerRoute, onDismiss: workoutModalDidDismiss) { route in
+         if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
+           SetRefSharePicker(
+             context: setRefSharing,
+@@ -472,7 +485,9 @@
+       Text(videoViewModel.retryErrorMessage ?? "")
+     }
+     #if os(iOS)
+-      .fullScreenCover(item: $directCameraTarget, content: directCamera)
++      .fullScreenCover(
++        item: $directCameraTarget, onDismiss: workoutModalDidDismiss,
++        content: directCamera)
+     #endif
+     .onChange(of: scenePhase) { _, phase in
+       if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
+@@ -1110,6 +1125,34 @@
+       && !videoViewModel.rowStates.values.contains { $0.attachment.status == .uploading }
+   }
+
++  private func workoutModalDidDismiss() { workoutModalIsPresented = false }
++
++  private var hasRequestedWorkoutModal: Bool {
++    editing != nil || quickLogRoute != nil || viewModel.completionPhase != nil
++      || showingReadinessSheet || setRefPickerRoute != nil || directCameraTarget != nil
++      || exerciseNote != nil || replay.selected != nil || videoViewModel.missingAttachment != nil
++  }
++
++  private var restRingPresentationBlocked: Bool {
++    if ancestorPresentationBlocked || bindFirstRun?.showsWelcome == true
++      || (viewModel.showsHandoffNotice && !viewModel.browsingPastPlan)
++    {
++      return true
++    }
++    if hasRequestedWorkoutModal || workoutModalIsPresented || childPresentationBlocked
++      || showingHistory || weightEntry?.isPresented == true
++    {
++      return true
++    }
++    if showingDirectCameraConsent || pendingDirectCameraTarget != nil
++      || preparingVideoSetID != nil || exerciseNavigation?.reference != nil
++    {
++      return true
++    }
++    return isPreparingSetRefPicker || setRefEntryErrorMessage != nil || retryTargetSetLogID != nil
++      || viewModel.actionErrorMessage != nil || videoViewModel.retryErrorMessage != nil
++  }
++
+   private func turnPlan(forward: Bool) {
+     guard safeHandoffBoundary else { return }
+     Task {
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AllDaySheetView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AllDaySheetView.swift
+@@ -10,8 +10,11 @@
+   let onVideo: (TodayWorkoutPresentation.Row) -> Void
+   let onNote: (TodayWorkoutSetRowDraft) -> Void
+   @State private var showsPicker = false
++  @State private var pickerIsPresented = false
+   @State private var removal: UUID?
+   @State private var previewExpanded: UUID?
++
++  private func pickerDidDismiss() { pickerIsPresented = false }
+
+   private var groups: [AllDayExercise] {
+     viewModel?.allDaySheet
+@@ -59,6 +62,7 @@
+       if editable, let viewModel {
+         Button(StudentStrings.localized(.addedAddExercise), systemImage: "plus") {
+           showsPicker = true
++          pickerIsPresented = true
+         }
+         .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+         .foregroundStyle(Color.MeetPR.goldText)
+@@ -67,12 +71,15 @@
+           groups.filter { $0.rows.first?.isStudentAdded == true }.count >= StudentAddedRows.limit
+         )
+         .accessibilityIdentifier("studentAdded.addExercise")
+-        .sheet(isPresented: $showsPicker) {
++        .sheet(isPresented: $showsPicker, onDismiss: pickerDidDismiss) {
+           StudentExercisePicker(
+             viewModel: viewModel, day: presentation.day,
+             addedIDs: Set(groups.flatMap(\.rows).filter(\.isStudentAdded).map(\.exerciseID)))
+         }
+       }
++    }
++    .transformPreference(TrainingPresentationBlockedKey.self) {
++      $0 = $0 || showsPicker || pickerIsPresented || removal != nil
+     }
+     .transaction(value: viewModel?.expandedAllDayExerciseID ?? previewExpanded) { transaction in
+       transaction.animation = nil
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/ExerciseNoteSheet.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/ExerciseNoteSheet.swift
+@@ -59,6 +59,7 @@
+ /// A transparent full-screen presentation centers the dialog and blocks the tab bar behind it.
+ struct ExerciseNotePresentation<Dialog: View>: ViewModifier {
+   @Binding var reference: ExerciseRefV1?
++  var onDismiss: () -> Void = {}
+   @ViewBuilder let dialog: (ExerciseRefV1) -> Dialog
+
+   private struct Item: Identifiable {
+@@ -74,11 +75,11 @@
+
+   func body(content: Content) -> some View {
+     #if os(iOS)
+-      content.fullScreenCover(item: item) { item in
++      content.fullScreenCover(item: item, onDismiss: onDismiss) { item in
+         dialog(item.reference).presentationBackground(.clear)
+       }
+     #else
+-      content.sheet(item: item) { item in dialog(item.reference) }
++      content.sheet(item: item, onDismiss: onDismiss) { item in dialog(item.reference) }
+     #endif
+   }
+ }
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/RestRingActivityTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/RestRingActivityTests.swift
+@@ -36,6 +36,34 @@
+ }
+
+ @MainActor
++@Test func restRingFirstSettingsWaitsForOtherPresentationToClose() {
++  let session = RestRingSession(controller: RingActivitySpy())
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: true)
++  #expect(session.presentation == nil)
++  #expect(session.settings.needsFirstSettings)
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: false)
++  #expect(session.presentation == .settings)
++  session.dismiss()
++  #expect(!session.settings.needsFirstSettings)
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: false)
++  #expect(session.presentation == nil)
++}
++
++@MainActor
++@Test func restRingDefersUnfinishedSetupWhenTrainingLosesPresentationPriority() {
++  let session = RestRingSession(controller: RingActivitySpy())
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: false)
++  #expect(session.presentation == .settings)
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: true)
++  #expect(session.presentation == nil)
++  #expect(session.settings.needsFirstSettings)
++  session.updatePresentationContext(isTrainable: false, hasOtherPresentation: false)
++  #expect(session.presentation == nil)
++  session.updatePresentationContext(isTrainable: true, hasOtherPresentation: false)
++  #expect(session.presentation == .settings)
++}
++
++@MainActor
+ private final class RingTestClock {
+   var date = Date(timeIntervalSince1970: 1000)
+ }
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayHost.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayHost.swift
+@@ -2,14 +2,15 @@
+
+ struct CompletedVideoReplayHost: ViewModifier {
+   @Bindable var model: CompletedVideoReplayModel
++  var onDismiss: () -> Void = {}
+
+   func body(content: Content) -> some View {
+     #if os(iOS)
+-      content.fullScreenCover(item: $model.selected) { request in
++      content.fullScreenCover(item: $model.selected, onDismiss: onDismiss) { request in
+         CompletedVideoReplayView(model: model, request: request)
+       }
+     #else
+-      content.sheet(item: $model.selected) { request in
++      content.sheet(item: $model.selected, onDismiss: onDismiss) { request in
+         CompletedVideoReplayView(model: model, request: request)
+       }
+     #endif
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AllDaySetRow.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AllDaySetRow.swift
+@@ -55,6 +55,7 @@
+         Task { _ = await viewModel?.removeStudentRow(id: draft.id) }
+       }
+     }
++    .preference(key: TrainingPresentationBlockedKey.self, value: showsRemoval)
+     .padding(.horizontal, MeetPRSpacing.space2)
+     .padding(.vertical, editing ? MeetPRSpacing.space2 : 0)
+     .background(
+--- a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoMissingFileHost.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoMissingFileHost.swift
+@@ -7,6 +7,7 @@
+   let model: VideoAttachmentViewModel
+   var enabled = true
+   let context: (VideoAttachment) -> String
++  var onDismiss: () -> Void = {}
+   var onRestored: () async -> Void = {}
+
+   func body(content: Content) -> some View {
+@@ -14,7 +15,8 @@
+       item: Binding(
+         get: { enabled ? model.missingAttachment : nil },
+         set: { if $0 == nil { model.missingAttachment = nil } }
+-      )
++      ),
++      onDismiss: onDismiss
+     ) { record in
+       VideoMissingFileSheet(
+         record: record, context: context(record), model: model, onRestored: onRestored)

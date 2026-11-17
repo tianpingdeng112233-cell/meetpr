@@ -1,0 +1,8 @@
+XcodeBuildMCP build_sim
+Simulator: iPhone 17e / 5D5FA360-BA49-48C6-A887-2F0D22F89749 / iOS 26.5
+Scheme: MeetPR-DemoStudent
+Final build: SUCCEEDED, 57.824 seconds, warnings: [], errors: []
+DerivedData: /private/tmp/meetpr-111-debug
+Extra arguments: -disableAutomaticPackageResolution -skipPackageUpdates SWIFT_COMPILATION_MODE=incremental SWIFT_OPTIMIZATION_LEVEL=-Onone -jobs 4
+Log: ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-111-d4ab5df01f1c/logs/build_sim_2026-11-17T11-23-03-746Z_pid40919_2db36544.log
+First normal DemoStudent build also SUCCEEDED (before final review and spacing fixes). Final acceptance uses the incremental nonoptimized build above.

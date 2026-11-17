@@ -1,0 +1,116 @@
+Final full StudentKit run: XcodeBuildMCP swift_package_test, parallel=false
+Result: 1333 passed, 0 failed, 0 skipped; 116.544 seconds
+Log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-111-d4ab5df01f1c/logs/swift_package_test_2026-11-17T11-46-51-447Z_pid40919_a13fda32.log
+
+✔ Suite AccessoryColumnsTests passed after 0.783 seconds.
+✔ Suite AccessoryRIRKeypadTests passed after 0.142 seconds.
+✔ Suite AccessoryWeightHistoryGuardsTests passed after 0.001 seconds.
+✔ Suite AccessoryWeightHistoryIntegrationTests passed after 0.025 seconds.
+✔ Suite AccessoryWeightHistoryTests passed after 0.001 seconds.
+✔ Suite AllDayDirectEditingTests passed after 0.214 seconds.
+✔ Suite AllDaySummaryTests passed after 0.031 seconds.
+✔ Suite AllDayVideoReplayTests passed after 0.963 seconds.
+✔ Suite AskCoachVisibilityTests passed after 1.462 seconds.
+✔ Suite BindGateOfflineRecoveryTests passed after 0.024 seconds.
+✔ Suite CameraReturnDuringPersistenceTests passed after 0.800 seconds.
+✔ Suite CompletedVideoLayoutTests passed after 0.202 seconds.
+✔ Suite CompletedVideoReplayTests passed after 0.004 seconds.
+✔ Suite E1RMPREventsContractTests passed after 0.007 seconds.
+✔ Suite EffortExplainerTests passed after 0.001 seconds.
+✔ Suite RIRStepperCopyTests passed after 0.001 seconds.
+✔ Suite FeedbackVideoPlaybackInteractionTests passed after 0.254 seconds.
+✔ Suite FeedbackVideoPlaybackModelTests passed after 0.004 seconds.
+✔ Suite GrowthE1RMDetailTests passed after 0.007 seconds.
+✔ Suite GrowthFormingAxisTests passed after 0.001 seconds.
+✔ Suite HeroActionSummaryRowTests passed after 0.435 seconds.
+✔ Suite HeroPrescriptionRowsTests passed after 0.001 seconds.
+✔ Suite HoldToCompleteGestureStateTests passed after 0.002 seconds.
+✔ Suite IntensityWeightSuggestionTests passed after 0.004 seconds.
+✔ Suite "Invite code paste button" passed after 0.267 seconds.
+✔ Suite OfflineAccessoryTests passed after 0.010 seconds.
+✔ Suite OfflineCompletionDeviceRegressionTests passed after 0.020 seconds.
+✔ Suite OfflineSetRecordingTests passed after 0.036 seconds.
+✔ Suite PctAnchorResolverTests passed after 0.001 seconds.
+✔ Suite PublishedDayTrainingTests passed after 1.934 seconds.
+✔ Suite QuickLogPlanTests passed after 0.027 seconds.
+◇ Test restRingActivityStartsUpdatesAndEndsThroughControllerSeam() started.
+✔ Test restRingActivityStartsUpdatesAndEndsThroughControllerSeam() passed after 0.001 seconds.
+◇ Test backgroundExpiryKeepsNotificationUntilForegroundReturn() started.
+✔ Test backgroundExpiryKeepsNotificationUntilForegroundReturn() passed after 0.001 seconds.
+◇ Test restRingDurationUsesCoachThenExerciseCategory() started.
+✔ Test restRingDurationUsesCoachThenExerciseCategory() passed after 0.001 seconds.
+◇ Test restRingRunsToDoneThenReturnsToIdleOnWallClock() started.
+✔ Test restRingRunsToDoneThenReturnsToIdleOnWallClock() passed after 0.001 seconds.
+◇ Test restRingAdjustsWithinBoundsAndCanEndOrCompleteTodaySilently() started.
+✔ Test restRingAdjustsWithinBoundsAndCanEndOrCompleteTodaySilently() passed after 0.001 seconds.
+◇ Test restRingChoosesExpandedThenHighlightedThenLastExercise() started.
+✔ Test restRingChoosesExpandedThenHighlightedThenLastExercise() passed after 0.001 seconds.
+◇ Test restRingAlertsOnlyOncePerLastTenSecondsAndRespectsForegroundAndSwitches() started.
+✔ Test restRingAlertsOnlyOncePerLastTenSecondsAndRespectsForegroundAndSwitches() passed after 0.001 seconds.
+◇ Test restRingMigratesThreeLegacyStorageShapes() started.
+✔ Test restRingMigratesThreeLegacyStorageShapes() passed after 0.001 seconds.
+◇ Test restRingFirstVisitShowsSettingsThenHintUntilFirstUse() started.
+✔ Test restRingFirstVisitShowsSettingsThenHintUntilFirstUse() passed after 0.001 seconds.
+✔ Suite "Retained set-video cleanup" passed after 0.001 seconds.
+✔ Suite SBDWeekBadgeTests passed after 0.002 seconds.
+✔ Suite SessionReflectionStoreTests passed after 0.035 seconds.
+✔ Suite SessionReviewStoreTests passed after 0.014 seconds.
+✔ Suite SetEntryNumberPadEditTests passed after 0.001 seconds.
+✔ Suite SetEntryPlateMathTests passed after 0.003 seconds.
+✔ Suite SetEntryRPEScaleTests passed after 0.005 seconds.
+✔ Suite SetEntryValueTests passed after 0.001 seconds.
+✔ Suite SetEntryVideoPlaybackStateTests passed after 0.002 seconds.
+✔ Suite SetEntryVideoPlayerTests passed after 2.368 seconds.
+✔ Suite "Set number surfaces" passed after 5.896 seconds.
+✔ Suite SetSyncCompletionTests passed after 0.009 seconds.
+✔ Suite SetSyncControlTests passed after 0.032 seconds.
+✔ Suite SetSyncDraftTests passed after 0.046 seconds.
+✔ Suite SetSyncLogoutTests passed after 0.015 seconds.
+✔ Suite SetSyncNetworkTests passed after 0.007 seconds.
+✔ Suite SetSyncQueueTests passed after 0.005 seconds.
+✔ Suite SetSyncReceiptTests passed after 0.017 seconds.
+✔ Suite SetSyncRegressionTests passed after 0.078 seconds.
+✔ Suite SetSyncSuspendedRequestTests passed after 0.027 seconds.
+✔ Suite SetSyncViewInjectionTests passed after 0.005 seconds.
+✔ Suite SetWeightSuggestionOutcomeTests passed after 0.640 seconds.
+✔ Suite SetWeightSuggestionTests passed after 0.003 seconds.
+✔ Suite LastWeightsTests passed after 0.001 seconds.
+✔ Suite "Student empty and failure states" passed after 0.083 seconds.
+✔ Suite StudentRefreshCancellationTests passed after 0.112 seconds.
+✔ Suite StudentSecondaryCancellationTests passed after 0.027 seconds.
+✔ Suite "StudentKit localization" passed after 0.011 seconds.
+✔ Suite "Today set-ref sharing" passed after 0.006 seconds.
+✔ Suite TodayWorkoutExerciseSectionTests passed after 0.002 seconds.
+✔ Suite TodayWorkoutPresentationTests passed after 0.007 seconds.
+✔ Suite TrainingCalendarScrollStateTests passed after 0.001 seconds.
+✔ Suite TodayWorkoutQuickLogDateRangeTests passed after 0.016 seconds.
+✔ Suite TodayWorkoutQuickLogRetryTests passed after 0.021 seconds.
+✔ Suite TodayWorkoutQuickLogTests passed after 0.021 seconds.
+✔ Suite TodayWorkoutSelectionResolverTests passed after 0.001 seconds.
+✔ Suite "Today workout set-ref entry layout" passed after 1.652 seconds.
+✔ Suite TrainingDayNumberTests passed after 0.001 seconds.
+✔ Suite TrainingFlowTests passed after 0.037 seconds.
+✔ Suite TrainingHistoryGroupingTests passed after 0.001 seconds.
+✔ Suite TrainingHistoryVideoTests passed after 0.001 seconds.
+✔ Suite TrainingReminderDefaultTests passed after 0.001 seconds.
+✔ Suite "Training reminder recovery" passed after 0.049 seconds.
+✔ Suite "Training reminders" passed after 0.009 seconds.
+✔ Suite TrainingTabRedesignTests passed after 0.001 seconds.
+✔ Suite TrainingWeekCalendarTests passed after 0.001 seconds.
+✔ Suite TrainingWeekPagingTests passed after 0.002 seconds.
+✔ Suite TrainingWeekPresentationTests passed after 0.001 seconds.
+✔ Suite "Set-video playback source" passed after 0.005 seconds.
+✔ Suite VideoCompletionBoundaryTests passed after 21.248 seconds.
+✔ Suite VideoCompletionControlTests passed after 0.052 seconds.
+✔ Suite VideoCompletionIngestionTests passed after 0.008 seconds.
+✔ Suite VideoCompletionIntegrationTests passed after 0.017 seconds.
+✔ Suite VideoCompletionReviewRegressionTests passed after 0.014 seconds.
+✔ Suite VideoCompletionRewardRouteTests passed after 0.021 seconds.
+✔ Suite VideoCompletionRuntimeTests passed after 0.038 seconds.
+✔ Suite "Video delivery failure presentation" passed after 0.002 seconds.
+✔ Suite WorkoutCompletionFlowModelTests passed after 0.004 seconds.
+✔ Suite WorkoutCompletionPresentationTests passed after 0.019 seconds.
+✔ Suite WorkoutDatePolicyTests passed after 0.006 seconds.
+✔ Suite WorkoutKeypadAccessibilityTests passed after 0.925 seconds.
+✔ Suite WorkoutKeypadSessionTests passed after 0.021 seconds.
+✔ Test run with 1333 tests in 93 suites passed after 110.757 seconds.
