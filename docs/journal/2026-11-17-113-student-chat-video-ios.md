@@ -92,3 +92,7 @@ The dark-mode blocker above is resolved. Root authorized a separate temporary si
 Waited until the other task's screen remained unchanged and no UI input commands were active; launched QA at 12:05, changed QA's own Settings → Appearance → Dark, then repeated + video → video-only gallery → preview → send. Personally inspected screenshots `06-menu-dark.jpg`, `07-video-picker-dark.jpg`, `08-preview-dark.jpg`, `09-delivered-dark.jpg`, also exported as `/Users/david/Documents/Codex/2026-11-17/lai-o/outputs/113-ios-<filename>`. In the independent QA run, the delivered card and 0:02 duration were visible immediately after send; the earlier scroll observation did not reproduce. Stopped only `com.meetpr.chatvideoqa` at 12:08, releasing 17e. No 17 / 17 Pro installs.
 
 Final local result: native build passed; 159 Networking + 100 ChatUI + 1327 StudentKit tests passed; Standards/Spec CLEAN (root reported); light/dark menu, gallery, preview, sent card inspected; cancel/reselect/send/playback exercised. Outstanding integration remains real deployed backend/OSS and coach/cross-platform receipt, as recorded in NEXT-RELEASE. Source frozen; no child commit/push.
+
+## 合并与真实联调准备（2026-11-17）
+
+David已批准合并、后端备份/0089/部署及双端真实联调。#478已squash到release/1.0@c3c1b34ef705deeb25ffe2971fbb633d02de0528；合并前CI三项全绿（44080694507）。以合并SHA准备Debug真实网络构建，目标iPhone17e；不使用Demo作为持久化证明。后端控制台连续连接超时，真实备份/迁移/部署及已绑定测试登录会话尚缺。没有Archive/上传，build号保持41，候选仍为42。
