@@ -1,5 +1,29 @@
 {
   "sourceLanguage": "en",
-  "strings": {},
+  "strings": {
+    "restRingFinished": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息结束"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息結束"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest over"
+          }
+        }
+      }
+    }
+  },
   "version": "1.0"
 }

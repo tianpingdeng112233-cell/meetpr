@@ -64,8 +64,11 @@ public final class TodayWorkoutViewModel {
   var accessoryVideosLoaded = false
   private(set) var accessorySavingIDs: Set<UUID> = []
   private(set) var accessoryBatchInFlight = false
-  public private(set) var restTimer: RestTimerState?
-  public private(set) var showsRestTimerExplanation = false
+  let restRing: RestRingSession
+  public var restTimer: RestTimerState? {
+    guard restRing.model.phase == .running, let endsAt = restRing.model.endsAt else { return nil }
+    return RestTimerState(endsAt: endsAt, totalSeconds: restRing.model.totalSeconds)
+  }
   public private(set) var planContext: TodayWorkoutPlanContext?
   private(set) var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
@@ -97,7 +100,6 @@ public final class TodayWorkoutViewModel {
   private let e1rmRepo: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
-  private let restTimerActivityController: any RestTimerActivityControlling
   private let historyWeightPrefillEnabled: Bool
   private let calendar: Calendar
   private let now: @Sendable () -> Date
@@ -148,9 +150,9 @@ public final class TodayWorkoutViewModel {
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
-    self.restTimerActivityController = restTimerActivityController
+    self.restRing = RestRingSession(
+      controller: restTimerActivityController, now: now, feedback: RestRingFeedback.emit)
     self.historyWeightPrefillEnabled = historyWeightPrefillEnabled
-    restTimerActivityController.end()
     self.calendar = calendar
     self.now = now
     self.completionSleep = completionSleep
@@ -359,6 +361,10 @@ public final class TodayWorkoutViewModel {
       studentDraftCache[day.id] = drafts.filter { $0.isExtra || $0.isStudentAdded }
     }
     currentStudentID = studentID
+    let ringSettings = restTimerSettings.ringSettings(for: studentID)
+    restRing.configure(student: studentID, settings: ringSettings) { [restTimerSettings] settings in
+      restTimerSettings.saveRingSettings(settings, for: studentID)
+    }
     if let setSyncQueue, setSyncQueue.studentID == studentID {
       setSyncQueue.onAcknowledged = { [weak self] record, receipt in
         await self?.applySyncedSet(record, receipt: receipt)
@@ -440,6 +446,10 @@ public final class TodayWorkoutViewModel {
   func refreshCurrentPlan(dayID: UUID?, studentID: UUID) async {
     guard !isPreviewingPlan, !browsingPastPlan else { return }
     currentStudentID = studentID
+    let ringSettings = restTimerSettings.ringSettings(for: studentID)
+    restRing.configure(student: studentID, settings: ringSettings) { [restTimerSettings] settings in
+      restTimerSettings.saveRingSettings(settings, for: studentID)
+    }
     loadGeneration += 1
     let generation = loadGeneration
     let startingRecordingGeneration = recordingGeneration
@@ -1130,6 +1140,7 @@ public final class TodayWorkoutViewModel {
     guard let day = currentDay, !allDayWriting,
       FlexibleTrainingDay.canWrite(day, in: planDays)
     else { return false }
+    restRing.completeToday()
     allDayWriting = true
     defer { allDayWriting = false }
     let ids = completionWrites.map(\.id)
@@ -1665,71 +1676,23 @@ public final class TodayWorkoutViewModel {
     )
   }
 
-  public func adjustRestTimer(bySeconds delta: Int) {
-    guard let timer = restTimer else { return }
-    let remaining = timer.endsAt.timeIntervalSince(now()) + TimeInterval(delta)
-    let clamped = min(max(remaining, 0), 900)
-    let adjustedTimer = RestTimerState(
-      endsAt: now().addingTimeInterval(clamped), totalSeconds: timer.totalSeconds)
-    restTimer = adjustedTimer
-    restTimerActivityController.update(
-      endsAt: adjustedTimer.endsAt,
-      totalSeconds: adjustedTimer.totalSeconds
-    )
+  public func adjustRestTimer(bySeconds delta: Int) { restRing.adjust(by: delta) }
+
+  public func skipRestTimer() { restRing.end() }
+
+  var currentRestExercise: SetRowDraft? {
+    let groups = allDaySheet
+    let id = RestRingModel.currentExercise(
+      ids: groups.map(\.id), expanded: expandedAllDayExerciseID,
+      highlighted: groups.first { $0.node == .current }?.id)
+    return groups.first { $0.id == id }?.rows.first
   }
 
-  public func skipRestTimer() {
-    restTimer = nil
-    restTimerActivityController.end()
-  }
-
-  public func acknowledgeRestTimerExplanation() {
-    guard let currentStudentID else { return }
-    restTimerSettings.markExplanationAcknowledged(for: currentStudentID)
-    showsRestTimerExplanation = false
-  }
-
-  private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
-    let finishedAccessory =
-      draft.isAccessory
-      && drafts.filter { $0.planExerciseID == draft.planExerciseID }.allSatisfy(\.completed)
-    guard
-      draft.isExtra || draft.isStudentAdded
-        || (!drafts.allSatisfy(\.completed) && !finishedAccessory)
-    else {
-      restTimer = nil
-      restTimerActivityController.end()
-      return
-    }
-    let seconds: Int
-    if draft.isAccessory {
-      seconds = RestTimerPolicy.accessorySeconds(
-        coachSeconds: draft.prescribed.restSeconds,
-        studentSeconds: currentStudentID.map { restTimerSettings.accessorySeconds(for: $0) })
-    } else {
-      seconds =
-        draft.prescribed.restSeconds
-        ?? currentStudentID.flatMap {
-          restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
-        }
-        ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
-    }
-    let hadActiveTimer = restTimer != nil
-    let nextTimer = RestTimerState(
-      endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
-    restTimer = nextTimer
-    if hadActiveTimer {
-      restTimerActivityController.end()
-    }
-    restTimerActivityController.start(
-      endsAt: nextTimer.endsAt,
-      totalSeconds: nextTimer.totalSeconds
-    )
-    if !draft.isAccessory, let currentStudentID,
-      !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
-    {
-      showsRestTimerExplanation = true
-    }
+  var currentRestSeconds: Int {
+    guard let row = currentRestExercise else { return restRing.settings.mainSeconds }
+    return RestRingModel.duration(
+      coachSeconds: row.prescribed.restSeconds, isAccessory: row.isAccessory,
+      main: restRing.settings.mainSeconds, accessory: restRing.settings.accessorySeconds)
   }
 
   private func acknowledgeUnacknowledgedPRs(studentID: UUID) async {

@@ -1,97 +1,105 @@
 import DesignSystem
 import SwiftUI
 
-#if canImport(UIKit)
-  import UIKit
-#endif
-
-/// Inter-set rest countdown bar (spec 030 §B3), pinned via safeAreaInset so
-/// it never covers the tab bar or set rows. Driven by TimelineView off the
-/// wall-clock `endsAt`, so backgrounding the app keeps the remaining time
-/// honest with zero background-task machinery.
-@available(iOS 17.0, macOS 14.0, *)
 struct RestTimerOverlay: View {
-  let timer: TodayWorkoutViewModel.RestTimerState
-  let now: () -> Date
-  let onAdjust: (Int) -> Void
-  let onSkip: () -> Void
+  @Bindable var session: RestRingSession
+  let available: Bool
+  let hidden: Bool
+  let hasOtherPresentation: Bool
+  let seconds: Int
+  let exercise: String
+  let headerBottom: CGFloat
+  let dockTop: CGFloat?
+  @Environment(\.scenePhase) private var scenePhase
 
   var body: some View {
-    TimelineView(.periodic(from: .now, by: 1)) { context in
-      let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
-      VStack(spacing: MeetPRSpacing.xs) {
-        if remaining > 0 {
-          countdown(remaining: remaining)
-        } else {
-          finished
+    ZStack {
+      if available && !hidden && !hasOtherPresentation {
+        RestRingFloatingButton(
+          remaining: session.model.phase == .idle
+            ? seconds : session.model.remaining(at: session.clock),
+          total: session.model.totalSeconds,
+          running: session.model.phase == .running, done: session.model.phase == .done,
+          showsHint: session.settings.showsHint,
+          headerBottom: headerBottom, dockTop: dockTop,
+          onTap: { session.tap(seconds: seconds, exercise: exercise) },
+          onHold: {
+            RestRingFeedback.hold()
+            session.openSettings()
+          })
+      }
+    }
+    .onChange(of: canPresentFirstSettings, initial: true) { _, _ in
+      session.updatePresentationContext(
+        isTrainable: available && !hidden,
+        hasOtherPresentation: hasOtherPresentation || scenePhase != .active)
+    }
+    .onChange(of: scenePhase, initial: true) { _, phase in
+      session.setForeground(phase == .active)
+    }
+    #if os(iOS)
+      .fullScreenCover(item: $session.presentation) { presentation in
+        RestRingModal(session: session, presentation: presentation)
+        .presentationBackground(.clear)
+        .interactiveDismissDisabled()
+      }
+    #else
+      .sheet(item: $session.presentation) { presentation in
+        RestRingModal(session: session, presentation: presentation)
+      }
+    #endif
+    .transaction { $0.disablesAnimations = true }
+  }
+
+  private var canPresentFirstSettings: Bool {
+    available && !hidden && !hasOtherPresentation && scenePhase == .active
+  }
+}
+
+private struct RestRingModal: View {
+  @Bindable var session: RestRingSession
+  let presentation: RestRingSession.Presentation
+
+  var body: some View {
+    GeometryReader { proxy in
+      let settings = presentation == .settings
+      let diameter = settings ? 340.0 : 280.0
+      let scale = min(1, (proxy.size.width - 12) / diameter)
+      ZStack {
+        Button(action: session.dismiss) {
+          Color.black.opacity(0.6).contentShape(.rect)
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(StudentStrings.localized(settings ? .restRingSave : .restRingDismiss))
+        .accessibilityIdentifier("restRing.scrim")
+        if settings {
+          RestRingSettingsDisk(
+            mainSeconds: $session.settings.mainSeconds,
+            accessorySeconds: $session.settings.accessorySeconds,
+            vibration: $session.settings.vibration, sound: $session.settings.sound
+          )
+          .scaleEffect(scale)
+        } else {
+          RestRingCountdownDisk(
+            remaining: session.model.remaining(at: session.clock),
+            total: session.model.totalSeconds,
+            exercise: session.model.exercise, onSettings: session.openSettings,
+            onAdjust: session.adjust, onEnd: session.end
+          )
+          .scaleEffect(scale)
+        }
+        Text(StudentStrings.localized(settings ? .restRingSave : .restRingDismiss))
+          .font(.system(size: 12))
+          .foregroundStyle(Color.MeetPR.inkOnCTAFill)
+          .multilineTextAlignment(.center)
+          .frame(maxWidth: proxy.size.width - 24)
+          .position(x: proxy.size.width / 2, y: proxy.size.height / 2 + diameter * scale / 2 + 24)
+          .allowsHitTesting(false)
       }
-      .padding(.horizontal, MeetPRSpacing.md)
-      .padding(.vertical, MeetPRSpacing.sm)
-      .frame(maxWidth: .infinity)
-      .background(Color.MeetPR.surfaceElevated)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-      .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
-      .padding(.horizontal, MeetPRSpacing.md)
-      .padding(.bottom, MeetPRSpacing.xs)
+      .frame(width: proxy.size.width, height: proxy.size.height)
     }
-    // Keyed to endsAt: starting/adjusting a timer cancels the stale
-    // completion task, so an old 3s dismiss can't clear a fresh timer
-    // (Codex review P1).
-    .task(id: timer.endsAt) {
-      let remaining = max(0, timer.endsAt.timeIntervalSince(now()))
-      try? await Task.sleep(for: .seconds(remaining))
-      guard !Task.isCancelled else { return }
-      #if canImport(UIKit)
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-      #endif
-      try? await Task.sleep(for: .seconds(3))
-      guard !Task.isCancelled else { return }
-      onSkip()
-    }
-  }
-
-  private func countdown(remaining: TimeInterval) -> some View {
-    VStack(spacing: MeetPRSpacing.xs) {
-      HStack(spacing: MeetPRSpacing.md) {
-        Image(systemName: "timer")
-          .foregroundStyle(Color.MeetPR.gold500)
-        Text(Self.minutesSeconds(remaining))
-          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size22, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .contentTransition(.numericText())
-        Spacer()
-        Button("-30s") { onAdjust(-30) }
-          .buttonStyle(.bordered)
-          .tint(Color.MeetPR.textSecondary)
-        Button(StudentStrings.localized(.restTimerOverlay001)) { onSkip() }
-          .buttonStyle(.bordered)
-          .tint(Color.MeetPR.goldText)
-        Button("+30s") { onAdjust(30) }
-          .buttonStyle(.bordered)
-          .tint(Color.MeetPR.textSecondary)
-      }
-      ProgressView(
-        value: max(0, min(1, remaining / Double(timer.totalSeconds)))
-      )
-      .tint(Color.MeetPR.gold500)
-    }
-    .accessibilityElement(children: .contain)
-    .accessibilityLabel(
-      StudentStrings.replacing(.restTimerOverlay002, values: ["\(Self.minutesSeconds(remaining))"]))
-  }
-
-  private var finished: some View {
-    HStack {
-      Text(StudentStrings.localized(.restTimerOverlay003))
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
-        .foregroundStyle(Color.MeetPR.success)
-      Spacer()
-    }
-  }
-
-  private static func minutesSeconds(_ interval: TimeInterval) -> String {
-    Duration.seconds(Int(interval.rounded()))
-      .formatted(.time(pattern: .minuteSecond))
+    .ignoresSafeArea()
+    .onChange(of: session.settings.sound) { _, _ in session.applyAlertSettings() }
+    .onChange(of: session.settings.vibration) { _, _ in session.applyAlertSettings() }
   }
 }
