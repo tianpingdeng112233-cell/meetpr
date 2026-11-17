@@ -3,13 +3,6 @@ import SwiftUI
 /// Bottom-sheet keypad defined by `NumberPad.dc.html`.
 @MainActor
 public struct MeetPRNumberPad: View {
-  public enum Field: Hashable, Sendable {
-    case weight
-    case reps
-    case rpe
-    case rir
-  }
-
   let field: Field
   private let inputValue: MeetPRNumberPadInputValue
   var initialValueText: String { inputValue.placeholder }
@@ -22,6 +15,7 @@ public struct MeetPRNumberPad: View {
   private let onNext: (@MainActor (Double) -> Void)?
   private let onCancel: @MainActor () -> Void
 
+  private var allDayActions: MeetPRAllDayPadActions?
   private var onTextCommit: (@MainActor (String) -> Void)?
   private var unitOverride: String?
   private var onTextChange: (@MainActor (String) -> Void)?
@@ -68,11 +62,13 @@ public struct MeetPRNumberPad: View {
     onTextCommit: @escaping @MainActor (String) -> Void,
     onCancel: @escaping @MainActor () -> Void,
     onTextChange: (@MainActor (String) -> Void)? = nil,
-    dismissTitle: String? = nil
+    dismissTitle: String? = nil,
+    allDayActions: MeetPRAllDayPadActions? = nil
   ) {
     self.init(
       field: field, value: 0, contextText: contextText,
       nextTitle: commitTitle, commitTitle: commitTitle, onCommit: { _ in }, onCancel: onCancel)
+    self.allDayActions = allDayActions
     self._textInput = State(initialValue: NumberPadTextInput(value: text, field: field))
     self.onTextCommit = onTextCommit
     self.unitOverride = unit
@@ -80,8 +76,7 @@ public struct MeetPRNumberPad: View {
     self.dismissTitle = dismissTitle
   }
 
-  /// Weight floor is caller-supplied: 20 fits barbell lifts (empty bar), but
-  /// accessories (dumbbell/cable/bodyweight) legitimately go below — pass 0.
+  /// Use a zero weight floor for accessories; barbell lifts default to 20 kg.
   public static func snapped(_ raw: Double, field: Field, minimumWeight: Double = 20) -> Double {
     switch field {
     case .weight:
@@ -108,7 +103,11 @@ public struct MeetPRNumberPad: View {
           onNext: onNext.map { onNext in { onNext(resolvedValue) } }
         )
       }
-      if textInput != nil {
+      if let allDayActions, let textInput {
+        MeetPRAllDayNumberPad(
+          field: field, initialText: textInput.text, context: contextText ?? fieldTitle,
+          actions: allDayActions, onChange: { onTextChange?($0) })
+      } else if textInput != nil {
         allDayPad
       } else {
         header
@@ -160,7 +159,6 @@ public struct MeetPRNumberPad: View {
           .opacity(textInput?.isValid == false ? 0.4 : 1)
           .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: MeetPRSpacing.space2)
         }
-        // dc: `margin-top:8px` on the cancel/confirm row.
         .padding(.top, MeetPRSpacing.space2)
       }
     }
@@ -180,6 +178,11 @@ public struct MeetPRNumberPad: View {
       Rectangle()
         .fill(Color.MeetPR.borderDefault)
         .frame(height: 1)
+    }
+    .overlay(alignment: .topTrailing) {
+      if allDayActions != nil {
+        MeetPRNumberPadDismissButton(action: onCancel)
+      }
     }
     .sensoryFeedback(.selection, trigger: feedbackTrigger)
   }

@@ -20,13 +20,16 @@ struct WorkoutKeypadOverlay: View {
         }
 
         MeetPRNumberPad(
-          field: cell.field, text: cell.value, contextText: cell.context, unit: cell.unit,
+          field: cell.field, text: cell.value,
+          contextText: cell.context + (session.actionMessage.map { " · " + $0 } ?? ""),
+          unit: cell.unit,
           commitTitle: session.next.map {
             StudentStrings.replacing(.keypadNext, values: [$0.fieldTitle])
           },
           onTextCommit: session.commit,
           onCancel: session.dismiss,
-          onTextChange: session.update, dismissTitle: StudentStrings.localized(.allDayDone)
+          onTextChange: session.update, dismissTitle: StudentStrings.localized(.allDayDone),
+          allDayActions: session.allDayActions
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(cell.context)

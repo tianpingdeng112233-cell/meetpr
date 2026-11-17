@@ -7,6 +7,45 @@ import ViewInspector
 @MainActor
 @Suite("Number pad shortcuts")
 struct NumberPadShortcutTests {
+  @Test func allDayRIRHasSixQuickPicksAndNoNextAction() throws {
+    let pad = MeetPRNumberPad(
+      field: .rir, text: "2", contextText: "Squat", unit: nil, commitTitle: "Next",
+      onTextCommit: { _ in }, onCancel: {},
+      allDayActions: .init(effortField: .rir, onAdd: {}, onFillUp: {}, onFillDown: {}, onEffort: {})
+    )
+    let picks = try pad.inspect().findAll(ViewType.Button.self) {
+      (try? $0.accessibilityIdentifier().hasPrefix("numberPad.quick.")) == true
+    }
+    #expect(picks.count == 6)
+    #expect(try pad.inspect().findAll(ViewType.Text.self) { try $0.string() == "Next" }.isEmpty)
+    #expect(
+      try pad.inspect().find(viewWithAccessibilityIdentifier: "numberPad.digit..").button()
+        .isDisabled())
+  }
+
+  @Test func allDayFunctionKeysAndQuickPicksForwardActions() throws {
+    var actions: [String] = []
+    var selected: String?
+    let pad = MeetPRNumberPad(
+      field: .rpe, text: "8", contextText: "Squat", unit: nil,
+      onTextCommit: { _ in }, onCancel: { actions.append("dismiss") },
+      onTextChange: { selected = $0 },
+      allDayActions: .init(
+        effortField: .rpe, onAdd: { actions.append("add") },
+        onFillUp: { actions.append("up") }, onFillDown: { actions.append("down") },
+        onEffort: { actions.append("effort") }))
+    for key in ["add", "fillUp", "fillDown", "effort", "dismiss"] {
+      try pad.inspect().find(viewWithAccessibilityIdentifier: "numberPad.\(key)").button().tap()
+    }
+    #expect(actions == ["add", "up", "down", "effort", "dismiss"])
+    let picks = try pad.inspect().findAll(ViewType.Button.self) {
+      (try? $0.accessibilityIdentifier().hasPrefix("numberPad.quick.")) == true
+    }
+    #expect(picks.count == 9)
+    try pad.inspect().find(viewWithAccessibilityIdentifier: "numberPad.quick.8.5").button().tap()
+    #expect(selected == "8.5")
+  }
+
   @Test("Untouched localized weight keeps its original value", arguments: ["de_DE", "fr_FR"])
   func untouchedLocalizedWeight(localeIdentifier: String) {
     let input = MeetPRNumberPadInputValue(

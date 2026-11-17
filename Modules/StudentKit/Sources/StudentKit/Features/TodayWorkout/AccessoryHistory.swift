@@ -22,7 +22,8 @@ enum AccessoryHistory {
   ) -> [Int: StudentSetLog] {
     let eligible = logs.filter {
       ($0.exerciseID ?? planExerciseToExercise[$0.planExerciseID]) == exerciseID
-        && $0.planExerciseID != currentPlanExerciseID && $0.completed && !$0.failed && !$0.assumed
+        && $0.planExerciseID != currentPlanExerciseID && !$0.isWarmup
+        && $0.completed && !$0.failed && !$0.assumed
     }
     guard
       let last = eligible.max(by: {

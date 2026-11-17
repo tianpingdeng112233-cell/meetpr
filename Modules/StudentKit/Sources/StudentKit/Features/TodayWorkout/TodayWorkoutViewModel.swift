@@ -1132,6 +1132,10 @@ public final class TodayWorkoutViewModel {
     else { return false }
     allDayWriting = true
     defer { allDayWriting = false }
+    let emptyWarmups = (currentDrafts ?? []).filter { $0.isWarmup && $0.actualWeight == nil }
+    for row in emptyWarmups {
+      guard await removeStudentRow(id: row.id) else { return false }
+    }
     let ids = completionWrites.map(\.id)
     for id in ids {
       guard currentDay?.id == day.id,
@@ -1661,7 +1665,8 @@ public final class TodayWorkoutViewModel {
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
       rpe: draft.actualRPE, actualRIR: draft.actualRIR,
       completed: completed,
-      failed: failed
+      failed: failed,
+      isWarmup: draft.isWarmup
     )
   }
 
@@ -1941,6 +1946,7 @@ extension TodayWorkoutViewModel {
     registeredOneRMKg: Decimal?,
     occurredAt: Date? = nil
   ) async -> PRBreakthroughEvent? {
+    guard !draft.isWarmup, !log.isWarmup else { return nil }
     let recorder: E1RMRecorder
     if let occurredAt {
       recorder = E1RMRecorder(e1rm: e1rmRepo, now: { occurredAt })
@@ -2066,12 +2072,43 @@ extension TodayWorkoutViewModel {
 
   func showAddedVideoError() { actionErrorMessage = StudentStrings.localized(.addedHasVideo) }
 
-  func addExtraSet(exerciseID: UUID) {
+  /// Warm-ups share wire slots with extra sets but have their own five-row limit.
+  @discardableResult
+  func addWarmupSet(exerciseID: UUID) -> UUID? {
+    guard !isPreviewingPlan, !browsingPastPlan,
+      case .loaded(let day, var drafts) = state,
+      FlexibleTrainingDay.canWrite(day, in: planDays),
+      let exercise = day.exercises.first(where: { $0.id == exerciseID })
+    else { return nil }
+    let rows = drafts.filter { $0.planExerciseID == exerciseID }
+    let warmups = rows.filter(\.isWarmup).sorted { $0.prescribed.setIndex < $1.prescribed.setIndex }
+    guard warmups.count < 5, let first = rows.first(where: { !$0.isExtra }) else { return nil }
+    let index = max(
+      exercise.prescribedSets.count, (rows.map(\.prescribed.setIndex).max() ?? -1) + 1)
+    var row = SetRowDraft(
+      id: UUID(), planExerciseID: exerciseID, exerciseID: first.exerciseID,
+      exerciseName: first.exerciseName, exerciseNameEn: first.exerciseNameEn,
+      isCatalogExercise: first.isCatalogExercise, isAccessory: first.isAccessory,
+      isMainLift: first.isMainLift, liftFamily: first.liftFamily,
+      planExerciseSortOrder: first.planExerciseSortOrder,
+      prescribed: PrescribedSet(id: UUID(), setIndex: index),
+      actualWeight: warmups.last?.actualWeight,
+      actualReps: warmups.last?.actualReps ?? first.actualReps)
+    row.isExtra = true
+    row.isWarmup = true
+    guard storeUnfilledDraft(row, day: day) else { return nil }
+    drafts.append(row)
+    state = .loaded(plan: day, drafts: drafts)
+    return row.id
+  }
+
+  func addExtraSet(exerciseID: UUID, copyLastVisible: Bool = false) {
     guard !isPreviewingPlan, !browsingPastPlan else { return }
     guard case .loaded(let day, var drafts) = state,
       FlexibleTrainingDay.canWrite(day, in: planDays),
       let exercise = day.exercises.first(where: { $0.id == exerciseID }),
-      let row = StudentAddedRows.extra(exercise: exercise, drafts: drafts)
+      let row = StudentAddedRows.extra(
+        exercise: exercise, drafts: drafts, copyLastVisible: copyLastVisible)
     else { return }
     guard storeUnfilledDraft(row, day: day) else { return }
     drafts.append(row)
@@ -2484,7 +2521,10 @@ extension TodayWorkoutViewModel {
   }
 
   var completionWrites: [SetRowDraft] {
-    (currentDrafts ?? []).filter { !$0.isBlankAddedRow && (!$0.completed || !$0.hasSavedRecord) }
+    (currentDrafts ?? []).filter {
+      !$0.isBlankAddedRow && (!$0.isWarmup || $0.actualWeight != nil)
+        && (!$0.completed || !$0.hasSavedRecord)
+    }
   }
 
   var expandedAllDayExerciseID: UUID? {
@@ -2506,7 +2546,7 @@ extension TodayWorkoutViewModel {
     guard let day = currentDay else { return [] }
     if let marked = allDayCollapsed[day.id] { return marked }
     return Set(
-      Dictionary(grouping: currentDrafts ?? [], by: \.planExerciseID)
+      Dictionary(grouping: (currentDrafts ?? []).filter { !$0.isWarmup }, by: \.planExerciseID)
         .filter { !$0.value.isEmpty && $0.value.allSatisfy { $0.completed && $0.hasSavedRecord } }
         .map(\.key))
   }
@@ -2541,6 +2581,15 @@ extension TodayWorkoutViewModel {
       forKey: "meetpr.effort.\(studentID)")
   }
 
+  func allDayDisplayNumber(for draft: SetRowDraft) -> Int {
+    let warmups = (currentDrafts ?? []).filter {
+      $0.planExerciseID == draft.planExerciseID && $0.isWarmup
+        && $0.prescribed.setIndex < draft.prescribed.setIndex
+    }.count
+    // Preserve existing extra-set gaps; only warm-up wire slots are hidden from formal numbering.
+    return draft.isWarmup ? warmups + 1 : SetDisplayNumber.number(for: draft) - warmups
+  }
+
   var allDaySheet: [AllDayExercise] {
     guard currentDay != nil else { return [] }
     return AllDayExercise.build(
@@ -2562,6 +2611,7 @@ extension TodayWorkoutViewModel {
     defer { allDayWriting = false }
     let ids = (currentDrafts ?? []).filter {
       $0.planExerciseID == exerciseID && !$0.isBlankAddedRow
+        && (!$0.isWarmup || $0.actualWeight != nil)
     }.map(\.id)
     guard !ids.isEmpty else { return false }
     for id in ids {
@@ -2582,6 +2632,9 @@ extension TodayWorkoutViewModel {
     guard !isPreviewingPlan, !browsingPastPlan else { return false }
     defer { prefillAllDayPercentages() }
     guard let drafts = currentDrafts, drafts.indices.contains(rowIndex) else { return false }
+    if drafts[rowIndex].isWarmup && drafts[rowIndex].actualWeight == nil, let day = currentDay {
+      return storeUnfilledDraft(drafts[rowIndex], day: day)
+    }
     if drafts[rowIndex].isStudentAdded {
       return await persistAdded(
         rowIndex: rowIndex, completed: completed || drafts[rowIndex].completed)

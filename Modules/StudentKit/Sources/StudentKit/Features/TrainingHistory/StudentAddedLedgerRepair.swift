@@ -66,7 +66,7 @@ enum StudentAddedLedgerRepair {
         log.id,
         Source(
           weight: log.weightKg, reps: log.reps, rpe: log.rpe, coachRPE: log.coachRPE,
-          valid: log.completed && !log.failed && !log.assumed)
+          valid: !log.isWarmup && log.completed && !log.failed && !log.assumed)
       )
     }
     let added = records.added.map { log in

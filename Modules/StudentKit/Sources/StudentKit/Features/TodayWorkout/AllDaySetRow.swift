@@ -20,11 +20,17 @@ struct AllDaySetRow: View {
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.space2) {
-      Text(String(SetDisplayNumber.number(for: draft)))
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textSecondary)
-        .frame(width: 20)
-        .accessibilityIdentifier("todayWorkout.set.\(draft.id.uuidString).number")
+      Text(
+        draft.isWarmup
+          ? StudentStrings.localized(.warmupBadge)
+          : String(
+            viewModel?.allDayDisplayNumber(for: draft) ?? SetDisplayNumber.number(for: draft))
+      )
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(draft.isWarmup ? Color.MeetPR.goldText : Color.MeetPR.textSecondary)
+      .fontWeight(draft.isWarmup ? .bold : .regular)
+      .frame(width: 20)
+      .accessibilityIdentifier("todayWorkout.set.\(draft.id.uuidString).number")
       if editing {
         AllDayInlineEditor(draft: draft, viewModel: viewModel, keypad: keypad)
       } else {
@@ -35,9 +41,13 @@ struct AllDaySetRow: View {
           editable: editable, onEdit: openEditor
         )
       }
-      AllDaySetVideoButton(
-        draft: draft, trainingDate: viewModel?.currentDay?.scheduledDate ?? .distantPast,
-        editable: editable, uploads: uploads, replay: replay, onEditVideo: onVideo)
+      if draft.isWarmup {
+        Color.clear.frame(width: 40, height: 40)
+      } else {
+        AllDaySetVideoButton(
+          draft: draft, trainingDate: viewModel?.currentDay?.scheduledDate ?? .distantPast,
+          editable: editable, uploads: uploads, replay: replay, onEditVideo: onVideo)
+      }
       if case .percentage(let value) = draft.prescribed.intensity {
         Text(StudentFormatting.decimal(value) + "%")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
@@ -93,7 +103,7 @@ private struct AllDaySetValues: View {
             )
             .foregroundStyle(Color.MeetPR.textSecondary)
           }
-          if weightChanged, let original = draft.prescribed.weightKg {
+          if weightChanged, let original = draft.allDayComparisonWeight {
             Text(
               StudentStrings.replacing(
                 .allDayOriginal, values: [UnitDisplay.weightText(kg: original, unit: unit)])
@@ -101,6 +111,18 @@ private struct AllDaySetValues: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
             .foregroundStyle(Color.MeetPR.textSecondary)
           }
+
+        }
+        .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
+        .contentShape(.rect)
+      }
+      .buttonStyle(.plain)
+      .disabled(!editable)
+      .accessibilityIdentifier("allDay.row.\(draft.id)")
+      Button {
+        onEdit(.reps)
+      } label: {
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space1) {
           Text("×").foregroundStyle(Color.MeetPR.textSecondary)
           VStack(alignment: .leading, spacing: 2) {
             Text(repsText)
@@ -113,12 +135,12 @@ private struct AllDaySetValues: View {
             }
           }
         }
-        .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
+        .frame(minWidth: 44, minHeight: 38, alignment: .leading)
         .contentShape(.rect)
       }
       .buttonStyle(.plain)
       .disabled(!editable)
-      .accessibilityIdentifier("allDay.row.\(draft.id)")
+      .accessibilityIdentifier("allDay.reps.\(draft.id)")
       Button {
         onEdit(effortField)
       } label: {
@@ -147,7 +169,7 @@ private struct AllDaySetValues: View {
   }
 
   private var weightChanged: Bool {
-    draft.prescribed.weightKg != nil && draft.actualWeight != draft.prescribed.weightKg
+    draft.allDayComparisonWeight != nil && draft.actualWeight != draft.allDayComparisonWeight
   }
   private var repsChanged: Bool {
     draft.prescribed.reps != nil && draft.actualReps != draft.prescribed.reps

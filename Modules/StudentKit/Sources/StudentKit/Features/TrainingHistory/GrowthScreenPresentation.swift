@@ -250,7 +250,7 @@ enum GrowthScreenPresentation {
     logs: [StudentSetLog], added: [StudentAddedSetLog] = [],
     calendar: Calendar = .current
   ) -> GrowthHistoryStats {
-    let completed = logs.filter { $0.completed && !$0.assumed }
+    let completed = logs.filter { !$0.isWarmup && $0.completed && !$0.assumed }
     let addedCompleted = added.filter { $0.completed && !$0.assumed }
     let dates = completed.map(\.loggedAt) + addedCompleted.map(\.loggedAt)
     let sessionDays = Set(dates.map { calendar.startOfDay(for: $0) })

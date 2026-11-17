@@ -19,6 +19,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let coachRPE: Decimal?
   public let completed: Bool
   public let failed: Bool
+  public let isWarmup: Bool
   public let assumed: Bool
 
   public init(
@@ -36,6 +37,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
+    isWarmup: Bool = false,
     assumed: Bool = false
   ) {
     self.id = id
@@ -52,6 +54,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
+    self.isWarmup = isWarmup
     self.assumed = assumed
   }
 
@@ -71,6 +74,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
+    isWarmup = try container.decodeIfPresent(Bool.self, forKey: .isWarmup) ?? false
     assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
   }
 
@@ -94,6 +98,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
+    try container.encode(isWarmup, forKey: .isWarmup)
     try container.encode(assumed, forKey: .assumed)
   }
 
@@ -172,6 +177,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     case coachRPE = "coachRpe"
     case completed
     case failed
+    case isWarmup
     case assumed
   }
 

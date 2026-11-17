@@ -135,6 +135,7 @@ extension SetLogDTO {
       coachRPE: coachRPE,
       completed: completed,
       failed: failed,
+      isWarmup: isWarmup,
       assumed: assumed
     )
   }

@@ -23,7 +23,7 @@ struct AllDaySheetView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
       AllDaySummary(
         date: presentation.day.date, today: today, exercises: groups.count,
-        sets: groups.flatMap(\.rows).count, editable: editable)
+        sets: groups.flatMap(\.rows).filter { !$0.isWarmup }.count, editable: editable)
       ForEach(groups) { group in
         HStack(alignment: .top, spacing: MeetPRSpacing.space3) {
           AllDayTimelineNode(node: group.node, last: group.id == groups.last?.id)

@@ -4,6 +4,38 @@ import Testing
 
 @testable import Networking
 
+@Test func allDayWarmupRequestUsesBackend068Flag() throws {
+  let request = CreateSetLogRequestDTO(
+    planExerciseID: UUID(), setIndex: 4, weightKg: 20, reps: 5,
+    completed: true, isWarmup: true)
+  let encoded = try #require(
+    JSONSerialization.jsonObject(with: MeetPRCodec.encoder.encode(request)) as? [String: Any])
+  #expect(encoded["is_warmup"] as? Bool == true)
+}
+
+@Test func allDayWarmupFlagSurvivesStudentReadAndLegacyRecordsDefaultToFalse() throws {
+  for flag in [true, false, nil] as [Bool?] {
+    var row: [String: Any] = [
+      "id": UUID().uuidString, "student_id": UUID().uuidString,
+      "plan_exercise_id": UUID().uuidString, "set_index": 4,
+      "weight_kg": "20", "reps": 5, "completed": true,
+      "logged_at": "2026-11-17T10:00:00Z",
+    ]
+    row["is_warmup"] = flag
+    let dto = try MeetPRCodec.decoder.decode(
+      SetLogDTO.self, from: JSONSerialization.data(withJSONObject: row))
+    let encoded = try #require(
+      JSONSerialization.jsonObject(with: MeetPRCodec.encoder.encode(dto)) as? [String: Any])
+    #expect(encoded["is_warmup"] as? Bool == (flag ?? false))
+    let domain = dto.toDomain()
+    let cached = try MeetPRCodec.decoder.decode(
+      StudentSetLog.self, from: MeetPRCodec.encoder.encode(domain))
+    let restored = try #require(
+      JSONSerialization.jsonObject(with: MeetPRCodec.encoder.encode(cached)) as? [String: Any])
+    #expect(restored["is_warmup"] as? Bool == (flag ?? false))
+  }
+}
+
 @Test func allDayBackend065SharedFixtureDecodesNullableLogAndExerciseNote() throws {
   let samples = try allDayContractSamples()
   let logs = try #require(samples["nullable_set_log"]?["response"] as? [String: Any])

@@ -21,7 +21,11 @@ struct AllDayExercise: Identifiable, Equatable, Sendable {
     let current = order.first { !collapsed.contains($0) }
     return order.enumerated().map { index, id in
       Self(
-        id: id, rows: groups[id] ?? [],
+        id: id,
+        rows: (groups[id] ?? []).sorted {
+          if $0.isWarmup != $1.isWarmup { return $0.isWarmup }
+          return $0.prescribed.setIndex < $1.prescribed.setIndex
+        },
         node: collapsed.contains(id) ? .completed : id == current ? .current : .pending,
         hidesName: index > 0
           && groups[order[index - 1]]?.first?.exerciseID == groups[id]?.first?.exerciseID)

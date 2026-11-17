@@ -11,6 +11,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
   public let completed: Bool
   public let loggedDate: String?
   public let failed: Bool
+  public let isWarmup: Bool
 
   public init(
     planExerciseID: UUID,
@@ -21,7 +22,8 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     actualRIR: Int? = nil,
     completed: Bool,
     loggedDate: String? = nil,
-    failed: Bool = false
+    failed: Bool = false,
+    isWarmup: Bool = false
   ) {
     self.planExerciseID = planExerciseID
     self.setIndex = setIndex
@@ -32,6 +34,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     self.completed = completed
     self.loggedDate = loggedDate
     self.failed = failed
+    self.isWarmup = isWarmup
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -49,6 +52,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     try container.encode(completed, forKey: .completed)
     try container.encodeIfPresent(loggedDate, forKey: .loggedDate)
     try container.encode(failed, forKey: .failed)
+    try container.encode(isWarmup, forKey: .isWarmup)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -61,6 +65,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     case completed
     case loggedDate
     case failed
+    case isWarmup
   }
 }
 
@@ -101,6 +106,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let coachRPE: Decimal?
   public let completed: Bool
   public let failed: Bool
+  public let isWarmup: Bool
   public let assumed: Bool
   public let loggedAt: Date
   /// Server-assigned training day (`YYYY-MM-DD`, the student's gym-day).
@@ -120,6 +126,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
+    isWarmup: Bool = false,
     assumed: Bool = false,
     loggedAt: Date,
     loggedDate: String? = nil
@@ -137,6 +144,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
+    self.isWarmup = isWarmup
     self.assumed = assumed
     self.loggedAt = loggedAt
     self.loggedDate = loggedDate
@@ -157,6 +165,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
+    isWarmup = try container.decodeIfPresent(Bool.self, forKey: .isWarmup) ?? false
     assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
     loggedDate = try container.decodeIfPresent(String.self, forKey: .loggedDate)
@@ -181,6 +190,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
+    try container.encode(isWarmup, forKey: .isWarmup)
     try container.encode(assumed, forKey: .assumed)
     try container.encode(loggedAt, forKey: .loggedAt)
     try container.encodeIfPresent(loggedDate, forKey: .loggedDate)
@@ -200,6 +210,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case coachRPE = "coachRpe"
     case completed
     case failed
+    case isWarmup
     case assumed
     case loggedAt
     case loggedDate

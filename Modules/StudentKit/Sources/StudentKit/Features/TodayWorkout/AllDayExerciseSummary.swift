@@ -21,7 +21,7 @@ struct AllDayExerciseSummary: Equatable, Sendable {
     rows: [TodayWorkoutSetRowDraft], unit: UnitPreference = .kg,
     locale: Locale = .current, previousEffort: ActualEffortMode? = nil
   ) -> Self {
-    let values = rows.map {
+    let values = rows.filter { !$0.isWarmup }.map {
       segment($0, unit: unit, locale: locale, previousEffort: previousEffort)
     }
     var groups: [[Segment]] = []

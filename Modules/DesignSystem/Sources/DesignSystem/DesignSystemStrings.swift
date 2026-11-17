@@ -1,6 +1,12 @@
 import Foundation
 
 public enum DesignSystemStrings {
+  static let numberPadAddSet = localized("designSystem.numberPad.addSet")
+  static let numberPadFill = localized("designSystem.numberPad.fill")
+  static let numberPadUp = localized("designSystem.numberPad.up")
+  static let numberPadDown = localized("designSystem.numberPad.down")
+  static let numberPadDismissKeyboard = localized("designSystem.numberPad.dismissKeyboard")
+
   public static let startTraining = localized("designSystem.action.startTraining")
   public static let squatBenchDeadlift = localized("designSystem.action.squatBenchDeadlift")
 
