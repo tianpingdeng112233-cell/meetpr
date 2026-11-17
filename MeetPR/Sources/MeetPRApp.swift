@@ -182,8 +182,8 @@ struct MeetPRApp: App {
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
         studentPlans: launchHangRepositories?.studentPlans
-          ?? InMemoryStudentPlanRepository(store: planStore),
-        studentLogs: ProgressDemoScenario.logRepository(wrapping: studentLogs),
+          ?? demoStudentPlans(store: planStore),
+        studentLogs: demoStudentLogs(studentLogs),
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,
         studentE1RM: InMemoryE1RMRepository(
@@ -543,4 +543,17 @@ struct MeetPRApp: App {
         .preferredColorScheme(preferredAppColorScheme)
     }
   }
+}
+
+/// Spec 110 layout fixtures (`--plan-handoff-demo current|joined`) take over the
+/// demo student's plan and start from empty logs; otherwise the regular seed applies.
+private func demoStudentPlans(store: InMemoryPlanStore) -> any StudentPlanRepository {
+  PlanHandoffDemoScenario.repository() ?? InMemoryStudentPlanRepository(store: store)
+}
+
+private func demoStudentLogs(
+  _ seeded: any StudentTrainingLogRepository
+) -> any StudentTrainingLogRepository {
+  if PlanHandoffDemoScenario.enabled { return InMemoryStudentTrainingLogRepository() }
+  return ProgressDemoScenario.logRepository(wrapping: seeded)
 }
