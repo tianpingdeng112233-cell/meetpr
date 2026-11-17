@@ -31,27 +31,39 @@ struct RestRingFloatingButton: View {
         lower, min(proxy.size.height, buttonTop - origin) - 44)
       let centerY = lower + (upper - lower) * min(1, max(0, verticalFraction))
       let centerX = left ? 48.0 : proxy.size.width - 48
+      let hintOnRight = centerX + translation.width < proxy.size.width / 2
       ZStack {
         if showsHint {
-          Text(StudentStrings.localized(.restRingHint))
-            .font(.system(size: 12))
-            .foregroundStyle(
-              colorScheme == .light ? Color.MeetPR.holdTrack : Color.MeetPR.textPrimary
-            )
-            .padding(10)
-            .background(
-              colorScheme == .light ? Color.MeetPR.gold200 : Color.MeetPR.surface2,
-              in: .rect(cornerRadius: 10)
-            )
-            .overlay {
-              if colorScheme == .light {
-                RoundedRectangle(cornerRadius: 10)
-                  .strokeBorder(Color.MeetPR.gold500, lineWidth: 1)
-              }
+          HStack(spacing: 6) {
+            if hintOnRight {
+              Image(systemName: "arrow.left").accessibilityHidden(true)
             }
-            .fixedSize()
-            .position(x: left ? centerX + 120 : centerX - 120, y: centerY)
-            .allowsHitTesting(false)
+            Text(StudentStrings.localized(.restRingHint))
+            if !hintOnRight {
+              Image(systemName: "arrow.right").accessibilityHidden(true)
+            }
+          }
+          .font(.system(size: 12))
+          .foregroundStyle(
+            colorScheme == .light ? Color.MeetPR.holdTrack : Color.MeetPR.textPrimary
+          )
+          .padding(10)
+          .background(
+            colorScheme == .light ? Color.MeetPR.gold200 : Color.MeetPR.surface2,
+            in: .rect(cornerRadius: 10)
+          )
+          .overlay {
+            if colorScheme == .light {
+              RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color.MeetPR.gold500, lineWidth: 1)
+            }
+          }
+          .fixedSize()
+          // Anchor to the ring's edge so translated text keeps an 8pt gap.
+          .frame(width: 64, height: 64, alignment: hintOnRight ? .leading : .trailing)
+          .offset(x: hintOnRight ? 72 : -72)
+          .position(x: centerX + translation.width, y: centerY + translation.height)
+          .allowsHitTesting(false)
         }
         Button(action: onTap) {
           RestRingButtonFace(remaining: remaining, total: total, running: running, done: done)
