@@ -11,6 +11,7 @@ struct RestRingFloatingButton: View {
   let dockTop: CGFloat?
   let onTap: () -> Void
   let onHold: () -> Void
+  @Environment(\.colorScheme) private var colorScheme
   @AppStorage("meetpr.restRing.left") private var left = false
   @AppStorage("meetpr.restRing.verticalFraction") private var verticalFraction = 1.0
   @State private var translation: CGSize = .zero
@@ -34,9 +35,20 @@ struct RestRingFloatingButton: View {
         if showsHint {
           Text(StudentStrings.localized(.restRingHint))
             .font(.system(size: 12))
-            .foregroundStyle(Color.MeetPR.textPrimary)
+            .foregroundStyle(
+              colorScheme == .light ? Color.MeetPR.holdTrack : Color.MeetPR.textPrimary
+            )
             .padding(10)
-            .background(Color.MeetPR.surface2, in: .rect(cornerRadius: 10))
+            .background(
+              colorScheme == .light ? Color.MeetPR.gold200 : Color.MeetPR.surface2,
+              in: .rect(cornerRadius: 10)
+            )
+            .overlay {
+              if colorScheme == .light {
+                RoundedRectangle(cornerRadius: 10)
+                  .strokeBorder(Color.MeetPR.gold500, lineWidth: 1)
+              }
+            }
             .fixedSize()
             .position(x: left ? centerX + 120 : centerX - 120, y: centerY)
             .allowsHitTesting(false)
