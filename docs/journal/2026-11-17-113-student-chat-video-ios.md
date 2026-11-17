@@ -19,13 +19,13 @@
 ## Red → green evidence
 
 Logs in `docs/journal/113-ios-evidence/`:
-- DTO standalone old-kind compatibility: `ios113-red.log` (missing API), `ios113-green.log` (1 passed).
-- 5 MiB multipart + wire request: `ios113-upload-red.log` (invalidAttachment default), `ios113-upload-green.log` (2 passed).
-- Outbox retry/file cleanup: `ios113-outbox-red.log` (missing video API), `ios113-outbox-green.log` (2 passed).
-- Missing-URL renewal: `ios113-renew-red.log` (unavailable), `ios113-renew-green.log` (1 passed).
-- Demo playback copy: `ios113-demo-red.log` (invalidAttachment), `ios113-demo-green.log` (1 passed).
+- DTO standalone old-kind compatibility: `ios113-red.txt` (missing API), `ios113-green.txt` (1 passed).
+- 5 MiB multipart + wire request: `ios113-upload-red.txt` (invalidAttachment default), `ios113-upload-green.txt` (2 passed).
+- Outbox retry/file cleanup: `ios113-outbox-red.txt` (missing video API), `ios113-outbox-green.txt` (2 passed).
+- Missing-URL renewal: `ios113-renew-red.txt` (unavailable), `ios113-renew-green.txt` (1 passed).
+- Demo playback copy: `ios113-demo-red.txt` (invalidAttachment), `ios113-demo-green.txt` (1 passed).
 - Initial outbox implementation hit Swift exclusivity during dictionary replacement; fixed by computing replacement from current item before mutating the dictionary. Final green log above.
-- `swiftlint lint --strict` all 24 changed/new Swift files: 0 violations, `ios113-lint.log`. `git diff --check`: clean.
+- `swiftlint lint --strict` all 24 changed/new Swift files: 0 violations, `ios113-lint.txt`. `git diff --check`: clean.
 - Added failure-phase upload cleanup tests (part/complete/send); included in pending full Networking run.
 
 ## Pending verification / precise handoff
@@ -61,14 +61,14 @@ At handoff the ChatUI and Networking full builds both report `No space left on d
 
 ### Review fixes / resumed native acceptance
 
-- Spec P3: pending video card now shows known local duration at bottom-right during uploading and failed states, matching delivered-card style. `ios113-pending-duration-lint.log`: 0 violations.
+- Spec P3: pending video card now shows known local duration at bottom-right during uploading and failed states, matching delivered-card style. `ios113-pending-duration-lint.txt`: 0 violations.
 - Native Xcode first resumed build found generated xcstrings symbol collision (`chat.video.unavailable` vs legacy `chat.videoUnavailable`). Renamed only new key/reference to `chat.standaloneVideoUnavailable`; string values unchanged. SwiftPM cannot detect this Xcode string-symbol generation issue. Incremental native build rerun.
 - After space recovered, root owns final full module tests in `/tmp/ios113-*-final.log`; this child does not duplicate those runs.
 - 17e queue checked free; a valid repository MP4 was added to its gallery using simctl addmedia because exposed MCP simulator-management tools have no add-media capability. UI tap and appearance controls use XcodeBuildMCP CLI since those tools are not exposed through current MCP session.
 
 ### Independent review closure
 
-Root reports Standards and Spec round-1 reviews both CLEAN. Pending-duration P3 is closed. Networking 159 and ChatUI 100 final tests passed; StudentKit is still compiling under root session 60558. Evidence logs are mirrored to tracked `.txt` files because repository ignores `*.log`; original temporary log names above remain execution references.
+Root reports Standards and Spec round-1 reviews both CLEAN. Pending-duration P3 is closed. Networking 159 and ChatUI 100 final tests passed; StudentKit is still compiling under root session 60558. Evidence uses tracked `.txt` files. Full package output is retained in adjacent `.txt.gz` archives with SHA256 and a readable final excerpt; original temporary paths above are execution references, not the delivery source.
 - Native compile then exposed an internal ChatUI presentation helper referenced from StudentKit. The standalone video receipt now uses StudentBlackGoldChatView's existing localized read/delivered strings; standalone row extracted to keep lint body length. No product behavior change. Native incremental build rerun.
 - NEXT-RELEASE now records spec 113 under a separate pending-merge candidate section (P1/T2, David merge, backend #429/0089 deployment and real OSS cross-platform acceptance required, not packaged); build 42 target and RELEASES unchanged.
 
