@@ -5,7 +5,7 @@ import Testing
 @testable import StudentKit
 
 @MainActor
-@Test func allDayClearWeightThenNextFieldDoesNotRestoreOriginalValue() async throws {
+@Test func allDayEmptyWeightDismissalKeepsLastLegalValue() async throws {
   let plan = StudentAddedTestPlan.unsettledDemo()
   let model = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(
@@ -16,8 +16,8 @@ import Testing
   let keypad = WorkoutKeypadSession()
   keypad.openAllDay(draft: draft, viewModel: model, field: .weight)
   keypad.update("")
-  keypad.commit("")
-  #expect(model.currentDrafts?.first?.actualWeight == nil)
+  keypad.dismiss()
+  #expect(model.currentDrafts?.first?.actualWeight == draft.actualWeight)
 }
 
 @Test func allDayRecordedEmptyWeightRetainsActualEffortAndHighlightsRIRChange() {

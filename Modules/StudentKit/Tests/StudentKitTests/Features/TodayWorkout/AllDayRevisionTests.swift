@@ -134,7 +134,7 @@ import Testing
 }
 
 @MainActor
-@Test func allDayPoundEditingStoresMetricAndAllowsClearingWeight() async throws {
+@Test func allDayPoundEditingStoresMetricAndRestoresLastLegalWeight() async throws {
   let plan = StudentAddedTestPlan.unsettledDemo()
   let day = plan.days[0]
   let student = StudentDemoSeed.studentID
@@ -157,7 +157,7 @@ import Testing
   keypad.openAllDay(draft: edited, viewModel: model, field: .weight)
   keypad.update("")
   keypad.dismiss()
-  #expect(model.currentDrafts?.first?.actualWeight == nil)
+  #expect(model.currentDrafts?.first?.actualWeight == 100.02)
 }
 
 @MainActor

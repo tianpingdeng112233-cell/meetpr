@@ -13,6 +13,7 @@ struct AllDayExerciseBlock: View {
   let onVideo: (TodayWorkoutSetRowDraft) -> Void
   let onNote: (TodayWorkoutSetRowDraft) -> Void
   let onRemove: () -> Void
+  @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
@@ -31,6 +32,24 @@ struct AllDayExerciseBlock: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.goldText)
         }
+        if editable, group.rows.first?.isStudentAdded == false {
+          let atLimit = group.rows.filter(\.isWarmup).count >= 5
+          Button {
+            keypad?.dismiss()
+            if let viewModel, let id = viewModel.addWarmupSet(exerciseID: group.id),
+              let draft = viewModel.currentDrafts?.first(where: { $0.id == id })
+            {
+              keypad?.openAllDay(draft: draft, viewModel: viewModel, field: .weight)
+            }
+          } label: {
+            Text(StudentStrings.localized(atLimit ? .warmupLimit : .warmupAdd))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+              .foregroundStyle(atLimit ? Color.MeetPR.textMuted : Color.MeetPR.goldText)
+              .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+          }
+          .disabled(atLimit)
+          .accessibilityIdentifier("allDay.addWarmup.\(group.id)")
+        }
         VStack(spacing: 0) {
           ForEach(group.rows) { draft in
             AllDaySetRow(
@@ -46,13 +65,13 @@ struct AllDayExerciseBlock: View {
               if first.isStudentAdded {
                 viewModel?.addStudentSet(exerciseID: first.exerciseID)
               } else {
-                viewModel?.addExtraSet(exerciseID: group.id)
+                viewModel?.addExtraSet(exerciseID: group.id, copyLastVisible: true)
               }
             }
             .disabled(
               first.isStudentAdded
                 ? group.rows.count >= StudentAddedRows.limit
-                : group.rows.filter(\.isExtra).count >= StudentAddedRows.limit)
+                : group.rows.filter { $0.isExtra && !$0.isWarmup }.count >= StudentAddedRows.limit)
             Spacer()
             Button {
               onNote(first)

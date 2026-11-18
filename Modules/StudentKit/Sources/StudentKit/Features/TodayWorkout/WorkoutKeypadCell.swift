@@ -13,6 +13,7 @@ struct WorkoutKeypadCell: Identifiable, Sendable {
   var name = ""
   var number = 1
   var unit: String?
+  var isWarmup = false
   var id: Address { Address(rowID: rowID, field: field) }
 
   var fieldTitle: String {
@@ -26,7 +27,7 @@ struct WorkoutKeypadCell: Identifiable, Sendable {
 
   var context: String {
     StudentStrings.replacing(
-      .keypadContext,
+      isWarmup ? .warmupContext : .keypadContext,
       values: [name, String(number), fieldTitle + (unit.map { " " + $0.lowercased() } ?? "")])
   }
 

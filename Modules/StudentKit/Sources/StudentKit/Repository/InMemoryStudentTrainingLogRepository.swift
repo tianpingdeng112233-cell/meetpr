@@ -35,6 +35,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
+        isWarmup: log.isWarmup,
         assumed: false
       )
       logs[index] = persisted
@@ -53,6 +54,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
+        isWarmup: log.isWarmup,
         assumed: false
       )
       logs.append(persisted)

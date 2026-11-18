@@ -69,6 +69,7 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     previousVolumeChangePercent: Int? = nil,
     locale: Locale = .current
   ) {
+    let drafts = drafts.filter { !$0.isWarmup }
     let completed = drafts.filter(\.completed)
     let failedCount = completed.filter(\.failed).count
     let mainExerciseID = day.exercises.first?.id
@@ -110,11 +111,7 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     // stays on the stable coach-authored schedule; only the subtitle follows the
     // recommended date (spec 080).
     self.date = day.scheduledDate
-    self.dateSubtitle = Self.dateSubtitle(
-      date: day.date,
-      weekCode: weekCode,
-      locale: locale
-    )
+    self.dateSubtitle = Self.dateSubtitle(date: day.date, weekCode: weekCode, locale: locale)
     self.streak = streak
     self.exercises = day.exercises.map { exercise in
       Self.exercisePerformance(

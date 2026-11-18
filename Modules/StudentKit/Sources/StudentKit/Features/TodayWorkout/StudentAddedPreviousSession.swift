@@ -12,7 +12,8 @@ enum StudentAddedPreviousSession {
       days.first { $0.id == draft.studentAddedDayID }?.exercises.map(\.id) ?? [])
     let planned = records.planned.filter {
       ($0.exerciseID == draft.exerciseID || slots.contains($0.planExerciseID))
-        && !currentSlots.contains($0.planExerciseID) && $0.completed && !$0.failed && !$0.assumed
+        && !currentSlots.contains($0.planExerciseID) && !$0.isWarmup
+        && $0.completed && !$0.failed && !$0.assumed
     }
     let added = records.added.filter {
       $0.exerciseID == draft.exerciseID && $0.planDayID != draft.studentAddedDayID

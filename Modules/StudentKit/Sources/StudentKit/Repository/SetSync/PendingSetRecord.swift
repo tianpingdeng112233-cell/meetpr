@@ -64,6 +64,8 @@ func overlayPendingSets(
       result[index] = record.draft
     } else if let index {
       // Prescriptions belong to the server; only local execution fields overlay them.
+      result[index].isWarmup = record.draft.isWarmup
+      result[index].allDayOriginalWeight = record.draft.allDayOriginalWeight
       result[index].actualWeight = record.draft.actualWeight
       result[index].actualReps = record.draft.actualReps
       result[index].actualRPE = record.draft.actualRPE

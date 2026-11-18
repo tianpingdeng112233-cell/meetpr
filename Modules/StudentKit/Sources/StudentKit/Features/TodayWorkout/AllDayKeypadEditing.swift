@@ -31,54 +31,35 @@ extension WorkoutKeypadSession {
   func openAllDay(
     draft: TodayWorkoutSetRowDraft, viewModel: TodayWorkoutViewModel, field: MeetPRNumberPad.Field
   ) {
+    guard !viewModel.isPreviewingPlan, !viewModel.browsingPastPlan,
+      let day = viewModel.currentDay, FlexibleTrainingDay.canWrite(day, in: viewModel.planDays)
+    else { return }
     let previousEffort =
       effortField(for: draft.id)
       ?? (draft.allDayEffortMode(previous: viewModel.previousAllDayEffort(for: draft)) == .rir
         ? .rir : .rpe)
     if current != nil { dismiss() }
+    guard let draft = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) else { return }
     let dayID = viewModel.currentDay?.id
     let unit = viewModel.onboardingProfile?.unitPreference ?? .kg
     let save: (WorkoutKeypadCell, String) -> Void = { cell, text in
-      let input = NumberPadTextInput(value: text, field: cell.field)
-      guard input.isValid, !text.isEmpty || cell.field != .reps,
-        viewModel.currentDay?.id == dayID,
-        let index = viewModel.currentDrafts?.firstIndex(where: { $0.id == draft.id }),
-        let current = viewModel.currentDrafts?[index]
-      else { return }
-      switch cell.field {
-      case .weight:
-        let entered = Decimal(string: input.committedText)
-        let weight = entered.map {
-          unit == .kg
-            ? $0
-            : UnitDisplay.rounded($0 / UnitDisplay.lbPerKg, scale: 2)
-        }
-        guard weight != current.actualWeight else { return }
-        viewModel.updateWeight(rowIndex: index, weight: weight)
-      case .reps:
-        let reps = Int(input.committedText)
-        guard reps != current.actualReps else { return }
-        viewModel.updateReps(rowIndex: index, reps: reps)
-      case .rpe, .rir:
-        viewModel.rememberAllDayEffort(cell.field == .rir ? .rir : .rpe, for: current)
-        let rpe = cell.field == .rpe ? Decimal(string: input.committedText) : nil
-        let rir = cell.field == .rir ? Int(input.committedText) : nil
-        guard rpe != current.actualRPE || rir != current.actualRIR else { return }
-        viewModel.updateEffort(rowIndex: index, rpe: rpe, rir: rir)
-      }
-      Task {
-        guard viewModel.currentDay?.id == dayID,
-          let latestIndex = viewModel.currentDrafts?.firstIndex(where: { $0.id == draft.id })
-        else { return }
-        _ = await viewModel.saveAllDayRow(rowIndex: latestIndex)
-      }
+      viewModel.updateAllDayValue(cell: cell, text: text, dayID: dayID, unit: unit)
+    }
+    let cells = WorkoutKeypadCell.allDayCells(
+      draft: draft, unit: unit,
+      effortOverride: field == .rir || field == .rpe ? field : previousEffort
+    ).map { original in
+      var cell = original
+      cell.number = viewModel.allDayDisplayNumber(for: draft)
+      cell.isWarmup = draft.isWarmup
+      return cell
     }
     open(
-      cells: WorkoutKeypadCell.allDayCells(
-        draft: draft, unit: unit,
-        effortOverride: field == .rir || field == .rpe ? field : previousEffort),
+      cells: cells,
       at: .init(rowID: draft.id, field: field),
       onChange: { cell, text in if let text { save(cell, text) } },
-      allowsEmptyWeight: true, allowsBackgroundInteraction: true, onCommit: save)
+      allowsEmptyWeight: false, allowsBackgroundInteraction: true, onCommit: save)
+    configureAllDayActions(draft: draft, viewModel: viewModel)
+
   }
 }

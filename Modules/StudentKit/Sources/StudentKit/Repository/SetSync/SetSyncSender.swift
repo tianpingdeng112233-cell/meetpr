@@ -50,7 +50,7 @@ import RepositoryContracts
       guard Self.isMissingPlanExercise(error) else { throw error }
       // This 400 also covers unpublished or inaccessible plans. Only a fresh
       // published plan containing the original day can prove an exercise deletion.
-      guard let plans,
+      guard !record.draft.isWarmup, let plans,
         let plan = try await plans.refreshCurrentPlan(studentID: record.studentID),
         let day = plan.days.first(where: { $0.id == record.dayID }),
         !day.exercises.contains(where: { $0.id == record.draft.planExerciseID })
@@ -99,7 +99,7 @@ import RepositoryContracts
   private struct ErrorEnvelope: Decodable { let error: String }
 
   private func bindPendingVideos(_ record: PendingSetRecord, receipt: SetSyncReceipt) async {
-    guard let videos else { return }
+    guard !record.draft.isWarmup, let videos else { return }
     let setID: UUID
     switch receipt {
     case .planned(let log): setID = log.id

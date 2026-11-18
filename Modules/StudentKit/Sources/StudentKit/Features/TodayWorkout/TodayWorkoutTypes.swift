@@ -34,6 +34,8 @@ public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiabl
   public var prescribed: PrescribedSet
   /// Optional local-only metadata; old cached drafts decode without these keys.
   public var previousAccessoryWeight: Decimal?
+  var allDayOriginalWeight: Decimal?
+  var allDayComparisonWeight: Decimal? { prescribed.weightKg ?? allDayOriginalWeight }
   public var isHistoryWeightPrefill: Bool?
   public var actualWeight: Decimal?
   public var actualReps: Int?
@@ -44,6 +46,12 @@ public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiabl
   public var assumed: Bool
   public var loggedSetID: UUID?
   public var recordedAt: Date?
+  // Optional storage keeps pre-112 queue files decodable.
+  private var warmup: Bool?
+  public var isWarmup: Bool {
+    get { warmup ?? false }
+    set { warmup = newValue }
+  }
   public var isExtra = false
   public var studentAddedDayID: UUID?
   public var isStudentAdded: Bool { studentAddedDayID != nil }

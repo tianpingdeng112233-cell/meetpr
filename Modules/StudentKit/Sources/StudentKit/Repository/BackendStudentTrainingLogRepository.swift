@@ -31,7 +31,8 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
         rpe: log.rpe, actualRIR: log.actualRIR,
         completed: log.completed,
         loggedDate: log.loggedDate,
-        failed: log.failed
+        failed: log.failed,
+        isWarmup: log.isWarmup
       ),
       accessToken: token
     )
@@ -53,6 +54,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       coachRPE: log.coachRPE,
       completed: log.completed,
       failed: log.failed,
+      isWarmup: log.isWarmup,
       assumed: false
     )
   }

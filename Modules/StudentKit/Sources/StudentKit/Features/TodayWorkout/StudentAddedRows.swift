@@ -6,14 +6,16 @@ enum StudentAddedRows {
   static let limit = 10
 
   static func extra(
-    exercise: StudentPlanExercise, drafts: [TodayWorkoutSetRowDraft]
+    exercise: StudentPlanExercise, drafts: [TodayWorkoutSetRowDraft], copyLastVisible: Bool = false
   ) -> TodayWorkoutSetRowDraft? {
     let rows = drafts.filter { $0.planExerciseID == exercise.id }
-    guard rows.count(where: \.isExtra) < limit else { return nil }
-    let previous = rows.filter {
-      $0.hasSavedRecord && !$0.assumed && ($0.completed || $0.failed)
-    }
-    .max { ($0.recordedAt ?? .distantPast) < ($1.recordedAt ?? .distantPast) }
+    guard rows.count(where: { $0.isExtra && !$0.isWarmup }) < limit else { return nil }
+    let formal = rows.filter { !$0.isWarmup }
+    let previous =
+      copyLastVisible
+      ? formal.max { $0.prescribed.setIndex < $1.prescribed.setIndex }
+      : formal.filter { $0.hasSavedRecord && !$0.assumed && ($0.completed || $0.failed) }
+        .max { ($0.recordedAt ?? .distantPast) < ($1.recordedAt ?? .distantPast) }
     let last = exercise.prescribedSets.last
     let index = max(
       exercise.prescribedSets.count, (rows.map(\.prescribed.setIndex).max() ?? -1) + 1)
@@ -33,6 +35,7 @@ enum StudentAddedRows {
       var draft = makeExtra(
         exercise: exercise, set: PrescribedSet(id: log.id, setIndex: log.setIndex),
         weight: log.weightKg, reps: log.reps)
+      draft.isWarmup = log.isWarmup
       draft.actualRPE = log.rpe
       draft.actualRIR = log.actualRIR
       draft.applyPersistResult(log, completed: log.completed, failed: log.failed)
@@ -52,6 +55,7 @@ enum StudentAddedRows {
       planExerciseSortOrder: exercise.sequenceIndex, prescribed: set,
       actualWeight: weight, actualReps: reps)
     draft.isExtra = true
+    draft.allDayOriginalWeight = weight
     return draft
   }
 }

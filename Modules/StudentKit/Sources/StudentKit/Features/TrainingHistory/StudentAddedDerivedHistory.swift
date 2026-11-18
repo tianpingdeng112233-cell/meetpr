@@ -47,7 +47,8 @@ enum StudentAddedDerivedHistory {
     let planned = records.planned.compactMap { log -> E1RMWeightBaseline? in
       let exercise =
         log.exerciseID.flatMap { id in catalog.first { $0.id == id } } ?? slots[log.planExerciseID]
-      guard log.completed, !log.failed, !log.assumed, let weight = log.weightKg, weight > 0,
+      guard !log.isWarmup, log.completed, !log.failed, !log.assumed, let weight = log.weightKg,
+        weight > 0,
         log.reps > 0,
         let exercise, let family = resolveCompetitionFamily(exercise: exercise, onboarding: profile)
       else { return nil }

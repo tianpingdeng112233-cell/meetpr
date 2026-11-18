@@ -44,6 +44,7 @@ extension TodayWorkoutViewModel {
     lastLoggedWeightKg: Decimal? = nil,
     registeredOneRMKg: Decimal? = nil
   ) -> SetWeightSuggestionOutcome {
+    let drafts = drafts.filter { !$0.isWarmup }
     guard let targetIndex = drafts.firstIndex(where: { $0.id == setID }) else {
       return .unavailableWithoutReason
     }
@@ -276,8 +277,7 @@ extension TodayWorkoutViewModel {
   /// (and the backend widens the end to a full day), so ending at 00:00 would
   /// leak the viewed day's own logs in; that day is covered by drafts instead.
   /// Bounds follow the device-local day; exact UTC wire-day alignment rides
-  /// the gym-day day-boundary spec (harmless here — lastWeights takes the
-  /// latest log, and same-day leaks lose to the drafts path anyway).
+  /// the gym-day day-boundary spec.
   nonisolated static func lastWeightHistoryRange(before dayDate: Date) -> ClosedRange<Date> {
     let dayStart = dayRange(containing: dayDate).lowerBound
     let lowerBound = dayStart.addingTimeInterval(-Double(lastWeightLookbackDays) * 86_400)
@@ -296,27 +296,6 @@ extension TodayWorkoutViewModel {
       map[exercise.id] = exercise.exercise.id
     }
     return map
-  }
-
-  /// Most recent completed, non-failed logged weight per catalog exercise.
-  nonisolated static func lastWeights(
-    from logs: [StudentSetLog],
-    planExerciseToExercise: [UUID: UUID]
-  ) -> [UUID: Decimal] {
-    var latest: [UUID: StudentSetLog] = [:]
-    for log in logs where log.completed && !log.failed && log.weightKg.map({ $0 > 0 }) == true {
-      guard let exerciseID = log.exerciseID ?? planExerciseToExercise[log.planExerciseID] else {
-        continue
-      }
-      if let current = latest[exerciseID],
-        current.loggedAt > log.loggedAt
-          || (current.loggedAt == log.loggedAt && current.setIndex > log.setIndex)
-      {
-        continue
-      }
-      latest[exerciseID] = log
-    }
-    return latest.compactMapValues(\.weightKg)
   }
 
   static func makeDrafts(

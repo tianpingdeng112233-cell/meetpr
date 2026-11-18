@@ -11,6 +11,8 @@ final class WorkoutKeypadSession {
   private var onChange: ((WorkoutKeypadCell, String?) -> Void)?
   private var editedText: String?
   private var allowsEmptyWeight = false
+  var actionMessage: String?
+  var allDayActions: MeetPRAllDayPadActions?
   var panelTop: CGFloat = 0
   private(set) var allowsBackgroundInteraction = false
 
@@ -45,6 +47,7 @@ final class WorkoutKeypadSession {
 
   func update(_ text: String) {
     guard let current else { return }
+    actionMessage = nil
     editedText = text
     onChange?(current, text)
   }
@@ -63,6 +66,10 @@ final class WorkoutKeypadSession {
     editedText = nil
     index += 1
     if self.current == nil { reset() }
+  }
+
+  func apply(_ text: String, to cell: WorkoutKeypadCell) {
+    onCommit?(cell, text)
   }
 
   func dismiss() {
@@ -85,6 +92,8 @@ final class WorkoutKeypadSession {
   }
 
   private func reset() {
+    allDayActions = nil
+    actionMessage = nil
     cells = []
     index = 0
     onCommit = nil

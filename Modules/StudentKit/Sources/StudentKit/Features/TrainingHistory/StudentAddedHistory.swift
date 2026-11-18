@@ -8,8 +8,11 @@ enum StudentAddedHistory {
   }
 
   static func extraIndices(exercise: StudentPlanExercise, logs: [StudentSetLog]) -> [Int] {
-    logs.filter { $0.planExerciseID == exercise.id && $0.setIndex >= exercise.prescribedSets.count }
-      .map(\.setIndex).sorted()
+    logs.filter {
+      !$0.isWarmup && $0.planExerciseID == exercise.id
+        && $0.setIndex >= exercise.prescribedSets.count
+    }
+    .map(\.setIndex).sorted()
   }
 
   static func record(
@@ -36,7 +39,7 @@ extension StudentAddedHistory {
     let slots = Dictionary(
       days.flatMap(\.exercises).map { ($0.id, $0.exercise) },
       uniquingKeysWith: { first, _ in first })
-    for log in logs.sorted(by: { $0.loggedAt < $1.loggedAt }) where !log.assumed {
+    for log in logs.sorted(by: { $0.loggedAt < $1.loggedAt }) where !log.assumed && !log.isWarmup {
       let exercise =
         log.exerciseID.flatMap { id in catalog.first { $0.id == id } } ?? slots[log.planExerciseID]
       guard let exercise,
