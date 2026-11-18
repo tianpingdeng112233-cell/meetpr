@@ -250,6 +250,7 @@ enum StudentStrings {
     static let addedAddExercise = Key("student.added.addExercise")
     static let addedAdded = Key("student.added.added")
     static let addedRemove = Key("student.added.remove")
+    static let addedDeleteAction = Key("student.added.deleteAction")
     static let addedAddedHint = Key("student.added.addedHint")
     static let addedSearch = Key("student.added.search")
     static let addedAlreadyAdded = Key("student.added.alreadyAdded")

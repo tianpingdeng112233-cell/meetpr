@@ -9,10 +9,16 @@ struct AllDaySetRow: View {
   let onVideo: () -> Void
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var showsRemoval = false
+  @State private var swipeTapState = AllDaySwipeDelete.TapState.idle
+  @State private var swipeCloseRequest = 0
   @Environment(VideoAttachmentViewModel.self) private var uploads: VideoAttachmentViewModel?
   @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
 
   private var editing: Bool { keypad?.current?.rowID == draft.id }
+  private var removable: Bool { draft.isExtra || draft.isStudentAdded }
+  private var canSwipe: Bool {
+    AllDaySwipeDelete.canSwipe(isRemovableRow: removable, editable: editable, editing: editing)
+  }
   private var shortReps: Bool {
     guard let actual = draft.actualReps, let target = draft.prescribed.reps else { return false }
     return actual < target
@@ -55,10 +61,27 @@ struct AllDaySetRow: View {
           .fixedSize()
       }
     }
+    .padding(.horizontal, MeetPRSpacing.space2)
+    .padding(.vertical, editing ? MeetPRSpacing.space2 : 0)
+    .background(
+      editing
+        ? Color.MeetPR.goldRGB.opacity(0.10)
+        : shortReps ? Color.MeetPR.dangerSoft : Color.MeetPR.surfaceCard
+    )
+    .background(Color.MeetPR.surfaceCard)
+    .modifier(
+      AllDaySwipeDeleteModifier(
+        enabled: canSwipe, rowID: draft.id, tapState: $swipeTapState,
+        closeRequest: swipeCloseRequest
+      ) { showsRemoval = true }
+    )
     .contextMenu {
-      if editable, draft.isExtra || draft.isStudentAdded {
+      if editable, removable {
         Button(StudentStrings.localized(.addedRemove), role: .destructive) { showsRemoval = true }
       }
+    }
+    .accessibilityAction(named: Text(StudentStrings.localized(.addedRemoveSet))) {
+      if canSwipe { showsRemoval = true }
     }
     .confirmationDialog(StudentStrings.localized(.addedConfirmSet), isPresented: $showsRemoval) {
       Button(StudentStrings.localized(.addedRemove), role: .destructive) {
@@ -66,15 +89,16 @@ struct AllDaySetRow: View {
       }
     }
     .preference(key: TrainingPresentationBlockedKey.self, value: showsRemoval)
-    .padding(.horizontal, MeetPRSpacing.space2)
-    .padding(.vertical, editing ? MeetPRSpacing.space2 : 0)
-    .background(
-      editing
-        ? Color.MeetPR.goldRGB.opacity(0.10)
-        : shortReps ? Color.MeetPR.dangerSoft : Color.MeetPR.surfaceCard)
   }
 
   private func openEditor(_ field: MeetPRNumberPad.Field) {
+    switch swipeTapState {
+    case .dragging: return
+    case .open:
+      swipeCloseRequest += 1
+      return
+    case .idle: break
+    }
     guard editable, let viewModel, let keypad else { return }
     keypad.openAllDay(draft: draft, viewModel: viewModel, field: field)
   }
