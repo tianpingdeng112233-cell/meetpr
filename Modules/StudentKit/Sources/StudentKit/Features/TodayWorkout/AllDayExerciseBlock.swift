@@ -32,23 +32,28 @@ struct AllDayExerciseBlock: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.goldText)
         }
-        if editable, group.rows.first?.isStudentAdded == false {
+        if editable, let first = group.rows.first, !first.isStudentAdded {
           let atLimit = group.rows.filter(\.isWarmup).count >= 5
-          Button {
-            keypad?.dismiss()
-            if let viewModel, let id = viewModel.addWarmupSet(exerciseID: group.id),
-              let draft = viewModel.currentDrafts?.first(where: { $0.id == id })
-            {
-              keypad?.openAllDay(draft: draft, viewModel: viewModel, field: .weight)
+          HStack {
+            Button {
+              keypad?.dismiss()
+              if let viewModel, let id = viewModel.addWarmupSet(exerciseID: group.id),
+                let draft = viewModel.currentDrafts?.first(where: { $0.id == id })
+              {
+                keypad?.openAllDay(draft: draft, viewModel: viewModel, field: .weight)
+              }
+            } label: {
+              Text(StudentStrings.localized(atLimit ? .warmupLimit : .warmupAdd))
+                .font(Self.addRowFont)
+                .foregroundStyle(atLimit ? Color.MeetPR.textMuted : Color.MeetPR.goldText)
             }
-          } label: {
-            Text(StudentStrings.localized(atLimit ? .warmupLimit : .warmupAdd))
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
-              .foregroundStyle(atLimit ? Color.MeetPR.textMuted : Color.MeetPR.goldText)
-              .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .disabled(atLimit)
+            .accessibilityIdentifier("allDay.addWarmup.\(group.id)")
+            Spacer()
+            noteButton(first)
           }
-          .disabled(atLimit)
-          .accessibilityIdentifier("allDay.addWarmup.\(group.id)")
+          .foregroundStyle(Color.MeetPR.goldText)
+          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
         }
         VStack(spacing: 0) {
           ForEach(group.rows) { draft in
@@ -61,27 +66,23 @@ struct AllDayExerciseBlock: View {
         .clipShape(.rect(cornerRadius: 12))
         if editable, let first = group.rows.first {
           HStack {
-            Button(StudentStrings.localized(.addedAddSet), systemImage: "plus") {
+            Button {
               if first.isStudentAdded {
                 viewModel?.addStudentSet(exerciseID: first.exerciseID)
               } else {
                 viewModel?.addExtraSet(exerciseID: group.id, copyLastVisible: true)
               }
+            } label: {
+              // Same look as "＋ 加热身组" (David 2026-11-18).
+              Text("＋ " + StudentStrings.localized(.addedAddSet)).font(Self.addRowFont)
             }
             .disabled(
               first.isStudentAdded
                 ? group.rows.count >= StudentAddedRows.limit
                 : group.rows.filter { $0.isExtra && !$0.isWarmup }.count >= StudentAddedRows.limit)
             Spacer()
-            Button {
-              onNote(first)
-            } label: {
-              Image(systemName: "text.bubble")
-                .frame(
-                  width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
-            }
-            .accessibilityLabel(StudentStrings.localized(.allDayAskCoach))
-            .accessibilityIdentifier("allDay.note.\(group.id)")
+            // Planned exercises carry the note button on the warm-up row above.
+            if first.isStudentAdded { noteButton(first) }
           }
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
           .foregroundStyle(Color.MeetPR.goldText)
@@ -95,6 +96,22 @@ struct AllDayExerciseBlock: View {
     }
     .foregroundStyle(Color.MeetPR.textPrimary)
     .buttonStyle(.plain)
+  }
+
+  /// Shared by "＋ 加热身组" and "＋ 加一组".
+  private static let addRowFont = Font.MeetPR.body(
+    size: MeetPRFontMetrics.size13, weight: .semibold)
+
+  private func noteButton(_ first: TodayWorkoutSetRowDraft) -> some View {
+    Button {
+      onNote(first)
+    } label: {
+      Image(systemName: "text.bubble")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+    }
+    .accessibilityLabel(StudentStrings.localized(.allDayAskCoach))
+    .accessibilityIdentifier("allDay.note.\(group.id)")
   }
 }
 
