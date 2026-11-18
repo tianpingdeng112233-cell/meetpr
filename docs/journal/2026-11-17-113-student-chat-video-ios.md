@@ -1,6 +1,6 @@
 # 113 · Card B · iOS student standalone chat video
 
-**当前结论（2026-11-17）**：主代理已收货 iOS 本地实现，独立 Standards / Spec CLEAN，原生构建、Networking 159 / ChatUI 100 / StudentKit 1327 项测试及 17e 浅深色实际流程通过。交 T2 PR 等 David，不自合；真实后端 / OSS 跨端联调尚未执行。下文早期 handoff、磁盘满与模拟器替换记录是过程证据，最终状态以末尾验收记录为准。
+**当前结论（2026-11-18）**：#478已合并；国内0089/后端部署与真实双向收发、四角色播放及冷启动回读通过。P1纳入1.0(42)，未发布。自动化/原生/真实验收分层证据与观察见末节；下文早期阻塞仅保留历史。
 
 - Worktree: `/Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release`
 - Branch: `feat/113-student-chat-video`; base `c693abab729a8f92340178780a90a6822c92b304`.
@@ -92,3 +92,15 @@ The dark-mode blocker above is resolved. Root authorized a separate temporary si
 Waited until the other task's screen remained unchanged and no UI input commands were active; launched QA at 12:05, changed QA's own Settings → Appearance → Dark, then repeated + video → video-only gallery → preview → send. Personally inspected screenshots `06-menu-dark.jpg`, `07-video-picker-dark.jpg`, `08-preview-dark.jpg`, `09-delivered-dark.jpg`, also exported as `/Users/david/Documents/Codex/2026-11-17/lai-o/outputs/113-ios-<filename>`. In the independent QA run, the delivered card and 0:02 duration were visible immediately after send; the earlier scroll observation did not reproduce. Stopped only `com.meetpr.chatvideoqa` at 12:08, releasing 17e. No 17 / 17 Pro installs.
 
 Final local result: native build passed; 159 Networking + 100 ChatUI + 1327 StudentKit tests passed; Standards/Spec CLEAN (root reported); light/dark menu, gallery, preview, sent card inspected; cancel/reselect/send/playback exercised. Outstanding integration remains real deployed backend/OSS and coach/cross-platform receipt, as recorded in NEXT-RELEASE. Source frozen; no child commit/push.
+
+## 合并与真实联调准备（2026-11-17）
+
+David已批准合并、后端备份/0089/部署及双端真实联调。#478已squash到release/1.0@c3c1b34ef705deeb25ffe2971fbb633d02de0528；合并前CI三项全绿（44080694507）。以合并SHA准备Debug真实网络构建，目标iPhone17e；不使用Demo作为持久化证明。后端控制台连续连接超时，真实备份/迁移/部署及已绑定测试登录会话尚缺。没有Archive/上传，build号保持41，候选仍为42。
+
+Debug真实网络构建通过（282.9s，XcodeBuildMCP build_sim）；独立QA产物bundleId `com.meetpr.chatvideoliveqa`，只修改复制产物的Info.plist并adhoc签名，源码与正式签名配置未改。MeetPR.debug.dylib SHA256保持 `180462259a42120d4fe626ce13b6758533c6099ccfdab709f62b7b78d8a7dd3f`。已在iPhone17e安装/启动，显式API base为国内staging；尚待已绑定测试师生登录与0089部署。
+
+## 国内真实跨端验收与 P1 入班车（2026-11-18）
+
+David手动登录并交换角色后，两方向真实上传（Android MP4 6秒 → iOS教练；iOS MOV 7秒 → Android教练）、四角色完整播放、冷启动历史回读/回播通过。iOS #478已入release/1.0，NEXT-RELEASE目标1.0(42)。backend0089已执行、5ac8da8已部署。此前“等待登录/部署/合并”是历史阶段，不再是阻塞。
+
+完整逐项依据、截图、素材/构建SHA和限制见[跨端验收正典](https://github.com/tianpingdeng112233-cell/MeetPR-backend/blob/staging/docs/evidence/069-chat-video/interop-2026-11-18/README.md)。Android首次回播链接失败随后重试及冷启成功，原因未确认，无源码返修；真实弱网注入/自然签名过期、正式包覆盖升级与真机音频未现场验证，自动化与发包gate分别承担。尚未发布App，没有bump/tag/Archive。
