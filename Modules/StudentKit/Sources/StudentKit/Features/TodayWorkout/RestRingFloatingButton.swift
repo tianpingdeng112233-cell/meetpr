@@ -1,6 +1,13 @@
 import DesignSystem
 import SwiftUI
 
+/// Floating ring geometry: 16pt edge margin, 12pt gap to the header and the completion button.
+enum RestRingMetrics {
+  static let diameter: CGFloat = 76
+  static let edgeInset: CGFloat = 16 + diameter / 2
+  static let verticalInset: CGFloat = 12 + diameter / 2
+}
+
 struct RestRingFloatingButton: View {
   let remaining: Int
   let total: Int
@@ -24,13 +31,14 @@ struct RestRingFloatingButton: View {
   var body: some View {
     GeometryReader { proxy in
       let origin = proxy.frame(in: .global).minY
-      let lower = max(44, headerBottom - origin + 44)
+      let inset = RestRingMetrics.verticalInset
+      let lower = max(inset, headerBottom - origin + inset)
       // The completion dock includes space3 padding above its actual button.
       let buttonTop = dockTop.map { $0 + MeetPRSpacing.space3 } ?? (origin + proxy.size.height)
       let upper = max(
-        lower, min(proxy.size.height, buttonTop - origin) - 44)
+        lower, min(proxy.size.height, buttonTop - origin) - inset)
       let centerY = lower + (upper - lower) * min(1, max(0, verticalFraction))
-      let centerX = left ? 48.0 : proxy.size.width - 48
+      let centerX = left ? RestRingMetrics.edgeInset : proxy.size.width - RestRingMetrics.edgeInset
       let hintOnRight = centerX + translation.width < proxy.size.width / 2
       ZStack {
         if showsHint {
@@ -60,8 +68,11 @@ struct RestRingFloatingButton: View {
           }
           .fixedSize()
           // Anchor to the ring's edge so translated text keeps an 8pt gap.
-          .frame(width: 64, height: 64, alignment: hintOnRight ? .leading : .trailing)
-          .offset(x: hintOnRight ? 72 : -72)
+          .frame(
+            width: RestRingMetrics.diameter, height: RestRingMetrics.diameter,
+            alignment: hintOnRight ? .leading : .trailing
+          )
+          .offset(x: (RestRingMetrics.diameter + 8) * (hintOnRight ? 1 : -1))
           .position(x: centerX + translation.width, y: centerY + translation.height)
           .allowsHitTesting(false)
         }
@@ -98,7 +109,9 @@ struct RestRingFloatingButton: View {
               }
               if dragged {
                 translation = CGSize(
-                  width: min(proxy.size.width - 48, max(48, centerX + value.translation.width))
+                  width: min(
+                    proxy.size.width - RestRingMetrics.edgeInset,
+                    max(RestRingMetrics.edgeInset, centerX + value.translation.width))
                     - centerX,
                   height: min(upper, max(lower, centerY + value.translation.height)) - centerY)
               }
@@ -141,27 +154,27 @@ private struct RestRingButtonFace: View {
     ZStack {
       Circle().fill(Color.MeetPR.surface3)
       if running {
-        RestRingProgress(remaining: remaining, total: total, width: 4)
+        RestRingProgress(remaining: remaining, total: total, width: 5)
         Text(RestRingTime.text(remaining))
-          .font(.system(size: 17, weight: .bold, design: .monospaced))
+          .font(.system(size: 20, weight: .bold, design: .monospaced))
           .foregroundStyle(remaining <= 10 ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
       } else if done {
-        Circle().strokeBorder(Color.MeetPR.gold500, lineWidth: 4)
+        Circle().strokeBorder(Color.MeetPR.gold500, lineWidth: 5)
         Text(StudentStrings.localized(.restRingDone))
-          .font(.system(size: 13, weight: .bold))
+          .font(.system(size: 15, weight: .bold))
           .multilineTextAlignment(.center)
           .foregroundStyle(Color.MeetPR.textPrimary)
       } else {
         Circle().strokeBorder(Color.MeetPR.gold500, lineWidth: 1.5)
         VStack(spacing: 3) {
-          Image(systemName: "timer").font(.system(size: 20)).foregroundStyle(Color.MeetPR.gold500)
+          Image(systemName: "timer").font(.system(size: 24)).foregroundStyle(Color.MeetPR.gold500)
           Text(RestRingTime.text(remaining))
-            .font(.system(size: 12, weight: .bold, design: .monospaced))
+            .font(.system(size: 14, weight: .bold, design: .monospaced))
             .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
     }
-    .frame(width: 64, height: 64)
+    .frame(width: RestRingMetrics.diameter, height: RestRingMetrics.diameter)
     .contentShape(.circle)
   }
 }
