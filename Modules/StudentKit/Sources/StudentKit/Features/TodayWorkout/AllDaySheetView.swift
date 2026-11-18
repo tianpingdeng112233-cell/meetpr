@@ -10,8 +10,11 @@ struct AllDaySheetView: View {
   let onVideo: (TodayWorkoutPresentation.Row) -> Void
   let onNote: (TodayWorkoutSetRowDraft) -> Void
   @State private var showsPicker = false
+  @State private var pickerIsPresented = false
   @State private var removal: UUID?
   @State private var previewExpanded: UUID?
+
+  private func pickerDidDismiss() { pickerIsPresented = false }
 
   private var groups: [AllDayExercise] {
     viewModel?.allDaySheet
@@ -59,6 +62,7 @@ struct AllDaySheetView: View {
       if editable, let viewModel {
         Button(StudentStrings.localized(.addedAddExercise), systemImage: "plus") {
           showsPicker = true
+          pickerIsPresented = true
         }
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
         .foregroundStyle(Color.MeetPR.goldText)
@@ -67,12 +71,15 @@ struct AllDaySheetView: View {
           groups.filter { $0.rows.first?.isStudentAdded == true }.count >= StudentAddedRows.limit
         )
         .accessibilityIdentifier("studentAdded.addExercise")
-        .sheet(isPresented: $showsPicker) {
+        .sheet(isPresented: $showsPicker, onDismiss: pickerDidDismiss) {
           StudentExercisePicker(
             viewModel: viewModel, day: presentation.day,
             addedIDs: Set(groups.flatMap(\.rows).filter(\.isStudentAdded).map(\.exerciseID)))
         }
       }
+    }
+    .transformPreference(TrainingPresentationBlockedKey.self) {
+      $0 = $0 || showsPicker || pickerIsPresented || removal != nil
     }
     .transaction(value: viewModel?.expandedAllDayExerciseID ?? previewExpanded) { transaction in
       transaction.animation = nil

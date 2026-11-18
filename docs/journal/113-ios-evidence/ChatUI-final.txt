@@ -1,0 +1,31 @@
+Command: swift test --package-path Modules/ChatUI --jobs 2
+Result: exit 0
+Full output: ChatUI-final.txt.gz
+Uncompressed SHA256: fad5140631186bcc82d9410790b03fd77e0bc1b81ac8d1653cb00881493003c9
+
+Final output excerpt:
+✔ Test cancellationGenerationDiscardsLateNonCooperativeResponse() passed after 0.220 seconds.
+✔ Test staleRefreshResponseCannotOverwriteNewerSnapshot() passed after 0.218 seconds.
+✔ Test repeatedPollingStartHasOneOwnerAndCancellationIsNotAnError() passed after 0.213 seconds.
+✔ Suite ChatSendCoordinatorTests passed after 0.224 seconds.
+✔ Test staleLoadCannotResurrectMessageDeletedDuringRenewal() passed after 0.223 seconds.
+✔ Test sendEnqueuedDuringCleanupDoesNotOutliveIt() passed after 0.221 seconds.
+✔ Suite ConversationVideoRenewalTests passed after 0.226 seconds.
+✔ Test repeatedStartCreatesOneThirtySecondPoller() passed after 0.219 seconds.
+✔ Suite ChatInboxViewModelTests passed after 0.225 seconds.
+✔ Test staleMarkReadResponseCannotOverwriteNewerInboxState() passed after 0.224 seconds.
+✔ Test cancelAllWaitsForImageCleanup() passed after 0.227 seconds.
+✔ Test logoutCancelsWaitingIntentWithoutImageCleanup() passed after 0.221 seconds.
+✔ Suite ConversationViewModelTests passed after 0.231 seconds.
+✔ Test failedRetryReusesClientIDAndNeverEntersImageCleanupPath() passed after 0.232 seconds.
+✔ Suite ChatSendCoordinatorSetRefTests passed after 0.242 seconds.
+✔ Test retryDuringCleanupDoesNotOutliveIt() passed after 0.247 seconds.
+✔ Suite ChatSendCoordinatorCleanupTests passed after 0.252 seconds.
+✔ Test chatReadAdvancesReceiptWithoutGoingBackwards() passed after 0.281 seconds.
+✔ Test conversationConnectedStateSuspendsThreeSecondPolling() passed after 0.299 seconds.
+✔ Test conversationFiltersEventsAndCoalescesDenseRefreshes() passed after 0.299 seconds.
+✔ Test inboxSuspendsPollingWhileConnectedAndRestoresItWhenDisconnected() passed after 0.300 seconds.
+✔ Suite ChatRealtimeTests passed after 0.308 seconds.
+✔ Test "export preserves orientation, audio, duration, and burns the badge into every segment" passed after 14.985 seconds.
+✔ Suite "Video badge exporter" passed after 14.992 seconds.
+✔ Test run with 100 tests in 19 suites passed after 14.994 seconds.

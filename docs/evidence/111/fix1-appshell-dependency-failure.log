@@ -1,0 +1,8 @@
+Fetching https://github.com/nalexn/ViewInspector from cache
+Fetching https://github.com/CoreOffice/CoreXLSX from cache
+warning: 'viewinspector': skipping cache due to an error: Couldn’t fetch updates from remote repositories:
+    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Recv failure: Operation timed out
+Fetched https://github.com/CoreOffice/CoreXLSX from cache (68.57s)
+error: Failed to clone repository https://github.com/nalexn/ViewInspector:
+    Cloning into bare repository '/Users/david/Projects/apps/MeetPR-wt-111/Modules/AppShell/.build/repositories/ViewInspector-8f6ae9a2'...
+    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Error in the HTTP2 framing layer

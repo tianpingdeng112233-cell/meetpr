@@ -29,9 +29,13 @@ public struct TodayWorkoutView: View {
   private let onPlanChanged: (StudentPlanView) -> Void
   @Environment(BodyWeightEntryModel.self) private var weightEntry: BodyWeightEntryModel?
   @Environment(ProfileNavigation.self) private var profileNavigation: ProfileNavigation?
+  @Environment(\.isStudentPresentationBlocked) private var ancestorPresentationBlocked
+  @Environment(\.bindFirstRun) private var bindFirstRun
+  @State private var childPresentationBlocked = false
+  @State private var workoutModalIsPresented = false
   private let onOpenCoach: () -> Void
 
-  @State private var restTimerHeight: CGFloat = 0
+  @State private var restRingHeaderBottom: CGFloat = 0
   @State private var completionDockTop: CGFloat?
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
@@ -52,10 +56,6 @@ public struct TodayWorkoutView: View {
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
-  @State private var opensRestSettingsAfterExplanation = false
-  @State private var showingRestSettings = false
-  @State private var accessoryRestSeconds = 60
-  @State private var restPreference: StudentRestTimerPreference = .automatic
   @State private var exerciseNoteSent = false
   @State private var exerciseNote: ExerciseRefV1?
   @Environment(ExerciseNoteNavigation.self) private var exerciseNavigation: ExerciseNoteNavigation?
@@ -176,8 +176,25 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     workoutContent
+      .onPreferenceChange(TrainingPresentationBlockedKey.self) { childPresentationBlocked = $0 }
+      .onChange(of: hasRequestedWorkoutModal, initial: true) { _, requested in
+        if requested { workoutModalIsPresented = true }
+      }
+      .onPreferenceChange(RestRingHeaderBottomKey.self) { restRingHeaderBottom = $0 }
+      .overlay {
+        RestTimerOverlay(
+          session: viewModel.restRing,
+          available: isVisible && isEditable && viewModel.currentRestExercise != nil,
+          hidden: keypad?.current != nil || editing != nil,
+          hasOtherPresentation: restRingPresentationBlocked,
+          seconds: viewModel.currentRestSeconds,
+          exercise: viewModel.currentRestExercise?.displayExerciseName ?? "",
+          headerBottom: restRingHeaderBottom, dockTop: completionDockTop)
+      }
       .modifier(
-        ExerciseNotePresentation(reference: $exerciseNote) { reference in
+        ExerciseNotePresentation(
+          reference: $exerciseNote, onDismiss: workoutModalDidDismiss
+        ) { reference in
           ExerciseNoteSheet(reference: reference) { note in
             guard let notifications, let chat = notifications.chatContext else { return false }
             let result = await notifications.openExerciseNoteConversation()
@@ -272,7 +289,7 @@ public struct TodayWorkoutView: View {
       accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
       sequencePage: sequencePage,
       gymDayToday: gymDayToday,
-      restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight,
+      restTimerHeight: 0,
       completionDockTop: completionDockTop,
       videoFailureCount: videoFailurePresentation.failureCount,
       onRetryVideos: retryDayVideos,
@@ -314,12 +331,13 @@ public struct TodayWorkoutView: View {
       VideoMissingFileHost(
         model: videoViewModel, enabled: editing == nil,
         context: missingVideoContext,
+        onDismiss: workoutModalDidDismiss,
         onRestored: {
           await videoViewModel.retryFailures(
             studentID: studentID, workout: viewModel, trainingDate: selectedTrainingDate)
         })
     )
-    .modifier(CompletedVideoReplayHost(model: replay))
+    .modifier(CompletedVideoReplayHost(model: replay, onDismiss: workoutModalDidDismiss))
     .task { await replay.load(studentID: studentID) }
     .safeAreaInset(edge: .bottom) {
       VStack(spacing: 0) {
@@ -363,74 +381,34 @@ public struct TodayWorkoutView: View {
   private var workoutContent: some View {
     workoutBase()
       #if os(iOS)
-        .fullScreenCover(item: $editing) { target in
+        .fullScreenCover(item: $editing, onDismiss: workoutModalDidDismiss) { target in
           setEntry(for: target)
         }
       #else
-        .sheet(item: $editing) { target in
+        .sheet(item: $editing, onDismiss: workoutModalDidDismiss) { target in
           setEntry(for: target)
         }
       #endif
       #if os(iOS)
-        .fullScreenCover(item: $quickLogRoute) { route in
-          quickLogSheet(for: route)
-        }
+        .fullScreenCover(
+          item: $quickLogRoute, onDismiss: workoutModalDidDismiss, content: quickLogSheet)
       #else
-        .sheet(item: $quickLogRoute) { route in
+        .sheet(item: $quickLogRoute, onDismiss: workoutModalDidDismiss) { route in
           quickLogSheet(for: route)
         }
       #endif
       #if os(iOS)
-        .fullScreenCover(item: $viewModel.completionPhase) { phase in
+        .fullScreenCover(
+          item: $viewModel.completionPhase, onDismiss: workoutModalDidDismiss
+        ) { phase in
           completionFlow(phase: phase)
         }
       #else
-        .sheet(item: $viewModel.completionPhase) { phase in
-          completionFlow(phase: phase)
-        }
+        .sheet(
+          item: $viewModel.completionPhase, onDismiss: workoutModalDidDismiss,
+          content: completionFlow)
       #endif
-      .sheet(
-        isPresented: restTimerExplanationPresented,
-        onDismiss: {
-          if opensRestSettingsAfterExplanation {
-            opensRestSettingsAfterExplanation = false
-            restPreference = restTimerSettings.preference(for: studentID)
-            accessoryRestSeconds = restTimerSettings.accessorySeconds(for: studentID)
-            showingRestSettings = true
-          }
-        },
-        content: {
-          RestTimerExplanationView(
-            onAcknowledge: { viewModel.acknowledgeRestTimerExplanation() },
-            onOpenSettings: {
-              opensRestSettingsAfterExplanation = true
-              viewModel.acknowledgeRestTimerExplanation()
-            }
-          )
-          .presentationDetents([.medium, .large])
-          .interactiveDismissDisabled()
-        }
-      )
-      .sheet(isPresented: $showingRestSettings) {
-        NavigationStack {
-          RestTimerSettingsView(
-            preference: $restPreference, accessorySeconds: $accessoryRestSeconds
-          )
-          .onChange(of: accessoryRestSeconds) { _, seconds in
-            restTimerSettings.setAccessorySeconds(seconds, for: studentID)
-          }
-          .onChange(of: restPreference) { _, preference in
-            restTimerSettings.setPreference(preference, for: studentID)
-          }
-          .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-              Button(StudentStrings.acknowledge) { showingRestSettings = false }
-                .font(.MeetPR.body)
-            }
-          }
-        }
-      }
-      .sheet(isPresented: $showingReadinessSheet) {
+      .sheet(isPresented: $showingReadinessSheet, onDismiss: workoutModalDidDismiss) {
         ReadinessCheckinSheet(
           studentID: studentID,
           viewModel: readinessViewModel,
@@ -453,7 +431,7 @@ public struct TodayWorkoutView: View {
       } message: {
         Text(setRefEntryErrorMessage ?? "")
       }
-      .sheet(item: $setRefPickerRoute) { route in
+      .sheet(item: $setRefPickerRoute, onDismiss: workoutModalDidDismiss) { route in
         if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
           SetRefSharePicker(
             context: setRefSharing,
@@ -507,7 +485,9 @@ public struct TodayWorkoutView: View {
       Text(videoViewModel.retryErrorMessage ?? "")
     }
     #if os(iOS)
-      .fullScreenCover(item: $directCameraTarget, content: directCamera)
+      .fullScreenCover(
+        item: $directCameraTarget, onDismiss: workoutModalDidDismiss,
+        content: directCamera)
     #endif
     .onChange(of: scenePhase) { _, phase in
       if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
@@ -1069,13 +1049,6 @@ public struct TodayWorkoutView: View {
     )
   }
 
-  private var restTimerExplanationPresented: Binding<Bool> {
-    Binding(
-      get: { viewModel.showsRestTimerExplanation && editing == nil },
-      set: { _ in }
-    )
-  }
-
   private var retryDialogPresented: Binding<Bool> {
     Binding(
       get: { retryTargetSetLogID != nil },
@@ -1150,6 +1123,34 @@ public struct TodayWorkoutView: View {
       && weightEntry?.isPresented != true
       && viewModel.completionPhase == nil && keypad?.current == nil
       && !videoViewModel.rowStates.values.contains { $0.attachment.status == .uploading }
+  }
+
+  private func workoutModalDidDismiss() { workoutModalIsPresented = false }
+
+  private var hasRequestedWorkoutModal: Bool {
+    editing != nil || quickLogRoute != nil || viewModel.completionPhase != nil
+      || showingReadinessSheet || setRefPickerRoute != nil || directCameraTarget != nil
+      || exerciseNote != nil || replay.selected != nil || videoViewModel.missingAttachment != nil
+  }
+
+  private var restRingPresentationBlocked: Bool {
+    if ancestorPresentationBlocked || bindFirstRun?.showsWelcome == true
+      || (viewModel.showsHandoffNotice && !viewModel.browsingPastPlan)
+    {
+      return true
+    }
+    if hasRequestedWorkoutModal || workoutModalIsPresented || childPresentationBlocked
+      || showingHistory || weightEntry?.isPresented == true
+    {
+      return true
+    }
+    if showingDirectCameraConsent || pendingDirectCameraTarget != nil
+      || preparingVideoSetID != nil || exerciseNavigation?.reference != nil
+    {
+      return true
+    }
+    return isPreparingSetRefPicker || setRefEntryErrorMessage != nil || retryTargetSetLogID != nil
+      || viewModel.actionErrorMessage != nil || videoViewModel.retryErrorMessage != nil
   }
 
   private func turnPlan(forward: Bool) {

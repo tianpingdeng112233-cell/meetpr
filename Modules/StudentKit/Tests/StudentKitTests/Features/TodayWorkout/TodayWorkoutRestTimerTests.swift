@@ -69,14 +69,13 @@ private final class RestTimerActivityControllerSpy: RestTimerActivityControlling
 @Test func allDayCompletionNeverStartsRestOrLiveActivity() async throws {
   let activity = RestTimerActivityControllerSpy()
   let model = try await makeViewModel(restTimerActivityController: activity)
-  #expect(activity.events == [.end])
+  #expect(activity.events.isEmpty)
   await model.toggleComplete(rowIndex: 0)
   await model.toggleComplete(rowIndex: 1)
   #expect(model.restTimer == nil)
-  #expect(!model.showsRestTimerExplanation)
-  #expect(activity.events == [.end])
+  #expect(activity.events.isEmpty)
   model.adjustRestTimer(bySeconds: 30)
-  #expect(activity.events == [.end])
+  #expect(activity.events.isEmpty)
 }
 
 @MainActor
@@ -90,7 +89,6 @@ private final class RestTimerActivityControllerSpy: RestTimerActivityControlling
   model.updateRPE(rowIndex: 0, rpe: 10)
   await model.toggleComplete(rowIndex: 0)
   #expect(model.restTimer == nil)
-  #expect(!model.showsRestTimerExplanation)
   #expect(
     settings.store.preference(for: StudentDemoSeed.studentID)
       == .custom(lowSeconds: 105, midSeconds: 195, highSeconds: 300))

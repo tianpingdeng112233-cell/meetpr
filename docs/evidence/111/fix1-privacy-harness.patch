@@ -1,0 +1,12 @@
+--- a/Modules/AppShell/Sources/AppShell/AnalyticsRootModifier.swift
++++ b/Modules/AppShell/Sources/AppShell/AnalyticsRootModifier.swift
+@@ -68,6 +68,9 @@
+   private static let noticeKey = "meetpr.analytics.privacy_notice_confirmed"
+
+   private static func shouldShowNotice(mode: AnalyticsMode) -> Bool {
++    if ProcessInfo.processInfo.arguments.contains("--spec111-privacy-notice") {
++      return !UserDefaults.standard.bool(forKey: noticeKey)
++    }
+     guard case .live = mode else { return false }
+     return !UserDefaults.standard.bool(forKey: noticeKey)
+   }

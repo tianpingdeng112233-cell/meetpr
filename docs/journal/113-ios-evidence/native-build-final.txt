@@ -1,0 +1,56 @@
+Source log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/lai-o-612e1c77f2e2/logs/build_run_sim_2026-11-17T11-49-07-696Z_pid92851_4e66954c.log
+
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name MeetPR --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.meetpr.app --output /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app --target-triple arm64-apple-ios17.0-simulator --binary-file /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/MeetPR --dependency-file /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/Objects-normal/arm64/MeetPR_dependency_info.dat --stringsdata-file /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/Objects-normal/arm64/MeetPR.SwiftFileList --metadata-file-list /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/MeetPR.DependencyMetadataFileList --static-metadata-file-list /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/MeetPR.DependencyStaticMetadataFileList --swift-const-vals-list /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/Objects-normal/arm64/MeetPR.SwiftConstValuesFileList --quiet-warnings --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-17 11:55:08.462 appintentsmetadataprocessor[758:21854212] Starting appintentsmetadataprocessor export
+2026-11-17 11:55:08.479 appintentsmetadataprocessor[758:21854212] Extracted no relevant App Intents symbols, skipping writing output
+
+CopySwiftLibs /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/MeetPR.debug.dylib --scan-folder /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Frameworks --scan-folder /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/PlugIns --scan-folder /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/SystemExtensions --scan-folder /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Extensions --scan-folder /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/System/Library/Frameworks/AppIntents.framework --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+AppIntentsSSUTraining (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Info.plist --temp-dir-path /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/ssu --bundle-id com.meetpr.app --product-path /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app --extracted-metadata-path /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Metadata.appintents --metadata-file-list /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/MeetPR.DependencyMetadataFileList --source-file /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Info.plist --archive-ssu-assets
+2026-11-17 11:55:08.505 appintentsnltrainingprocessor[760:21854215] Parsing options for appintentsnltrainingprocessor
+2026-11-17 11:55:08.506 appintentsnltrainingprocessor[760:21854215] Starting AppIntents SSU YAML Generation
+2026-11-17 11:55:08.507 appintentsnltrainingprocessor[760:21854215] No AppShortcuts found - Skipping.
+
+CodeSign /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/MeetPR.debug.dylib (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+
+    Signing Identity:     "Sign to Run Locally"
+
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/MeetPR.debug.dylib
+
+CodeSign /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/__preview.dylib (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+
+    Signing Identity:     "Sign to Run Locally"
+
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/__preview.dylib
+
+CodeSign /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+
+    Signing Identity:     "Sign to Run Locally"
+
+    /usr/bin/codesign --force --sign - --entitlements /tmp/MeetPR-ios113-derived/Build/Intermediates.noindex/MeetPR.build/DemoStudent-iphonesimulator/MeetPR.build/MeetPR.app.xcent --timestamp\=none --generate-entitlement-der /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app
+
+ValidateEmbeddedBinary /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/PlugIns/MeetPRWidgets.appex (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    /Applications/Xcode.app/Contents/Developer/usr/bin/embeddedBinaryValidationUtility /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/PlugIns/MeetPRWidgets.appex -signing-cert - -info-plist-path /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app/Info.plist
+
+RegisterExecutionPolicyException /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    builtin-RegisterExecutionPolicyException /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app
+
+Validate /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    builtin-validationUtility /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app (in target 'MeetPR' from project 'MeetPR')
+    cd /Users/david/.codex/worktrees/student-chat-video-ios/MeetPR-release
+    /usr/bin/touch -c /tmp/MeetPR-ios113-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app
+
+** BUILD SUCCEEDED **

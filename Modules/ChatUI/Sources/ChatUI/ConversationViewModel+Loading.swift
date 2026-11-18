@@ -313,7 +313,7 @@ extension ConversationViewModel {
       {
         imageURLObtainedAt[message.id] = obtainedAt
       }
-      if message.setRef != nil, message.videoURL != nil,
+      if message.hasChatVideo, message.videoURL != nil,
         existing?.videoURL != message.videoURL || videoURLObtainedAt[message.id] == nil
       {
         videoURLObtainedAt[message.id] = obtainedAt

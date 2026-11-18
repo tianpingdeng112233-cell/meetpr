@@ -17,7 +17,6 @@ import Testing
   #expect(saved.completed)
   #expect(saved.actualRPE == nil)
   #expect(model.restTimer == nil)
-  #expect(!model.showsRestTimerExplanation)
   let stored = try #require(
     try await logs.fetchLogsForExercise(
       studentID: StudentDemoSeed.studentID, planExerciseID: draft.planExerciseID
@@ -136,7 +135,6 @@ func accessoryFixture(
   }
   #expect(coach.model.restTimer == nil)
   #expect(coach.model.currentDrafts?.contains { !$0.completed } == true)
-  #expect(!coach.model.showsRestTimerExplanation)
 }
 
 @MainActor

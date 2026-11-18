@@ -66,6 +66,8 @@ private struct ChatMessageBubble: View {
       case .text:
         if message.exerciseRef?.version == 1 {
           ExerciseNoteCard(message: message)
+        } else if message.isStandaloneVideo {
+          ChatStandaloneVideoCard(message: message, openVideo: openVideo)
         } else if let presentation = ChatSetCardPresentation(message: message) {
           ChatSetCardView(
             presentation: presentation,
@@ -222,6 +224,8 @@ struct PendingChatMessageRow: View {
           case .text(let text), .exerciseNote(let text, _):
             Text(text)
               .font(.body)
+          case .video(let video):
+            ChatPendingVideoCard(video: video, progress: item.sendingProgress)
           case .image:
             Label(ChatStrings.image, systemImage: "photo")
               .font(.body)

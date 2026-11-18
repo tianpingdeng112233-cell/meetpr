@@ -1,0 +1,31 @@
+Command: swift test --package-path Modules/Networking --jobs 2
+Result: exit 0
+Full output: Networking-final.txt.gz
+Uncompressed SHA256: 5df3bcf1a71b4329a8e999d479ba1db0c2df9ea0a3441750616a1c502ed98f58
+
+Final output excerpt:
+✔ Test fetchedLogDecodesLoggedDateAndAnchorsBackfilledLogsOnTheirTrainingDay() passed after 0.041 seconds.
+✔ Test actualRIRUsesItsOwnWireKeyAndRoundTripsToDomain() passed after 0.050 seconds.
+✔ Test networkChatRepositoryDeletesCompletedAttachmentWhenMessageFails() passed after 0.179 seconds.
+✔ Test networkChatRepositoryAbortsAttachmentWhenImageUploadIsCancelled() passed after 0.178 seconds.
+✔ Test networkChatRepositoryDeletesNewAttachmentOnIdempotentOldMessage() passed after 0.178 seconds.
+✔ Test fetchedLogWithoutLoggedDateKeepsServerTimestamp() passed after 0.051 seconds.
+✔ Test backfilledLogOnADSTTransitionDayStillAnchorsAtLocalNoon() passed after 0.051 seconds.
+✔ Suite RealtimeEventTests passed after 0.184 seconds.
+✔ Test helloConnectsWithBearerHeaderAndTokenNeverEntersURL() passed after 0.062 seconds.
+✔ Test acceptResponseDecodesEvaluationPeriod() passed after 0.178 seconds.
+✔ Test sendsProtocolPingEveryTwentySeconds() passed after 0.065 seconds.
+✔ Test helloResetsBackoffBeforeTheNextFailure() passed after 0.064 seconds.
+✔ Test staleRunCannotOverwriteStateAfterReconnect() passed after 0.065 seconds.
+✔ Test disconnectPublishesDisconnectedBeforeItsSuspensionEvenWhenConnectRaces() passed after 0.066 seconds.
+✔ Test networkChatRepositoryEncodesBeforeAndLatestQueriesExactly() passed after 0.166 seconds.
+✔ Test planAndDayDecodeSequenceCompletionFields() passed after 0.181 seconds.
+✔ Test standaloneVideoFailureCleansRemoteUpload(failure:) with 3 test cases passed after 0.188 seconds.
+✔ Test planIntensityDTOFieldsRoundTripWithWireTypes() passed after 0.185 seconds.
+✔ Test feedbackDTODecodesAndMapsLinkedVideo() passed after 0.185 seconds.
+✔ Test fetchedLogOnItsOwnGymDayKeepsServerTimestamp() passed after 0.062 seconds.
+✔ Suite SetLogDTOTests passed after 0.195 seconds.
+✔ Test failuresUseCappedExponentialBackoffAndDisconnectStopsReconnects() passed after 0.077 seconds.
+✔ Suite RealtimeClientTests passed after 0.199 seconds.
+✔ Test typedEndpointsUseWireContractPaths() passed after 0.199 seconds.
+✔ Test run with 159 tests in 3 suites passed after 0.206 seconds.

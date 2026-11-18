@@ -94,6 +94,10 @@ public protocol ChatRepository: Sendable {
     -> ChatMessage
   func sendImage(in conversationID: UUID, imageData: Data, clientID: String) async throws
     -> ChatMessage
+  func sendVideo(
+    in conversationID: UUID, video: ChatVideoFile, clientID: String,
+    progress: @escaping @Sendable (Double) async -> Void
+  ) async throws -> ChatMessage
   func sendSetRef(
     in conversationID: UUID,
     body: String,
@@ -127,5 +131,15 @@ extension ChatRepository {
     in conversationID: UUID, body: String, exerciseRef: ExerciseRefV1, clientID: String
   ) async throws -> ChatMessage {
     try await sendText(in: conversationID, text: body, clientID: clientID)
+  }
+}
+
+// Repositories must opt in explicitly; a text fallback must never claim a video was sent.
+extension ChatRepository {
+  public func sendVideo(
+    in conversationID: UUID, video: ChatVideoFile, clientID: String,
+    progress: @escaping @Sendable (Double) async -> Void
+  ) async throws -> ChatMessage {
+    throw ChatRepositoryError.invalidAttachment
   }
 }

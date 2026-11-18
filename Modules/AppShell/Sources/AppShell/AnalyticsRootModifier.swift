@@ -1,6 +1,7 @@
 import Analytics
 import Foundation
 import Networking
+import StudentKit
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -11,16 +12,22 @@ struct AnalyticsRootModifier: ViewModifier {
   @Environment(\.scenePhase) private var scenePhase
   @State private var didConfigure = false
   @State private var showingNotice: Bool
+  @State private var noticeDismissed: Bool
 
   init(session: Session, mode: AnalyticsMode) {
     self.session = session
     self.mode = mode
     _showingNotice = State(initialValue: Self.shouldShowNotice(mode: mode))
+    _noticeDismissed = State(initialValue: !Self.shouldShowNotice(mode: mode))
   }
 
   func body(content: Content) -> some View {
     content
-      .sheet(isPresented: $showingNotice) {
+      .environment(
+        \.isStudentPresentationBlocked,
+        showingNotice || !noticeDismissed || FrictionFeedbackController.shared.pendingPrompt != nil
+      )
+      .sheet(isPresented: $showingNotice, onDismiss: noticeDidDismiss) {
         AnalyticsPrivacyNotice {
           UserDefaults.standard.set(true, forKey: Self.noticeKey)
           Analytics.shared.confirmPrivacyNotice()
@@ -55,6 +62,8 @@ struct AnalyticsRootModifier: ViewModifier {
         }
       }
   }
+
+  private func noticeDidDismiss() { noticeDismissed = true }
 
   private static let noticeKey = "meetpr.analytics.privacy_notice_confirmed"
 

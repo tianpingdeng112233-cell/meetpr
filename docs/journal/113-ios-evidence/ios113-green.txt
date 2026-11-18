@@ -1,0 +1,36 @@
+[0/1] Planning build
+Building for debugging...
+[0/6] Write sources
+[3/6] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Emitting module CoreModels
+[6/8] Compiling CoreModels ChatMessage.swift
+[7/10] Emitting module RepositoryContracts
+[8/10] Compiling RepositoryContracts ChatRepository.swift
+[9/13] Compiling Networking NetworkChatRepository.swift
+[10/13] Emitting module Networking
+[11/13] Compiling Networking ChatDTOs.swift
+[12/21] Compiling NetworkingTests ChatSetRefDTOTests.swift
+[13/21] Compiling NetworkingTests ChatStandaloneVideoTests.swift
+[14/21] Compiling NetworkingTests AllDayContractTests.swift
+[15/21] Compiling NetworkingTests NetworkChatRepositoryImageTests.swift
+[16/21] Compiling NetworkingTests NetworkChatRepositoryTests.swift
+[17/21] Compiling NetworkingTests ChatDTOTests.swift
+[18/21] Compiling NetworkingTests BuildConfigTests.swift
+[19/21] Emitting module NetworkingTests
+[20/23] Emitting module NetworkingPackageTests
+[21/23] Compiling NetworkingPackageTests runner.swift
+[21/23] Write Objects.LinkFileList
+[22/23] Linking NetworkingPackageTests
+Build complete! (37.09s)
+Test Suite 'Selected tests' started at 2026-11-17 11:21:20.755.
+Test Suite 'NetworkingPackageTests.xctest' started at 2026-11-17 11:21:20.759.
+Test Suite 'NetworkingPackageTests.xctest' passed at 2026-11-17 11:21:20.759.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-17 11:21:20.759.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test standaloneVideoDecodesWithoutChangingLegacyMessageKind() started.
+✔ Test standaloneVideoDecodesWithoutChangingLegacyMessageKind() passed after 0.006 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.006 seconds.
