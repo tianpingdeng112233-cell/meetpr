@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本周期主项走势 · 第三轮</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.dark{--ok:#5E9E78;--bad:#C88888;--bg:#0A0A0C;--stack:#121217;--card:#141416;--border:#262629;--t1:#EDEDED;--t2:#C8C8CC;--t3:#8A8A90;--gold:#F5A623;--gold2:#FFC93C;--goldSoft:rgba(245,166,35,.14);--goldMid:rgba(245,166,35,.32);--goldText:#F5A623;--done:#5A5A62;--todo:#2A2A30;--frame:#000}
+*{box-sizing:border-box}
+body{margin:0;background:#d9dce2;font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;color:#111827}
+header{padding:20px 28px 0}header h1{margin:0;font-size:19px}
+section{padding:22px 28px 4px}section h2{margin:0 0 12px;font-size:17px}
+.grid{display:flex;flex-wrap:wrap;gap:30px 32px}.opt{width:360px;display:flex;flex-direction:column;gap:8px}.cap{font-weight:700;font-size:14px}
+.phone{position:relative;width:360px;height:740px;border-radius:44px;background:var(--bg);color:var(--t1);border:8px solid var(--frame);overflow:hidden;display:flex;flex-direction:column}
+.status{height:36px;flex:none;padding:0 24px 4px;display:flex;justify-content:space-between;align-items:flex-end;font:600 12px 'IBM Plex Sans'}
+.scroll{flex:1;padding:4px 16px;overflow:hidden}
+.title{font:900 30px Archivo,'IBM Plex Sans';margin:6px 0 14px}
+.nav{display:flex;align-items:center;gap:8px;margin:6px 0 12px;font-size:17px;font-weight:700}.nav i{font-style:normal;color:var(--goldText);font-size:22px;line-height:1}
+.tabbar{height:58px;flex:none;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;font-size:11px;color:var(--t3)}
+.tabbar span{display:flex;flex-direction:column;align-items:center;gap:3px}.tabbar i{width:18px;height:18px;border-radius:6px;border:2px solid currentColor}.tabbar .on{color:var(--gold)}
+.mrow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;font-size:15px;cursor:pointer}
+.mrow i{width:22px;height:22px;border-radius:7px;border:2px solid var(--t3);flex:none}.mrow span{flex:1}.mrow em{font-style:normal;font:13px 'IBM Plex Mono';color:var(--t3)}.mrow b{color:var(--t3);font-weight:400}
+.mrow.new{outline:2px solid var(--gold);outline-offset:-2px}.mrow.new i{border-color:var(--gold)}
+.idc{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px}.idc .av{width:48px;height:48px;border-radius:50%;background:var(--border)}.idc b{display:block;font-size:16px}.idc small{color:var(--t3)}
+.seg{display:flex;background:var(--stack);border-radius:9px;padding:2px;margin:0 0 10px}.seg span{flex:1;text-align:center;font-size:13px;padding:7px 0;border-radius:7px;color:var(--t3);cursor:pointer}.seg span.on{background:var(--border);color:var(--t1);font-weight:600}
+.e1{display:flex;align-items:baseline;gap:8px;margin:2px 0 10px}.e1 b{font:900 28px Archivo,'IBM Plex Mono'}.e1 small{font:600 12px 'IBM Plex Mono';color:var(--t3)}
+.tw{overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+table.rt{border-collapse:separate;border-spacing:0;font:12px 'IBM Plex Mono'}
+.rt th,.rt td{padding:7px 0;text-align:center;min-width:50px}
+.rt th{color:var(--t3);font-weight:600;position:sticky;top:0;background:var(--bg)}
+.rt td.r,.rt th.r{position:sticky;left:-16px;background:var(--bg);z-index:1;min-width:40px;color:var(--t3);font-weight:600;padding-left:4px;text-align:left}
+.rt td{color:var(--t2)}.rt td:first-child{border-radius:6px 0 0 6px}.rt td:last-child{border-radius:0 6px 6px 0}
+.rt td.hot{color:var(--bg);background:linear-gradient(180deg,var(--gold2),var(--gold));font-weight:700;border-radius:6px}
+.rt tr:nth-child(even) td{background:var(--stack)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:91%;overflow-y:auto;scrollbar-width:none;background:var(--card);border-radius:22px 22px 0 0;padding:10px 16px 20px}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px}
+.sh-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.sh-h b{font-size:17px}.sh-h span{font-size:12px;color:var(--t3)}
+.wk{font:900 30px Archivo,'IBM Plex Sans';display:flex;align-items:center;gap:8px}.sub{font-size:13px;color:var(--t2)}
+.chip{padding:3px 9px;border-radius:999px;background:var(--goldSoft);color:var(--goldText);font:600 12px 'IBM Plex Sans'}
+.lift{padding:10px 0 4px}.lift+.lift{border-top:1px solid var(--border)}.lh{font-size:14px;font-weight:700}
+.stairs{display:flex;gap:4px;align-items:flex-end;height:112px;margin-top:4px}
+.st{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+.st .lab{text-align:center;font:600 12px/1.25 'IBM Plex Mono';color:var(--t2);padding-bottom:4px;white-space:nowrap}.st .lab small{display:block;font-size:10px;font-weight:400;color:var(--t3)}
+.st .lab .short{color:var(--bad)}
+.bar{border-radius:6px 6px 0 0;background:var(--todo);position:relative}
+.st.top .bar{background:linear-gradient(180deg,var(--gold2),var(--gold))}.st.top .lab{color:var(--goldText)}
+.st.skip .lab{color:var(--t3);font-weight:400}.st.skip .bar{background:none;border:1.5px solid var(--done);border-bottom:none}
+.wks{display:flex;gap:4px;border-top:1px solid var(--border)}.wks span{flex:1;min-width:0;text-align:center;font:600 11px 'IBM Plex Mono';color:var(--t3);padding-top:5px;white-space:nowrap}
+.wks i.ok{font-style:normal;margin-right:2px}.wks span.cur{color:var(--t1)}.wks span.cur::after{content:' 本周';font-family:'IBM Plex Sans';font-weight:400}.wks span.topw{color:var(--goldText)}
+/* G1 金顶 */
+.g1 .st.done .bar{background:var(--done);border-top:3px solid var(--gold)}.g1 .wks i.ok{color:var(--goldText)}
+/* G2 金描边 */
+.g2 .st.done .bar{background:var(--stack);border:1.5px solid var(--gold);border-bottom:none}.g2 .wks i.ok{color:var(--goldText)}
+/* G3 浅金填充 */
+.g3 .st.done .bar{background:var(--goldMid)}.g3 .st.done .lab{color:var(--t1)}.g3 .wks i.ok{color:var(--goldText)}
+/* G4 金色勾章 */
+.g4 .st.done .bar{background:var(--done)}.g4 .wks i.ok{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--gold);color:var(--bg);font:700 9px/14px 'IBM Plex Sans';text-align:center;margin-right:3px;vertical-align:1px}
+/* G5 金色数字 */
+.g5 .st.done .bar{background:var(--done)}.g5 .st.done:not(.skip) .lab{color:var(--goldText)}.g5 .st.done .lab small{color:var(--goldMid);color:#B8935A}.g5 .wks i.ok{color:var(--goldText)}
+/* F 定稿：G3 浅金填充 + 本周金色描边 */
+.fin .st.done .bar{background:var(--goldMid)}.fin .st.done .lab{color:var(--t1)}.fin .wks i.ok{color:var(--goldText)}
+.fin .st.cur .bar{background:var(--todo);border:1.5px solid var(--gold);border-bottom:none}
+.fin .st.cur.top .bar{background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--gold)}
+</style>
+</head>
+<body>
+<header><h1>本周期主项走势 · 第三轮</h1></header>
+<div id="g"></div>
+<script>
+const RTS=[[.863,.878,.892,.907,.922,.939,.955,.978,1],[.837,.85,.863,.878,.892,.907,.922,.939,.955],[.811,.824,.837,.85,.863,.878,.892,.907,.922],[.786,.799,.811,.824,.837,.85,.863,.878,.892],[.762,.774,.786,.799,.811,.824,.837,.85,.863],[.739,.751,.762,.774,.786,.799,.811,.824,.837],[.707,.723,.739,.751,.762,.774,.786,.799,.811],[.68,.694,.707,.723,.739,.751,.762,.774,.786],[.653,.667,.68,.694,.707,.723,.739,.751,.762],[.626,.64,.653,.667,.68,.694,.707,.723,.739],[.599,.6125,.626,.64,.653,.667,.68,.694,.707],[.572,.5855,.599,.6125,.626,.64,.653,.667,.68]];
+const RPES=[10,9.5,9,8.5,8,7.5,7,6.5,6];
+const fl=x=>Math.floor(x/2.5+1e-6)*2.5;
+const LIFT={深蹲:{e:225,hot:[5,8]},卧推:{e:122.5,hot:[3,8]},硬拉:{e:265,hot:[1,8]},'%':{e:null,hot:null}};
+function table(name){const L=LIFT[name];
+ const head=`<tr><th class="r">次数</th>${RPES.map(r=>`<th>@${r}</th>`).join('')}</tr>`;
+ const body=RTS.map((row,ri)=>`<tr><td class="r">${ri+1}</td>${RPES.map(r=>{const v=row[(r-6)/.5];const hot=false;return `<td class="${hot?'hot':''}">${L.e?fl(L.e*v):Math.round(v*1000)/10+'%'}</td>`}).join('')}</tr>`).join('');
+ return `<div class="tw"><table class="rt">${head}${body}</table></div>`}
+function rpePage(sel='硬拉'){const L=LIFT[sel];
+ return `<div class="seg">${Object.keys(LIFT).map(k=>`<span class="${k===sel?'on':''}" onclick="pick(this,'${k}')">${k}</span>`).join('')}</div>
+ <div class="e1v">${L.e?`<div class="e1"><b>${L.e}</b><small>e1RM · kg</small></div>`:'<div class="e1"><b>100%</b><small>1RM</small></div>'}</div><div class="tbl">${table(sel)}</div>`}
+function pick(el,k){const p=el.closest('.scroll');p.innerHTML=p.dataset.head+rpePage(k)}
+const tabs=on=>`<div class="tabbar">${['训练','教练','成长','我的'].map((t,i)=>`<span class="${i===on?'on':''}"><i></i>${t}</span>`).join('')}</div>`;
+const phone=(body,on,head='')=>`<div class="phone dark"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div><div class="scroll" data-head='${head}'>${head}${body}</div>${tabs(on)}</div>`;
+const growthList=`<div class="title">成长</div>
+ <div class="mrow"><i></i><span>E1RM 曲线</span><em>225 · 122.5 · 265</em><b>›</b></div>
+ <div class="mrow"><i></i><span>历史记录</span><em>38 次</em><b>›</b></div>
+ <div class="mrow"><i></i><span>体重</span><em>82.4</em><b>›</b></div>
+ <div class="mrow"><i></i><span>强度指标</span><em></em><b>›</b></div>
+ <div class="mrow new"><i></i><span>RPE 对照表</span><em></em><b>›</b></div>`;
+const meList=`<div class="title">我的</div><div class="idc"><div class="av"></div><div><b>史俊义</b><small>学员 · 王教练</small></div></div>
+ <div class="mrow"><i></i><span>关于我</span><em></em><b>›</b></div>
+ <div class="mrow"><i></i><span>伤病记录</span><em></em><b>›</b></div>
+ <div class="mrow"><i></i><span>比赛</span><em>12/20</em><b>›</b></div>
+ <div class="mrow new"><i></i><span>RPE 对照表</span><em></em><b>›</b></div>
+ <div class="mrow"><i></i><span>设定</span><em></em><b>›</b></div>`;
+const nav=t=>`<div class="nav"><i>‹</i>${t}</div>`;
+// ---------- 已练完的周：实际记录 + 金色点缀 ----------
+const S=(kg,r,rpe=null,src='coach')=>({kg,r,rpe,src});
+const rts=(r,x)=>{const row=RTS[r-1],p=(x-6)/.5,i=Math.floor(p),f=p-i;return row[i]*(1-f)+(row[Math.min(i+1,8)]??row[8])*f};
+const score=w=>{const l=w.kg;return l*l*(1+0.03*w.r-(w.src==='coach'&&w.rpe!=null?0.03*w.rpe:0))};
+const W=(plan,act)=>({plan,act});
+const ROWS=[
+ ['深蹲',[W(S(150,5),S(150,5)),W(S(157.5,5),S(160,5)),W(S(165,3),S(165,2)),W(S(172.5,2)),W(S(177.5,1))]],
+ ['卧推',[W(S(90,5),S(90,5)),W(S(95,4),S(95,4)),W(S(102.5,3),S(100,3)),W(S(107.5,2)),W(S(110,1))]],
+ ['硬拉',[W(S(225,3,7,'e1rm'),S(227.5,3,7,'actual')),W(S(232.5,2,7.5,'e1rm'),'skip'),W(S(242.5,1,8,'e1rm'),S(245,1,8,'actual')),W(S(247.5,1,8.5,'e1rm')),W(S(252.5,1,9,'e1rm'))]],
+];
+const CUR=3;
+function row(ws){
+ const shown=ws.map((w,i)=>i<CUR?(w.act==='skip'?null:w.act):w.plan);
+ const sc=shown.map(x=>x?score(x):null),v=sc.filter(x=>x!=null),hi=Math.max(...v),mn=Math.min(...v),lo=Math.min(mn,hi*.85);
+ let top=-1;sc.forEach((s,i)=>{if(s!=null&&(top<0||s>=sc[top]-1e-9))top=i});
+ const px=s=>Math.round(12+66*(s-lo)/(hi-lo));
+ const cols=ws.map((w,i)=>{const done=i<CUR;
+  if(done&&w.act==='skip')return `<div class="st skip done"><div class="lab">没做</div><div class="bar" style="height:${px(score(w.plan))}px"></div></div>`;
+  const x=shown[i],rr=done&&x.r<w.plan.r?`<span class="short">${x.r}/${w.plan.r}</span>`:x.r;
+  const lab=`${!done&&x.src==='e1rm'?'约':''}${x.kg}<small>×${rr}${x.rpe!=null?' @'+x.rpe:''}</small>`;
+  return `<div class="st ${done?'done':''} ${i===CUR?'cur':''} ${i===top?'top':''}"><div class="lab">${lab}</div><div class="bar" style="height:${px(sc[i])}px"></div></div>`}).join('');
+ const wk=ws.map((w,i)=>`<span class="${i===CUR?'cur':''} ${i===top?'topw':''}">${i<CUR?'<i class="ok">✓</i>':''}W${i+1}</span>`).join('');
+ return `<div class="stairs">${cols}</div><div class="wks">${wk}</div>`}
+const outlook=cls=>`<div class="phone dark ${cls}"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div><div class="scroll"><div class="wk">W4<span class="chip">整个周期 ›</span></div><div class="sub">硬拉300 · 共 5 周</div></div>${tabs(0)}<div class="dim"></div>
+ <div class="sheet"><div class="grab"></div><div class="sh-h"><b>整个周期</b><span>硬拉300 · 5 周</span></div>${ROWS.map(([n,ws])=>`<div class="lift"><div class="lh">${n}</div>${row(ws)}</div>`).join('')}</div></div>`;
+const G=[['定稿 · 浅金填充 + 本周金色描边','fin'],['G1 · 金顶','g1'],['G2 · 金描边','g2'],['G3 · 浅金填充','g3'],['G4 · 金色勾章','g4'],['G5 · 金色数字','g5']];
+document.getElementById('g').innerHTML=
+ `<section><h2>RPE 对照表放在哪</h2><div class="grid">
+  <div class="opt"><div class="cap">P1 · 成长</div>${phone(growthList,2)}</div>
+  <div class="opt"><div class="cap">P1 · 成长 › RPE 对照表</div>${phone(rpePage('硬拉'),2,nav('RPE 对照表'))}</div>
+  <div class="opt"><div class="cap">P2 · 我的</div>${phone(meList,3)}</div>
+  <div class="opt"><div class="cap">没有 e1RM 时</div>${phone(rpePage('%'),2,nav('RPE 对照表'))}</div>
+ </div></section>
+ <section><h2>已练完的周：实际记录 + 金色点缀</h2><div class="grid">${G.map(([t,c])=>`<div class="opt"><div class="cap">${t}</div>${outlook(c)}</div>`).join('')}</div></section>`;
+document.querySelectorAll('.tw').forEach(e=>e.scrollLeft=0);
+</script>
+</body>
+</html>
