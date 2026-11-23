@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本周期主项走势 · T2 各种情况</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.dark{--ok:#5E9E78;--bg:#0A0A0C;--stack:#121217;--card:#141416;--border:#262629;--t1:#EDEDED;--t2:#C8C8CC;--t3:#8A8A90;--gold:#F5A623;--goldSoft:rgba(245,166,35,.14);--goldText:#F5A623;--done:#5A5A62;--todo:#2A2A30;--dayFill:#EDEDED;--dayInk:#0A0A0C;--frame:#000}
+.light{--ok:#15803D;--bg:#F5F6F8;--stack:#EEF0F3;--card:#FFFFFF;--border:#E5E7EB;--t1:#111827;--t2:#4B5563;--t3:#5C6371;--gold:#D97706;--goldSoft:rgba(217,119,6,.14);--goldText:#9A4A06;--done:#4B5563;--todo:#E3E5EA;--dayFill:#FEF3C7;--dayInk:#7A4E0E;--frame:#1a1a1a}
+*{box-sizing:border-box}
+body{margin:0;background:#d9dce2;font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;color:#111827}
+header{padding:20px 28px 0}header h1{margin:0 0 4px;font-size:19px}header p{margin:0 0 4px;font-size:13px;color:#4B5563;max-width:980px;line-height:1.6}
+.grid{display:flex;flex-wrap:wrap;gap:36px 32px;padding:20px 28px 40px}
+.opt{width:360px;display:flex;flex-direction:column;gap:6px}.cap{font-weight:700;font-size:14px}.why{font-size:12.5px;color:#4B5563;line-height:1.55;min-height:58px}.why b{color:#111827}
+.phone{position:relative;width:360px;height:740px;border-radius:44px;background:var(--bg);color:var(--t1);border:8px solid var(--frame);overflow:hidden;display:flex;flex-direction:column}
+.status{height:36px;flex:none;padding:0 24px 4px;display:flex;justify-content:space-between;align-items:flex-end;font:600 12px 'IBM Plex Sans'}
+.scroll{flex:1;padding:4px 16px}.wk{font:900 30px Archivo,'IBM Plex Sans';display:flex;align-items:center;gap:8px}.sub{font-size:13px;color:var(--t2)}
+.chip{padding:3px 9px;border-radius:999px;background:var(--goldSoft);color:var(--goldText);font:600 12px 'IBM Plex Sans';cursor:pointer}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);cursor:pointer}.phone.closed .dim,.phone.closed .sheet{display:none}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:91%;overflow-y:auto;scrollbar-width:none;background:var(--card);border-radius:22px 22px 0 0;padding:10px 16px 20px}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px}
+.sh-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.sh-h b{font-size:17px}.sh-h span{font-size:12px;color:var(--t3)}.sh-h span.part{color:var(--goldText);font-weight:600}
+.lift{padding:10px 0 4px}.lift+.lift{border-top:1px solid var(--border)}
+.lh{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:700;gap:8px}.lh span{font:400 11px 'IBM Plex Mono';color:var(--goldText)}.lh span.m{color:var(--t3);font-family:'IBM Plex Sans'}
+.hs{overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}.hs .inner{width:max-content}
+.fill .inner{width:100%}
+.stairs{display:flex;gap:4px;align-items:flex-end;height:104px;margin-top:4px}
+.st{flex:none;width:56px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer}.fill .st{flex:1;width:auto;min-width:0}
+.st .lab{text-align:center;font:600 12px/1.25 'IBM Plex Mono';color:var(--t2);padding-bottom:4px;white-space:nowrap}.st .lab small{display:block;font-size:10px;font-weight:400;color:var(--t3)}
+.st .bar{border-radius:6px 6px 0 0;background:var(--todo)}.st.done .bar{background:var(--done)}
+.st.top .bar{background:linear-gradient(180deg,#FFC93C,var(--gold))}.st.top .lab{color:var(--goldText)}
+.st.unpub,.st.none{cursor:default}.st.unpub .bar{background:none;border:1.5px dashed var(--t3);border-bottom:none;opacity:.6}.st.unpub .lab,.st.none .lab{color:var(--t3);font-weight:400}
+.st.none .bar{background:none;height:2px!important;border-bottom:1.5px solid var(--border)}
+
+.wks{display:flex;gap:4px;border-top:1px solid var(--border)}.wks span{flex:none;width:56px;text-align:center;font:600 11px 'IBM Plex Mono';color:var(--t3);padding-top:5px;white-space:nowrap}.fill .wks span{flex:1;width:auto;min-width:0}
+.wks i.ok{font-style:normal;color:var(--ok);margin-right:2px}.wks span.cur{color:var(--t1)}.wks span.cur::after{content:' 本周';font-family:'IBM Plex Sans';font-weight:400}.wks span.topw{color:var(--goldText)}
+.hint{font-size:11px;color:var(--t3);text-align:right;margin-top:4px}.foot{font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5}
+.toast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:var(--t1);color:var(--bg);font-size:12px;padding:8px 12px;border-radius:999px;white-space:nowrap;opacity:0;transition:opacity .2s;z-index:20;pointer-events:none}.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>本周期主项走势 · T2 横向滑动</h1></header>
+<div class="grid" id="g"></div>
+<script>
+/* 每格：[kg|null, reps, rpe|null, pct|null]；null 整格 = 那周没有这个动作 */
+const R=(kg,r,rpe=null,pct=null)=>[kg,r,rpe,pct];
+const CASES=[
+
+ {cap:'① 4 周，每周加重（基准）',name:'硬拉300',N:4,cur:1,lifts:[
+  ['深蹲',[R(150,5),R(157.5,5),R(165,3),R(172.5,2)]],['卧推',[R(90,5),R(95,4),R(102.5,3),R(107.5,2)]],['硬拉',[R(225,3,7),R(232.5,2,7.5),R(242.5,1,8),R(247.5,1,8.5)]]]},
+ {cap:'② 12 周写满，含减载和测试',name:'备赛 12 周',N:12,cur:4,lifts:[
+  ['深蹲',[150,155,160,135,165,170,175,145,180,185,170,210].map((k,i)=>R(k,[5,5,5,5,3,3,3,3,2,2,1,1][i]))],
+  ['卧推',[90,92.5,95,80,97.5,100,102.5,85,105,107.5,100,115].map((k,i)=>R(k,[5,5,5,5,3,3,3,3,2,2,1,1][i]))],
+  ['硬拉',[225,230,237.5,200,242.5,247.5,252.5,215,257.5,262.5,240,265].map((k,i)=>R(k,[3,3,2,3,2,1,1,3,1,1,1,1][i],[7,7.5,8,6,8,8,8.5,6,9,9,7,10][i]))]]},
+ {cap:'③ 12 周只排了前 6 周',name:'备赛 12 周',N:12,cur:4,written:6,lifts:[
+  ['深蹲',[150,155,160,135,165,170,175,145,180,185,170,210].map((k,i)=>R(k,[5,5,5,5,3,3,3,3,2,2,1,1][i]))],
+  ['卧推',[90,92.5,95,80,97.5,100,102.5,85,105,107.5,100,115].map((k,i)=>R(k,[5,5,5,5,3,3,3,3,2,2,1,1][i]))],
+  ['硬拉',[225,230,237.5,200,242.5,247.5,252.5,215,257.5,262.5,240,265].map((k,i)=>R(k,[3,3,2,3,2,1,1,3,1,1,1,1][i],[7,7.5,8,6,8,8,8.5,6,9,9,7,10][i]))]]},
+ {cap:'④ 只排了第 1 周',name:'新周期',N:8,cur:0,written:1,lifts:[
+  ['深蹲',[R(160,5),...Array(7).fill(R(0,0))]],['卧推',[R(95,5),...Array(7).fill(R(0,0))]],['硬拉',[R(230,3,7),...Array(7).fill(R(0,0))]]]},
+ {cap:'⑤ 重量不变，只加次数',name:'容量块',N:4,cur:1,lifts:[
+  ['深蹲',[R(150,5),R(150,6),R(150,7),R(150,8)]],['卧推',[R(90,6),R(90,7),R(90,8),R(90,8)]],['硬拉',[R(200,4),R(200,5),R(200,5),R(200,6)]]]},
+ {cap:'⑥ 每周只加 2.5 kg',name:'线性进阶',N:4,cur:1,lifts:[
+  ['深蹲',[R(150,5),R(152.5,5),R(155,5),R(157.5,5)]],['卧推',[R(100,5),R(102.5,5),R(105,5),R(107.5,5)]],['硬拉',[R(200,5),R(202.5,5),R(205,5),R(207.5,5)]]]},
+ {cap:'⑦ 某几周没有这个主项',name:'换变式',N:4,cur:1,lifts:[
+  ['深蹲',[R(150,5),R(157.5,5),R(165,3),R(172.5,2)]],['卧推',[R(95,5),R(100,4),null,null]],['硬拉',[R(225,3,7),R(232.5,2,7.5),R(242.5,1,8),R(247.5,1,8.5)]]]},
+ {cap:'⑧ 算不出重量的组',name:'第一个周期',N:4,cur:0,lifts:[
+  ['深蹲',[R(100,5),R(105,5),R(110,4),R(115,3)]],['卧推',[R(null,5,null,70),R(null,5,null,75),R(null,4,null,80),R(null,3,null,85)]],['硬拉',[R(null,5,6),R(null,5,7),R(null,4,7.5),R(null,3,8)]]]},
+ {cap:'⑨ 重量次数不变，只升 RPE',name:'强化块',N:4,cur:1,approx:false,lifts:[
+  ['深蹲',[R(150,5,7),R(150,5,7.5),R(150,5,8),R(150,5,8.5)]],['卧推',[R(95,5,7),R(95,5,7.5),R(95,5,8),R(95,5,8)]],['硬拉',[R(200,3,7),R(200,3,7.5),R(200,3,8),R(200,3,9)]]]},
+ {cap:'⑩ 先加次数，再加重量',name:'双进阶',N:4,cur:1,lifts:[
+  ['深蹲',[R(150,5),R(150,6),R(150,7),R(155,5)]],['卧推',[R(90,6),R(90,7),R(90,8),R(92.5,6)]],['硬拉',[R(200,3),R(200,4),R(200,5),R(205,3)]]]},
+];
+const RTS=[[.863,.878,.892,.907,.922,.939,.955,.978,1],[.837,.85,.863,.878,.892,.907,.922,.939,.955],[.811,.824,.837,.85,.863,.878,.892,.907,.922],[.786,.799,.811,.824,.837,.85,.863,.878,.892],[.762,.774,.786,.799,.811,.824,.837,.85,.863],[.739,.751,.762,.774,.786,.799,.811,.824,.837],[.707,.723,.739,.751,.762,.774,.786,.799,.811],[.68,.694,.707,.723,.739,.751,.762,.774,.786]];
+const rts=(r,x)=>{const row=RTS[r-1],p=(x-6)/.5,i=Math.floor(p),f=p-i;return row[i]*(1-f)+(row[Math.min(i+1,8)]??row[8])*f};
+/* 一个分数：重量为主；每多 1 次 +3%；写死重量时 RPE 每高 1 档 -3%（同样的重量更费劲=退步）。
+   换不成 kg 的用强度（百分比，或 RPE 表查出的 %1RM）代替重量。 */
+const WEIGHT_K=2; /* 重量每涨 1% 按 2% 算 */
+const score=(x,fixed)=>{const [kg,r,rpe,pct]=x;const load=kg!=null?kg:pct!=null?pct/100:rts(r,rpe);
+ return Math.pow(load,WEIGHT_K)*(1+0.03*r-(kg!=null&&fixed&&rpe!=null?0.03*rpe:0))};
+function heights(ws,shown,fixed){
+ const idx=ws.map((x,i)=>shown(i)&&x?i:-1).filter(i=>i>=0);if(!idx.length)return{H:{},top:-1};
+ const S={};idx.forEach(i=>S[i]=score(ws[i],fixed));
+ const v=idx.map(i=>S[i]),hi=Math.max(...v),lo=Math.min(...v,hi*0.85),H={};
+ idx.forEach(i=>H[i]=hi-Math.min(...v)<1e-9?48:Math.round(12+60*(S[i]-lo)/(hi-lo)));
+ let top=idx[0];idx.forEach(i=>{if(S[i]>=S[top]-1e-9)top=i});
+ const kgs=idx.map(i=>ws[i][0]),heaviest=ws[top][0]!=null&&kgs.filter(k=>k===ws[top][0]).length===1&&ws[top][0]===Math.max(...kgs);
+ return{H,top,heaviest};
+}
+function lift([n,ws],ci,c){
+ const N=c.N,written=c.written??N,shown=i=>i<written;
+ const {H,top,heaviest}=heights(ws,shown,c.approx===false);
+ const cols=ws.map((x,i)=>{
+  if(!shown(i))return `<div class="st unpub"><div class="lab">未排</div><div class="bar" style="height:20px"></div></div>`;
+  if(!x)return `<div class="st none"><div class="lab">没练</div><div class="bar"></div></div>`;
+  const [kg,r,rpe,pct]=x,cls=(i<c.cur?'done ':'')+(i===top?'top ':'');
+  const go=`onclick="toast(this,'跳到 W${i+1} · 周条切到那一天')"`;
+  const lab=kg==null?(pct!=null?`${pct}%<small>×${r}</small>`:`${r} @${rpe}<small>RPE</small>`):rpe!=null?`${c.approx===false?'':'约'}${kg}<small>×${r} @${rpe}</small>`:`${kg}<small>×${r}</small>`;
+  return `<div class="st ${cls}" ${go}><div class="lab">${lab}</div><div class="bar" style="height:${H[i]}px"></div></div>`}).join('');
+ const wk=ws.map((_,i)=>`<span class="${i===c.cur?'cur':''} ${i===top?'topw':''}">${i<c.cur&&shown(i)&&ws[i]?'<i class="ok">✓</i>':''}W${i+1}</span>`).join('');
+ const right=top<0?'':`<span>W${top+1}</span>`;
+ return `<div class="lift"><div class="lh">${n}</div><div class="hs ${N<=5?'fill':''}"><div class="inner"><div class="stairs">${cols}</div><div class="wks">${wk}</div></div></div></div>`;
+}
+function phone(c,ci){
+ const written=c.written??c.N,part=written<c.N;
+ const hasRpe=c.lifts.some(([,ws])=>ws.some(x=>x&&x[0]!=null&&x[2]!=null));
+ const hasUnk=c.lifts.some(([,ws])=>ws.some(x=>x&&x[0]==null));
+ return `<div class="phone ${c.theme||'dark'}"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
+ <div class="scroll"><div class="wk">W${c.cur+1}<span class="chip" onclick="this.closest('.phone').classList.remove('closed')">整个周期 ›</span></div><div class="sub">${c.name} · ${c.N} 周</div></div>
+ <div class="dim" onclick="this.closest('.phone').classList.add('closed')"></div>
+ <div class="sheet"><div class="grab"></div><div class="sh-h"><b>整个周期</b>${part?`<span class="part">已排 ${written} / ${c.N} 周</span>`:`<span>${c.name} · ${c.N} 周</span>`}</div>
+ ${c.lifts.map(l=>lift(l,ci,c)).join('')}</div><div class="toast"></div></div>`;
+}
+document.getElementById('g').innerHTML=CASES.map((c,i)=>`<div class="opt"><div class="cap">${c.cap}</div>${phone(c,i)}</div>`).join('');
+document.querySelectorAll('.phone').forEach((ph,k)=>{const c=CASES[k],hs=[...ph.querySelectorAll('.hs:not(.fill)')];hs.forEach(e=>{e.scrollLeft=c.cur>0?(c.cur-1)*60+16:0;e.addEventListener('scroll',()=>hs.forEach(o=>{if(o!==e&&o.scrollLeft!==e.scrollLeft)o.scrollLeft=e.scrollLeft}))})});
+let tt;function toast(el,m){const t=el.closest('.phone').querySelector('.toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1400)}
+</script>
+</body>
+</html>
