@@ -86,6 +86,8 @@ public struct TrainingHistoryView: View {
           FeedbackInboxView(studentID: studentID, viewModel: model.feedback)
         case .bodyWeight:
           BodyWeightPage(model: weights, studentID: studentID, onboarding: onboarding)
+        case .rpeTable:
+          RPETablePage(model: model)
         case .intensity:
           ProgressIntensityPage(model: model)
         }

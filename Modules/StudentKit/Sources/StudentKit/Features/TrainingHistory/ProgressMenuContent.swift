@@ -7,6 +7,7 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
   case bodyWeight
   case feedback
   case intensity
+  case rpeTable
 
   var title: String {
     switch self {
@@ -14,6 +15,7 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
     case .history: StudentStrings.localized(.e1rmSourceHistory)
     case .feedback: StudentStrings.localized(.feedbackInboxView006)
     case .bodyWeight: StudentStrings.localized(.bodyWeightTitle)
+    case .rpeTable: StudentStrings.localized(.rpeTableTitle)
     case .intensity: StudentStrings.localized(.progressIntensity)
     }
   }
@@ -25,6 +27,7 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
     case .feedback: "bubble.left"
     case .bodyWeight: "scalemass"
     case .intensity: "chart.bar"
+    case .rpeTable: "tablecells"
     }
   }
 
@@ -35,6 +38,7 @@ enum ProgressMenuDestination: CaseIterable, Hashable, Sendable {
     case .feedback: values?.feedback
     case .bodyWeight: bodyWeight
     case .intensity: values?.intensity
+    case .rpeTable: nil
     }
   }
 }

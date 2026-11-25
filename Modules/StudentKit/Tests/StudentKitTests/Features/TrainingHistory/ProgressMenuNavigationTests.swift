@@ -6,23 +6,24 @@ import ViewInspector
 
 @MainActor
 @Test(arguments: [false, true])
-func progressMenuKeepsFourRowsAndRemovesFeedbackWhileUnavailable(failed: Bool) throws {
+func progressMenuKeepsFiveRowsAndRemovesFeedbackWhileUnavailable(failed: Bool) throws {
   var destinations: [ProgressMenuDestination] = []
   let view = ProgressMenuContent(
     values: nil, isFailed: failed, onOpen: { destinations.append($0) }, onRetry: {})
   let rows = try view.inspect().findAll(StudentMenuRow.self)
-  #expect(rows.count == 4)
+  #expect(rows.count == 5)
   #expect(
     try rows.map { try $0.actualView().title } == [
       StudentStrings.localized(.progressE1rm), StudentStrings.localized(.e1rmSourceHistory),
       StudentStrings.localized(.bodyWeightTitle),
       StudentStrings.localized(.progressIntensity),
+      StudentStrings.localized(.rpeTableTitle),
     ])
   for row in rows {
     #expect(try row.actualView().value == nil)
     try row.find(ViewType.Button.self).tap()
   }
-  #expect(destinations == [.e1rm, .history, .bodyWeight, .intensity])
+  #expect(destinations == [.e1rm, .history, .bodyWeight, .intensity, .rpeTable])
   #expect(try view.inspect().findAll(GrowthE1RMCard.self).isEmpty)
   #expect(try view.inspect().findAll(VolumeIntensityChart.self).isEmpty)
 }

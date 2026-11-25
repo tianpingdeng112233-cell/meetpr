@@ -10,6 +10,8 @@ final class ProgressDataModel {
   let history: TrainingHistoryViewModel
   let growth: GrowthCurveViewModel
   let feedback: FeedbackInboxViewModel
+  private let plans: any StudentPlanRepository
+  private let e1rm: any E1RMRepository
   private let studentID: UUID
   private let onboarding: (any OnboardingProfileReading)?
   private var profile: OnboardingProfile?
@@ -23,6 +25,8 @@ final class ProgressDataModel {
     e1rm: any E1RMRepository, onboarding: (any OnboardingProfileReading)?,
     feedback: FeedbackInboxViewModel?
   ) {
+    self.plans = plans
+    self.e1rm = e1rm
     self.studentID = studentID
     self.onboarding = onboarding
     history = TrainingHistoryViewModel(plans: plans, logs: logs)
@@ -100,6 +104,29 @@ final class ProgressDataModel {
     monthSnapshots = snapshots(range: .thirtyDays)
     quarterSnapshots = snapshots(range: .ninetyDays)
     await feedback.load(studentID: studentID)
+  }
+
+  func rpeTableSnapshot() async throws -> RPETableSnapshot {
+    let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+    let profile = try await onboarding?.fetchProfile(studentId: studentID)
+    var values: [LiftFamily: Double] = [:]
+    let ids = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan, onboarding: profile)
+    for family in CycleOutlook.families {
+      let stored = try await e1rm.fetchHistory(studentId: studentID, family: family)
+      values[family] = E1RMSeries.trustedSuggestionEligibleRaw(points: stored, family: family)
+        .map(\.e1RMKg).max()
+      for exerciseID in ids[family] ?? [] {
+        let points = try await e1rm.fetchHistory(studentId: studentID, exerciseId: exerciseID)
+        if let best = E1RMSeries.trustedSuggestionEligibleRaw(points: points, family: family).map(
+          \.e1RMKg
+        ).max() {
+          values[family] = max(values[family] ?? 0, best)
+        }
+      }
+    }
+    return RPETableSnapshot(
+      e1RM: values, unit: profile?.unitPreference ?? .kg,
+      defaultFamily: RPETable.defaultFamily(plan: plan, profile: profile))
   }
 
   private func snapshots(range: GrowthTimeRange) -> [GrowthCurveSnapshot] {

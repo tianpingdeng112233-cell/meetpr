@@ -68,6 +68,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var previewDay: StudentPlanDay?
   var showsHandoffNotice = false
   var onDismissHandoff: () -> Void = {}
+  var onCycleOutlook: (() -> Void)?
 
   @State private var scrollTarget: UUID?
   @State private var pendingScrollTarget: UUID?
@@ -114,7 +115,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onNotifications: onNotifications,
         showsBackToToday: showsBackToToday,
         onBackToToday: onBackToToday,
-        isPlanPreview: previewDay != nil
+        isPlanPreview: previewDay != nil, onCycleOutlook: onCycleOutlook
       )
 
       if let handoffSummary {
@@ -412,12 +413,29 @@ private struct TodayWorkoutHeader: View {
   let onBackToToday: () -> Void
 
   var isPlanPreview = false
+  var onCycleOutlook: (() -> Void)?
 
   var body: some View {
     HStack {
       Text(weekCode)
         .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
         .foregroundStyle(isPlanPreview ? Color.MeetPR.textSecondary : Color.MeetPR.textPrimary)
+      if let onCycleOutlook {
+        Button(action: onCycleOutlook) {
+          HStack(spacing: MeetPRSpacing.space1) {
+            Text(StudentStrings.localized(.cycleTitle))
+            Image(systemName: "chevron.right")
+          }
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(Color.MeetPR.goldText)
+          .padding(.horizontal, MeetPRSpacing.space2)
+          .padding(.vertical, MeetPRSpacing.space1)
+          .background(Color.MeetPR.goldRGB.opacity(0.14), in: .capsule)
+          .contentShape(.rect.inset(by: -MeetPRSpacing.space3))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("cycle-outlook")
+      }
       if isPlanPreview {
         Text(StudentStrings.localized(.handoffNewCycle))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))

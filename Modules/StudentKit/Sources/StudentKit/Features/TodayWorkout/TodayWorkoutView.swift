@@ -43,6 +43,7 @@ public struct TodayWorkoutView: View {
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var handledUploadFailureToken = 0
   @State private var pendingUploadRetryDate: Date?
+  @State private var showingCycleOutlook = false
   @State private var selectedDayID: UUID?
   @State private var previewDayID: UUID?
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
@@ -304,7 +305,8 @@ public struct TodayWorkoutView: View {
       handoffSummary: viewModel.handoff?.plans.first { $0.id == viewModel.displayedPlan?.cycleID },
       previewDay: previewDay,
       showsHandoffNotice: viewModel.showsHandoffNotice && !viewModel.browsingPastPlan,
-      onDismissHandoff: { viewModel.dismissHandoffNotice() }
+      onDismissHandoff: { viewModel.dismissHandoffNotice() },
+      onCycleOutlook: viewModel.showsCycleOutlook ? { showingCycleOutlook = true } : nil
 
     )
   }
@@ -408,6 +410,14 @@ public struct TodayWorkoutView: View {
           item: $viewModel.completionPhase, onDismiss: workoutModalDidDismiss,
           content: completionFlow)
       #endif
+      .sheet(isPresented: $showingCycleOutlook, onDismiss: workoutModalDidDismiss) {
+        CycleOutlookSheet(model: viewModel) { dayID in
+          showingCycleOutlook = false
+          TodayWorkoutSelectionResolver.selectCycleDay(
+            dayID, plan: viewModel.displayedPlan, isPreview: viewModel.isPreviewingPlan,
+            selectedDayID: &selectedDayID, previewDayID: &previewDayID)
+        }
+      }
       .sheet(isPresented: $showingReadinessSheet, onDismiss: workoutModalDidDismiss) {
         ReadinessCheckinSheet(
           studentID: studentID,
@@ -1118,7 +1128,7 @@ public struct TodayWorkoutView: View {
   }
 
   private var safeHandoffBoundary: Bool {
-    editing == nil && quickLogRoute == nil && directCameraTarget == nil
+    !showingCycleOutlook && editing == nil && quickLogRoute == nil && directCameraTarget == nil
       && pendingDirectCameraTarget == nil && preparingVideoSetID == nil
       && weightEntry?.isPresented != true
       && viewModel.completionPhase == nil && keypad?.current == nil
@@ -1129,7 +1139,8 @@ public struct TodayWorkoutView: View {
 
   private var hasRequestedWorkoutModal: Bool {
     editing != nil || quickLogRoute != nil || viewModel.completionPhase != nil
-      || showingReadinessSheet || setRefPickerRoute != nil || directCameraTarget != nil
+      || showingCycleOutlook || showingReadinessSheet || setRefPickerRoute != nil
+      || directCameraTarget != nil
       || exerciseNote != nil || replay.selected != nil || videoViewModel.missingAttachment != nil
   }
 

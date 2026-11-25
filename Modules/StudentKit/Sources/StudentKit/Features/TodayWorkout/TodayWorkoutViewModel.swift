@@ -1788,6 +1788,31 @@ public final class TodayWorkoutViewModel {
     return lowerBound...max(last, now).addingTimeInterval(86_400)
   }
 
+  var showsCycleOutlook: Bool {
+    CycleOutlook.isAvailable(plan: displayedPlan, profile: onboardingProfile)
+  }
+
+  func makeCycleOutlook(locale: Locale = .current) async throws -> CycleOutlookPlan {
+    guard let plan = displayedPlan, let studentID = currentStudentID else {
+      throw CancellationError()
+    }
+    let preview = isPreviewingPlan
+    let currentWeek = StudentPlanSequence.cursorDay(in: plan)?.weekNumber
+    let allExercises = plan.days.flatMap(\.exercises)
+    let referenceDay = StudentPlanDay(
+      id: plan.cycleID, date: plan.startDate, exercises: allExercises)
+    async let references = exerciseReferenceSnapshot(for: referenceDay, studentID: studentID)
+    let records = preview ? [] : try await planLogs(for: plan, studentID: studentID)
+    let snapshot = try await references
+    guard displayedPlan?.cycleID == plan.cycleID, isPreviewingPlan == preview else {
+      throw CancellationError()
+    }
+    return CycleOutlook.make(
+      plan: plan, catalog: exerciseCatalog, profile: onboardingProfile,
+      e1RM: snapshot.suggestionE1RMByExercise, logs: records, isPreview: preview,
+      currentWeek: currentWeek, locale: locale)
+  }
+
   private func planLogs(
     for plan: StudentPlanView,
     studentID: UUID
