@@ -1,0 +1,4636 @@
+{
+ "version": 2,
+ "formula": {
+  "weightExponent": 2,
+  "repBonus": 0.03,
+  "coachRpePenalty": 0.03,
+  "floorOfTop": 0.85,
+  "equalRatio": 0.6,
+  "increment": 2.5
+ },
+ "cases": [
+  {
+   "name": "① 4 周，每周加重（基准）",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 157.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 165,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 172.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "157.5",
+       "sub": "×5",
+       "ratio": 0.468,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "165",
+       "sub": "×3",
+       "ratio": 0.6706,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "172.5",
+       "sub": "×2",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 102.5,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 107.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×4",
+       "ratio": 0.2702,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "102.5",
+       "sub": "×3",
+       "ratio": 0.7281,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "107.5",
+       "sub": "×2",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7,
+         "e1rmKg": 225
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 7.5,
+         "e1rmKg": 232.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8,
+         "e1rmKg": 242.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8.5,
+         "e1rmKg": 247.5
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约225",
+       "sub": "×3 @7",
+       "ratio": 0.1639,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约232.5",
+       "sub": "×2 @7.5",
+       "ratio": 0.3878,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约242.5",
+       "sub": "×1 @8",
+       "ratio": 0.7334,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约247.5",
+       "sub": "×1 @8.5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "② 12 周写满，含减载和测试",
+   "currentWeekIndex": 4,
+   "totalWeeks": 12,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 155,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 160,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 135,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 165,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 170,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 175,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 145,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 180,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 185,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 170,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 210,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0.201,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "155",
+       "sub": "×5",
+       "ratio": 0.2726,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "160",
+       "sub": "×5",
+       "ratio": 0.3467,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "135",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "165",
+       "sub": "×3",
+       "ratio": 0.3563,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "170",
+       "sub": "×3",
+       "ratio": 0.4309,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "175",
+       "sub": "×3",
+       "ratio": 0.5078,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "145",
+       "sub": "×3",
+       "ratio": 0.0801,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "180",
+       "sub": "×2",
+       "ratio": 0.5471,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "185",
+       "sub": "×2",
+       "ratio": 0.6262,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "170",
+       "sub": "×1",
+       "ratio": 0.36,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "210",
+       "sub": "×1",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 92.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 80,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 97.5,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 102.5,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 85,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 105,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 107.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 115,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×5",
+       "ratio": 0.3122,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "92.5",
+       "sub": "×5",
+       "ratio": 0.396,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5",
+       "ratio": 0.4821,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "80",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "97.5",
+       "sub": "×3",
+       "ratio": 0.4794,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×3",
+       "ratio": 0.5653,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "102.5",
+       "sub": "×3",
+       "ratio": 0.6535,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "85",
+       "sub": "×3",
+       "ratio": 0.0823,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "105",
+       "sub": "×2",
+       "ratio": 0.6909,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "107.5",
+       "sub": "×2",
+       "ratio": 0.7809,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×1",
+       "ratio": 0.4695,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "115",
+       "sub": "×1",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7,
+         "e1rmKg": 225
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7.5,
+         "e1rmKg": 230
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 8,
+         "e1rmKg": 237.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 6,
+         "e1rmKg": 200
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 8,
+         "e1rmKg": 242.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8,
+         "e1rmKg": 247.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8.5,
+         "e1rmKg": 252.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 6,
+         "e1rmKg": 215
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 9,
+         "e1rmKg": 257.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 9,
+         "e1rmKg": 262.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 7,
+         "e1rmKg": 240
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 10,
+         "e1rmKg": 265
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约225",
+       "sub": "×3 @7",
+       "ratio": 0.4031,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约230",
+       "sub": "×3 @7.5",
+       "ratio": 0.4894,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约237.5",
+       "sub": "×2 @8",
+       "ratio": 0.5635,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约200",
+       "sub": "×3 @6",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约242.5",
+       "sub": "×2 @8",
+       "ratio": 0.6521,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约247.5",
+       "sub": "×1 @8",
+       "ratio": 0.6785,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约252.5",
+       "sub": "×1 @8.5",
+       "ratio": 0.7681,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约215",
+       "sub": "×3 @6",
+       "ratio": 0.2362,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约257.5",
+       "sub": "×1 @9",
+       "ratio": 0.8595,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约262.5",
+       "sub": "×1 @9",
+       "ratio": 0.9527,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约240",
+       "sub": "×1 @7",
+       "ratio": 0.5474,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约265",
+       "sub": "×1 @10",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "③ 12 周只排了前 6 周",
+   "currentWeekIndex": 4,
+   "totalWeeks": 12,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 155,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 160,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 135,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 165,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 170,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0.4663,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "155",
+       "sub": "×5",
+       "ratio": 0.6327,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "160",
+       "sub": "×5",
+       "ratio": 0.8045,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "135",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "165",
+       "sub": "×3",
+       "ratio": 0.8268,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "170",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 92.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 80,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 97.5,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×5",
+       "ratio": 0.5523,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "92.5",
+       "sub": "×5",
+       "ratio": 0.7005,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5",
+       "ratio": 0.8528,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "80",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "97.5",
+       "sub": "×3",
+       "ratio": 0.848,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7,
+         "e1rmKg": 225
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7.5,
+         "e1rmKg": 230
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 8,
+         "e1rmKg": 237.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 6,
+         "e1rmKg": 200
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 8,
+         "e1rmKg": 242.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8,
+         "e1rmKg": 247.5
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约225",
+       "sub": "×3 @7",
+       "ratio": 0.5941,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约230",
+       "sub": "×3 @7.5",
+       "ratio": 0.7213,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约237.5",
+       "sub": "×2 @8",
+       "ratio": 0.8305,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约200",
+       "sub": "×3 @6",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约242.5",
+       "sub": "×2 @8",
+       "ratio": 0.961,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约247.5",
+       "sub": "×1 @8",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "④ 只排了第 1 周",
+   "currentWeekIndex": 0,
+   "totalWeeks": 8,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 160,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "160",
+       "sub": "×5",
+       "ratio": 0.6,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5",
+       "ratio": 0.6,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7,
+         "e1rmKg": 230
+        },
+        "actual": null
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       },
+       {
+        "state": "unscheduled"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约230",
+       "sub": "×3 @7",
+       "ratio": 0.6,
+       "isTop": true
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      },
+      {
+       "state": "unscheduled",
+       "isCurrent": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑤ 重量不变，只加次数",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 7,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 8,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0.5161,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×6",
+       "ratio": 0.6774,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×7",
+       "ratio": 0.8387,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×8",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 7,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 8,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 8,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×6",
+       "ratio": 0.6774,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×7",
+       "ratio": 0.8387,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×8",
+       "ratio": 1,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×8",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×4",
+       "ratio": 0.661,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×5",
+       "ratio": 0.8305,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×5",
+       "ratio": 0.8305,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×6",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑥ 每周只加 2.5 kg",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 152.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 155,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 157.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0.3802,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "152.5",
+       "sub": "×5",
+       "ratio": 0.5834,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "155",
+       "sub": "×5",
+       "ratio": 0.79,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "157.5",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 102.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 105,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 107.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×5",
+       "ratio": 0.1022,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "102.5",
+       "sub": "×5",
+       "ratio": 0.3943,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "105",
+       "sub": "×5",
+       "ratio": 0.6935,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "107.5",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 202.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 205,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 207.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×5",
+       "ratio": 0.5268,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "202.5",
+       "sub": "×5",
+       "ratio": 0.6826,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "205",
+       "sub": "×5",
+       "ratio": 0.8403,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "207.5",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑦ 某几周没有这个主项",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 157.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 165,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 172.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "157.5",
+       "sub": "×5",
+       "ratio": 0.468,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "165",
+       "sub": "×3",
+       "ratio": 0.6706,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "172.5",
+       "sub": "×2",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "notTrained"
+       },
+       {
+        "state": "notTrained"
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5",
+       "ratio": 0.5112,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×4",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "notTrained",
+       "isCurrent": false
+      },
+      {
+       "state": "notTrained",
+       "isCurrent": false
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7,
+         "e1rmKg": 225
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 7.5,
+         "e1rmKg": 232.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8,
+         "e1rmKg": 242.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8.5,
+         "e1rmKg": 247.5
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约225",
+       "sub": "×3 @7",
+       "ratio": 0.1639,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约232.5",
+       "sub": "×2 @7.5",
+       "ratio": 0.3878,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约242.5",
+       "sub": "×1 @8",
+       "ratio": 0.7334,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约247.5",
+       "sub": "×1 @8.5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑧ 算不出重量的组",
+   "currentWeekIndex": 0,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 105,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 110,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 115,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "105",
+       "sub": "×5",
+       "ratio": 0.4043,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "110",
+       "sub": "×4",
+       "ratio": 0.7039,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "115",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 70,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 75,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 80,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 85,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "70%",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "75%",
+       "sub": "×5",
+       "ratio": 0.3722,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "80%",
+       "sub": "×4",
+       "ratio": 0.6843,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "85%",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 6
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 4,
+         "rpe": 7.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 8
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "5 @6",
+       "sub": "RPE",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "5 @7",
+       "sub": "RPE",
+       "ratio": 0.2966,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "4 @7.5",
+       "sub": "RPE",
+       "ratio": 0.6436,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "3 @8",
+       "sub": "RPE",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑨ 重量次数不变，只升 RPE",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": 8
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": 8.5
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5 @7",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5 @7.5",
+       "ratio": 0.8936,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5 @8",
+       "ratio": 0.7872,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5 @8.5",
+       "ratio": 0.6809,
+       "isTop": false
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": 8
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 5,
+         "rpe": 8
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5 @7",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5 @7.5",
+       "ratio": 0.8936,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5 @8",
+       "ratio": 0.7872,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×5 @8",
+       "ratio": 0.7872,
+       "isTop": false
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 3,
+         "rpe": 8
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 3,
+         "rpe": 9
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×3 @7",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×3 @7.5",
+       "ratio": 0.8864,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×3 @8",
+       "ratio": 0.7727,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×3 @9",
+       "ratio": 0.5455,
+       "isTop": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑩ 先加次数，再加重量",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 7,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 155,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0.5768,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×6",
+       "ratio": 0.7397,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×7",
+       "ratio": 0.9026,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "155",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 7,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 8,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 92.5,
+         "pct": null,
+         "reps": 6,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×6",
+       "ratio": 0.6445,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×7",
+       "ratio": 0.805,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×8",
+       "ratio": 0.9654,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "92.5",
+       "sub": "×6",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 200,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 205,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×3",
+       "ratio": 0.6522,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×4",
+       "ratio": 0.8261,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "200",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "205",
+       "sub": "×3",
+       "ratio": 0.9721,
+       "isTop": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑪ 混合周：没有 e1RM，用写了重量的周估 e1RM（M2）",
+   "currentWeekIndex": 1,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 100,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 100,
+         "reps": 5,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 105,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 110,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 115,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "100",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "105",
+       "sub": "×5",
+       "ratio": 0.4043,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "110",
+       "sub": "×4",
+       "ratio": 0.7039,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "115",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 70,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 70,
+         "reps": 5,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 72.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 8
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 8.5
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "70",
+       "sub": "×5",
+       "ratio": 0.5482,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "72.5",
+       "sub": "×5",
+       "ratio": 1,
+       "isTop": true
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约72.5",
+       "sub": "×3 @8",
+       "ratio": 0.6522,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约75",
+       "sub": "×2 @8.5",
+       "ratio": 0.9094,
+       "isTop": false
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 6
+        },
+        "actual": {
+         "kg": 120,
+         "reps": 5,
+         "rpe": 6
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 140,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "120",
+       "sub": "×5 @6",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约125",
+       "sub": "×5 @7",
+       "ratio": 0.1932,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "140",
+       "sub": "×3",
+       "ratio": 0.659,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "150",
+       "sub": "×2",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑫ 全是 RPE / 百分比，没有 e1RM、没有登记 1RM",
+   "currentWeekIndex": 0,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 70,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 75,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 80,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 85,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "70%",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "75%",
+       "sub": "×5",
+       "ratio": 0.3722,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "80%",
+       "sub": "×4",
+       "ratio": 0.6843,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "85%",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 6
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 5,
+         "rpe": 7
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 4,
+         "rpe": 7.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 8
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "5 @6",
+       "sub": "RPE",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "5 @7",
+       "sub": "RPE",
+       "ratio": 0.2966,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "4 @7.5",
+       "sub": "RPE",
+       "ratio": 0.6436,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "3 @8",
+       "sub": "RPE",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑬ 已练完的周用实际：超重、少 1 次、那天没做",
+   "currentWeekIndex": 3,
+   "totalWeeks": 5,
+   "lifts": [
+    {
+     "lift": "squat",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 150,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 150,
+         "reps": 5,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 157.5,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 160,
+         "reps": 5,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 165,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 165,
+         "reps": 2,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 172.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 177.5,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "150",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "160",
+       "sub": "×5",
+       "ratio": 0.5421,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": true,
+       "main": "165",
+       "sub": "×2/3",
+       "ratio": 0.4537,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "172.5",
+       "sub": "×2",
+       "ratio": 0.8617,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "177.5",
+       "sub": "×1",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 90,
+         "pct": null,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 90,
+         "reps": 5,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 95,
+         "pct": null,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 95,
+         "reps": 4,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": 102.5,
+         "pct": null,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": {
+         "kg": 100,
+         "reps": 3,
+         "rpe": null
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 107.5,
+         "pct": null,
+         "reps": 2,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": 110,
+         "pct": null,
+         "reps": 1,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "90",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "95",
+       "sub": "×4",
+       "ratio": 0.2519,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "100",
+       "sub": "×3",
+       "ratio": 0.5035,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "107.5",
+       "sub": "×2",
+       "ratio": 0.9322,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "110",
+       "sub": "×1",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    },
+    {
+     "lift": "deadlift",
+     "input": {
+      "e1rmKg": 265,
+      "oneRmKg": null,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 3,
+         "rpe": 7
+        },
+        "actual": {
+         "kg": 227.5,
+         "reps": 3,
+         "rpe": 7
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 2,
+         "rpe": 7.5
+        },
+        "actual": "skipped"
+       },
+       {
+        "state": "scheduled",
+        "done": true,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8
+        },
+        "actual": {
+         "kg": 245,
+         "reps": 1,
+         "rpe": 8
+        }
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 8.5
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": null,
+         "reps": 1,
+         "rpe": 9
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "227.5",
+       "sub": "×3 @7",
+       "ratio": 0.0605,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "skipped": true,
+       "main": "没做",
+       "sub": "",
+       "ratio": 0.1504,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": true,
+       "short": false,
+       "main": "245",
+       "sub": "×1 @8",
+       "ratio": 0.6098,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "约247.5",
+       "sub": "×1 @8.5",
+       "ratio": 0.7386,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "约252.5",
+       "sub": "×1 @9",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "⑭ 百分比组按登记 1RM 折成 kg",
+   "currentWeekIndex": 0,
+   "totalWeeks": 4,
+   "lifts": [
+    {
+     "lift": "bench",
+     "input": {
+      "e1rmKg": null,
+      "oneRmKg": 120,
+      "weeks": [
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 70,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 75,
+         "reps": 5,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 80,
+         "reps": 4,
+         "rpe": null
+        },
+        "actual": null
+       },
+       {
+        "state": "scheduled",
+        "done": false,
+        "plan": {
+         "kg": null,
+         "pct": 85,
+         "reps": 3,
+         "rpe": null
+        },
+        "actual": null
+       }
+      ]
+     },
+     "expected": [
+      {
+       "state": "scheduled",
+       "isCurrent": true,
+       "done": false,
+       "short": false,
+       "main": "82.5",
+       "sub": "×5",
+       "ratio": 0,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "90",
+       "sub": "×5",
+       "ratio": 0.4842,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "95",
+       "sub": "×4",
+       "ratio": 0.7423,
+       "isTop": false
+      },
+      {
+       "state": "scheduled",
+       "isCurrent": false,
+       "done": false,
+       "short": false,
+       "main": "100",
+       "sub": "×3",
+       "ratio": 1,
+       "isTop": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

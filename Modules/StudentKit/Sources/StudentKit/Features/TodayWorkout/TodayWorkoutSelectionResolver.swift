@@ -2,6 +2,15 @@ import CoreModels
 import Foundation
 
 enum TodayWorkoutSelectionResolver {
+  /// Shares the week strip selection state; preview selection never loads a writable workout.
+  static func selectCycleDay(
+    _ dayID: UUID, plan: StudentPlanView?, isPreview: Bool,
+    selectedDayID: inout UUID?, previewDayID: inout UUID?
+  ) {
+    guard let plan, plan.days.contains(where: { $0.id == dayID }) else { return }
+    if isPreview { previewDayID = dayID } else { selectedDayID = dayID }
+  }
+
   static func receive(
     _ handoff: TodayWorkoutPlanHandoff?, selectedDayID: inout UUID?, days: [StudentPlanDay]
   ) {
