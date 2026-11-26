@@ -8,13 +8,12 @@ struct MeetPRNumberPadDismissButton: View {
       Image(systemName: "keyboard.chevron.compact.down")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size19))
         .foregroundStyle(Color.MeetPR.textPrimary)
-        .frame(width: 48, height: 44)
+        .frame(width: 48, height: MeetPRSpacing.minimumHitTarget)
         .background(Color.MeetPR.surfaceRaised, in: .rect(cornerRadius: 12))
     }
     .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(DesignSystemStrings.numberPadDismissKeyboard)
     .accessibilityIdentifier("numberPad.dismiss")
-    .offset(y: -48)
     .padding(.trailing, MeetPRSpacing.space4)
   }
 }

@@ -179,6 +179,7 @@ public struct MeetPRNumberPad: View {
         .fill(Color.MeetPR.borderDefault)
         .frame(height: 1)
     }
+    .padding(.top, allDayActions == nil ? 0 : MeetPRSpacing.minimumHitTarget + MeetPRSpacing.space1)
     .overlay(alignment: .topTrailing) {
       if allDayActions != nil {
         MeetPRNumberPadDismissButton(action: onCancel)
@@ -186,7 +187,6 @@ public struct MeetPRNumberPad: View {
     }
     .sensoryFeedback(.selection, trigger: feedbackTrigger)
   }
-
 }
 
 extension MeetPRNumberPad {
