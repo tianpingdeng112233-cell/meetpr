@@ -34,14 +34,19 @@ public struct PlanDayCompletion: Equatable, Sendable {
   public let dayID: UUID
   public let studentID: UUID
   public let source: String
+  public let actualCompletionDate: String?
   public let completedAt: Date
 
-  public init(id: UUID, dayID: UUID, studentID: UUID, source: String, completedAt: Date) {
+  public init(
+    id: UUID, dayID: UUID, studentID: UUID, source: String, completedAt: Date,
+    actualCompletionDate: String? = nil
+  ) {
     self.id = id
     self.dayID = dayID
     self.studentID = studentID
     self.source = source
     self.completedAt = completedAt
+    self.actualCompletionDate = actualCompletionDate
   }
 }
 
@@ -61,6 +66,9 @@ public protocol StudentPlanRepository: Sendable {
   func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay]
   @discardableResult
   func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion
+  @discardableResult
+  func completeDay(id: UUID, studentID: UUID, actualCompletionDate: String?) async throws
+    -> PlanDayCompletion
   func undoDayCompletion(id: UUID, studentID: UUID) async throws
 }
 
@@ -107,6 +115,13 @@ extension StudentPlanRepository {
   @discardableResult
   public func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion {
     throw PlanDayCompletionError.unavailable
+  }
+
+  public func completeDay(id: UUID, studentID: UUID, actualCompletionDate: String?) async throws
+    -> PlanDayCompletion
+  {
+    guard actualCompletionDate == nil else { throw PlanDayCompletionError.unavailable }
+    return try await completeDay(id: id, studentID: studentID)
   }
 
   public func undoDayCompletion(id: UUID, studentID: UUID) async throws {

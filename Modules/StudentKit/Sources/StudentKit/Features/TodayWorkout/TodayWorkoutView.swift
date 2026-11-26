@@ -44,6 +44,13 @@ public struct TodayWorkoutView: View {
   @State private var handledUploadFailureToken = 0
   @State private var pendingUploadRetryDate: Date?
   @State private var showingCycleOutlook = false
+  @State private var resumePrompt: WorkoutResumePrompt?
+  @State private var resumeNotice: String?
+  @State private var resumeNoticeTask: Task<Void, Never>?
+  @State private var entryReady = true
+  @State private var defaultEntry = true
+  @State private var waitingResume: (prompt: WorkoutResumePrompt, date: Date)?
+  private let resumeVisits = WorkoutResumeVisits()
   @State private var selectedDayID: UUID?
   @State private var previewDayID: UUID?
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
@@ -133,6 +140,7 @@ public struct TodayWorkoutView: View {
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onPlanChanged = onPlanChanged
     self.onOpenCoach = onOpenCoach
+    self._defaultEntry = State(initialValue: planHandoff?.dayID == nil && date == nil)
     self._selectedDayID = State(initialValue: planHandoff?.dayID)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
@@ -177,6 +185,28 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     workoutContent
+      .onChange(of: visitContext, initial: true) { _, context in
+        checkResume(context)
+      }
+      .onChange(of: viewModel.planDays) { _, days in
+        guard let prompt = resumePrompt, !viewModel.isCompletionMutationInFlight,
+          !viewModel.allDayWriting, days.first(where: { $0.id == prompt.id })?.completedAt != nil
+        else { return }
+        resumePrompt = nil
+        returnToCurrentDay()
+      }
+      .sheet(item: $resumePrompt, onDismiss: workoutModalDidDismiss) { prompt in
+        let current = prompt.asOf(gymDayToday)
+        WorkoutResumeSheet(
+          prompt: current, lockedDate: viewModel.lockedResumeDate(dayID: prompt.id)
+        ) { date in
+          await finishResume(current, date: date)
+        } onContinue: {
+          resumeVisits.continueDay(
+            student: studentID, plan: prompt.planID, day: prompt.id, today: gymDayToday)
+          resumePrompt = nil
+        }
+      }
       .onPreferenceChange(TrainingPresentationBlockedKey.self) { childPresentationBlocked = $0 }
       .onChange(of: hasRequestedWorkoutModal, initial: true) { _, requested in
         if requested { workoutModalIsPresented = true }
@@ -232,6 +262,7 @@ public struct TodayWorkoutView: View {
               setRefEntryErrorMessage = StudentStrings.localized(.allDayUnavailable)
               return
             }
+            defaultEntry = false
             selectedDayID = day.id
             await loadWorkout(for: day.id, preloadedPlan: plan)
           } catch {
@@ -306,6 +337,7 @@ public struct TodayWorkoutView: View {
       previewDay: previewDay,
       showsHandoffNotice: viewModel.showsHandoffNotice && !viewModel.browsingPastPlan,
       onDismissHandoff: { viewModel.dismissHandoffNotice() },
+      resumeNotice: resumeNotice,
       onCycleOutlook: viewModel.showsCycleOutlook ? { showingCycleOutlook = true } : nil
 
     )
@@ -413,6 +445,7 @@ public struct TodayWorkoutView: View {
       .sheet(isPresented: $showingCycleOutlook, onDismiss: workoutModalDidDismiss) {
         CycleOutlookSheet(model: viewModel) { dayID in
           showingCycleOutlook = false
+          defaultEntry = false
           TodayWorkoutSelectionResolver.selectCycleDay(
             dayID, plan: viewModel.displayedPlan, isPreview: viewModel.isPreviewingPlan,
             selectedDayID: &selectedDayID, previewDayID: &previewDayID)
@@ -500,7 +533,14 @@ public struct TodayWorkoutView: View {
         content: directCamera)
     #endif
     .onChange(of: scenePhase) { _, phase in
-      if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
+      if phase == .active {
+        let today = WorkoutDatePolicy.gymDayToday()
+        if today != gymDayToday, isVisible, safeHandoffBoundary {
+          defaultEntry = true
+          selectedDayID = StudentPlanSequence(days: viewModel.planDays).cursorDay?.id
+        }
+        gymDayToday = today
+      }
     }
     .task {
       gymDayToday = WorkoutDatePolicy.gymDayToday()
@@ -529,9 +569,15 @@ public struct TodayWorkoutView: View {
     }
     .onChange(of: isVisible) { _, visible in
       if !visible {
+        entryReady = false
+        resumePrompt = nil
         viewModel.setSyncCompletion?.reset()
       } else {
-        Task { await enterTrainingIfSafe() }
+        Task {
+          await enterTrainingIfSafe()
+          defaultEntry = true
+          entryReady = true
+        }
       }
     }
     .onChange(of: viewModel.previewPlan?.cycleID) { _, _ in
@@ -558,6 +604,7 @@ public struct TodayWorkoutView: View {
     }
     .onChange(of: planHandoff?.id) { _, _ in
       guard let planHandoff else { return }
+      defaultEntry = false
       started = false
       let previousSelection = selectedDayID
       TodayWorkoutSelectionResolver.receive(
@@ -573,6 +620,7 @@ public struct TodayWorkoutView: View {
       // presentation still resumes recording when real logs already exist;
       // zero-log days alone return to the explicit pre-start state.
       started = false
+      defaultEntry = true
       TodayWorkoutSelectionResolver.receive(
         nil, selectedDayID: &selectedDayID, days: viewModel.planDays)
     }
@@ -593,6 +641,12 @@ public struct TodayWorkoutView: View {
       Task { await refreshWorkoutPlan() }
     }
     .onChange(of: viewModel.completionRevision) { _, _ in
+      if let waiting = waitingResume,
+        viewModel.planDays.first(where: { $0.id == waiting.prompt.id })?.completedAt != nil
+      {
+        waitingResume = nil
+        showCompletedResume(waiting.prompt, date: waiting.date)
+      }
       if let plan = viewModel.planProjection {
         onPlanChanged(plan)
       }
@@ -625,6 +679,7 @@ public struct TodayWorkoutView: View {
       )
     }?.id
     pendingUploadRetryDate = targetDayID == selectedDayID ? nil : destination.trainingDate
+    defaultEntry = false
     selectedDayID = targetDayID
     Task {
       await videoViewModel.retryFailures(studentID: studentID, workout: viewModel)
@@ -1124,11 +1179,15 @@ public struct TodayWorkoutView: View {
   private var displayedDayBinding: Binding<UUID?> {
     Binding(
       get: { viewModel.isPreviewingPlan ? previewDay?.id : selectedDayID },
-      set: { if viewModel.isPreviewingPlan { previewDayID = $0 } else { selectedDayID = $0 } })
+      set: {
+        defaultEntry = false
+        if viewModel.isPreviewingPlan { previewDayID = $0 } else { selectedDayID = $0 }
+      })
   }
 
   private var safeHandoffBoundary: Bool {
-    !showingCycleOutlook && editing == nil && quickLogRoute == nil && directCameraTarget == nil
+    resumePrompt == nil && !showingCycleOutlook && editing == nil && quickLogRoute == nil
+      && directCameraTarget == nil
       && pendingDirectCameraTarget == nil && preparingVideoSetID == nil
       && weightEntry?.isPresented != true
       && viewModel.completionPhase == nil && keypad?.current == nil
@@ -1138,7 +1197,8 @@ public struct TodayWorkoutView: View {
   private func workoutModalDidDismiss() { workoutModalIsPresented = false }
 
   private var hasRequestedWorkoutModal: Bool {
-    editing != nil || quickLogRoute != nil || viewModel.completionPhase != nil
+    resumePrompt != nil || editing != nil || quickLogRoute != nil
+      || viewModel.completionPhase != nil
       || showingCycleOutlook || showingReadinessSheet || setRefPickerRoute != nil
       || directCameraTarget != nil
       || exerciseNote != nil || replay.selected != nil || videoViewModel.missingAttachment != nil
@@ -1173,6 +1233,97 @@ public struct TodayWorkoutView: View {
       } else {
         selectedDayID = viewModel.currentDay?.id
       }
+    }
+  }
+
+  private struct VisitContext: Equatable {
+    let plan: UUID
+    let day: UUID
+    let today: Date
+    let canPrompt: Bool
+  }
+
+  private var visitContext: VisitContext? {
+    guard isVisible, entryReady, scenePhase == .active, !showingHistory,
+      !ancestorPresentationBlocked, !childPresentationBlocked, bindFirstRun?.showsWelcome != true,
+      !hasRequestedWorkoutModal, !viewModel.isCompletionMutationInFlight,
+      !viewModel.isPreviewingPlan,
+      !viewModel.browsingPastPlan, let plan = viewModel.planProjection,
+      plan.actualCompletionDateEnabled, case .loaded(let day, _) = viewModel.state,
+      day.id == selectedDayID, day.completedAt == nil,
+      viewModel.setSyncQueue?.completionGate.videoWait(dayID: day.id) == nil
+    else { return nil }
+    let cursor = StudentPlanSequence(days: plan.days).cursorDay?.id
+    return VisitContext(
+      plan: plan.cycleID, day: day.id, today: gymDayToday,
+      canPrompt: defaultEntry && cursor == day.id)
+  }
+
+  private func checkResume(_ context: VisitContext?) {
+    // A hidden tab or interrupted loading state cannot establish a visit.
+    guard let context else { return }
+    guard resumePrompt == nil, let day = viewModel.currentDay else { return }
+    guard
+      let last = resumeVisits.open(
+        student: studentID, plan: context.plan,
+        day: context.day, today: context.today, prompt: context.canPrompt)
+    else { return }
+    let rows = (viewModel.currentDrafts ?? []).filter { !$0.isWarmup && !$0.isBlankAddedRow }
+    resumePrompt = WorkoutResumePrompt(
+      id: day.id, planID: context.plan,
+      code: TrainingSequenceText.code(for: day, in: viewModel.planDays),
+      lastOpened: last, today: context.today, recorded: rows.filter(\.hasSavedRecord).count,
+      total: rows.count)
+  }
+
+  private func finishResume(_ prompt: WorkoutResumePrompt, date: Date) async -> Bool {
+    guard isVisible, prompt.planID == viewModel.planProjection?.cycleID,
+      (prompt.lastOpened...prompt.today).contains(date)
+        || viewModel.lockedResumeDate(dayID: prompt.id) == date,
+      await viewModel.completeResumedDay(id: prompt.id, actualDate: date)
+    else { return false }
+    resumeVisits.continueDay(
+      student: studentID, plan: prompt.planID, day: prompt.id, today: gymDayToday)
+    resumePrompt = nil
+    if viewModel.planDays.first(where: { $0.id == prompt.id })?.completedAt != nil {
+      showCompletedResume(prompt, date: date)
+    } else {
+      waitingResume = (prompt, date)
+      showResumeNotice(StudentStrings.localized(.resumeWaiting))
+    }
+    return true
+  }
+
+  private func showCompletedResume(_ prompt: WorkoutResumePrompt, date: Date) {
+    let next = StudentPlanSequence(days: viewModel.planDays).cursorDay
+    let actual = viewModel.planDays.first { $0.id == prompt.id }?.actualCompletionDate
+    let selected = TodayWorkoutViewModel.gymDate(
+      WorkoutDatePolicy.deviceCalendar.date(bySettingHour: 12, minute: 0, second: 0, of: date)
+        ?? date,
+      calendar: WorkoutDatePolicy.deviceCalendar)
+    let completed = [prompt.code, StudentFormatting.monthDay(date)]
+    if actual != selected {
+      selectedDayID = next?.id ?? prompt.id
+      defaultEntry = false
+      showResumeNotice(StudentStrings.replacing(.resumeAlreadyFinished, values: [prompt.code]))
+      return
+    }
+    defaultEntry = false
+    if let next {
+      selectedDayID = next.id
+      let code = TrainingSequenceText.code(for: next, in: viewModel.planDays)
+      showResumeNotice(StudentStrings.replacing(.resumeAdvanced, values: completed + [code]))
+    } else {
+      showResumeNotice(StudentStrings.replacing(.resumeFinished, values: completed))
+    }
+  }
+
+  private func showResumeNotice(_ message: String) {
+    resumeNoticeTask?.cancel()
+    resumeNotice = message
+    resumeNoticeTask = Task {
+      do { try await Task.sleep(for: .seconds(5)) } catch { return }
+      withAnimation(.easeOut(duration: 0.2)) { resumeNotice = nil }
     }
   }
 

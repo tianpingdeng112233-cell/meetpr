@@ -38,10 +38,12 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   public func fetchPlan(id: UUID, studentID: UUID) async throws -> StudentPlanView? {
     do {
       let token = try await session.accessToken()
-      let tree = try await api.plan(id: id, accessToken: token).toDomain()
+      let detail = try await api.plan(id: id, accessToken: token)
+      let tree = detail.toDomain()
       guard tree.plan.traineeID == studentID else { return nil }
       let exercises = try await exerciseCatalog(accessToken: token)
       var plan = StudentPlanProjection.project(tree: tree, catalog: exercises, weekIndex: 1)
+      plan.actualCompletionDateEnabled = detail.actualCompletionDateEnabled
       plan.handoff = await cache.loadPlan(studentID: studentID)?.handoff
       try await cache.saveSnapshot(plan: plan, studentID: studentID)
       return plan
@@ -104,13 +106,20 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   }
 
   public func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion {
+    try await completeDay(id: id, studentID: studentID, actualCompletionDate: nil)
+  }
+
+  public func completeDay(id: UUID, studentID: UUID, actualCompletionDate: String?) async throws
+    -> PlanDayCompletion
+  {
     let token = try await session.accessToken()
     do {
-      let completion = try await api.completePlanDay(id: id, accessToken: token)
+      let completion = try await api.completePlanDay(
+        id: id, accessToken: token, actualCompletionDate: actualCompletionDate)
       await updateCachedCompletion(
         dayID: id,
         completedAt: completion.completedAt,
-        source: completion.source,
+        source: completion.source, actualDate: completion.actualCompletionDate,
         studentID: studentID
       )
       return PlanDayCompletion(
@@ -118,7 +127,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
         dayID: completion.planDayID,
         studentID: completion.studentID,
         source: completion.source,
-        completedAt: completion.completedAt
+        completedAt: completion.completedAt, actualCompletionDate: completion.actualCompletionDate
       )
     } catch {
       throw Self.completionError(from: error)
@@ -165,13 +174,15 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
       return nil
     }
 
-    let tree = try await api.plan(id: planID, accessToken: token).toDomain()
+    let detail = try await api.plan(id: planID, accessToken: token)
+    let tree = detail.toDomain()
     let exercises = try await exerciseCatalog(accessToken: token)
     var projection = StudentPlanProjection.project(
       tree: tree,
       catalog: exercises,
       weekIndex: 1
     )
+    projection.actualCompletionDateEnabled = detail.actualCompletionDateEnabled
     projection.handoff = response.handoff
     try await cache.save(plan: projection, studentID: studentID)
     return projection
@@ -222,27 +233,19 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   private func updateCachedCompletion(
     dayID: UUID,
     completedAt: Date?,
-    source: String?,
+    source: String?, actualDate: String? = nil,
     studentID: UUID
   ) async {
     guard let plan = await cache.loadPlan(studentID: studentID) else { return }
     let updatedDays = plan.days.map { day in
       guard day.id == dayID else { return day }
-      return StudentPlanDay(
-        id: day.id,
-        weekNumber: day.weekNumber,
-        dayOfWeek: day.dayOfWeek,
-        sortOrder: day.sortOrder,
-        date: day.scheduledDate,
-        shiftedToDate: day.shiftedToDate,
-        completedAt: completedAt,
-        completionSource: source,
-        exercises: day.exercises
-      )
+      return day.replacingCompletion(
+        completedAt: completedAt, source: source, actualDate: actualDate)
     }
     let updated = StudentPlanView(
       cycleID: plan.cycleID,
       handoff: plan.handoff,
+      actualCompletionDateEnabled: plan.actualCompletionDateEnabled,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
       endDate: plan.endDate,

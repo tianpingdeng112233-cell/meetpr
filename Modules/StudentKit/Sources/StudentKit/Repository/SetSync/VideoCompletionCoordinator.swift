@@ -123,7 +123,8 @@ import RepositoryContracts
     dayID: UUID, wait: WorkoutCompletionGate.VideoWait,
     queue: SetSyncQueue, generation: Int
   ) async throws -> PlanDayCompletion {
-    if let day = try await plans.fetchDay(studentID: queue.studentID, dayID: dayID),
+    if queue.completionGate.actualCompletionDate(dayID: dayID) == nil,
+      let day = try await plans.fetchDay(studentID: queue.studentID, dayID: dayID),
       let date = day.completedAt
     {
       return PlanDayCompletion(
@@ -135,7 +136,9 @@ import RepositoryContracts
     guard active, generation == self.generation, await isCurrentAccount(),
       queue.pendingCount(dayID: dayID) == 0, latest.delivered
     else { throw CancellationError() }
-    return try await plans.completeDay(id: dayID, studentID: queue.studentID)
+    return try await plans.completeDay(
+      id: dayID, studentID: queue.studentID,
+      actualCompletionDate: queue.completionGate.actualCompletionDate(dayID: dayID))
   }
 
   private func updateTimeout(

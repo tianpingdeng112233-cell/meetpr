@@ -77,10 +77,16 @@ extension APIClient {
     try await get(path: "/plans/\(id.uuidString)", accessToken: accessToken)
   }
 
-  public func completePlanDay(id: UUID, accessToken: String) async throws
+  public func completePlanDay(id: UUID, accessToken: String, actualCompletionDate: String? = nil)
+    async throws
     -> PlanDayCompletionDTO
   {
-    try await post(path: "/plans/days/\(id.uuidString)/complete", accessToken: accessToken)
+    if let actualCompletionDate {
+      return try await post(
+        path: "/plans/days/\(id.uuidString)/complete",
+        body: ["actual_completion_date": actualCompletionDate], accessToken: accessToken)
+    }
+    return try await post(path: "/plans/days/\(id.uuidString)/complete", accessToken: accessToken)
   }
 
   public func undoPlanDayCompletion(id: UUID, accessToken: String) async throws {

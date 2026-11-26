@@ -16,6 +16,9 @@ enum TrainingDayPresentation {
     let range = WorkoutDatePolicy.gymDayRange(containing: now, calendar: calendar)
     return StudentPlanSequence(days: days).orderedDays.last {
       guard let completedAt = $0.completedAt else { return false }
+      if let actual = $0.actualCompletionDate {
+        return actual == TodayWorkoutViewModel.gymDate(now, calendar: calendar)
+      }
       return range.contains(completedAt)
     }
   }

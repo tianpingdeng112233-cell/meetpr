@@ -74,15 +74,18 @@ import RepositoryContracts
         videosDelivered: true,
         complete: {
           // A response may have been lost immediately before process death.
-          if let day = try await self.plans.fetchDay(
-            studentID: self.queue.studentID, dayID: dayID),
+          if self.queue.completionGate.actualCompletionDate(dayID: dayID) == nil,
+            let day = try await self.plans.fetchDay(
+              studentID: self.queue.studentID, dayID: dayID),
             let completedAt = day.completedAt
           {
             return PlanDayCompletion(
               id: day.id, dayID: day.id, studentID: self.queue.studentID,
               source: day.completionSource ?? "manual", completedAt: completedAt)
           }
-          return try await self.plans.completeDay(id: dayID, studentID: self.queue.studentID)
+          return try await self.plans.completeDay(
+            id: dayID, studentID: self.queue.studentID,
+            actualCompletionDate: self.queue.completionGate.actualCompletionDate(dayID: dayID))
         })
     }
   }
