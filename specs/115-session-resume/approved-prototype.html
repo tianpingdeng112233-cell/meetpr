@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MeetPR · 相隔一周的训练续接</title>
+<style>
+:root{--bg:#f5f6f8;--ink:#131b28;--muted:#626873;--gold:#a9681d;--line:#e6e7eb;--black:#20170d}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#e9e9e7;font-variant-numeric:tabular-nums}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #a76822;outline-offset:2px}[hidden]{display:none!important}
+main{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px}.phone{width:min(100%,393px);height:min(824px,calc(100svh - 85px));min-height:570px;overflow:hidden;position:relative;background:var(--bg);border-radius:34px;box-shadow:0 8px 42px #20232923}.app{height:100%;display:flex;flex-direction:column}.status{display:flex;align-items:center;justify-content:space-between;padding:15px 24px 6px 30px;font:650 14px/17px -apple-system,BlinkMacSystemFont,sans-serif}.status svg{width:57px;height:16px}.content{flex:1;min-height:0;overflow:auto;padding:8px 19px}.heading{margin:0 0 12px;font-size:29px;line-height:1.15;letter-spacing:-.035em;font-weight:800}.weight{height:45px;border-radius:12px;background:#efeff1;border:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:8px;font-size:13px}.weight b{font-size:14px}.weight .metric{margin-left:auto;color:var(--muted);font-size:12px}.icon{width:19px;height:19px;display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.week{margin:19px 0;display:flex;align-items:center;justify-content:space-between}.week>.icon{width:14px}.week>.icon:first-child{opacity:.3}.day{text-align:center;flex:1}.day small{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.day b{display:grid;place-items:center;margin:auto;position:relative;width:32px;height:32px;border-radius:50%;font-size:14px;color:#68707b;font-weight:500}.day.planned b{background:#fff0c8;color:#754e1c;font-weight:750}.day.selected b{outline:2px solid #bc792a;outline-offset:2px}.day.done b:after{content:'✓';position:absolute;bottom:-4px;right:-2px;background:#19864b;color:white;border-radius:100%;font-size:10px;width:14px;height:14px}.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:15px}.sectionHead b{font-size:15px}.rows{display:grid;gap:7px}.row{position:relative;display:grid;grid-template-columns:24px 1fr;gap:7px}.dot{width:18px;height:18px;border:2px solid #cbd0d5;border-radius:50%;background:var(--bg);margin:7px 0 0 2px}.row:not(:last-child):before{content:'';position:absolute;top:28px;bottom:-9px;left:10px;width:2px;background:#d9dce1}.row:first-child .dot{background:linear-gradient(130deg,#eaae4e,#d17d17);border-color:#efc789}.exercise{padding:6px 7px 5px 5px;border:1px solid transparent;border-radius:10px}.row:first-child .exercise{border-color:#d49b50;background:#f4ece2}.name{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:650}.name i{margin-left:auto;width:11px;height:11px;display:inline-flex;color:#737983}.name i svg{width:100%;height:100%}.circle{height:25px;width:25px;border:1.6px solid #63707c;border-radius:50%;background:var(--bg)}.rx{display:flex;align-items:center;gap:21px;margin-top:2px;font-size:12px;color:#5a606a}.rx span:last-child{color:#876135}.add{text-align:center;color:#996127;font-size:13px;margin-top:14px}.ring{width:56px;height:56px;border:1.6px solid #c88831;border-radius:50%;align-self:flex-end;margin:5px 16px 7px;background:#f2ece4;color:#ac6b20;display:grid;place-content:center;justify-items:center}.ring b{font:700 12px/16px ui-monospace,monospace;color:#27221c}.dock{border-top:1px solid var(--line);padding:9px 18px;background:#fbfbfa}.finish,.primary{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--black);color:white;border:1px solid #67421d;border-radius:40px;font-size:15px;font-weight:650;min-height:49px}.nav{background:white;border-top:1px solid var(--line);display:flex;padding:6px 0 12px}.nav span{flex:1;display:grid;justify-items:center;gap:4px;color:#606773;font-size:10px}.nav span:first-child{color:#a46625}.nav svg{width:19px;height:19px}.notice{border:1px solid #dad4c8;background:#fffaf0;margin-bottom:12px;padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.5}.backdrop{position:absolute;inset:0;background:#12151b50;display:flex;align-items:flex-end}.sheet{width:100%;max-height:100%;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:8px 21px 22px}.handle{width:35px;height:4px;border-radius:4px;background:#d3d3d6;margin:0 auto 19px}.sheet h2{font-size:23px;line-height:1.3;letter-spacing:-.025em;margin:0 0 6px}.sheet p{font-size:14px;line-height:1.6;color:#575f69;margin:0}.summary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;padding:13px 0 12px;margin:4px 0;border-bottom:1px solid var(--line)}.summary span{color:#646a72}.dateLink{margin-left:auto;border:0;background:none;color:#87541c;padding:9px 1px}
+.dateLink{min-width:56px;min-height:44px}.summary{padding:12px 0}.completionDate{display:flex;align-items:center;gap:8px;font-size:14px;min-height:46px}.completionDate .dateLink{font-size:13px}.completionDate time{font-weight:650}
+#field{padding:10px 0 0}.dateChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.dateChoices button{font:inherit;min-height:54px;border:1px solid #e2e3e5;border-radius:10px;background:#f6f7f8;color:var(--ink);padding:4px}.dateChoices button[aria-pressed=true]{background:#fff2db;border-color:#af742d}.dateChoices b,.dateChoices small{display:block}.dateChoices b{font-size:15px}.dateChoices small{margin-top:3px;font-size:11px;color:#5d5e60}
+
+.sheet .effect{font-size:12px;margin:10px 0 12px}.primary,.secondary{width:100%}.secondary{min-height:44px;border:0;background:transparent;color:#3e4550;font-weight:600;margin-top:3px}.tools{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#676a70;flex-wrap:wrap}.tools select,.tools button{font:inherit;color:#484b50;background:transparent;border:0;padding:6px}.tools button{text-decoration:underline;text-underline-offset:3px}.symbols{display:none}
+@media(max-width:530px){main{padding:0;gap:0}.phone{width:100%;max-width:none;height:100svh;min-height:490px;border-radius:0;box-shadow:none}.tools{padding:12px}.sheet{padding-bottom:max(16px,env(safe-area-inset-bottom))}.nav{padding-bottom:max(12px,env(safe-area-inset-bottom))}}
+.notice.completed{animation:fade-completion 200ms ease-out 5s forwards}
+@keyframes fade-completion{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.notice.completed{animation-duration:1ms}}
+</style>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="flag" viewBox="0 0 24 24"><path d="M4 21V4m0 1c5-4 10 3 16-1v10c-6 4-11-3-16 1"/></symbol>
+<symbol id="left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol><symbol id="right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol><symbol id="down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+<symbol id="timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 13 8 9m4-7h3m3 3 2 2"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l3 2"/></symbol>
+<symbol id="train" viewBox="0 0 24 24"><path stroke-width="3" d="M3 9v6m4-9v12m10-12v12m4-9v6M7 12h10"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M3 4h18v13H9l-6 4z"/></symbol>
+<symbol id="trend" viewBox="0 0 24 24"><path d="M3 4v16h18M6 15l4-5 4 2 6-7"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-9 16-9 16 0"/></symbol>
+</defs></svg>
+<main><section class="phone" aria-label="MeetPR 学员训练页">
+<div class="app" id="app"><div class="status">09:41 <svg aria-hidden="true" viewBox="0 0 57 16"><path d="M1 13v-3h3v3zm5 0V8h3v5zm5 0V5h3v8zm5 0V2h3v11zM23 6q6-6 12 0l-2 2q-4-4-8 0zm4 4q2-2 4 0l-2 3z"/><rect x="38" y="3" width="16" height="10" rx="2" fill="none" stroke="currentColor"/><rect x="40" y="5" width="12" height="6" rx="1"/><path d="M55 6h1v4h-1z"/></svg></div>
+<div class="content"><h1 class="heading">W1</h1><div class="weight"><svg class="icon"><use href="#flag"/></svg><b>距比赛 3 天</b><span class="metric">今天体重</span><b>83.0 <small>kg</small></b></div>
+<div class="week" id="week"></div><div class="notice" id="notice" tabindex="-1" role="status" hidden></div><div class="sectionHead"><b id="title"></b></div><div class="rows" id="rows"></div><div class="add">＋ 加动作</div></div>
+<div class="ring"><svg class="icon"><use href="#timer"/></svg><b>3:00</b></div><div class="dock"><div class="finish"><svg class="icon"><use href="#clock"/></svg>长按 · 完成今日训练</div></div><div class="nav" id="nav"></div></div>
+<div class="backdrop" id="overlay"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="question" aria-describedby="desc"><div class="handle"></div><h2 id="question">上次训练，练完了吗？</h2>
+<p id="desc">你在 11 月 24 日打开过这节训练，还没点完成。</p>
+<div class="summary"><strong>W1D1</strong><span id="progress"></span></div>
+<div class="completionDate"><span id="dateLabel">实际完成日期</span><time id="selectedDate"></time><button class="dateLink" id="edit" aria-expanded="false" aria-controls="field">改日期</button></div>
+<div id="field" hidden role="group" aria-labelledby="dateLabel">
+<div class="dateChoices" id="choices"></div></div>
+<p class="effect">确认后，未记录的组会按计划补齐，并进入下一节。</p><button class="primary" id="done"></button><button class="secondary" id="resume">继续这节</button>
+</section></div></section>
+<div class="tools"><span>示例 · 12 月 1 日重新打开</span><label>示例记录 <select id="scenario"><option value="0">未记录组数</option><option value="2">已记录 2 组</option></select></label><button id="replay">重新体验</button></div></main>
+<script>
+const get=id=>document.getElementById(id);
+const icon=name=>'<svg aria-hidden="true" class="icon"><use href="#'+name+'"/></svg>';
+const plans=[
+ [['杠铃深蹲','3×5','100 kg','RPE 7'],['暂停深蹲','3×3','80 kg','RPE 7'],['腿举','3×10','120 kg','RIR 2']],
+ [['杠铃卧推','4×5','75 kg','RPE 7'],['哑铃划船','3×10','24 kg','RIR 2'],['绳索下压','3×12','20 kg','RIR 2']]
+];
+get('nav').innerHTML=['训练','教练','成长','我的'].map((t,i)=>'<span>'+icon(['train','chat','trend','user'][i])+t+'</span>').join('');
+const original='2026-11-24';
+let state='ask', editing=false, confirmedDate=original;
+const today = Date.UTC(2026,11,1);
+const dayMs = 86400000;
+const dateText=s=>{const [y,m,d]=s.split('-').map(Number);return (y===2026?'':y+' 年 ')+m+' 月 '+d+' 日'};
+function render(){
+ const next=state==='next',asking=state==='ask',day=next?26:24;
+ get('app').inert=asking;get('overlay').hidden=!asking;
+ get('week').innerHTML=icon('left')+['一','二','三','四','五','六','日'].map((w,i)=>{
+ const n=23+i,classes=['day',n===24||n===26?'planned':'',n===day?'selected':'',next&&n===24?'done':''].join(' ');
+ return '<div class="'+classes+'"><small>周'+w+'</small><b>'+n+'</b></div>'
+ }).join('')+icon('right');
+ get('title').textContent='11月'+day+'日 · 3 个动作';
+ get('rows').innerHTML=plans[Number(next)].map(([name,sets,weight,effort],i)=>'<div class="row"><span class="dot"></span><div class="exercise"><div class="name">'+name+'<i>'+icon('down')+'</i><span class="circle"></span></div><div class="rx"><span>'+sets+'</span><span>'+weight+'</span><span>'+effort+'</span></div>'+(!next&&i===0&&get('scenario').value==='2'?'<small>已记录 2 / 3 组</small>':'')+'</div></div>').join('');
+ get('notice').classList.toggle('completed',next);
+ get('notice').hidden=asking;
+ get('notice').textContent=next?'W1D1 已按 '+dateText(confirmedDate)+' 完成，已进入 W1D2。':'继续 W1D1。'+(get('scenario').value==='2'?'已保留 2 组记录。':'');
+ get('progress').textContent=get('scenario').value==='2'?'已记录 2 / 9 组':'尚无组记录';
+ get('field').hidden=!editing;get('edit').setAttribute('aria-expanded',String(editing));get('edit').textContent=editing?'收起':'改日期';
+ get('selectedDate').dateTime=confirmedDate;
+ get('selectedDate').textContent=dateText(confirmedDate);
+ get('done').textContent=dateText(confirmedDate)+'已练完';
+ if(editing) renderChoices();
+}
+function renderChoices(){
+ const choices=get('choices');
+ choices.replaceChildren();
+ for(let time=Date.parse(original);time<=today;time+=dayMs){
+   const d=new Date(time);
+   const iso=d.toISOString().slice(0,10);
+   const btn=document.createElement('button');
+   const weekday='周'+'日一二三四五六'[d.getUTCDay()];
+   const hint=iso===original?'上次打开':time===today?'今天':time===today-dayMs?'昨天':weekday;
+   btn.innerHTML='<b>'+(d.getUTCMonth()+1)+'月'+d.getUTCDate()+'日</b><small>'+hint+'</small>';
+   btn.setAttribute('aria-label',dateText(iso)+'，'+hint);
+   btn.setAttribute('aria-pressed',String(confirmedDate===iso));
+   btn.onclick=()=>{confirmedDate=iso;editing=false;render();get('done').focus({preventScroll:true})};
+   choices.append(btn);
+ }
+}
+function reset(){state='ask';editing=false;confirmedDate=original;render();get('question').tabIndex=-1;get('question').focus({preventScroll:true});document.querySelector('.phone').scrollIntoView({block:'nearest'})}
+get('edit').onclick=()=>{
+ editing=!editing;
+ render();
+ if(editing)get('choices').querySelector('[aria-pressed=true]').focus({preventScroll:true});
+};
+get('done').onclick=()=>{state='next';editing=false;render();get('notice').focus({preventScroll:true})};
+get('notice').addEventListener('animationend', event=>{
+ if(event.animationName==='fade-completion' && state==='next') get('notice').hidden=true;
+});
+get('resume').onclick=()=>{state='resume';render();get('notice').focus({preventScroll:true})};
+get('scenario').onchange=reset;get('replay').onclick=reset;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state==='ask'&&editing){get('edit').click();get('edit').focus()}});
+render();
+</script></html>
