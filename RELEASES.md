@@ -18,6 +18,20 @@
 
 ---
 
+## 1.0 (43) — 2026-11-26 — 已上传 Apple
+
+Organizer 记录 09:59:37 UTC 上传 com.meetpr.app 1.0 (43)，零错误。唯一警告 90725 为 iOS 26.5 SDK 版本。David 本次放行，下一包按全局 SDK 门槛切包。TestFlight 测试组分发状态待核。
+
+取包 tag 为 `beta/1.0-43`（`98ba2e5d`），[tag CI](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/45794027910) 三项通过。教练与学员 demo 安装容器均实读 1.0 (43)。
+
+### 本版包含
+
+- **训练数字键盘避让（P1，#493，2026-11-26 David 放行）**：编辑底部训练组、连续加组或切到 RPE 时，当前组会移到键盘收起按钮上方。见[模拟器回归记录](docs/journal/2026-11-26-107-keypad-visibility-ios.md)。
+
+- **spec 115 跨训练日续接（P1）**：学员跨训练日再进默认未完成的一节，可按上次打开至今天的实际日期补齐缺组并推进，或继续这节。已在 iPhone 17e 验证一周、改日期、推进及提示淡出。iOS #495 与 [Android #222](https://github.com/tianpingdeng112233-cell/meetpr-rn/pull/222) 同批，后端 071 / 0091 [国内 staging 部署已验](https://github.com/tianpingdeng112233-cell/MeetPR-backend/actions/runs/45789692419)。双端解析器已从同一合成学员响应回读同一实际日期，真实账号双端登录回读待验。见[定稿](specs/115-session-resume/SPEC.md)和[iOS 验收](docs/journal/2026-11-26-115-ios.md)。
+
+- **spec 114 本周期主项走势 + RPE 对照表（P1，#492，2026-11-25 David 放行）**：训练页标题旁「整个周期」胶囊，底部弹层每周一根阶梯柱看深蹲 / 卧推 / 硬拉推到多重；已练完的周显示实际组并浅金填充 + 金色 ✓，本周金色描边，最高周金色；交接预览里也能看下一份计划。成长 tab 末行新增「RPE 对照表」，按学员当前 e1RM 换算 kg。纯客户端，无后端依赖。已验：StudentKit 1363 tests 绿、iPhone 17e DemoStudent 浅 / 深色亲眼看（返修 1 轮对齐安卓）；未验：带历史老账号升级后第一屏、12 周计划、繁体 / 英文。安卓同批 meetpr-rn#220。
+
 ## 1.0 (42) — 2026-11-18 — 已上传 Apple
 
 David 2026-11-18 在 Xcode Organizer 完成 com.meetpr.app 1.0 (42) 上传（Upload completed with warnings）。唯一警告为 SDK 版本提示：本包用 iOS 26.5 SDK 构建，2027 年 4 月起须用 Xcode 27 / iOS 27 SDK 才能上传，本次不受影响。Neice / Ceshi 分发状态待确认。
