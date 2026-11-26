@@ -37,12 +37,12 @@ struct WorkoutKeypadOverlay: View {
         .accessibilityAction(.escape) { session.dismiss() }
         .accessibilityFocused($focusedCell, equals: cell.id)
         .onAppear { focusedCell = cell.id }
-        .id(cell.id)
         .onGeometryChange(for: CGFloat.self) {
           $0.frame(in: .global).minY
         } action: {
           session.panelTop = $0
         }
+        .id(cell.id)
         .accessibilityIdentifier("workout.keypad")
       }
     }
