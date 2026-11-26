@@ -4,6 +4,7 @@ import Foundation
 /// Produced by the coach-side publish mapper; the student side never sees the
 /// coach's editing-time draft types (PlanRule / WeeklyVariation).
 public struct StudentPlanView: Codable, Hashable, Sendable {
+  public var actualCompletionDateEnabled: Bool
   public var handoff: StudentPlanHandoff?
   public let cycleID: UUID
   public let weekIndex: Int
@@ -22,6 +23,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   public init(
     cycleID: UUID,
     handoff: StudentPlanHandoff? = nil,
+    actualCompletionDateEnabled: Bool = false,
     weekIndex: Int,
     startDate: Date,
     endDate: Date? = nil,
@@ -31,6 +33,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     latestShiftCreatedAt: Date? = nil,
     days: [StudentPlanDay]
   ) {
+    self.actualCompletionDateEnabled = actualCompletionDateEnabled
     self.handoff = handoff
     self.cycleID = cycleID
     self.weekIndex = weekIndex
@@ -45,6 +48,8 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    actualCompletionDateEnabled =
+      try container.decodeIfPresent(Bool.self, forKey: .actualCompletionDateEnabled) ?? false
     handoff = try container.decodeIfPresent(StudentPlanHandoff.self, forKey: .handoff)
     cycleID = try container.decode(UUID.self, forKey: .cycleID)
     weekIndex = try container.decode(Int.self, forKey: .weekIndex)
@@ -58,7 +63,7 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case handoff
+    case handoff, actualCompletionDateEnabled
     case cycleID = "cycleId"
     case weekIndex
     case startDate
@@ -82,6 +87,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
   /// Sequence progression deliberately does not consume this value (spec 080).
   public let shiftedToDate: Date?
   public let completedAt: Date?
+  public let actualCompletionDate: String?
   public let completionSource: String?
   public let exercises: [StudentPlanExercise]
 
@@ -98,6 +104,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
     date: Date,
     shiftedToDate: Date? = nil,
     completedAt: Date? = nil,
+    actualCompletionDate: String? = nil,
     completionSource: String? = nil,
     exercises: [StudentPlanExercise]
   ) {
@@ -108,6 +115,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
     self.scheduledDate = date
     self.shiftedToDate = shiftedToDate
     self.completedAt = completedAt
+    self.actualCompletionDate = actualCompletionDate
     self.completionSource = completionSource
     self.exercises = exercises
   }
@@ -121,6 +129,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
     scheduledDate = try container.decode(Date.self, forKey: .date)
     shiftedToDate = try container.decodeIfPresent(Date.self, forKey: .shiftedToDate)
     completedAt = try container.decodeIfPresent(Date.self, forKey: .completedAt)
+    actualCompletionDate = try container.decodeIfPresent(String.self, forKey: .actualCompletionDate)
     completionSource = try container.decodeIfPresent(String.self, forKey: .completionSource)
     exercises = try container.decode([StudentPlanExercise].self, forKey: .exercises)
   }
@@ -134,13 +143,14 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
     try container.encode(scheduledDate, forKey: .date)
     try container.encodeIfPresent(shiftedToDate, forKey: .shiftedToDate)
     try container.encodeIfPresent(completedAt, forKey: .completedAt)
+    try container.encodeIfPresent(actualCompletionDate, forKey: .actualCompletionDate)
     try container.encodeIfPresent(completionSource, forKey: .completionSource)
     try container.encode(exercises, forKey: .exercises)
   }
 
   public func replacingCompletion(
     completedAt: Date?,
-    source: String?
+    source: String?, actualDate: String? = nil
   ) -> StudentPlanDay {
     StudentPlanDay(
       id: id,
@@ -150,6 +160,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
       date: scheduledDate,
       shiftedToDate: shiftedToDate,
       completedAt: completedAt,
+      actualCompletionDate: actualDate,
       completionSource: source,
       exercises: exercises
     )
@@ -163,7 +174,7 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
     case date
     case shiftedToDate
     case completedAt
-    case completionSource
+    case actualCompletionDate, completionSource
     case exercises
   }
 }

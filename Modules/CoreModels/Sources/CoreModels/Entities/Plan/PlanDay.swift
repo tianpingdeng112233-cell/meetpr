@@ -8,6 +8,7 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
   public let sortOrder: Int
   public let shiftedToDate: Date?
   public let completedAt: Date?
+  public let actualCompletionDate: String?
   public let completionSource: String?
 
   public init(
@@ -18,6 +19,7 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     sortOrder: Int,
     shiftedToDate: Date? = nil,
     completedAt: Date? = nil,
+    actualCompletionDate: String? = nil,
     completionSource: String? = nil
   ) {
     self.id = id
@@ -27,6 +29,7 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     self.sortOrder = sortOrder
     self.shiftedToDate = shiftedToDate
     self.completedAt = completedAt
+    self.actualCompletionDate = actualCompletionDate
     self.completionSource = completionSource
   }
 
@@ -38,6 +41,6 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     case sortOrder
     case shiftedToDate
     case completedAt
-    case completionSource
+    case actualCompletionDate, completionSource
   }
 }

@@ -79,6 +79,7 @@ enum StudentPlanProjection {
       date: scheduledDate(for: day, firstScheduledDate: firstScheduledDate),
       shiftedToDate: day.shiftedToDate,
       completedAt: day.completedAt,
+      actualCompletionDate: day.actualCompletionDate,
       completionSource: day.completionSource,
       exercises: exercises
     )

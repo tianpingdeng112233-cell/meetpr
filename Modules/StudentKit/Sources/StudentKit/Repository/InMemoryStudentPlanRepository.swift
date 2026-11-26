@@ -34,6 +34,12 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
   }
 
   public func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion {
+    try await completeDay(id: id, studentID: studentID, actualCompletionDate: nil)
+  }
+
+  public func completeDay(id: UUID, studentID: UUID, actualCompletionDate: String?) async throws
+    -> PlanDayCompletion
+  {
     guard let plan = try await fetchCurrentPlan(studentID: studentID),
       plan.days.contains(where: { $0.id == id })
     else {
@@ -45,7 +51,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
         dayID: id,
         studentID: studentID,
         source: day.completionSource ?? "manual",
-        completedAt: completedAt
+        completedAt: completedAt, actualCompletionDate: day.actualCompletionDate
       )
     }
 
@@ -54,7 +60,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
       id,
       in: plan,
       completedAt: completedAt,
-      source: "manual"
+      source: "manual", actualDate: actualCompletionDate
     )
     await store.savePublishedProjection(updated, forStudent: studentID)
     return PlanDayCompletion(
@@ -62,7 +68,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
       dayID: id,
       studentID: studentID,
       source: "manual",
-      completedAt: completedAt
+      completedAt: completedAt, actualCompletionDate: actualCompletionDate
     )
   }
 
@@ -98,25 +104,17 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
     _ dayID: UUID,
     in plan: StudentPlanView,
     completedAt: Date?,
-    source: String?
+    source: String?, actualDate: String? = nil
   ) -> StudentPlanView {
     let days = plan.days.map { day in
       guard day.id == dayID else { return day }
-      return StudentPlanDay(
-        id: day.id,
-        weekNumber: day.weekNumber,
-        dayOfWeek: day.dayOfWeek,
-        sortOrder: day.sortOrder,
-        date: day.scheduledDate,
-        shiftedToDate: day.shiftedToDate,
-        completedAt: completedAt,
-        completionSource: source,
-        exercises: day.exercises
-      )
+      return day.replacingCompletion(
+        completedAt: completedAt, source: source, actualDate: actualDate)
     }
     return StudentPlanView(
       cycleID: plan.cycleID,
       handoff: plan.handoff,
+      actualCompletionDateEnabled: plan.actualCompletionDateEnabled,
       weekIndex: days.first(where: { $0.completedAt == nil })?.weekNumber
         ?? days.last?.weekNumber
         ?? plan.weekIndex,

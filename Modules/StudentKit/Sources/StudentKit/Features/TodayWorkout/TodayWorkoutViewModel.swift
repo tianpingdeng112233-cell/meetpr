@@ -101,6 +101,7 @@ public final class TodayWorkoutViewModel {
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let historyWeightPrefillEnabled: Bool
+  private var directResumeGate: WorkoutCompletionGate?
   private let calendar: Calendar
   private let now: @Sendable () -> Date
   private let completionSleep: @MainActor @Sendable () async -> Void
@@ -1136,6 +1137,62 @@ public final class TodayWorkoutViewModel {
   }
 
   public func completeCurrentDay() async -> Bool {
+    if let day = currentDay, let locked = lockedResumeDate(dayID: day.id) {
+      return await completeResumedDay(id: day.id, actualDate: locked)
+    }
+    return await finishAllDay(actualDate: nil)
+  }
+
+  func completeResumedDay(id: UUID, actualDate: Date) async -> Bool {
+    guard planProjection?.actualCompletionDateEnabled == true, currentDay?.id == id,
+      StudentPlanSequence(days: planDays).cursorDay?.id == id
+    else { return false }
+    return await finishAllDay(actualDate: actualDate)
+  }
+
+  private func resumeGate(studentID: UUID) throws -> WorkoutCompletionGate {
+    if let queue = setSyncQueue { return queue.completionGate }
+    // Live sessions always provide their durable account queue. Direct demo
+    // repositories keep both their plan and group mutations in memory.
+    if let directResumeGate, directResumeGate.studentID == studentID { return directResumeGate }
+    let gate = try WorkoutCompletionGate(studentID: studentID, storage: MemorySetSyncStorage())
+    directResumeGate = gate
+    return gate
+  }
+
+  /// Only the first write can release a new reservation after a proven rejection.
+  private func reserveResumeSetDate(dayID: UUID, studentID: UUID, time: Date?) throws
+    -> WorkoutCompletionGate?
+  {
+    guard let time else { return nil }
+    let gate = try resumeGate(studentID: studentID)
+    let first = gate.actualCompletionDate(dayID: dayID) == nil
+    try gate.prepareResumeWrites(dayID: dayID, date: Self.gymDate(time, calendar: calendar))
+    return first ? gate : nil
+  }
+
+  private func writeResumeSet<T>(
+    dayID: UUID, studentID: UUID, time: Date?, write: @MainActor () async throws -> T
+  ) async throws -> T {
+    let reservation = try reserveResumeSetDate(dayID: dayID, studentID: studentID, time: time)
+    do {
+      return try await write()
+    } catch {
+      if WorkoutCompletionGate.definitelyRejected(error) { try reservation?.forget(dayID: dayID) }
+      throw error
+    }
+  }
+
+  func lockedResumeDate(dayID: UUID) -> Date? {
+    let gate = setSyncQueue?.completionGate ?? directResumeGate
+    guard gate?.studentID == currentStudentID, let date = gate?.actualCompletionDate(dayID: dayID)
+    else { return nil }
+    let parts = date.split(separator: "-").compactMap { Int($0) }
+    guard parts.count == 3 else { return nil }
+    return calendar.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
+  }
+
+  private func finishAllDay(actualDate: Date?) async -> Bool {
     guard !isPreviewingPlan, !browsingPastPlan else { return false }
     guard let day = currentDay, !allDayWriting,
       FlexibleTrainingDay.canWrite(day, in: planDays)
@@ -1147,39 +1204,53 @@ public final class TodayWorkoutViewModel {
     for row in emptyWarmups {
       guard await removeStudentRow(id: row.id) else { return false }
     }
-    let ids = completionWrites.map(\.id)
+    let completionTime = actualDate.flatMap {
+      calendar.date(bySettingHour: 12, minute: 0, second: 0, of: $0)
+    }
+    let ids = completionWrites.filter { actualDate == nil || !$0.hasSavedRecord }.map(\.id)
+    let date = completionTime.map { Self.gymDate($0, calendar: calendar) }
+    if let actualDate, let locked = lockedResumeDate(dayID: day.id),
+      !calendar.isDate(actualDate, inSameDayAs: locked)
+    {
+      return false
+    }
     for id in ids {
       guard currentDay?.id == day.id,
         let index = currentDrafts?.firstIndex(where: { $0.id == id }),
-        await saveAllDayRow(rowIndex: index, completed: true)
+        await saveAllDayRow(rowIndex: index, completed: true, completionTime: completionTime)
       else { return false }
     }
-    return await completeDay(day, presentsCelebration: true)
+    return await completeDay(
+      day, presentsCelebration: actualDate == nil,
+      actualDate: date)
   }
 
   /// Completes a specific day. Quick-log passes the day it wrote sets for, so
   /// a refresh that moves `currentDay` mid-flight can never complete another.
   private func completeDay(
-    _ day: StudentPlanDay, presentsCelebration: Bool = false
+    _ day: StudentPlanDay, presentsCelebration: Bool = false, actualDate: String? = nil
   ) async -> Bool {
     guard !isCompletionMutationInFlight, let studentID = currentStudentID else { return false }
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
     let requestedAt = now()
-    if presentsCelebration, !(await prepareSetSyncCompletion(dayID: day.id)) { return false }
-    if presentsCelebration, let queue = setSyncQueue,
+    let usesGate = presentsCelebration || actualDate != nil
+    if usesGate, !(await prepareSetSyncCompletion(dayID: day.id, actualDate: actualDate)) {
+      return false
+    }
+    if usesGate, let queue = setSyncQueue,
       queue.pendingCount(dayID: day.id) > 0, deferCompletionUntilOnline(day)
     {
-      completionPhase = .celebration
+      if presentsCelebration { completionPhase = .celebration }
       return true
     }
-    if presentsCelebration, let videos = setSyncQueue?.videoCompletion {
+    if usesGate, let videos = setSyncQueue?.videoCompletion {
       do {
         if try await videos.deferIfNeeded(
           dayID: day.id, trainingDate: day.scheduledDate, startedAt: requestedAt)
         {
-          completionPhase = .celebration
+          if presentsCelebration { completionPhase = .celebration }
           return true
         }
       } catch {
@@ -1197,16 +1268,17 @@ public final class TodayWorkoutViewModel {
       )
     }
     return await performDayCompletion(
-      day, studentID: studentID, presentsCelebration: presentsCelebration)
+      day, studentID: studentID, presentsCelebration: presentsCelebration, actualDate: actualDate)
   }
 
   private func performDayCompletion(
-    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool
+    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool, actualDate: String?
   ) async -> Bool {
     do {
       guard
         let completion = try await sendDayCompletion(
-          day, studentID: studentID, presentsCelebration: presentsCelebration)
+          day, studentID: studentID, presentsCelebration: presentsCelebration,
+          actualDate: actualDate)
       else {
         isCompletionSending = false
         completionPhase = nil
@@ -1217,7 +1289,7 @@ public final class TodayWorkoutViewModel {
       await applyCompletionMutation(
         fallback: day.replacingCompletion(
           completedAt: completion.completedAt,
-          source: completion.source
+          source: completion.source, actualDate: completion.actualCompletionDate
         ),
         studentID: studentID
       )
@@ -1225,7 +1297,7 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
-      if presentsCelebration, Self.isConnectivityFailure(error),
+      if presentsCelebration || actualDate != nil, Self.isConnectivityFailure(error),
         deferCompletionUntilOnline(day)
       {
         return true
@@ -1277,17 +1349,19 @@ public final class TodayWorkoutViewModel {
     guard let day = currentDay, let studentID = currentStudentID,
       let result = setSyncQueue?.videoCompletion?.completed[day.id], day.completedAt == nil
     else { return }
-    let completed = day.replacingCompletion(completedAt: result.completedAt, source: result.source)
+    let completed = day.replacingCompletion(
+      completedAt: result.completedAt, source: result.source,
+      actualDate: result.actualCompletionDate)
     replaceCurrentDay(completed)
     await applyCompletionMutation(fallback: completed, studentID: studentID)
   }
 
-  private func prepareSetSyncCompletion(dayID: UUID) async -> Bool {
+  private func prepareSetSyncCompletion(dayID: UUID, actualDate: String?) async -> Bool {
     guard let queue = setSyncQueue, let coordinator = setSyncCompletion else { return true }
     guard await coordinator.prepare(dayID: dayID, retry: coordinator.phase == .failed) else {
       return false
     }
-    do { try queue.completionGate.request(dayID: dayID) } catch {
+    do { try queue.completionGate.request(dayID: dayID, actualCompletionDate: actualDate) } catch {
       actionErrorMessage = Self.recordingErrorMessage(for: error)
       return false
     }
@@ -1295,19 +1369,26 @@ public final class TodayWorkoutViewModel {
   }
 
   private func sendDayCompletion(
-    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool
+    _ day: StudentPlanDay, studentID: UUID, presentsCelebration: Bool, actualDate: String?
   ) async throws -> PlanDayCompletion? {
-    guard presentsCelebration else {
+    guard presentsCelebration || actualDate != nil else {
       return try await plans.completeDay(id: day.id, studentID: studentID)
     }
     let complete = {
       try await WorkoutCompletionRequest().complete(
-        dayID: day.id, studentID: studentID, plans: self.plans, sleep: self.completionSleep)
+        dayID: day.id, studentID: studentID, plans: self.plans, actualCompletionDate: actualDate,
+        sleep: self.completionSleep)
     }
     if let queue = setSyncQueue {
       return try await queue.completionGate.completeIfReady(
         dayID: day.id, setsSynced: queue.pendingCount(dayID: day.id) == 0,
         videosDelivered: true, complete: complete)
+    }
+    if let actualDate {
+      let gate = try resumeGate(studentID: studentID)
+      try gate.request(dayID: day.id, actualCompletionDate: actualDate)
+      return try await gate.completeIfReady(
+        dayID: day.id, setsSynced: true, videosDelivered: true, complete: complete)
     }
     return try await complete()
   }
@@ -1540,6 +1621,7 @@ public final class TodayWorkoutViewModel {
     StudentPlanView(
       cycleID: plan.cycleID,
       handoff: plan.handoff,
+      actualCompletionDateEnabled: plan.actualCompletionDateEnabled,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
       endDate: plan.endDate,
@@ -1560,7 +1642,8 @@ public final class TodayWorkoutViewModel {
   // UI merge together makes their required ordering explicit.
   // swiftlint:disable:next function_body_length
   private func performPersist(
-    rowIndex: Int, completed: Bool, failed: Bool, generation: Int, startsRestTimer: Bool
+    rowIndex: Int, completed: Bool, failed: Bool, generation: Int, startsRestTimer: Bool,
+    completionTime: Date? = nil
   ) async -> Bool {
     guard let studentID = currentStudentID else {
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel003)
@@ -1581,7 +1664,8 @@ public final class TodayWorkoutViewModel {
       studentID: studentID,
       completed: completed,
       failed: failed,
-      loggedAt: now()
+      loggedAt: completionTime ?? now(),
+      loggedDate: completionTime.map { Self.gymDate($0, calendar: calendar) }
     )
     let family = Self.exerciseFamily(
       in: plan,
@@ -1592,7 +1676,11 @@ public final class TodayWorkoutViewModel {
 
     do {
       let previouslyCompleted = drafts[rowIndex].completed
-      let persisted = try await logs.recordSet(log)
+      let persisted = try await writeResumeSet(
+        dayID: plan.id, studentID: studentID, time: completionTime
+      ) {
+        try await logs.recordSet(log)
+      }
       mergePersistedLog(persisted)
       await repairChangedSetHistory(draft, setID: persisted.id, studentID: studentID)
       let prEvent: PRBreakthroughEvent?
@@ -1976,13 +2064,14 @@ extension TodayWorkoutViewModel {
   /// video attach and 完成本组 can overlap — chain persists so completions
   /// apply in submission order instead of racing.
   fileprivate func persist(
-    rowIndex: Int, completed: Bool, failed: Bool = false, startsRestTimer: Bool = true
+    rowIndex: Int, completed: Bool, failed: Bool = false, startsRestTimer: Bool = true,
+    completionTime: Date? = nil
   ) async -> Bool {
     guard !isPreviewingPlan, !browsingPastPlan else { return false }
     if setSyncQueue != nil {
       return enqueueSet(
         rowIndex: rowIndex, completed: completed, failed: failed,
-        startsRestTimer: startsRestTimer)
+        startsRestTimer: startsRestTimer, completionTime: completionTime)
     }
     let previous = pendingPersist
     // Queued work is only valid for the day it was submitted against: a day
@@ -1993,7 +2082,7 @@ extension TodayWorkoutViewModel {
       guard let self, self.isCurrentLoad(generation) else { return false }
       return await self.performPersist(
         rowIndex: rowIndex, completed: completed, failed: failed, generation: generation,
-        startsRestTimer: startsRestTimer)
+        startsRestTimer: startsRestTimer, completionTime: completionTime)
     }
     pendingPersist = task
     return await task.value
@@ -2150,16 +2239,22 @@ extension TodayWorkoutViewModel {
     return draft
   }
 
-  private func persistAdded(rowIndex: Int, completed: Bool) async -> Bool {
+  private func persistAdded(rowIndex: Int, completed: Bool, completionTime: Date? = nil) async
+    -> Bool
+  {
     guard !isPreviewingPlan, !browsingPastPlan else { return false }
     if setSyncQueue != nil {
       return enqueueSet(
-        rowIndex: rowIndex, completed: completed, failed: false, startsRestTimer: true)
+        rowIndex: rowIndex, completed: completed, failed: false, startsRestTimer: true,
+        completionTime: completionTime)
     }
-    return await performAddedWrite(rowIndex: rowIndex, completed: completed)
+    return await performAddedWrite(
+      rowIndex: rowIndex, completed: completed, completionTime: completionTime)
   }
 
-  private func performAddedWrite(rowIndex: Int, completed: Bool) async -> Bool {
+  private func performAddedWrite(rowIndex: Int, completed: Bool, completionTime: Date? = nil) async
+    -> Bool
+  {
     guard case .loaded(let day, let drafts) = state, drafts.indices.contains(rowIndex),
       let studentID = currentStudentID, let repository = logs as? any StudentAddedLogRepository,
       FlexibleTrainingDay.canWrite(day, in: planDays)
@@ -2168,32 +2263,24 @@ extension TodayWorkoutViewModel {
     let draft = drafts[rowIndex]
     recordingGeneration += 1
     let pinned =
-      addedDatePins[day.id]?[draft.exerciseID]
+      completionTime.map { Self.gymDate($0, calendar: calendar) } ?? addedDatePins[day.id]?[
+        draft.exerciseID]
       ?? Self.gymDate(now(), calendar: calendar)
-    addedDatePins[day.id, default: [:]][draft.exerciseID] = pinned
+    if completionTime == nil { addedDatePins[day.id, default: [:]][draft.exerciseID] = pinned }
     let log = StudentAddedSetLog(
       id: draft.loggedSetID ?? UUID(), studentID: studentID, planDayID: day.id,
       exerciseID: draft.exerciseID, setIndex: draft.prescribed.setIndex,
-      loggedAt: now(), loggedDate: pinned, weightKg: draft.actualWeight,
+      loggedAt: completionTime ?? now(), loggedDate: pinned, weightKg: draft.actualWeight,
       reps: draft.actualReps ?? 0, rpe: draft.actualRPE, actualRIR: draft.actualRIR,
       completed: completed)
     do {
-      let saved = try await repository.recordAddedSet(log)
-      addedLogs.removeAll { $0.id == saved.id }
-      addedLogs.append(saved)
-      if let index = studentDraftCache[day.id]?.firstIndex(where: { $0.id == draft.id }) {
-        studentDraftCache[day.id]?[index].loggedSetID = saved.id
-        studentDraftCache[day.id]?[index].completed = saved.completed
-        studentDraftCache[day.id]?[index].failed = saved.failed
+      let saved = try await writeResumeSet(
+        dayID: day.id, studentID: studentID, time: completionTime
+      ) {
+        try await repository.recordAddedSet(log)
       }
-      if case .loaded(let visibleDay, var current) = state, visibleDay.id == day.id,
-        let index = current.firstIndex(where: { $0.id == draft.id })
-      {
-        current[index].loggedSetID = saved.id
-        current[index].completed = saved.completed
-        current[index].failed = saved.failed
-        state = .loaded(plan: visibleDay, drafts: current)
-      }
+      addedDatePins[day.id, default: [:]][draft.exerciseID] = pinned
+      applyAddedRecord(saved, dayID: day.id, draftID: draft.id)
       if draft.loggedSetID != nil {
         await repairStudentDerived(setID: saved.id, studentID: studentID)
       }
@@ -2208,6 +2295,24 @@ extension TodayWorkoutViewModel {
     } catch {
       actionErrorMessage = Self.recordingErrorMessage(for: error)
       return false
+    }
+  }
+
+  private func applyAddedRecord(_ saved: StudentAddedSetLog, dayID: UUID, draftID: UUID) {
+    addedLogs.removeAll { $0.id == saved.id }
+    addedLogs.append(saved)
+    if let index = studentDraftCache[dayID]?.firstIndex(where: { $0.id == draftID }) {
+      studentDraftCache[dayID]?[index].loggedSetID = saved.id
+      studentDraftCache[dayID]?[index].completed = saved.completed
+      studentDraftCache[dayID]?[index].failed = saved.failed
+    }
+    if case .loaded(let visibleDay, var current) = state, visibleDay.id == dayID,
+      let index = current.firstIndex(where: { $0.id == draftID })
+    {
+      current[index].loggedSetID = saved.id
+      current[index].completed = saved.completed
+      current[index].failed = saved.failed
+      state = .loaded(plan: visibleDay, drafts: current)
     }
   }
 
@@ -2380,7 +2485,7 @@ extension TodayWorkoutViewModel {
   }
 
   private func enqueueSet(
-    rowIndex: Int, completed: Bool, failed: Bool, startsRestTimer: Bool
+    rowIndex: Int, completed: Bool, failed: Bool, startsRestTimer: Bool, completionTime: Date? = nil
   ) -> Bool {
     guard let setSyncQueue, setSyncQueue.studentID == currentStudentID,
       case .loaded(let day, var drafts) = state, drafts.indices.contains(rowIndex),
@@ -2391,15 +2496,21 @@ extension TodayWorkoutViewModel {
     draft.completed = completed
     draft.failed = failed
     draft.assumed = false
-    draft.recordedAt = now()
+    draft.recordedAt = completionTime ?? now()
+    var reservation: WorkoutCompletionGate?
     do {
+      reservation = try reserveResumeSetDate(
+        dayID: day.id, studentID: setSyncQueue.studentID, time: completionTime)
       try setSyncQueue.enqueue(
         dayID: day.id, trainingDate: day.scheduledDate,
-        draft: draft, recordedAt: now(),
-        loggedDate: draft.isStudentAdded
-          ? addedDatePins[day.id]?[draft.exerciseID]
-          : planLogsSnapshot?.logs.first(where: { $0.id == draft.loggedSetID })?.loggedDate)
+        draft: draft, recordedAt: completionTime ?? now(),
+        loggedDate: completionTime.map { Self.gymDate($0, calendar: calendar) }
+          ?? (draft.isStudentAdded
+            ? addedDatePins[day.id]?[draft.exerciseID]
+            : planLogsSnapshot?.logs.first(where: { $0.id == draft.loggedSetID })?.loggedDate))
     } catch {
+      // enqueue publishes/wakes its worker only after the atomic disk write.
+      try? reservation?.forget(dayID: day.id)
       actionErrorMessage = Self.recordingErrorMessage(for: error)
       return false
     }
@@ -2616,7 +2727,9 @@ extension TodayWorkoutViewModel {
   }
 
   @discardableResult
-  func saveAllDayRow(rowIndex: Int, completed: Bool = false) async -> Bool {
+  func saveAllDayRow(rowIndex: Int, completed: Bool = false, completionTime: Date? = nil) async
+    -> Bool
+  {
     guard !isPreviewingPlan, !browsingPastPlan else { return false }
     defer { prefillAllDayPercentages() }
     guard let drafts = currentDrafts, drafts.indices.contains(rowIndex) else { return false }
@@ -2625,10 +2738,11 @@ extension TodayWorkoutViewModel {
     }
     if drafts[rowIndex].isStudentAdded {
       return await persistAdded(
-        rowIndex: rowIndex, completed: completed || drafts[rowIndex].completed)
+        rowIndex: rowIndex, completed: completed || drafts[rowIndex].completed,
+        completionTime: completionTime)
     }
     return await persist(
       rowIndex: rowIndex, completed: completed || drafts[rowIndex].completed,
-      startsRestTimer: false)
+      startsRestTimer: false, completionTime: completionTime)
   }
 }

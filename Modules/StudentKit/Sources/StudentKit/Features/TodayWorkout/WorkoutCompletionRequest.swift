@@ -14,13 +14,15 @@ final class WorkoutCompletionRequest {
     dayID: UUID,
     studentID: UUID,
     plans: any StudentPlanRepository,
+    actualCompletionDate: String? = nil,
     sleep: @escaping @MainActor @Sendable () async -> Void
   ) async throws -> PlanDayCompletion {
     try await withCheckedThrowingContinuation { continuation in
       self.continuation = continuation
       request = Task {
         do {
-          let completion = try await plans.completeDay(id: dayID, studentID: studentID)
+          let completion = try await plans.completeDay(
+            id: dayID, studentID: studentID, actualCompletionDate: actualCompletionDate)
           finish(.success(completion))
         } catch {
           finish(.failure(error))

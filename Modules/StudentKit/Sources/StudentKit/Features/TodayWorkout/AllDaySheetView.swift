@@ -117,12 +117,11 @@ private struct AllDaySummary: View {
       )
       .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
       Spacer(minLength: MeetPRSpacing.space2)
-      Text(
-        StudentStrings.replacing(
-          editable ? .allDayEditHint : .allDaySetCount, values: [String(sets)])
-      )
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-      .foregroundStyle(Color.MeetPR.textSecondary)
+      if !editable {
+        Text(StudentStrings.replacing(.allDaySetCount, values: [String(sets)]))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+      }
     }
     .foregroundStyle(Color.MeetPR.textPrimary)
   }

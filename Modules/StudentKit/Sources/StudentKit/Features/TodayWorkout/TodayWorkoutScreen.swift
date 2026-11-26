@@ -68,6 +68,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var previewDay: StudentPlanDay?
   var showsHandoffNotice = false
   var onDismissHandoff: () -> Void = {}
+  var resumeNotice: String?
   var onCycleOutlook: (() -> Void)?
 
   @State private var scrollTarget: UUID?
@@ -140,6 +141,14 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
                 key: RestRingHeaderBottomKey.self, value: proxy.frame(in: .global).maxY)
             }
           }
+        if let resumeNotice {
+          Text(resumeNotice)
+            .font(.footnote)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(Color.MeetPR.goldText.opacity(0.08), in: .rect(cornerRadius: 8))
+            .transition(.opacity)
+        }
         screenContent
       }
     }

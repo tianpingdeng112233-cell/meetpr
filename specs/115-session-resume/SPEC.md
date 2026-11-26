@@ -1,5 +1,7 @@
 # 115 跨训练日续接
 
+状态：InReview（iOS 实装）。
+
 David 2026-11-26 定稿，iOS 与 Android 同批，P1。先读本仓 CONTEXT.md。界面依据 approved-prototype.html；另一已验场景为 11 月 24 日至 12 月 1 日共八个日期。
 
 ## 范围与验收

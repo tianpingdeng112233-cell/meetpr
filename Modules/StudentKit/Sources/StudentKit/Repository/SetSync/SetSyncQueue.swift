@@ -79,7 +79,7 @@ import Observation
       record.loggedDate = previous.loggedDate
       record.fallbackSetIndex = previous.fallbackSetIndex
       record.draft.loggedSetID = previous.draft.loggedSetID ?? record.draft.loggedSetID
-    } else if draft.isStudentAdded,
+    } else if draft.isStudentAdded, loggedDate == nil,
       let previous = records.first(where: {
         $0.draftOnly != true && $0.dayID == dayID
           && $0.draft.exerciseID == draft.exerciseID && $0.draft.isStudentAdded

@@ -69,6 +69,7 @@ extension PlanDayDTO {
       sortOrder: sortOrder,
       shiftedToDate: shiftedToDate,
       completedAt: completedAt,
+      actualCompletionDate: actualCompletionDate,
       completionSource: completionSource
     )
   }

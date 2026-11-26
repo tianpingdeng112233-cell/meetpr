@@ -311,3 +311,24 @@ private func feedbackJSON(id: String) -> String {
   }
   """
 }
+
+@Test func datedCompletionUsesOptionalWireDateAndReadsAuthoritativeReceipt() async throws {
+  let dayID = UUID()
+  let studentID = UUID()
+  let client = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    let body = try #require(request.httpBody)
+    #expect(
+      try JSONDecoder().decode([String: String].self, from: body) == [
+        "actual_completion_date": "2026-11-24"
+      ])
+    let payload = """
+      {"id":"\(UUID())","plan_day_id":"\(dayID)","student_id":"\(studentID)",
+       "completed_at":"2026-11-26T13:00:00Z","source":"manual",
+       "actual_completion_date":"2026-11-25"}
+      """
+    return APIResponse(data: Data(payload.utf8), statusCode: 200)
+  }
+  let result = try await client.completePlanDay(
+    id: dayID, accessToken: "token", actualCompletionDate: "2026-11-24")
+  #expect(result.actualCompletionDate == "2026-11-25")
+}

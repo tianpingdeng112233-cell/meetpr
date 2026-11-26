@@ -28,6 +28,7 @@ public enum StudentDemoSeed {
     todayOffset: Int = 3,
     selectedCalendar: Calendar = .current
   ) -> StudentPlanView {
+    _ = seedResumeVisit
     let scenario = TrainingStripDemoScenario.current
     let startDate = demoCycleStart(
       today: scenario == nil
@@ -61,6 +62,7 @@ public enum StudentDemoSeed {
         AccessoryDemoScenario.configure(
           StudentPlanView(
             cycleID: uuid(301),
+            actualCompletionDateEnabled: true,
             weekIndex: weekIndex,
             startDate: scenarioStart,
             endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
@@ -68,6 +70,16 @@ public enum StudentDemoSeed {
             days: days
           ))))
   }
+
+  /// Reproduce the cross-day entry on the demo account without changing the device clock.
+  private static let seedResumeVisit: Void = {
+    guard ProcessInfo.processInfo.arguments.contains("--spec115-resume") else { return }
+    let today = WorkoutDatePolicy.gymDayToday()
+    guard let lastWeek = WorkoutDatePolicy.deviceCalendar.date(byAdding: .day, value: -7, to: today)
+    else { return }
+    WorkoutResumeVisits().continueDay(
+      student: studentID, plan: uuid(301), day: uuid(1002), today: lastWeek)
+  }()
 
   public static func makeHistoricalLogs(
     studentID: UUID = Self.studentID,
