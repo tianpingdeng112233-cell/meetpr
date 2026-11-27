@@ -93,6 +93,7 @@ public struct E1RMCompetitionLiftGate<Content: View>: View {
         .padding(MeetPRSpacing.base)
       case .idle, .migrating:
         ProgressView(StudentStrings.localized(.e1RmcompetitionLiftGate004))
+          .launchBlocking()
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

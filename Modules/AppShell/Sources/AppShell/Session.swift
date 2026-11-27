@@ -21,6 +21,8 @@ public final class Session {
   static let logger = Logger(subsystem: "com.meetpr.app.appshell", category: "auth")
 
   public internal(set) var state: State = .anonymous
+  /// True once the cold-start session restore has settled, whatever it settled on.
+  public private(set) var hasBootstrapped = false
 
   @ObservationIgnored let auth: any AuthRepository
   @ObservationIgnored let tokenStore: any TokenStoring
@@ -333,6 +335,7 @@ extension Session: @unchecked Sendable {}
 
 extension Session {
   public func bootstrap() async {
+    defer { hasBootstrapped = true }
     if let bootstrapTask {
       await bootstrapTask.value
       return

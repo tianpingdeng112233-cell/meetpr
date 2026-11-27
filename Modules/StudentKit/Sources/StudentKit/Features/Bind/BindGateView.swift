@@ -199,6 +199,7 @@ public struct BindGateView<
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
+    .launchBlocking()
   }
 
   private var failedView: some View {

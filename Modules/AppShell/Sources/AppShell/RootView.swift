@@ -151,11 +151,9 @@ public struct RootView: View {
     case .anonymous:
       AuthFlowView()
     case .authenticating:
-      VStack(spacing: 12) {
-        ProgressView()
-        Text(AppShellStrings.validatingSession)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-      }
+      // Cold start covers this with the launch splash (spec 099); logout shows it bare.
+      ProgressView()
+        .launchBlocking()
     case .authenticated(let user):
       authenticatedContent(for: user)
     }
@@ -209,6 +207,7 @@ public struct RootView: View {
         coachContent(for: user, chat: chat)
       } else {
         ProgressView()
+          .launchBlocking()
           .task(id: user.id) {
             await chatSession.activateCoach(
               repository: chatRepository,
@@ -346,6 +345,7 @@ extension RootView {
           for: user, activeCoach: activeCoach, chat: chat, allowsChat: true, onLogout: onLogout)
       } else if chatSession.canActivateStudent(for: activeCoach.coachID) {
         ProgressView()
+          .launchBlocking()
           .task(id: activeCoach.coachID) {
             await chatSession.activateStudent(
               repository: chatRepository,
@@ -356,6 +356,7 @@ extension RootView {
           }
       } else {
         ProgressView()
+          .launchBlocking()
       }
     } else {
       studentRoot(
