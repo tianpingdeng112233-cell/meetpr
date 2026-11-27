@@ -103,3 +103,19 @@ func sessionReportsBootstrapSettledOnlyAfterRestoreFinishes() async {
   #expect(session.hasBootstrapped)
   #expect(session.state == .anonymous)
 }
+
+@MainActor
+@Test
+func launchSplashClockStartsAtTheFirstDrawnFrameAndPausesThroughStalls() {
+  let clock = LaunchSplashClock()
+  let start = Date(timeIntervalSinceReferenceDate: 1_000)
+
+  // However late the first frame is drawn, the entrance starts from zero.
+  #expect(clock.advance(to: start) == 0)
+  #expect(abs(clock.advance(to: start.addingTimeInterval(1.0 / 60)) - 1.0 / 60) < 1e-9)
+
+  // A two-second stall moves the animation by one capped step, not two seconds.
+  let afterStall = clock.advance(to: start.addingTimeInterval(2))
+  #expect(abs(afterStall - (1.0 / 60 + LaunchSplashClock.maxStep)) < 1e-9)
+  #expect(afterStall < LaunchSplashTimeline.entranceDuration)
+}

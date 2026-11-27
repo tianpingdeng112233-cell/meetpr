@@ -8,7 +8,7 @@ struct LaunchSplashModifier: ViewModifier {
   @Environment(Session.self) private var session
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-  @State private var startedAt: Date?
+  @State private var clock = LaunchSplashClock()
   @State private var isBlocked = false
   @State private var animationFinished = false
   @State private var firstScreenReady = false
@@ -43,8 +43,12 @@ struct LaunchSplashModifier: ViewModifier {
       }
     }
     .task {
-      startedAt = startedAt ?? Date()
-      try? await Task.sleep(for: .seconds(LaunchSplashTimeline.entranceDuration))
+      // The entrance is over once it has actually been drawn to the end, not
+      // 1.2 s after launch: a slow cold start must not swallow it.
+      while clock.elapsed < LaunchSplashTimeline.entranceDuration {
+        try? await Task.sleep(for: .milliseconds(16))
+        if Task.isCancelled { return }
+      }
       animationFinished = true
     }
     .task(id: ReadyInput(bootstrapped: session.hasBootstrapped, blocked: isBlocked)) {
@@ -62,20 +66,36 @@ struct LaunchSplashModifier: ViewModifier {
 
   private var splash: some View {
     TimelineView(.animation) { context in
-      LaunchSplashView(frame: LaunchSplashTimeline.frame(at: elapsed(at: context.date)))
+      let elapsed = clock.advance(to: context.date)
+      // Reduce Motion: open on the last frame; only the loader keeps moving.
+      let time = reduceMotion ? LaunchSplashTimeline.entranceDuration + elapsed : elapsed
+      LaunchSplashView(frame: LaunchSplashTimeline.frame(at: time))
     }
-  }
-
-  private func elapsed(at date: Date) -> Double {
-    guard let startedAt else { return reduceMotion ? LaunchSplashTimeline.entranceDuration : 0 }
-    let elapsed = date.timeIntervalSince(startedAt)
-    // Reduce Motion: open on the last frame; only the loader keeps moving.
-    return reduceMotion ? LaunchSplashTimeline.entranceDuration + elapsed : elapsed
   }
 
   private struct ReadyInput: Equatable {
     let bootstrapped: Bool
     let blocked: Bool
+  }
+}
+
+/// Animation time for the splash: starts at the first frame that is actually
+/// drawn and never jumps ahead by more than `maxStep`, so a stalled main
+/// thread pauses the entrance instead of skipping it.
+@MainActor
+final class LaunchSplashClock {
+  static let maxStep = 0.05
+
+  private(set) var elapsed = 0.0
+  private var lastFrame: Date?
+
+  @discardableResult
+  func advance(to date: Date) -> Double {
+    if let lastFrame {
+      elapsed += min(Self.maxStep, max(0, date.timeIntervalSince(lastFrame)))
+    }
+    lastFrame = date
+    return elapsed
   }
 }
 
