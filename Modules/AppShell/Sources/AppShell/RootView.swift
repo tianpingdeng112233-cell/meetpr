@@ -242,10 +242,9 @@ public struct RootView: View {
       inbox: chat?.inbox,
       sendCoordinator: chat?.sendCoordinator,
       coachDisplayName: user.name,
-      privacyPolicyURL: AnalyticsPrivacyNotice.privacyPolicyURL,
-      onLogout: {
-        await session.logout()
-      },
+      privacyPolicyURL: LegalDocuments.privacyPolicyURL,
+      termsURL: LegalDocuments.termsURL,
+      onLogout: { await session.logout() },
       draftStore: draftStore,
       pushRoute: pushRouteBinding
     )

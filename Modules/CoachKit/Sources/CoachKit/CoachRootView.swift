@@ -16,6 +16,7 @@ public struct CoachRootView: View {
   private let videoMarkers: any VideoMarkerRepository
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
+  private let termsURL: URL?
   private let coachDisplayName: String?
   private let detailContext: CoachStudentDetailContext
   private let chat: CoachChatContext?
@@ -63,6 +64,7 @@ public struct CoachRootView: View {
     sendCoordinator: ChatSendCoordinator? = nil,
     coachDisplayName: String? = nil,
     privacyPolicyURL: URL? = nil,
+    termsURL: URL? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared,
     pushRoute: Binding<PushRouteIntent?> = .constant(nil)
@@ -123,12 +125,9 @@ public struct CoachRootView: View {
       initialValue: CoachVideoQueueViewModel(repository: resolvedVideoQueue)
     )
     _profileViewModel = State(
-      initialValue: CoachMyProfileViewModel(
-        displayName: coachDisplayName,
-        logoutAction: onLogout
-      )
-    )
+      initialValue: CoachMyProfileViewModel(displayName: coachDisplayName, logoutAction: onLogout))
     self.privacyPolicyURL = privacyPolicyURL
+    self.termsURL = termsURL
     self.coachDisplayName = coachDisplayName
   }
 
@@ -220,7 +219,8 @@ public struct CoachRootView: View {
       CoachMyProfileView(
         viewModel: profileViewModel,
         inviteCodes: inviteCodes,
-        privacyPolicyURL: privacyPolicyURL
+        privacyPolicyURL: privacyPolicyURL,
+        termsURL: termsURL
       )
       .coachTabLayer(shell.layer(for: .profile), store: tabHostStore)
     }

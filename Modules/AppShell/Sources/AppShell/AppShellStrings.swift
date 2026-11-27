@@ -50,6 +50,13 @@ enum AppShellStrings {
     localized(String.LocalizationValue(analyticsPrivacyBodyKey(for: track)))
   }
 
+  static let legalConsentBody = localized("appShell.legal.body")
+  static let legalAnd = localized("appShell.legal.and")
+  static let userAgreement = localized("appShell.legal.terms")
+  static let agreeAndContinue = localized("appShell.legal.agree")
+  static let declineConsent = localized("appShell.legal.decline")
+  static let consentRequired = localized("appShell.legal.required")
+  static let reviewConsent = localized("appShell.legal.review")
   static let acknowledge = localized("appShell.acknowledge")
   static let validatingSession = localized("appShell.root.validatingSession")
   static let demoCoach = localized("appShell.demo.coach")

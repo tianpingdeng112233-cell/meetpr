@@ -32,6 +32,10 @@ import ViewInspector
       == AnalyticsPrivacyNotice.privacyPolicyURL
   )
   #expect(
+    try inspected.find(link: LegalDocuments.termsURL).url()
+      == LegalDocuments.termsURL
+  )
+  #expect(
     try inspected.find(viewWithAccessibilityLabel: AppShellStrings.showPassword)
       .accessibilityLabel().string() == AppShellStrings.showPassword
   )

@@ -118,16 +118,22 @@ public struct LoginView: View {
             .disabled(isSubmitDisabled)
             .accessibilityIdentifier("login.submit")
 
-            HStack(spacing: MeetPRSpacing.space1) {
+            VStack(spacing: MeetPRSpacing.space1) {
               Text(AppShellStrings.consent)
                 .foregroundStyle(Color.MeetPR.textMuted)
-
-              Link(
-                AppShellStrings.privacyPolicy,
-                destination: AnalyticsPrivacyNotice.privacyPolicyURL
-              )
-              .foregroundStyle(Color.MeetPR.goldText)
-              .underline()
+              HStack(spacing: MeetPRSpacing.space1) {
+                Link(AppShellStrings.userAgreement, destination: LegalDocuments.termsURL)
+                  .foregroundStyle(Color.MeetPR.goldText)
+                  .underline()
+                Text(AppShellStrings.legalAnd)
+                  .foregroundStyle(Color.MeetPR.textMuted)
+                Link(
+                  AppShellStrings.privacyPolicy,
+                  destination: LegalDocuments.privacyPolicyURL
+                )
+                .foregroundStyle(Color.MeetPR.goldText)
+                .underline()
+              }
             }
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
             .frame(maxWidth: .infinity)

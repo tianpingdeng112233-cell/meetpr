@@ -1,6 +1,21 @@
+import Foundation
 import Testing
+import ViewInspector
 
 @testable import CoachKit
+
+@MainActor
+@Test func coachPrivacyTermsOffersBothDocumentLinks() throws {
+  let termsURL = try #require(URL(string: "https://meetpr.app/terms"))
+  let privacyURL = try #require(URL(string: "https://meetpr.app/privacy"))
+  let inspected = try CoachPrivacyTermsSheet(privacyPolicyURL: privacyURL, termsURL: termsURL)
+    .inspect()
+  #expect(try inspected.find(link: termsURL).url() == termsURL)
+  #expect(try inspected.find(link: privacyURL).url() == privacyURL)
+  #expect(throws: (any Error).self) {
+    try inspected.find(viewWithAccessibilityIdentifier: "coach.profile.userAgreement.unavailable")
+  }
+}
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
