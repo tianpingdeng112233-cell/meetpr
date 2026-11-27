@@ -4,6 +4,7 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 struct VolumeIntensityChart: View {
+  @Environment(\.locale) private var locale
   let buckets: [WeeklyProgressMetric]
   var isUnlocked = true
 
@@ -121,7 +122,8 @@ struct VolumeIntensityChart: View {
   }
 
   private func labels(_ geometry: VolumeChartGeometry) -> some View {
-    ZStack {
+    let dateLabels = geometry.dateLabels(locale: locale)
+    return ZStack {
       volumeLabel(geometry.volumeTopLabel)
         .position(geometry.point(x: 30, y: 21))
       volumeLabel(geometry.volumeMiddleLabel)
@@ -135,8 +137,8 @@ struct VolumeIntensityChart: View {
       rpeLabel("5")
         .position(geometry.point(x: 309, y: 95))
 
-      ForEach(geometry.dateLabels.indices, id: \.self) { index in
-        let label = geometry.dateLabels[index]
+      ForEach(dateLabels.indices, id: \.self) { index in
+        let label = dateLabels[index]
         Text(label.text)
           .font(.MeetPR.mono(size: 8, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
@@ -182,7 +184,7 @@ struct VolumeIntensityChart: View {
   }
 }
 
-private struct VolumeChartGeometry {
+struct VolumeChartGeometry {
   struct DateLabel {
     let text: String
     let x: CGFloat
@@ -238,9 +240,11 @@ private struct VolumeChartGeometry {
     }
   }
 
-  var dateLabels: [DateLabel] {
+  func dateLabels(locale: Locale) -> [DateLabel] {
     buckets.enumerated().map { index, bucket in
-      DateLabel(text: Self.dayMonth(bucket.weekStart), x: centerX(index))
+      let date = bucket.weekStart.formatted(
+        .dateTime.month(.twoDigits).day(.twoDigits).locale(locale))
+      return DateLabel(text: date, x: centerX(index))
     }
   }
 
@@ -277,12 +281,5 @@ private struct VolumeChartGeometry {
       return thousands.formatted(.number.precision(.fractionLength(0))) + "k"
     }
     return thousands.formatted(.number.precision(.fractionLength(1))) + "k"
-  }
-
-  private static func dayMonth(_ date: Date) -> String {
-    let components = Calendar.current.dateComponents([.day, .month], from: date)
-    guard let day = components.day, let month = components.month else { return "—" }
-    return "\(day.formatted(.number.precision(.integerLength(2))))/"
-      + "\(month.formatted(.number.precision(.integerLength(2))))"
   }
 }

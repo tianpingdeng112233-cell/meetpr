@@ -4,6 +4,15 @@ import Testing
 
 @testable import StudentKit
 
+@Test func volumeChartDateLabelsFollowRegion() {
+  let weekStart = date(2026, 11, 22, calendar: Calendar(identifier: .gregorian))
+  let geometry = VolumeChartGeometry(
+    buckets: [.init(weekStart: weekStart, volumeKg: 100, avgRPE: 8)],
+    size: CGSize(width: 320, height: 172))
+  #expect(geometry.dateLabels(locale: Locale(identifier: "zh_Hans_CN")).first?.text == "11/22")
+  #expect(geometry.dateLabels(locale: Locale(identifier: "en_GB")).first?.text == "22/11")
+}
+
 @Test func weeklyMetricsSumCompletedVolumeAcrossMultipleWeeks() {
   let calendar = fixedCalendar()
   let logs = [
