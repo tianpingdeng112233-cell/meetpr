@@ -106,9 +106,11 @@
 
     var bodyWeights: [String: Decimal] {
       var result: [String: Decimal] = [:]
-      let variation = [0, 1, -1, 0, 2, -2, 1]
-      for ago in 0..<90 where ago % 9 != 5 {
-        let tenths = 830 + ago / 9 + variation[ago % variation.count]
+      for ago in 0..<90 where ago % 7 == 0 || ago % 7 == 3 {
+        let progress = Double(ago) / 89
+        // One gentle wave over the full window varies the pace of the decline.
+        let variation = 0.1 * sin(2 * .pi * progress)
+        let tenths = 830 + Int(((progress + variation) * 10).rounded())
         result[Self.dayString(Self.day(-ago, from: today))] = Decimal(tenths) / 10
       }
       return result

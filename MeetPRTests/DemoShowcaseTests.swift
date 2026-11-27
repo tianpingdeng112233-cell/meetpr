@@ -65,7 +65,7 @@
         })
     }
 
-    @Test func sevenTrainingWeeksIncludeALighterWeekAndDailyWeighIns() throws {
+    @Test func sevenTrainingWeeksIncludeALighterWeekAndTwiceWeeklyWeighIns() throws {
       let scene = DemoShowcase(today: today)
       let calendar = Calendar.current
       let weeks = Dictionary(grouping: scene.logs) {
@@ -82,10 +82,17 @@
       }
       #expect(volume(4) < volume(3) * 0.7)
       let weights = scene.bodyWeights
-      #expect(weights.count >= 60)
+      #expect((20...30).contains(weights.count))
       #expect(weights.values.allSatisfy { (82.4...84.2).contains($0) })
       #expect(weights[DemoShowcase.dayString(today)] == 83)
-      #expect(weights[DemoShowcase.dayString(DemoShowcase.day(-89, from: today))] != nil)
+      let chronological = weights.sorted { $0.key < $1.key }
+      let earliest = try #require(chronological.first)
+      let latest = try #require(chronological.last)
+      #expect(earliest.key <= DemoShowcase.dayString(DemoShowcase.day(-84, from: today)))
+      #expect(earliest.value > latest.value)
+      for (previous, next) in zip(chronological, chronological.dropFirst()) {
+        #expect(abs(next.value - previous.value) <= 0.2)
+      }
     }
 
     @Test func conversationLinksFeedbackMarkersAndReplays() async throws {

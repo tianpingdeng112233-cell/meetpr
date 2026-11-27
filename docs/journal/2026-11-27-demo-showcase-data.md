@@ -63,3 +63,13 @@ xcodebuild test -project MeetPR.xcodeproj -scheme MeetPR-DemoStudent -destinatio
 ```
 
 待验收项包括无参数启动与原有测试回归、各页截图、已完成训练的实际值、三处视频播放、图片和未读角标。本轮未安装或启动应用，尚无截图。
+
+## 2026-11-27 返修 · 体重图取点过密
+
+宣发截图中，90 天内的 80 个圆点反复上下跳动。学员 `-demo-showcase` 现从今天起每隔 3、4 天交替取点，共 26 条。从 87 天前的 84.0 kg 缓降至今天的 83.0 kg，趋势上的微调覆盖整个窗口，称重值保留一位小数。
+
+已更新 `sevenTrainingWeeksIncludeALighterWeekAndTwiceWeeklyWeighIns` 的点数、日期跨度、相邻差值和首末走势断言。独立 Swift 脚本运行生成代码，核实取点间隔和全部数值，相邻最大差值从 0.4 降到 0.1 kg。两个 Swift 文件通过 SwiftLint 和 swift-format 严格检查。Xcode 测试留待 Claude 在本机执行。
+
+## 2026-11-27 返修 · 学员演示测试链接失败
+
+本机复现时，`MeetPR-DemoStudent` 的 build 通过，test 在链接时找不到 `InMemoryVideoMarkerRepository` 和 `PendingVideoItem` 的符号。App 源码直接使用 `RepositoryContracts`，工程此前只通过其他包间接依赖它。现已在工程中登记本地包 `Modules/RepositoryContracts`，将同名 product 加入 `MeetPR` 的直接依赖和 Frameworks 构建阶段。报错引用来自宿主 App，测试源码没有直接导入该包，因此只调整 App target。本轮 `plutil -lint` 和依赖引用检查通过，实际测试链接待 Claude 在本机复验。
