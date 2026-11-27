@@ -15,7 +15,7 @@ public struct SignupView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: 0) {
         // ── Brand hero ───────────────────────────────────────────────
-        MeetPRMark(size: 56)
+        MeetPRMark(height: 23)
           .padding(.bottom, MeetPRSpacing.lg)
 
         Eyebrow(AppShellStrings.signupEyebrow)

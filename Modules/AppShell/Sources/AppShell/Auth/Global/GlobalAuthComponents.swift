@@ -7,7 +7,7 @@ struct GlobalAuthHero: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point18) {
-      MeetPRMark(fontSize: MeetPRFontMetrics.size15)
+      MeetPRMark(height: 23)
 
       VStack(alignment: .leading, spacing: 0) {
         Text(title)

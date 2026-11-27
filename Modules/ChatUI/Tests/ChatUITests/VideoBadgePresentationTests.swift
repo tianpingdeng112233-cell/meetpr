@@ -3,8 +3,20 @@ import Testing
 
 @testable import ChatUI
 
+#if canImport(UIKit)
+  import UIKit
+#endif
+
 @Suite("Video training badge")
 struct VideoBadgePresentationTests {
+  #if canImport(UIKit)
+    @Test("badge bundle contains the final wordmark at its artwork ratio")
+    func wordmarkResource() throws {
+      let image = try #require(UIImage(named: "MeetPRWordmark", in: .module, compatibleWith: nil))
+      #expect(abs(image.size.width / image.size.height - 2443.0 / 605) < 0.001)
+    }
+  #endif
+
   @Test("optional fields disappear without placeholder content")
   func optionalFieldsDisappear() {
     let presentation = VideoBadgePresentation(
