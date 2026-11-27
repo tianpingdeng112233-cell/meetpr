@@ -44,6 +44,14 @@ public actor InMemoryOnboardingRepository: OnboardingRepository, BodyWeightRepos
     self.now = now
   }
 
+  /// Historical weigh-ins supplied by an offline scenario.
+  public init(seed: OnboardingProfile, bodyWeightsByDay: [String: Decimal]) {
+    studentId = seed.userId
+    profile = seed
+    bodyWeights = bodyWeightsByDay.map { BodyWeightRecord(recordedOn: $0.key, weightKg: $0.value) }
+    now = { Date() }
+  }
+
   public func fetchProfile(studentId: UUID) async throws -> OnboardingProfile? {
     guard studentId == self.studentId else { return nil }
     return profile
