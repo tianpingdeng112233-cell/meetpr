@@ -4,6 +4,12 @@ import Foundation
 enum RPETable {
   static let efforts = stride(from: 10.0, through: 6.0, by: -0.5).map { $0 }
 
+  static func headerText(e1RM: Double?, unit: UnitPreference) -> String {
+    guard let e1RM else { return "100%" }
+    let kilograms = Decimal(e1RM)
+    return StudentFormatting.decimal(unit == .kg ? kilograms : kilograms * UnitDisplay.lbPerKg)
+  }
+
   static func values(e1RM: Double?, unit: UnitPreference) -> [[String]] {
     (1...12).map { reps in
       efforts.map { effort in

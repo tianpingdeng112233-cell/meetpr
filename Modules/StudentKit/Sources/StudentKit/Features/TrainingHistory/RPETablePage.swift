@@ -29,10 +29,8 @@ struct RPETablePage: View {
         if let snapshot {
           let value = family.flatMap { snapshot.e1RM[$0] }
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
-            Text(
-              value.map { UnitDisplay.weightText(kg: Decimal($0), unit: snapshot.unit) } ?? "100%"
-            )
-            .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
+            Text(RPETable.headerText(e1RM: value, unit: snapshot.unit))
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
             Text(value == nil ? "1RM" : "e1RM · \(UnitDisplay.weightUnitSuffix(snapshot.unit))")
               .font(.caption).foregroundStyle(Color.MeetPR.textMuted)
           }
