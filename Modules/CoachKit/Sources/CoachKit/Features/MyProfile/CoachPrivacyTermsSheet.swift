@@ -5,7 +5,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachPrivacyTermsSheet: View {
   let privacyPolicyURL: URL?
-  @Environment(\.openURL) private var openURL
+  let termsURL: URL?
 
   var body: some View {
     CoachProfileSheetScaffold(
@@ -15,11 +15,13 @@ struct CoachPrivacyTermsSheet: View {
       VStack(spacing: MeetPRSpacing.zero) {
         documentRow(
           title: CoachMyProfileStrings.userAgreement,
-          destination: nil
+          destination: termsURL,
+          identifier: "coach.profile.userAgreement"
         )
         documentRow(
           title: CoachMyProfileStrings.privacyPolicy,
-          destination: privacyPolicyURL
+          destination: privacyPolicyURL,
+          identifier: "coach.profile.privacyPolicy"
         )
         studentDataRow
       }
@@ -34,25 +36,16 @@ struct CoachPrivacyTermsSheet: View {
   }
 
   @ViewBuilder
-  private func documentRow(title: String, destination: URL?) -> some View {
+  private func documentRow(title: String, destination: URL?, identifier: String) -> some View {
     if let destination {
-      #if os(iOS)
-        Button {
-          openURL(destination)
-        } label: {
-          rowContent(title: title, isEnabled: true)
-        }
-        .accessibilityIdentifier("coach.profile.privacyPolicy")
-      #else
-        Link(destination: destination) {
-          rowContent(title: title, isEnabled: true)
-        }
-        .accessibilityIdentifier("coach.profile.privacyPolicy")
-      #endif
+      Link(destination: destination) {
+        rowContent(title: title, isEnabled: true)
+      }
+      .accessibilityIdentifier(identifier)
     } else {
       rowContent(title: title, isEnabled: false)
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("coach.profile.userAgreement.unavailable")
+        .accessibilityIdentifier(identifier)
     }
   }
 

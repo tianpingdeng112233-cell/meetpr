@@ -1,6 +1,167 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "appShell.legal.and": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "and"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和"
+          }
+        }
+      }
+    },
+    "appShell.legal.terms": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terms of Service"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "《用户服务协议》"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "《使用者服務協議》"
+          }
+        }
+      }
+    },
+    "appShell.legal.review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再看看"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再看看"
+          }
+        }
+      }
+    },
+    "appShell.legal.required": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You need to agree before you can use MeetPR."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要同意后才能使用 MeetPR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要同意後才能使用 MeetPR"
+          }
+        }
+      }
+    },
+    "appShell.legal.decline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disagree"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不同意"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不同意"
+          }
+        }
+      }
+    },
+    "appShell.legal.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please read and agree to the Terms of Service and Privacy Policy. We will protect your personal information in accordance with the policy."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请阅读并同意《用户服务协议》和《隐私政策》。我们会按照政策保护你的个人信息。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請閱讀並同意《使用者服務協議》和《隱私權政策》。我們會按照政策保護你的個人資訊。"
+          }
+        }
+      }
+    },
+    "appShell.legal.agree": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agree and continue"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意并继续"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意並繼續"
+          }
+        }
+      }
+    },
     "appShell.acknowledge": {
       "extractionState": "manual",
       "localizations": {
@@ -421,19 +582,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "By continuing, you agree to the"
+            "value": "By continuing, you agree to our"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "继续即表示同意"
+            "value": "继续即表示你同意我们的"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "繼續即表示同意"
+            "value": "繼續即表示你同意我們的"
           }
         }
       }
@@ -490,19 +651,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality, stored on our self-hosted Alibaba Cloud infrastructure in mainland China, and is not shared with third-party analytics SDKs, transferred overseas, or used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."
+            "value": "To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality, stored on our self-hosted Alibaba Cloud infrastructure in mainland China, and is not shared with third-party analytics SDKs or used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，留存在境内自建阿里云，不接入第三方统计 SDK、不出境，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"
+            "value": "为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，留存在境内自建阿里云，不接入第三方统计 SDK，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "為改進訓練流程，MeetPR 會收集產品互動、匿名裝置標識，以及你主動填寫的反饋文字。資料僅用於產品功能，留存在境內自建阿里雲，不接入第三方統計 SDK、不出境，也不用於追蹤或廣告。帳號存續期間我們會保留這些資料；刪除帳號後，它們會與你斷開關聯，成為無法識別你的匿名記錄。解除安裝會清除匿名安裝標識，你可透過刪除帳號或聯絡我們請求刪除。"
+            "value": "為改進訓練流程，MeetPR 會收集產品互動、匿名裝置標識，以及你主動填寫的反饋文字。資料僅用於產品功能，留存在境內自建阿里雲，不接入第三方統計 SDK，也不用於追蹤或廣告。帳號存續期間我們會保留這些資料；刪除帳號後，它們會與你斷開關聯，成為無法識別你的匿名記錄。解除安裝會清除匿名安裝標識，你可透過刪除帳號或聯絡我們請求刪除。"
           }
         }
       }
@@ -536,19 +697,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "About usage data"
+            "value": "Welcome to MeetPR"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "使用数据说明"
+            "value": "欢迎使用 MeetPR"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "使用資料說明"
+            "value": "歡迎使用 MeetPR"
           }
         }
       }
@@ -565,13 +726,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "隐私政策"
+            "value": "《隐私政策》"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "隱私政策"
+            "value": "《隱私政策》"
           }
         }
       }
@@ -1416,13 +1577,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "隐私政策"
+            "value": "《隐私政策》"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "隱私政策"
+            "value": "《隱私政策》"
           }
         }
       }

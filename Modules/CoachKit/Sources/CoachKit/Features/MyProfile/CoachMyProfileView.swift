@@ -16,6 +16,7 @@ struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
+  private let termsURL: URL?
   private let buildTrack: MeetPRBuildTrack?
   @Environment(\.coachInvitationBuildTrack) private var environmentTrack
   @State private var codesViewModel: InviteCodesViewModel
@@ -28,12 +29,14 @@ struct CoachMyProfileView: View {
     viewModel: CoachMyProfileViewModel,
     inviteCodes: any InviteCodeRepository,
     privacyPolicyURL: URL? = nil,
+    termsURL: URL? = nil,
     buildTrack: MeetPRBuildTrack? = nil,
     codesViewModel: InviteCodesViewModel? = nil
   ) {
     self.viewModel = viewModel
     self.inviteCodes = inviteCodes
     self.privacyPolicyURL = privacyPolicyURL
+    self.termsURL = termsURL
     self.buildTrack = buildTrack
     self._codesViewModel = State(
       initialValue: codesViewModel ?? InviteCodesViewModel(repository: inviteCodes))
@@ -305,7 +308,7 @@ extension CoachMyProfileView {
     case .help:
       CoachHelpFeedbackSheet()
     case .privacyAndTerms:
-      CoachPrivacyTermsSheet(privacyPolicyURL: privacyPolicyURL)
+      CoachPrivacyTermsSheet(privacyPolicyURL: privacyPolicyURL, termsURL: termsURL)
     case .logout:
       CoachLogoutConfirmationView(
         isLoggingOut: viewModel.isLoggingOut,

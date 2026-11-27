@@ -29,7 +29,6 @@ struct AnalyticsRootModifier: ViewModifier {
       )
       .sheet(isPresented: $showingNotice, onDismiss: noticeDidDismiss) {
         AnalyticsPrivacyNotice {
-          UserDefaults.standard.set(true, forKey: Self.noticeKey)
           Analytics.shared.confirmPrivacyNotice()
           showingNotice = false
         }
@@ -65,10 +64,9 @@ struct AnalyticsRootModifier: ViewModifier {
 
   private func noticeDidDismiss() { noticeDismissed = true }
 
-  private static let noticeKey = "meetpr.analytics.privacy_notice_confirmed"
-
-  private static func shouldShowNotice(mode: AnalyticsMode) -> Bool {
+  static func shouldShowNotice(mode: AnalyticsMode, defaults: UserDefaults = .standard) -> Bool {
     guard case .live = mode else { return false }
-    return !UserDefaults.standard.bool(forKey: noticeKey)
+    return defaults.string(forKey: LegalDocuments.acceptedVersionKey)
+      != LegalDocuments.version
   }
 }
