@@ -65,6 +65,22 @@ struct VideoBadgePresentationTests {
     #expect(pixels != (prefixChanged.dataProvider?.data as Data?))
   }
 
+  @Test
+  @MainActor
+  func largerMarkKeepsCardHeight() throws {
+    // The 27u mark overflows the 23u header row; the card stays 144u tall.
+    let infos = [
+      VideoBadgeInfo(exerciseName: "Squat", weightKg: 180, reps: 5, rpe: 8),
+      VideoBadgeInfo(exerciseName: "Squat", weightKg: 180, reps: 5),
+      VideoBadgeInfo(exerciseName: "Pull-up", reps: 8, rpe: 8),
+    ]
+    for info in infos {
+      let card = VideoBadgeCard(presentation: .init(info: info, mode: .export), scale: 1)
+      let image = try #require(ImageRenderer(content: card).cgImage)
+      #expect(image.height == 144)
+    }
+  }
+
   @Test("export lower-left anchor scales with the fitted portrait artboard")
   func exportGeometry() {
     for (size, scale, anchor) in [

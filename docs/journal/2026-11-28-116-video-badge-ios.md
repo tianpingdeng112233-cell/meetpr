@@ -181,3 +181,11 @@ Standards 和 Spec 两个只读 reviewer 分别对工作树做了一轮审查及
 - ChatUI 成片和卡片测试：`VideoBadgeExportFixture.swift`、`VideoBadgeExporterTests.swift`、`VideoBadgePresentationTests.swift`。首轮已收货的导出器和卡片样式没有净变化。
 - StudentKit：`RecordingAlbumSave.swift`、`RecordingAlbumSaveTests.swift`、`SetEntrySheet.swift`、`TodayWorkoutTypes.swift`、`AllDayKeypadPersistence.swift`、`TodayWorkoutViewModel.swift`、`CompletedDayPresentation.swift`、`SetEntryVideoPlayerTests.swift`、`SetWeightSuggestionOutcomeTests.swift`（复用内存仓储夹具）。
 - 文档：本 JOURNAL。
+
+## 圆盘放大（Claude 直接实装，2026-11-28）
+
+David 当日追加：角标卡第一行的橙色圆盘占位 23u → 27u（图标自带一圈留白，这样橙色部分与 21u 高的字标等高），与字标间距 7u → 6u；行高仍是 23u，圆盘上下各溢出 2u。David 明确要求这次不派 Codex、由 Claude 直接改。
+
+- 改动：`VideoBadgeCard.swift` 第一行；`VideoBadgePresentationTests` 新增 `largerMarkKeepsCardHeight`（都填了、没填 RPE、自重三种数据下卡片高度仍为 144u）。
+- 验证：`swift test --package-path Modules/ChatUI` 105 项通过。收起态的大圆盘未改。
+- 另：「收起」不加提示，保持现状（David 同日定）。

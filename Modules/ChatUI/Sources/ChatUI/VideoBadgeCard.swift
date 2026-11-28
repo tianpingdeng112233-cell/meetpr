@@ -26,8 +26,11 @@ struct VideoBadgeCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      HStack(spacing: 7 * scale) {
-        VideoBadgeLogoMark(size: 23 * scale)
+      HStack(spacing: 6 * scale) {
+        // The artwork carries its own margin: at 27u the amber disc matches the
+        // 21u wordmark. The row keeps its 23u height; the mark overflows by 2u.
+        VideoBadgeLogoMark(size: 27 * scale)
+          .padding(.vertical, -2 * scale)
         VideoBadgeWordmark.image
           .resizable()
           .frame(width: 21 * scale * 2443 / 605, height: 21 * scale)
