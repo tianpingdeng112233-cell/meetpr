@@ -73,7 +73,7 @@ private struct VideoMissingFileSheet: View {
   private func importVideo(_ item: PhotosPickerItem) async {
     defer { importTask = nil }
     do {
-      let movie = try await item.loadTransferable(type: PickedVideo.self)
+      let movie = try await PickedVideo.load(from: item)
       guard !Task.isCancelled, model.missingAttachment?.id == record.id else {
         if let movie { try? FileManager.default.removeItem(at: movie.url) }
         isImporting = false
@@ -107,7 +107,7 @@ private struct VideoMissingFileSheet: View {
       isImporting = false
       guard !Task.isCancelled, model.missingAttachment?.id == record.id else { return }
       VideoProcessingDiagnostics().report(.picker, error: error)
-      model.reportVideoProcessingFailure()
+      model.reportVideoProcessingFailure(draftID: record.pendingDraftID, error: error)
     }
   }
 

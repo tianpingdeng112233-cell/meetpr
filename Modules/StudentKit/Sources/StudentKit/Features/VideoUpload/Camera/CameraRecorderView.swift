@@ -9,12 +9,12 @@
     let maxDurationSeconds: TimeInterval
     @Binding var isPresented: Bool
     let onPicked: (URL) -> Void
-    let onFailure: () -> Void
+    let onFailure: (Error?) -> Void
     let allDayFlow: Bool
     @State private var pickedAlbumVideo: PhotosPickerItem?
     @State private var albumImportTask: Task<Void, Never>?
     @State private var isImportingAlbumVideo = false
-    @State private var showingAlbumImportFailure = false
+    @State private var albumImportFailureMessage: String?
     @State private var albumTrimFailed = false
 
     @Environment(\.scenePhase) private var scenePhase
@@ -32,7 +32,7 @@
       maxDurationSeconds: TimeInterval,
       isPresented: Binding<Bool>,
       onPicked: @escaping (URL) -> Void,
-      onFailure: @escaping () -> Void,
+      onFailure: @escaping (Error?) -> Void,
       allDayFlow: Bool = false
     ) {
       self.maxDurationSeconds = maxDurationSeconds
@@ -122,7 +122,7 @@
               secondaryAction: .init(
                 title: StudentStrings.localized(.cameraRecorderView005),
                 action: {
-                  onFailure()
+                  onFailure(nil)
                   close()
                 }
               )
@@ -158,8 +158,10 @@
         albumImportTask = Task { await importAlbumVideo(item) }
       }
       .alert(
-        StudentStrings.localized(.videoAttachmentViewModel001),
-        isPresented: $showingAlbumImportFailure
+        albumImportFailureMessage ?? "",
+        isPresented: Binding(
+          get: { albumImportFailureMessage != nil },
+          set: { if !$0 { albumImportFailureMessage = nil } })
       ) {
         Button(StudentStrings.localized(.cameraRecorderView005), role: .cancel) {}
       }
@@ -250,7 +252,7 @@
         albumImportTask = nil
       }
       do {
-        let movie = try await item.loadTransferable(type: PickedVideo.self)
+        let movie = try await PickedVideo.load(from: item)
         // Discard a provider's late copy after the recorder closes.
         guard isPresented, !Task.isCancelled else {
           if let movie { try? FileManager.default.removeItem(at: movie.url) }
@@ -279,13 +281,13 @@
       } catch {
         guard isPresented, !Task.isCancelled else { return }
         VideoProcessingDiagnostics().report(.picker, error: error)
-        reportAlbumImportFailure()
+        reportAlbumImportFailure(error)
       }
     }
 
-    private func reportAlbumImportFailure() {
-      showingAlbumImportFailure = true
-      onFailure()
+    private func reportAlbumImportFailure(_ error: Error? = nil) {
+      albumImportFailureMessage = VideoAttachmentViewModel.processingFailureMessage(for: error)
+      onFailure(error)
     }
 
     private func prepareTrim(of sourceURL: URL) {
@@ -395,5 +397,4 @@
       }
     }
   }
-
 #endif

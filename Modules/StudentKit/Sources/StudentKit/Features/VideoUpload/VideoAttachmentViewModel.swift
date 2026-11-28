@@ -40,8 +40,13 @@ public final class VideoAttachmentViewModel {
     reportVideoProcessingFailure(draftID: nil)
   }
 
-  func reportVideoProcessingFailure(draftID: UUID?) {
-    lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
+  static func processingFailureMessage(for error: Error?) -> String {
+    StudentStrings.localized(
+      error is AlbumVideoImportError ? .incompleteAlbumVideo : .videoAttachmentViewModel001)
+  }
+
+  func reportVideoProcessingFailure(draftID: UUID?, error: Error? = nil) {
+    lastErrorMessage = Self.processingFailureMessage(for: error)
     lastErrorDraftID = draftID
   }
 

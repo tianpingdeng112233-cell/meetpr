@@ -1046,8 +1046,8 @@ public struct TodayWorkoutView: View {
             await attachDirectCameraVideo(sourceURL: url, target: target)
           }
         },
-        onFailure: {
-          videoViewModel.reportVideoProcessingFailure()
+        onFailure: { error in
+          videoViewModel.reportVideoProcessingFailure(draftID: target.id, error: error)
         },
         allDayFlow: true
       )

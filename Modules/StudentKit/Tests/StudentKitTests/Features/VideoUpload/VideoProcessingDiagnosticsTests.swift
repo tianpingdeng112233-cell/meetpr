@@ -47,6 +47,12 @@ func videoProcessingDiagnosticsPayloads() async throws {
   #expect(codes.contains("video.export.EXPORT_FAILED"))
 }
 
+@Test("Two short Photos reads report a fixed picker code")
+func incompleteAlbumVideoDiagnostic() async throws {
+  let event = try await recordedVideoDiagnostic(AlbumVideoImportError.incomplete)
+  #expect(event.props["code"] == .enumCase("video.picker.ERR_INCOMPLETE_VIDEO"))
+}
+
 @Test("Cancellation and failures after dismissal do not enqueue video diagnostics")
 func videoProcessingDiagnosticsIgnoreCancellation() async throws {
   let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
@@ -133,7 +139,7 @@ func videoProcessingDiagnosticsCodeLength(
 }
 
 private func recordedVideoDiagnostic(
-  _ error: NSError, stage: VideoProcessingStage = .picker
+  _ error: Error, stage: VideoProcessingStage = .picker
 ) async throws -> AnalyticsEnvelope {
   let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
   defer { try? FileManager.default.removeItem(at: directory) }

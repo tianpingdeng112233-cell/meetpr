@@ -1361,6 +1361,7 @@ enum StudentStrings {
     static let videoAttachmentV3Controls008 = Key("student.videoAttachmentV3Controls.copy008")
     static let videoAttachmentV3Controls009 = Key("student.videoAttachmentV3Controls.copy009")
     static let videoAttachmentV3Previews001 = Key("student.videoAttachmentV3Previews.copy001")
+    static let incompleteAlbumVideo = Key("student.videoAttachment.incompleteFile")
     static let videoAttachmentViewModel001 = Key("student.videoAttachmentViewModel.copy001")
     static let videoAttachmentViewModel002 = Key("student.videoAttachmentViewModel.copy002")
     static let videoAttachmentViewModel003 = Key("student.videoAttachmentViewModel.copy003")
