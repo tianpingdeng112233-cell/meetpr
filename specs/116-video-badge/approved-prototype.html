@@ -1,0 +1,169 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>spec 116 视频角标 · 定稿画板</title>
+<!-- spec 116 的界面依据。画板 540×960，CSS 里的 px 就是画板单位。
+     换算：scale = min(宽, 高×9/16) / 540（导出取视频渲染尺寸，App 内取播放器容器尺寸）。
+     背景是纯色示意，不含真实训练视频（仓库公开）。数值与 SPEC.md 冲突时以 SPEC.md 为准。
+     字体：IBM Plex Sans / IBM Plex Mono（App 已内置）；本机没装时浏览器会回退到系统字体，以 approved-prototype.png 为准。 -->
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#F2F3F5;font-family:"IBM Plex Sans","PingFang SC",sans-serif;color:#111827;padding:32px}
+h1{font-size:20px;margin-bottom:20px}
+.grid{display:flex;flex-wrap:wrap;gap:24px}
+figure{width:270px}figcaption{font-size:12px;color:#4B5563;margin-top:8px}
+.slot{width:270px;height:480px;overflow:hidden;border-radius:10px}
+.ab{width:540px;height:960px;transform:scale(.5);transform-origin:0 0;position:relative;color:#fff}
+.ab.dk{background:linear-gradient(160deg,#2B2B30,#101013)}
+.ab.lt{background:linear-gradient(160deg,#F4F4F2,#C9CBCC)}
+
+/* ── 角标卡片 ── */
+.badge{position:absolute;left:44px;bottom:214px;max-width:452px;border-radius:22px;padding:17px 22px 19px;background:rgba(12,12,14,.45);display:flex;flex-direction:column;font-family:"IBM Plex Sans","PingFang SC",sans-serif}
+.badge .h{display:flex;align-items:center;gap:7px;height:23px}
+.badge .h .m{width:23px;height:23px}
+.badge .h .w{height:21px;width:auto}
+.badge .set{margin-left:auto;padding-left:24px;font-size:15px;color:rgba(255,255,255,.62);white-space:nowrap}
+.badge .bd{display:grid;grid-template:"ex ex" "ld rp"/auto auto;justify-content:start;align-items:baseline;margin-top:12px;row-gap:5px;column-gap:30px}
+.badge .bd.nr{grid-template:"ex" "ld"/auto}
+.badge .ex{grid-area:ex;font-size:19px;font-weight:500;line-height:1.15;color:rgba(255,255,255,.74);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.badge .ld{grid-area:ld;display:flex;align-items:baseline;gap:7px;white-space:nowrap;line-height:1.05}
+.badge .num{font-weight:600;font-variant-numeric:tabular-nums}
+.badge .wt,.badge .rep.big{font-size:38px}
+.badge .rep{font-size:29px}
+.badge .un{font-size:20px;font-weight:500;color:rgba(255,255,255,.58)}
+.badge .rp{grid-area:rp;font-size:24px;white-space:nowrap}
+.badge .rp i{font-style:normal;font-size:17px;font-weight:500;color:rgba(255,255,255,.58);margin-right:6px}
+
+/* ── App 内收起态 ── */
+.dot{position:absolute;left:44px;bottom:150px;width:61px;height:61px;filter:drop-shadow(0 4px 9px rgba(0,0,0,.38))}
+.dot .m{width:100%;height:100%}
+
+/* ── 打点：进度条刻度 + 浮出点评 ── */
+.sc{position:absolute;left:26px;right:26px;bottom:62px;display:flex;align-items:center;gap:14px;font-family:"IBM Plex Mono",monospace;font-size:17px}
+.lt .sc{color:#111827}
+.ba{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.3);position:relative}
+.lt .ba{background:rgba(0,0,0,.25)}
+.ba i{position:absolute;left:0;top:0;bottom:0;width:37.5%;background:#D97706;border-radius:3px}
+.ba b{position:absolute;top:-8px;width:5px;height:22px;margin-left:-2.5px;border-radius:3px;background:#FFB800}
+.ba u{position:absolute;left:37.5%;top:-9px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:#fff}
+.cue{position:absolute;left:44px;bottom:98px;max-width:452px;display:flex;align-items:baseline;gap:12px;padding:9px 20px;border-radius:999px;background:rgba(12,12,14,.45);font-size:20px;white-space:nowrap;color:#fff}
+.cue em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:16px;color:#FFB800}
+</style></head><body>
+<h1>spec 116 视频角标 · 定稿画板 540×960（2026-11-28）</h1>
+<div class="grid">
+<figure><div class="slot"><div class="ab dk"><div class="badge" style=""><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+</div><div class="bd"><span class="ex">相扑硬拉</span><span class="ld"><span class="num wt">180</span><span class="un">kg</span><span class="num rep">× 5</span></span><span class="rp"><i>RPE</i><span class="num">8</span></span></div></div></div></div><figcaption>外传视频 · 都填了（暗底）</figcaption></figure>
+<figure><div class="slot"><div class="ab lt"><div class="badge" style=""><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+</div><div class="bd"><span class="ex">相扑硬拉</span><span class="ld"><span class="num wt">180</span><span class="un">kg</span><span class="num rep">× 5</span></span><span class="rp"><i>RPE</i><span class="num">8</span></span></div></div></div></div><figcaption>外传视频 · 都填了（亮底）</figcaption></figure>
+<figure><div class="slot"><div class="ab dk"><div class="badge" style=""><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+</div><div class="bd nr"><span class="ex">相扑硬拉</span><span class="ld"><span class="num wt">180</span><span class="un">kg</span><span class="num rep">× 5</span></span></div></div></div></div><figcaption>外传视频 · 没填 RPE</figcaption></figure>
+<figure><div class="slot"><div class="ab lt"><div class="badge" style=""><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+</div><div class="bd"><span class="ex">引体向上</span><span class="ld"><span class="num rep big">× 8</span></span><span class="rp"><i>RPE</i><span class="num">8</span></span></div></div></div></div><figcaption>外传视频 · 自重动作</figcaption></figure>
+<figure><div class="slot"><div class="ab dk"><div class="badge" style=""><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+</div><div class="bd"><span class="ex">暂停低杠深蹲（三秒）加阻力带</span><span class="ld"><span class="num wt">142.5</span><span class="un">kg</span><span class="num rep">× 3</span></span><span class="rp"><i>RPE</i><span class="num">8.5</span></span></div></div></div></div><figcaption>外传视频 · 动作名过长截断</figcaption></figure>
+<figure><div class="slot"><div class="ab dk"><div class="sc"><span>0:03</span><div class="ba"><i></i><b style="left:37.5%"></b><b style="left:75%"></b><u></u></div><span>0:08</span></div><div class="cue"><em>0:03</em><span>下蹲时膝盖在外面</span></div><div class="badge" style="bottom:150px"><div class="h"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+<svg class="w" viewBox="0 0 2443 605" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M96.2 14H2242.53C2257.77 19.6913 2272.07 27.1823 2285.44 36.473C2318 59.1337 2342.47 88.6437 2358.84 125.003C2373.59 157.791 2380.96 192.784 2380.96 229.983C2380.96 272.358 2371.91 310.915 2353.82 345.654C2348.98 354.944 2343.67 363.761 2337.88 372.104L2383.54 476.834L2383.61 476.996L2435.93 597H36L96.2 14Z" fill="#F5F6F8"/>
+<path d="M189.266 96H330.838L393 348.657L455.162 96H596.734L640 515H523.087L499.169 283.502L442.235 515H343.765L286.831 283.502L262.913 515H146L189.266 96Z" fill="#111827"/>
+<path d="M639 515V96H962L951.571 197H755.5V254H924V351H755.5V414H962L951.571 515H639Z" fill="#111827"/>
+<path d="M961 515V96H1284L1273.57 197H1077.5V254H1246V351H1077.5V414H1284L1273.57 515H961Z" fill="#111827"/>
+<path d="M1379 515V197H1283V96H1608L1597.57 197H1495.5V515H1379Z" fill="#111827"/>
+<path d="M1607 515V96H1821.03C1843.87 96 1863.99 101.989 1881.38 113.966C1898.79 125.944 1912.41 142.488 1922.24 163.601C1932.08 184.712 1937 209.277 1937 237.291C1937 266.117 1932 291.189 1921.98 312.503C1911.97 333.819 1898.26 350.364 1880.86 362.138C1863.46 373.912 1843.52 379.8 1821.03 379.8H1723.5V515H1607ZM1723.5 281.749H1782.02C1794.31 281.749 1803.54 278.095 1809.69 270.786C1815.85 263.478 1818.92 252.719 1818.92 238.509C1818.92 228.765 1817.61 220.746 1814.97 214.453C1812.32 208.159 1808.28 203.389 1802.84 200.141C1797.39 196.893 1790.45 195.269 1782.02 195.269H1723.5V281.749Z" fill="#111827"/>
+<path d="M1936 515V96H2163.17C2190.23 96 2212.81 102.293 2230.91 114.879C2249 127.465 2262.62 143.909 2271.76 164.209C2280.89 184.51 2285.46 206.434 2285.46 229.983C2285.46 256.779 2280.01 280.632 2269.12 301.542C2258.23 322.451 2243.47 339.199 2224.84 351.785L2296 515H2165.28L2109.95 374.318H2052.49V515H1936ZM2052.49 281.139H2134.18C2143.32 281.139 2151.05 276.978 2157.37 268.655C2163.7 260.331 2166.86 249.268 2166.86 235.463C2166.86 226.937 2165.46 219.427 2162.65 212.93C2159.83 206.434 2155.97 201.258 2151.05 197.401C2146.13 193.544 2140.51 191.615 2134.18 191.615H2052.49V281.139Z" fill="#111827"/>
+</svg>
+<span class="set">第 1 组</span></div><div class="bd"><span class="ex">低杠深蹲</span><span class="ld"><span class="num wt">130</span><span class="un">kg</span><span class="num rep">× 5</span></span><span class="rp"><i>RPE</i><span class="num">8</span></span></div></div></div></div><figcaption>App 内回放 · 展开 + 打点</figcaption></figure>
+<figure><div class="slot"><div class="ab lt"><div class="sc"><span>0:03</span><div class="ba"><i></i><b style="left:37.5%"></b><b style="left:75%"></b><u></u></div><span>0:08</span></div><div class="cue"><em>0:03</em><span>下蹲时膝盖在外面</span></div><div class="dot"><svg class="m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+
+  <circle cx="50" cy="50" r="39" fill="#D97706"/>
+  <path d="M22.8 37.3 A30 30 0 0 1 60.3 21.8" fill="none" stroke="#F5F6F8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M31 60 H45 L64 39" fill="none" stroke="#F5F6F8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="37" r="6.4" fill="#F5F6F8"/>
+  <path d="M46 60 H62" fill="none" stroke="#F5F6F8" stroke-width="6.4" stroke-linecap="round" opacity="0.42"/>
+</svg>
+</div></div></div><figcaption>App 内回放 · 收起</figcaption></figure>
+</div>
+</body></html>
