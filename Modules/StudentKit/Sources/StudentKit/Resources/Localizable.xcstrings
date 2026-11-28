@@ -20448,6 +20448,29 @@
         }
       }
     },
+    "student.videoAttachment.incompleteFile": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save the full original video to your phone, then select it again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频文件不完整。请将原视频完整保存到手机后重新选择。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片檔案不完整。請將原始影片完整儲存到手機後重新選取。"
+          }
+        }
+      }
+    },
     "student.videoAttachmentViewModel.copy001": {
       "extractionState": "manual",
       "localizations": {

@@ -3,7 +3,6 @@ import CoreModels
 import DesignSystem
 import PhotosUI
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// "附视频" block inside SetEntrySheet (spec 027): pick from the photo
 /// library or record with the camera. Successful/background work stays
@@ -189,8 +188,8 @@ struct VideoAttachmentSection: View {
               await attach(sourceURL: url)
             }
           },
-          onFailure: {
-            videoViewModel.reportVideoProcessingFailure()
+          onFailure: { error in
+            videoViewModel.reportVideoProcessingFailure(draftID: draftID, error: error)
             isPreparing = false
           },
           allDayFlow: true
@@ -286,12 +285,12 @@ extension VideoAttachmentSection {
     defer { importTask = nil }
     let movie: PickedVideo?
     do {
-      movie = try await item.loadTransferable(type: PickedVideo.self)
+      movie = try await PickedVideo.load(from: item)
     } catch {
       isPreparing = false
       guard !Task.isCancelled else { return }
       VideoProcessingDiagnostics().report(.picker, error: error)
-      videoViewModel.reportVideoProcessingFailure()
+      videoViewModel.reportVideoProcessingFailure(draftID: draftID, error: error)
       return
     }
     guard !Task.isCancelled else {
@@ -379,22 +378,4 @@ extension VideoAttachmentSection {
     Task { await videoViewModel.remove(setLogID: record.setLogID) }
   }
 
-}
-
-/// File-URL transferable for PhotosPicker video items; the received file is
-/// copied into tmp so it outlives the picker session.
-struct PickedVideo: Identifiable, Transferable {
-  let id = UUID()
-  let url: URL
-
-  static var transferRepresentation: some TransferRepresentation {
-    FileRepresentation(contentType: .movie) { movie in
-      SentTransferredFile(movie.url)
-    } importing: { received in
-      let destination = FileManager.default.temporaryDirectory
-        .appendingPathComponent("\(UUID().uuidString).\(received.file.pathExtension)")
-      try FileManager.default.copyItem(at: received.file, to: destination)
-      return PickedVideo(url: destination)
-    }
-  }
 }

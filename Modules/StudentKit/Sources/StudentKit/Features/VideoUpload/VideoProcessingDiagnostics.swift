@@ -28,7 +28,9 @@ struct VideoProcessingDiagnostics: Sendable {
   func report(_ stage: VideoProcessingStage, error: Error, isActive: Bool = true) {
     guard isActive, !Task.isCancelled, !Self.isCancellation(error) else { return }
     var code: String
-    if case VideoUploadError.exportFailed = error {
+    if error is AlbumVideoImportError {
+      code = "ERR_INCOMPLETE_VIDEO"
+    } else if case VideoUploadError.exportFailed = error {
       code = "EXPORT_FAILED"
     } else if case VideoUploadError.durationExceedsLimit = error {
       code = Code.tooLong.rawValue
