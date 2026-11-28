@@ -8,9 +8,15 @@
 
 ## 本版将包含
 
-- **学员视频上传时继续播放音乐（P1）**：从打开相机、录制带现场声音的视频，到相册选片、裁剪和上传，允许其他 App 继续播放音乐。[实现与验证](docs/journal/2026-11-28-068-upload-music-ios.md)
+- 学员端「休息设置」移除圆盘下方的操作提示。点空白处仍会保存并收起。见 [spec 111](specs/111-rest-timer-ring/SPEC.md)。
 
 - **spec 099 开屏动画（P1，#501，2026-11-28 David 收货并排入下一班）**：冷启动先看到 MeetPR 字标入场和「Meet Every PR Together」，底下一条加载线从左扫到右，共 1.2 秒，首屏就绪后 0.3 秒淡出；首屏没好时加载线继续单向循环。系统启动屏换成同一张底图，交接无跳变；「正在验证会话…」文字去掉。纯客户端，无后端依赖。已验：AppShell 新增 7 条测试绿、iPhone 17e 已登录学员冷启动亲眼看、字标位置与定稿差 1pt 以内；未验：未登录冷启动、弱网时循环加载线的实机画面、后台切回不重播、带历史老账号升级后第一屏。安卓同批 meetpr-rn#229。[定稿与验收](specs/099-launch-animation/SPEC.md) · [实装记录](docs/journal/2026-11-27-099-launch-splash-ios.md)
+
+- **学员端两处显示修复（P1，#497，T1 自合）**：成长 › RPE 对照表顶部的 e1RM 不再显示成一长串小数（如 `178.34793491864840192`），改为和 E1RM 曲线页一样保留 1 位；成长 › 强度指标横轴日期原来写死「日/月」，现在跟随系统地区，中国地区显示 `11/22`。纯客户端，无后端依赖。已验：`RPETableHistoryTests`、`ProgressMetricsTests` 新增回归测试绿，iPhone 17e DemoStudent 亲眼看；未验：英制（lb）下的对照表实机画面。安卓对照表无此问题，横轴日期同批修（[meetpr-rn#232](https://github.com/tianpingdeng112233-cell/meetpr-rn/pull/232)）。[卡](docs/cards/2026-11-27-student-rpe-chat-chart.md) · [排查记录](docs/journal/2026-11-27-student-rpe-chat-chart.md)
+
+- **学员演示包宣发示例数据（不影响正式包，#499）**：`MeetPR-DemoStudent` 带 `-demo-showcase` 启动时换成一份 12 周备赛周期的丰富示例数据，供宣发截图用；顺带把 `RepositoryContracts` 列为 App 直接依赖，演示 scheme 的测试才能链接。正式包行为不变。[卡](docs/cards/2026-11-27-demo-showcase-data.md)
+
+- **学员视频上传时继续播放音乐（P1）**：从打开相机、录制带现场声音的视频，到相册选片、裁剪和上传，允许其他 App 继续播放音乐。[实现与验证](docs/journal/2026-11-28-068-upload-music-ios.md)
 
 ## 延期候选（未排期，前置解锁后另行排期）
 
