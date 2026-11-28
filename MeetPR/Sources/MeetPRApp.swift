@@ -18,6 +18,9 @@ struct MeetPRApp: App {
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   @Environment(\.scenePhase) private var scenePhase
   private let draftStore: DraftStore
+  #if DEMO_MODE && DEMO_USER_STUDENT
+    private let showcase: DemoShowcaseScreen?
+  #endif
   private let rootView: RootView
   private let restTimerActivityController: RestTimerLiveActivityController
   #if !DEMO_MODE
@@ -31,6 +34,16 @@ struct MeetPRApp: App {
     self.restTimerActivityController = restTimerActivityController
     restTimerActivityController.cleanUpAllActivities()
 
+    #if DEMO_MODE && DEMO_USER_STUDENT
+      if let scene = DemoShowcase.launch() {
+        let screen = DemoShowcaseScreen(scene: scene)
+        showcase = screen
+        rootView = RootView(draftStore: draftStore)
+        _session = State(initialValue: screen.session)
+        return
+      }
+      showcase = nil
+    #endif
     let dependencies = Self.makeRootDependencies(draftStore: draftStore)
     rootView = dependencies.rootView
     _session = State(initialValue: dependencies.session)
@@ -498,7 +511,11 @@ struct MeetPRApp: App {
   @ViewBuilder
   private var appContent: some View {
     #if DEMO_MODE && DEMO_USER_STUDENT
-      if let scenario = ProfileDemoScenario.launchValue, case .authenticated = session.state {
+      if let showcase, case .authenticated = session.state {
+        showcase
+      } else if let scenario = ProfileDemoScenario.launchValue,
+        case .authenticated = session.state
+      {
         ProfileDemoScene(scenario: scenario, onLogout: { await session.logout() })
       } else {
         rootView
