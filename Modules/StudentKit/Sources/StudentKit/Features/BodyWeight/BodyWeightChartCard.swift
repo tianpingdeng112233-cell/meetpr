@@ -86,20 +86,18 @@ private struct BodyWeightChart: View {
         LineMark(x: .value("Date", date), y: .value("kg", value))
           .foregroundStyle(Color.MeetPR.gold500)
           .lineStyle(StrokeStyle(lineWidth: 2.4))
-        PointMark(x: .value("Date", date), y: .value("kg", value))
-          .foregroundStyle(Color.MeetPR.gold500)
-          .symbolSize(40)
-          .annotation(position: .top) {
-            if records.count == 1 {
-              Text(BodyWeightInput.text(kg: record.weightKg, unit: .kg))
-                .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-                .foregroundStyle(Color.MeetPR.textSecondary)
-            }
-          }
-        if record.id != records.last?.id {
+        // A line alone carries the trend; only the latest weigh-in keeps a dot.
+        if record.id == records.last?.id {
           PointMark(x: .value("Date", date), y: .value("kg", value))
-            .foregroundStyle(Color.MeetPR.surfaceCard)
-            .symbolSize(16)
+            .foregroundStyle(Color.MeetPR.gold500)
+            .symbolSize(40)
+            .annotation(position: .top) {
+              if records.count == 1 {
+                Text(BodyWeightInput.text(kg: record.weightKg, unit: .kg))
+                  .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+                  .foregroundStyle(Color.MeetPR.textSecondary)
+              }
+            }
         }
       }
     }
