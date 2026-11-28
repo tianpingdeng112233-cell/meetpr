@@ -87,14 +87,14 @@ private struct RestRingModal: View {
             onAdjust: session.adjust, onEnd: session.end
           )
           .scaleEffect(scale)
+          Text(StudentStrings.localized(.restRingDismiss))
+            .font(.system(size: 12))
+            .foregroundStyle(Color.MeetPR.inkOnCTAFill)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: proxy.size.width - 24)
+            .position(x: proxy.size.width / 2, y: proxy.size.height / 2 + diameter * scale / 2 + 24)
+            .allowsHitTesting(false)
         }
-        Text(StudentStrings.localized(settings ? .restRingSave : .restRingDismiss))
-          .font(.system(size: 12))
-          .foregroundStyle(Color.MeetPR.inkOnCTAFill)
-          .multilineTextAlignment(.center)
-          .frame(maxWidth: proxy.size.width - 24)
-          .position(x: proxy.size.width / 2, y: proxy.size.height / 2 + diameter * scale / 2 + 24)
-          .allowsHitTesting(false)
       }
       .frame(width: proxy.size.width, height: proxy.size.height)
     }
