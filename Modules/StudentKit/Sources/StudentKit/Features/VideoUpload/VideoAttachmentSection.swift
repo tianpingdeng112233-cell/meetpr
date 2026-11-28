@@ -14,6 +14,7 @@ struct VideoAttachmentSection: View {
   let studentID: UUID
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel
+  @State private var albumSaveFailed = false
   let badge: VideoBadgeInfo?
   let playback: SetEntryVideoPlayer
   /// Set-log id when the row was already logged; nil until first commit.
@@ -178,6 +179,9 @@ struct VideoAttachmentSection: View {
       await loadPlayback()
     }
     #if os(iOS)
+      .alert(StudentStrings.localized(.cameraRecorderView013), isPresented: $albumSaveFailed) {
+        Button(DesignSystemStrings.done) {}
+      }
       .fullScreenCover(isPresented: $showingCamera) {
         CameraRecorderView(
           maxDurationSeconds: videoViewModel.maxDurationSeconds,
@@ -192,6 +196,8 @@ struct VideoAttachmentSection: View {
             videoViewModel.reportVideoProcessingFailure(draftID: draftID, error: error)
             isPreparing = false
           },
+          badge: { badge },
+          onAlbumSaveFailure: { albumSaveFailed = true },
           allDayFlow: true
         )
       }

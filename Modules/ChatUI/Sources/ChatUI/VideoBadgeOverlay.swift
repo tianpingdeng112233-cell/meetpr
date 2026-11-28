@@ -1,56 +1,78 @@
 import DesignSystem
 import SwiftUI
 
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-struct VideoBadgeOverlay: View {
+/// The recording preview and ImageRenderer both position the card in the actual video rectangle.
+public struct VideoBadgeExportOverlay: View {
   let info: VideoBadgeInfo
-  @Binding var isExpanded: Bool
-  /// Compact hosts (the 270pt workbench stage) pin the badge to the collapsed
-  /// logo mark: an expanded card cannot fit there without covering the central
-  /// playback button, and the set data is already shown beside the player.
-  var allowsExpansion: Bool = true
+  let size: CGSize
 
-  var body: some View {
-    GeometryReader { proxy in
-      VStack {
-        Spacer()
-        HStack {
-          Spacer()
-          if allowsExpansion {
-            Button {
-              isExpanded.toggle()
-            } label: {
-              badgeContent(containerWidth: proxy.size.width, expanded: isExpanded)
-            }
-            .accessibilityLabel(
-              isExpanded ? ChatStrings.collapseVideoBadge : ChatStrings.expandVideoBadge
-            )
-            .accessibilityIdentifier(
-              isExpanded ? "feedback.video.badge.expanded" : "feedback.video.badge.collapsed"
-            )
-          } else {
-            badgeContent(containerWidth: proxy.size.width, expanded: false)
-              .accessibilityHidden(true)
-          }
-          Spacer()
-        }
-      }
-    }
+  public init(info: VideoBadgeInfo, size: CGSize) {
+    self.info = info
+    self.size = size
   }
 
-  @ViewBuilder
-  private func badgeContent(containerWidth: CGFloat, expanded: Bool) -> some View {
-    if expanded {
-      VideoBadgeCard(
-        presentation: VideoBadgePresentation(info: info),
-        width: VideoBadgeLayout.screenCardWidth(containerWidth: containerWidth),
-        includesCoachAttribution: false
+  public var body: some View {
+    let layout = VideoBadgeLayout(size: size)
+    ZStack(alignment: .bottomLeading) {
+      Color.clear
+      if info.hasContent {
+        VideoBadgeCard(presentation: .init(info: info, mode: .export), scale: layout.scale)
+          .padding(.leading, layout.exportInsets.x)
+          .padding(.bottom, layout.exportInsets.y)
+      }
+    }
+    .frame(width: size.width, height: size.height)
+    .allowsHitTesting(false)
+  }
+}
+
+public struct VideoBadgeOverlay: View {
+  let info: VideoBadgeInfo
+  @Binding var isExpanded: Bool
+  var allowsExpansion = true
+  var scale: CGFloat = 1
+
+  public init(info: VideoBadgeInfo, isExpanded: Binding<Bool>, size: CGSize) {
+    self.info = info
+    _isExpanded = isExpanded
+    scale = VideoBadgeLayout(size: size).scale
+  }
+
+  init(
+    info: VideoBadgeInfo, isExpanded: Binding<Bool>, allowsExpansion: Bool = true,
+    scale: CGFloat = 1
+  ) {
+    self.info = info
+    _isExpanded = isExpanded
+    self.allowsExpansion = allowsExpansion
+    self.scale = scale
+  }
+
+  public var body: some View {
+    if allowsExpansion {
+      Button {
+        isExpanded.toggle()
+      } label: {
+        if isExpanded {
+          VideoBadgeCard(presentation: .init(info: info, mode: .replay), scale: scale)
+        } else {
+          VideoBadgeLogoMark(size: max(61 * scale, MeetPRSpacing.minimumHitTarget))
+            .scaleEffect(100 / 78.0)
+            .shadow(color: .black.opacity(0.38), radius: 9, y: 4)
+        }
+      }
+      .buttonStyle(.plain)
+      .padding(.leading, 44 * scale)
+      .accessibilityLabel(
+        isExpanded ? ChatStrings.collapseVideoBadge : ChatStrings.expandVideoBadge
       )
-      .environment(\.colorScheme, .dark)
+      .accessibilityIdentifier(
+        isExpanded ? "feedback.video.badge.expanded" : "feedback.video.badge.collapsed")
     } else {
       VideoBadgeLogoMark(size: MeetPRSpacing.minimumHitTarget)
         .shadow(color: .black.opacity(0.38), radius: 9, y: 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .accessibilityHidden(true)
     }
   }
 }

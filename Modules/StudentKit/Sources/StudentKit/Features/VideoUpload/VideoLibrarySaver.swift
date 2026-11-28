@@ -12,10 +12,22 @@
     }
 
     static func save(_ url: URL) async -> Bool {
+      await save(.file(url))
+    }
+
+    static func save(_ source: RecordingAlbumSource) async -> Bool {
       guard await requestAuthorization() else { return false }
       do {
         try await PHPhotoLibrary.shared().performChanges {
-          PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+          switch source {
+          case .file(let url):
+            PHAssetCreationRequest.forAsset().addResource(with: .video, fileURL: url, options: nil)
+          case .mappedOriginal(let data, let filename):
+            let options = PHAssetResourceCreationOptions()
+            options.originalFilename = filename
+            PHAssetCreationRequest.forAsset().addResource(
+              with: .video, data: data, options: options)
+          }
         }
         return true
       } catch {

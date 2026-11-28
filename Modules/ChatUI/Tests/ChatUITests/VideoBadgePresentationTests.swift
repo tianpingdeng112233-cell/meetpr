@@ -1,4 +1,5 @@
 import CoreGraphics
+import SwiftUI
 import Testing
 
 @testable import ChatUI
@@ -17,57 +18,64 @@ struct VideoBadgePresentationTests {
     }
   #endif
 
-  @Test("optional fields disappear without placeholder content")
-  func optionalFieldsDisappear() {
-    let presentation = VideoBadgePresentation(
-      info: VideoBadgeInfo(
-        exerciseName: "  ",
-        weightKg: .infinity,
-        reps: nil,
-        rpe: nil,
-        setOrdinal: nil,
-        coachName: "\n"
-      )
-    )
-
-    #expect(presentation.exerciseName == nil)
-    #expect(presentation.weightText == nil)
-    #expect(presentation.reps == nil)
-    #expect(presentation.rpeText == nil)
-    #expect(presentation.setOrdinal == nil)
-    #expect(presentation.coachName == nil)
-    #expect(!presentation.hasLoad)
+  @Test("replay includes the supplied ordinal and export omits it")
+  func presentationModes() {
+    let badge = VideoBadgeInfo(
+      exerciseName: "相扑硬拉", weightKg: 180, reps: 5, rpe: 8.5, setOrdinal: 3)
+    let replay = VideoBadgePresentation(info: badge, mode: .replay)
+    #expect(replay.setOrdinal == 3)
+    #expect(replay.exerciseName == "相扑硬拉")
+    #expect(replay.weightText == "180")
+    #expect(replay.reps == 5)
+    #expect(replay.rpeText == "8.5")
+    #expect(VideoBadgePresentation(info: badge, mode: .export).setOrdinal == nil)
   }
 
-  @Test("metrics use the app's zero-or-one-decimal display convention")
-  func metricsFormatting() {
-    let presentation = VideoBadgePresentation(
-      info: VideoBadgeInfo(
-        exerciseName: "传统硬拉",
-        weightKg: 180,
-        reps: 4,
-        rpe: 8.5,
-        setOrdinal: 3,
-        coachName: "陈教练"
-      )
-    )
-
-    #expect(presentation.exerciseName == "传统硬拉")
-    #expect(presentation.weightText == "180")
-    #expect(presentation.reps == 4)
-    #expect(presentation.rpeText == "8.5")
-    #expect(presentation.setOrdinal == 3)
-    #expect(presentation.coachName == "陈教练")
-    #expect(presentation.hasLoad)
+  @Test("optional metrics disappear and a set number alone cannot create a badge")
+  func optionalContent() {
+    let longName = String(repeating: "暂停低杠深蹲", count: 10)
+    let load = VideoBadgePresentation(
+      info: .init(exerciseName: longName, weightKg: 142.5, reps: 3), mode: .export)
+    #expect(load.exerciseName == longName)
+    #expect(load.weightText == "142.5")
+    #expect(load.rpeText == nil)
+    let bodyweight = VideoBadgePresentation(info: .init(reps: 8), mode: .export)
+    #expect(bodyweight.weightText == nil)
+    #expect(bodyweight.reps == 8)
+    #expect(VideoBadgeInfo(rpe: 8).hasContent)
+    #expect(!VideoBadgeInfo(exerciseName: "  ", weightKg: .infinity, setOrdinal: 1).hasContent)
   }
 
-  @Test("component preserves display-ready set ordinals without incrementing")
-  func preservesSetOrdinal() {
-    let presentation = VideoBadgePresentation(
-      info: VideoBadgeInfo(setOrdinal: 0)
-    )
+  @Test("long action names fit the card and only the visible prefix is rendered")
+  @MainActor
+  func longNameTruncation() throws {
+    func render(_ name: String) throws -> CGImage {
+      let card = VideoBadgeCard(
+        presentation: .init(info: .init(exerciseName: name, reps: 5), mode: .export), scale: 1)
+      return try #require(ImageRenderer(content: card).cgImage)
+    }
+    let prefix = String(repeating: "W", count: 60)
+    let long = try render(prefix + "111")
+    let suffixChanged = try render(prefix + "999")
+    let prefixChanged = try render("iii" + prefix)
+    #expect(long.width <= 452)
+    #expect(long.height == (try render("Squat")).height)
+    let pixels = try #require(long.dataProvider?.data as Data?)
+    #expect(pixels == (suffixChanged.dataProvider?.data as Data?))
+    #expect(pixels != (prefixChanged.dataProvider?.data as Data?))
+  }
 
-    #expect(presentation.setOrdinal == 0)
+  @Test("export lower-left anchor scales with the fitted portrait artboard")
+  func exportGeometry() {
+    for (size, scale, anchor) in [
+      (CGSize(width: 1080, height: 1920), 2.0, CGPoint(x: 88, y: 428)),
+      (CGSize(width: 1920, height: 1080), 1.125, CGPoint(x: 49.5, y: 240.75)),
+      (CGSize(width: 1080, height: 1440), 1.5, CGPoint(x: 66, y: 321)),
+    ] {
+      let layout = VideoBadgeLayout(size: size)
+      #expect(Double(layout.scale) == scale)
+      #expect(layout.exportInsets == anchor)
+    }
   }
 
   @Test("portrait preferred transform swaps render dimensions and normalizes origin")

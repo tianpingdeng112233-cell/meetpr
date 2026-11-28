@@ -10,22 +10,24 @@ public struct VideoBadgeInfo: Equatable, Sendable {
   public let reps: Int?
   public let rpe: Double?
   public let setOrdinal: Int?
-  public let coachName: String?
+
+  public var hasContent: Bool {
+    let presentation = VideoBadgePresentation(info: self, mode: .export)
+    return presentation.exerciseName != nil || presentation.hasLoad || presentation.rpeText != nil
+  }
 
   public init(
     exerciseName: String? = nil,
     weightKg: Double? = nil,
     reps: Int? = nil,
     rpe: Double? = nil,
-    setOrdinal: Int? = nil,
-    coachName: String? = nil
+    setOrdinal: Int? = nil
   ) {
     self.exerciseName = exerciseName
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
     self.setOrdinal = setOrdinal
-    self.coachName = coachName
   }
 }
 
@@ -35,15 +37,15 @@ struct VideoBadgePresentation: Equatable, Sendable {
   let reps: Int?
   let rpeText: String?
   let setOrdinal: Int?
-  let coachName: String?
 
-  init(info: VideoBadgeInfo) {
+  enum Mode { case replay, export }
+
+  init(info: VideoBadgeInfo, mode: Mode) {
     exerciseName = Self.nonempty(info.exerciseName)
     weightText = Self.metricText(info.weightKg)
     reps = info.reps
     rpeText = Self.metricText(info.rpe)
-    setOrdinal = info.setOrdinal
-    coachName = Self.nonempty(info.coachName)
+    setOrdinal = mode == .replay ? info.setOrdinal : nil
   }
 
   var hasLoad: Bool {

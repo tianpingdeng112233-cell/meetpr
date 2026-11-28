@@ -17,7 +17,6 @@ public struct CoachRootView: View {
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
   private let termsURL: URL?
-  private let coachDisplayName: String?
   private let detailContext: CoachStudentDetailContext
   private let chat: CoachChatContext?
   private let draftStore: DraftStore
@@ -128,7 +127,6 @@ public struct CoachRootView: View {
       initialValue: CoachMyProfileViewModel(displayName: coachDisplayName, logoutAction: onLogout))
     self.privacyPolicyURL = privacyPolicyURL
     self.termsURL = termsURL
-    self.coachDisplayName = coachDisplayName
   }
 
   private static func chatContext(
@@ -151,7 +149,6 @@ public struct CoachRootView: View {
   public var body: some View {
     coachTabs
       .buttonStyle(PressScaleButtonStyle())
-      .environment(\.coachVideoBadgeName, coachDisplayName)
       .environment(exerciseNavigation)
       .onChange(of: exerciseNavigation.reference) { _, reference in
         guard let reference, let studentID = exerciseNavigation.studentID else { return }

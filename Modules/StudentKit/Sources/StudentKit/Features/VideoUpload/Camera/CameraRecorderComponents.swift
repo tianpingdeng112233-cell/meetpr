@@ -1,5 +1,6 @@
 #if os(iOS)
   import AVFoundation
+  import ChatUI
   import DesignSystem
   import SwiftUI
 
@@ -110,6 +111,7 @@
 
   struct RecorderReviewView: View {
     let url: URL
+    let badge: VideoBadgeInfo?
     let duration: TimeInterval
     @Binding var saveToPhotoLibrary: Bool
     let isBusy: Bool
@@ -124,6 +126,9 @@
         ZStack(alignment: .topLeading) {
           LoopingVideoPlayer(url: url)
             .id(url)
+            .overlay {
+              if let badge, badge.hasContent { RecordingBadgePreview(url: url, badge: badge) }
+            }
             .ignoresSafeArea(edges: .top)
           RecorderCloseButton(action: onClose)
             .padding()

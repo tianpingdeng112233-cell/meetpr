@@ -13,7 +13,6 @@ struct StudentVideoGridView: View {
   let logs: [StudentSetLog]
   let feedbackVideoIDs: Set<UUID>
   @Bindable private var viewModel: StudentVideoGridViewModel
-  @Environment(\.coachVideoBadgeName) private var coachName
 
   init(
     videos: [StudentVideo],
@@ -160,8 +159,7 @@ struct StudentVideoGridView: View {
       CoachVideoBadgeResolver.studentVideo(
         $0,
         planDays: planDays,
-        logs: logs,
-        coachName: coachName
+        logs: logs
       )
     }
   }

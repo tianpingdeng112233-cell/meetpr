@@ -93,10 +93,6 @@ struct FeedbackVideoWorkbenchPlayer: View {
       VideoPlayer(player: player)
         .allowsHitTesting(false)
 
-      if badge != nil {
-        VideoBadgeScrim()
-      }
-
       Button(action: togglePlayback) {
         Image(systemName: isPlaying ? "pause.fill" : "play.fill")
           .font(

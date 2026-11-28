@@ -1,11 +1,14 @@
 #if os(iOS)
   import AVFoundation
+  import ChatUI
   import DesignSystem
   import SwiftUI
   import UIKit
 
   struct VideoTrimView: View {
     let session: VideoTrimSession
+    let recordingBadge: VideoBadgeInfo?
+    let albumPreference: Binding<Bool>?
     let uploadsOnSave: Bool
 
     @State private var player = AVPlayer()
@@ -18,7 +21,12 @@
     @State private var playbackTask: Task<Void, Never>?
     @State private var exportTask: Task<Void, Never>?
 
-    init(session: VideoTrimSession, uploadsOnSave: Bool = false) {
+    init(
+      session: VideoTrimSession, uploadsOnSave: Bool = false, recordingBadge: VideoBadgeInfo? = nil,
+      albumPreference: Binding<Bool>? = nil
+    ) {
+      self.recordingBadge = recordingBadge
+      self.albumPreference = albumPreference
       self.uploadsOnSave = uploadsOnSave
       self.session = session
       _selection = State(
@@ -54,6 +62,9 @@
 
         VideoTrimPlayerSurface(player: player)
           .overlay {
+            if let recordingBadge, recordingBadge.hasContent {
+              RecordingBadgePreview(url: session.sourceURL, badge: recordingBadge)
+            }
             if !isReady {
               ProgressView(StudentStrings.localized(.videoTrimView001))
                 .tint(.white)
@@ -63,6 +74,10 @@
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .background(.black)
 
+        if let albumPreference {
+          Toggle(StudentStrings.localized(.cameraRecorderComponents006), isOn: albumPreference)
+            .padding(.horizontal, MeetPRSpacing.space4)
+        }
         VideoTrimPlaybackControls(
           isPlaying: isPlaying, isEnabled: isReady, action: togglePlayback)
       }

@@ -75,8 +75,6 @@ enum ChatStrings {
   static let videoPlayback = localized("chat.videoPlayback")
   static let collapseVideoBadge = localized("chat.videoBadge.collapse")
   static let expandVideoBadge = localized("chat.videoBadge.expand")
-  static let videoBadgeSetPrefix = localized("chat.videoBadge.setPrefix")
-  static let videoBadgeSetSuffix = localized("chat.videoBadge.setSuffix")
   static let coachExportConfirmationTitle = localized(
     "chat.videoExport.coachConfirmation.title")
   static let coachExportConfirmationMessage = localized(
@@ -218,18 +216,6 @@ enum ChatStrings {
     return String(
       localized: "chat.relative.yearsAgo \(formattedCount)",
       bundle: .module
-    )
-  }
-
-  static func videoMarkers(_ count: Int) -> String {
-    localized("chat.videoMarkers").replacing("{count}", with: count.formatted())
-  }
-
-  static func videoBadgeCoach(_ coachName: String, locale: Locale = .current) -> String {
-    String(
-      localized: "chat.videoBadge.coach \(coachName)",
-      bundle: .module,
-      locale: locale
     )
   }
 

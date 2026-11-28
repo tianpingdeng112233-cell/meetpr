@@ -215,26 +215,33 @@ import ViewInspector
     try await Task.sleep(for: .milliseconds(250))
   }
 
-  @Test func expandedHeaderIncludesAvailableSetMetrics() throws {
+  @Test func expandedReplayIncludesAvailableSetMetrics() throws {
     let playback = SetEntryVideoPlayer()
     playback.state.toggleExpanded()
     let view = SetEntryVideoPlayerView(
       playback: playback,
       badge: VideoBadgeInfo(weightKg: 175, reps: 3, rpe: 8.5, setOrdinal: 1),
       retry: {})
-    let label = StudentStrings.replacing(.setEntryVideoSet, values: ["1"])
-    #expect(
-      try view.inspect().find(text: "\(label) · 175kg × 3 · RPE 8.5").string()
-        == "\(label) · 175kg × 3 · RPE 8.5")
+    let inspected = try view.inspect()
+    for value in ["175", "kg", "× 3", "RPE", "8.5"] {
+      #expect(try inspected.find(text: value).string() == value)
+    }
   }
 
-  @Test func expandedHeaderOmitsMissingFields() throws {
+  @Test func expandedReplayOmitsMissingFields() throws {
     let playback = SetEntryVideoPlayer()
     playback.state.toggleExpanded()
-    let view = SetEntryVideoPlayerView(
-      playback: playback, badge: VideoBadgeInfo(reps: 3, setOrdinal: 2), retry: {})
-    let label = StudentStrings.replacing(.setEntryVideoSet, values: ["2"])
-    #expect(try view.inspect().find(text: "\(label) · 3").string() == "\(label) · 3")
+    var row = TodayWorkoutSetRowDraft(
+      id: UUID(), planExerciseID: UUID(), exerciseID: UUID(), exerciseName: "Pull-up",
+      isAccessory: true, prescribed: .init(id: UUID(), setIndex: 1, loadMode: .bodyweight, reps: 3),
+      actualWeight: 0, actualReps: 3)
+    let view = SetEntryVideoPlayerView(playback: playback, badge: row.videoBadge, retry: {})
+    row.actualWeight = 5
+    #expect(row.videoBadge.weightKg == 5)
+    let inspected = try view.inspect()
+    #expect(try inspected.find(text: "× 3").string() == "× 3")
+    #expect((try? inspected.find(text: "kg")) == nil)
+    #expect((try? inspected.find(text: "RPE")) == nil)
   }
 
   @Test func setOrdinalIsInterpolatedInBothLanguages() {
@@ -245,5 +252,47 @@ import ViewInspector
       StudentStrings.replacing(
         .setEntryVideoSet, values: ["1"], locale: Locale(identifier: "zh-Hans"))
         == "第 1 组")
+  }
+}
+
+extension SetEntryVideoPlayerTests {
+  @Test(arguments: [(nil, false), (Decimal(8.5), false), (nil, true)])
+  func videoHandoffThenSetCompletionPreservesRecordedRPE(
+    prescribedRPE: Decimal?, explicitlyEnterEight: Bool
+  ) async throws {
+    let fixture = try await makeSuggestionSheetFixture(
+      seedHistory: false,
+      prescribed: .init(id: UUID(), setIndex: 0, weightKg: 90, reps: 5, rpe: prescribedRPE))
+    let harness = VideoUploadHarness()
+    defer { try? FileManager.default.removeItem(at: harness.filesDirectory) }
+    func entryAttachment() throws -> VideoAttachmentSection {
+      let sheet = SetEntrySheet(
+        rowIndex: 0, draft: fixture.draft, setNumber: 1, viewModel: fixture.viewModel,
+        studentID: fixture.studentID, trainingDate: fixture.date,
+        videoViewModel: VideoAttachmentViewModel(manager: harness.manager))
+      return try sheet.inspect().find(VideoAttachmentSection.self).actualView()
+    }
+    let attachment = try entryAttachment()
+    let enteredRPE = prescribedRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
+    #expect(attachment.badge?.rpe == enteredRPE)
+    attachment.onWillPick?()
+    let id = try #require(await attachment.resolveSetLogID())
+    // Reopening the editor and the direct camera read the still-incomplete row.
+    #expect(try entryAttachment().badge?.rpe == enteredRPE)
+    #expect(fixture.viewModel.currentDrafts?.first?.videoBadge.rpe == enteredRPE)
+    if explicitlyEnterEight {
+      fixture.viewModel.updateAllDayValue(
+        cell: .init(rowID: fixture.draft.id, field: .rpe, value: "8"), text: "8",
+        dayID: fixture.viewModel.currentDay?.id, unit: .kg)
+      #expect(try entryAttachment().badge?.rpe == 8)
+    }
+    // Return from the camera and complete using the training row.
+    #expect(await fixture.viewModel.commitSet(rowIndex: 0))
+    let saved = try #require(
+      try await fixture.logs.fetchLogsForExercise(
+        studentID: fixture.studentID, planExerciseID: fixture.draft.planExerciseID
+      ).first)
+    #expect(saved.id == id && saved.completed)
+    #expect(saved.rpe == (prescribedRPE ?? 8))
   }
 }

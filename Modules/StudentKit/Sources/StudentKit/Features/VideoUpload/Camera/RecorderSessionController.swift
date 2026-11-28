@@ -120,10 +120,10 @@
       await prepare()
     }
 
-    func relinquishReviewFile() async {
+    func relinquishReviewFile() {
       machine.close()
       _ = reviewFileOwner.relinquishReviewFile()
-      await worker.stopSession()
+      // Dismissing the recorder calls close(), which stops the session.
     }
 
     func replaceReviewFile(with editedURL: URL) async {

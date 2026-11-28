@@ -40,8 +40,12 @@ extension TodayWorkoutViewModel {
       rememberAllDayEffort(input.field == .rir ? .rir : .rpe, for: draft)
       let rpe = input.field == .rpe ? Decimal(string: input.committedText) : nil
       let rir = input.field == .rir ? Int(input.committedText) : nil
-      guard rpe != draft.actualRPE || rir != draft.actualRIR else { return false }
+      // Confirming the default number is still an edit when the badge omitted it.
+      let valueChanged = rpe != draft.actualRPE || rir != draft.actualRIR
+      guard valueChanged || (rpe != nil && draft.isRPEPlaceholder == true) else { return false }
       updateEffort(rowIndex: index, rpe: rpe, rir: rir)
+      // A provenance-only edit must not enqueue an incomplete log over a completion.
+      return valueChanged
     }
     return true
   }

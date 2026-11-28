@@ -8,8 +8,7 @@ enum CoachVideoBadgeResolver {
   static func studentVideo(
     _ video: StudentVideo,
     planDays: [StudentPlanDay],
-    logs: [StudentSetLog],
-    coachName: String?
+    logs: [StudentSetLog]
   ) -> VideoBadgeInfo {
     let exercise = video.planExerciseID.flatMap { planExerciseID in
       planDays.lazy.flatMap(\.exercises).first { $0.id == planExerciseID }
@@ -24,15 +23,13 @@ enum CoachVideoBadgeResolver {
       rpe: log?.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
       setOrdinal: log.map {
         SetIndexDisplay.number(forZeroBasedIndex: $0.setIndex)
-      },
-      coachName: coachName
+      }
     )
   }
 
   static func pendingVideo(
     _ item: PendingVideoItem,
-    setInfo: VideoSetInfo?,
-    coachName: String?
+    setInfo: VideoSetInfo?
   ) -> VideoBadgeInfo {
     VideoBadgeInfo(
       exerciseName: item.exerciseName.map {
@@ -41,8 +38,7 @@ enum CoachVideoBadgeResolver {
       weightKg: setInfo?.weightKg,
       reps: setInfo?.reps,
       rpe: setInfo?.rpe,
-      setOrdinal: setInfo?.displaySetNumber,
-      coachName: coachName
+      setOrdinal: setInfo?.displaySetNumber
     )
   }
 }

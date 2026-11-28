@@ -41,6 +41,13 @@ public struct TodayWorkoutSetRowDraft: Codable, Equatable, Sendable, Identifiabl
   public var actualReps: Int?
   public var actualRIR: Int?
   public var actualRPE: Decimal?
+  /// Incomplete media logs retain the editor's legacy default. Keep its origin
+  /// locally so reopening the camera does not burn it into the recording.
+  var isRPEPlaceholder: Bool?
+  var videoBadgeRPE: Decimal? {
+    guard actualRIR == nil, completed || failed || isRPEPlaceholder != true else { return nil }
+    return actualRPE
+  }
   public var completed: Bool
   public var failed: Bool
   public var assumed: Bool

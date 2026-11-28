@@ -6,7 +6,14 @@ struct VideoBadgeExportFixture: Sendable {
   let directory: URL
   let sourceURL: URL
 
+  private let size: CGSize
+  private let rotated: Bool
+
   static func makePortrait() async throws -> VideoBadgeExportFixture {
+    try await make(size: CGSize(width: 320, height: 180), rotated: true)
+  }
+
+  static func make(size: CGSize, rotated: Bool = false) async throws -> VideoBadgeExportFixture {
     let directory = FileManager.default.temporaryDirectory.appending(
       path: UUID().uuidString,
       directoryHint: .isDirectory
@@ -14,7 +21,7 @@ struct VideoBadgeExportFixture: Sendable {
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     let fixture = VideoBadgeExportFixture(
       directory: directory,
-      sourceURL: directory.appending(path: "portrait-source.mov")
+      sourceURL: directory.appending(path: "source.mov"), size: size, rotated: rotated
     )
     do {
       try await fixture.writeSource()
@@ -65,8 +72,8 @@ struct VideoBadgeExportFixture: Sendable {
   }
 
   private func makeWriterPipeline() throws -> WriterPipeline {
-    let width = 320
-    let height = 180
+    let width = Int(size.width)
+    let height = Int(size.height)
     let writer = try AVAssetWriter(outputURL: sourceURL, fileType: .mov)
     let input = AVAssetWriterInput(
       mediaType: .video,
@@ -76,7 +83,9 @@ struct VideoBadgeExportFixture: Sendable {
         AVVideoHeightKey: height,
       ]
     )
-    input.transform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 180, ty: 0)
+    if rotated {
+      input.transform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: size.height, ty: 0)
+    }
     let adaptor = AVAssetWriterInputPixelBufferAdaptor(
       assetWriterInput: input,
       sourcePixelBufferAttributes: [
@@ -150,6 +159,9 @@ struct VideoBadgeExportFixture: Sendable {
     audioInput.markAsFinished()
   }
 
+}
+
+extension VideoBadgeExportFixture {
   /// Flat gray frame with a red marker in the natural-coordinates region that
   /// the 90° preferredTransform maps to the displayed top-left corner. Any
   /// orientation mistake in the exporter moves the marker after transform.

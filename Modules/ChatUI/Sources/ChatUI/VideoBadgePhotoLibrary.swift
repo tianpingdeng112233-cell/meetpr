@@ -14,7 +14,7 @@
       }
       do {
         try await PHPhotoLibrary.shared().performChanges {
-          PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+          PHAssetCreationRequest.forAsset().addResource(with: .video, fileURL: url, options: nil)
         }
       } catch {
         throw VideoBadgePhotoLibraryError.saveFailed

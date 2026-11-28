@@ -22,8 +22,7 @@ struct VideoBadgeExporterTests {
         weightKg: 180,
         reps: 4,
         rpe: 8.5,
-        setOrdinal: 3,
-        coachName: "陈教练"
+        setOrdinal: 3
       )
     )
     defer { try? FileManager.default.removeItem(at: outputURL) }
@@ -62,29 +61,48 @@ struct VideoBadgeExporterTests {
       let centroid = try #require(stats.redCentroid)
       #expect(abs(centroid.x - sourceCentroid.x) < 15)
       #expect(abs(centroid.y - sourceCentroid.y) < 15)
-      // Badge presence on every sampled segment: gold (logo/RPE capsule) and
-      // bright text pixels that the flat gray-plus-red source cannot produce.
       #expect(stats.goldCount > 30)
       #expect(stats.brightCount > 100)
-      // The badge hugs the bottom edge, the red marker the top corner — their
-      // vertical separation proves the card really sits in the bottom band.
-      if let goldCentroid = stats.goldCentroid {
-        #expect(abs(goldCentroid.y - centroid.y) > Double(frame.height) * 0.4)
-      }
-      Self.expectScrimDarkensBottomBand(of: frame)
+      Self.expectCardBounds(stats.cardBounds, in: frame)
+      Self.expectOnlyCardDarkensFrame(frame)
     }
   }
 
-  /// Scrim: the flat-gray source must be darkened in the bottom band only.
-  /// Samples a column outside the card (right edge) and the red marker.
-  private static func expectScrimDarkensBottomBand(of frame: CGImage) {
-    let column = frame.width - 4
-    let top = luminance(in: frame, x: column, y: 8)
-    let middle = luminance(in: frame, x: column, y: frame.height / 2)
-    let bottom = luminance(in: frame, x: column, y: frame.height - 6)
-    #expect(abs(top - 190) < 12)
-    #expect(abs(middle - 190) < 16)
-    #expect(bottom < top * 0.6)
+  @Test(arguments: [CGSize(width: 1920, height: 1080), CGSize(width: 1080, height: 1440)])
+  @MainActor
+  func exportPlacesCardInFrame(_ size: CGSize) async throws {
+    let fixture = try await VideoBadgeExportFixture.make(size: size)
+    defer { fixture.remove() }
+    let url = try await VideoBadgeExporter().export(
+      sourceURL: fixture.sourceURL,
+      badge: VideoBadgeInfo(exerciseName: "Squat", weightKg: 180, reps: 4, rpe: 8.5))
+    defer { try? FileManager.default.removeItem(at: url) }
+    let frame = try Self.displayedFrame(of: AVURLAsset(url: url), atSeconds: 0.25)
+    #expect(frame.width == Int(size.width) && frame.height == Int(size.height))
+    let stats = Self.pixelStats(in: frame)
+    #expect(stats.goldCount > 30 && stats.brightCount > 100)
+    Self.expectCardBounds(stats.cardBounds, in: frame)
+  }
+
+  private static func expectCardBounds(_ bounds: CGRect, in frame: CGImage) {
+    let height = CGFloat(frame.height)
+    let scale = min(CGFloat(frame.width), height * 9 / 16) / 540
+    #expect(!bounds.isNull)
+    #expect(abs(bounds.minX - 44 * scale) <= 2)
+    #expect(abs(height - bounds.maxY - 214 * scale) <= 2)
+    #expect(bounds.height >= 95 * scale && bounds.height <= height * 0.20)
+  }
+
+  private static func expectOnlyCardDarkensFrame(_ frame: CGImage) {
+    // The 180×320 fixture scales the artboard by 1/3. The card starts at
+    // x≈15 and ends at y≈249. Sample its bottom padding, away from glyphs.
+    let clearColumn = frame.width - 4
+    #expect(abs(luminance(in: frame, x: clearColumn, y: 8) - 190) < 12)
+    #expect(abs(luminance(in: frame, x: clearColumn, y: frame.height / 2) - 190) < 16)
+    let card = luminance(in: frame, x: 35, y: 246)
+    let bottom = luminance(in: frame, x: 35, y: frame.height - 6)
+    #expect(card < 140)
+    #expect(abs(bottom - 190) < 12)
   }
 
   private static func luminance(in image: CGImage, x: Int, y: Int) -> Double {
@@ -122,7 +140,7 @@ struct VideoBadgeExporterTests {
 
   private struct PixelStats {
     var redCentroid: (x: Double, y: Double)?
-    var goldCentroid: (x: Double, y: Double)?
+    var cardBounds: CGRect
     var goldCount: Int
     var brightCount: Int
   }
@@ -142,11 +160,10 @@ struct VideoBadgeExporterTests {
     )
     context?.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
 
+    var cardBounds = CGRect.null
     var redSumX = 0.0
     var redSumY = 0.0
     var redCount = 0
-    var goldSumX = 0.0
-    var goldSumY = 0.0
     var goldCount = 0
     var brightCount = 0
     for y in 0..<height {
@@ -155,13 +172,15 @@ struct VideoBadgeExporterTests {
         let red = Int(pixels[offset])
         let green = Int(pixels[offset + 1])
         let blue = Int(pixels[offset + 2])
+        // Exclude the fixture's orientation fiducial and its codec halo.
+        if x > 64 || y > 184, red < 145, green < 145, blue < 145 {
+          cardBounds = cardBounds.union(CGRect(x: x, y: y, width: 1, height: 1))
+        }
         if red > 170, green < 110, blue < 110 {
           redSumX += Double(x)
           redSumY += Double(y)
           redCount += 1
         } else if red > 140, green > 80, green < 210, blue < 110, red > blue + 60 {
-          goldSumX += Double(x)
-          goldSumY += Double(y)
           goldCount += 1
         } else if red > 200, green > 200, blue > 200 {
           brightCount += 1
@@ -170,9 +189,7 @@ struct VideoBadgeExporterTests {
     }
     return PixelStats(
       redCentroid: redCount > 0 ? (redSumX / Double(redCount), redSumY / Double(redCount)) : nil,
-      goldCentroid: goldCount > 0
-        ? (goldSumX / Double(goldCount), goldSumY / Double(goldCount)) : nil,
-      goldCount: goldCount,
+      cardBounds: cardBounds, goldCount: goldCount,
       brightCount: brightCount
     )
   }

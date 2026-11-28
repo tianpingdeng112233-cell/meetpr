@@ -1,185 +1,120 @@
 import DesignSystem
 import SwiftUI
 
-/// Design source of truth: docs/design/video-badge/badge-01.html (David,
-/// 2026-08-21). All numbers below are that 540×960 artboard's values; the
-/// card is 468pt wide there, so `scale = width / 468`.
-enum VideoBadgeLayout {
-  static let cardWidthRatio = 468.0 / 540.0
-  static let referenceWidth: CGFloat = 468
-  static let bottomMarginRatio = 76.0 / 960.0
-  static let scrimHeightRatio = 0.44
+/// Design source of truth: specs/116-video-badge/SPEC.md (540 × 960 artboard).
+struct VideoBadgeLayout {
+  let scale: CGFloat
 
-  /// One ratio everywhere (no width cap): Pro Max screens keep the artboard
-  /// proportions instead of showing a narrower card than the design.
-  static func screenCardWidth(containerWidth: CGFloat) -> CGFloat {
-    containerWidth * cardWidthRatio
+  init(size: CGSize) {
+    scale = min(size.width, size.height * 9 / 16) / 540
   }
 
-  static func exportCardWidth(renderWidth: CGFloat) -> CGFloat {
-    renderWidth * cardWidthRatio
-  }
-
-  static func exportBottomMargin(renderHeight: CGFloat) -> CGFloat {
-    renderHeight * bottomMarginRatio
-  }
+  /// Distances from the left and bottom edges of the displayed image.
+  var exportInsets: CGPoint { CGPoint(x: 44 * scale, y: 214 * scale) }
 }
 
-/// Exact artboard colors; the badge is a brand element that must look the
-/// same on screen and burned into video, so it does not follow the app theme.
 enum VideoBadgePalette {
-  static let text = Color(red: 245 / 255, green: 245 / 255, blue: 247 / 255)
-  static let muted = Color(red: 138 / 255, green: 138 / 255, blue: 144 / 255)
-  static let dim = Color(red: 182 / 255, green: 182 / 255, blue: 188 / 255)
   static let gold = Color(red: 1, green: 184 / 255, blue: 0)
   static let amber = Color(red: 217 / 255, green: 119 / 255, blue: 6 / 255)
   static let ink = Color(red: 245 / 255, green: 246 / 255, blue: 248 / 255)
-  static let cardFill = Color(red: 10 / 255, green: 10 / 255, blue: 12 / 255).opacity(0.62)
-  static let cardStroke = Color.white.opacity(0.10)
-  static let scrim = Color(red: 5 / 255, green: 5 / 255, blue: 7 / 255)
+  static let cardFill = Color(red: 12 / 255, green: 12 / 255, blue: 14 / 255).opacity(0.45)
 }
 
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 struct VideoBadgeCard: View {
   let presentation: VideoBadgePresentation
-  let width: CGFloat
-  let includesCoachAttribution: Bool
-
-  private var scale: CGFloat {
-    width / VideoBadgeLayout.referenceWidth
-  }
+  let scale: CGFloat
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10 * scale) {
-      header
+    VStack(alignment: .leading, spacing: 0) {
+      HStack(spacing: 7 * scale) {
+        VideoBadgeLogoMark(size: 23 * scale)
+        VideoBadgeWordmark.image
+          .resizable()
+          .frame(width: 21 * scale * 2443 / 605, height: 21 * scale)
+          .accessibilityLabel("MEETPR")
+        if let ordinal = presentation.setOrdinal {
+          Spacer(minLength: 17 * scale)
+          Text(ChatStrings.setPosition(ordinal))
+            .font(.MeetPR.body(size: 15 * scale, weight: .medium))
+            .foregroundStyle(.white.opacity(0.62))
+            .fixedSize()
+        }
+      }
 
-      if let exerciseName = presentation.exerciseName {
-        Text(exerciseName)
-          .font(.MeetPR.body(size: 14 * scale, weight: .bold))
-          .tracking(-0.14 * scale)
-          .foregroundStyle(VideoBadgePalette.text)
+      if let name = presentation.exerciseName {
+        Text(name)
+          .font(.MeetPR.body(size: 19 * scale, weight: .medium))
+          .foregroundStyle(.white.opacity(0.74))
           .lineLimit(1)
-          .minimumScaleFactor(0.75)
+          .padding(.top, 12 * scale)
       }
 
       if presentation.hasLoad || presentation.rpeText != nil {
-        metrics
-      }
-
-      if includesCoachAttribution, let coachName = presentation.coachName {
-        Text(ChatStrings.videoBadgeCoach(coachName))
-          .font(.MeetPR.mono(size: 10 * scale, weight: .medium))
-          .foregroundStyle(VideoBadgePalette.muted)
-          .lineLimit(1)
+        VideoBadgeMetrics(presentation: presentation, scale: scale)
+          .padding(.top, (presentation.exerciseName == nil ? 12 : 5) * scale)
       }
     }
-    .padding(.top, 13 * scale)
-    .padding(.horizontal, 14 * scale)
-    .padding(.bottom, 14 * scale)
-    .frame(width: width, alignment: .leading)
-    .background(VideoBadgePalette.cardFill)
-    .clipShape(.rect(cornerRadius: 14 * scale))
-    .overlay {
-      RoundedRectangle(cornerRadius: 14 * scale)
-        .stroke(VideoBadgePalette.cardStroke, lineWidth: max(1, scale))
-    }
-  }
-
-  private var header: some View {
-    HStack(spacing: 7 * scale) {
-      VideoBadgeLogoMark(size: 22 * scale)
-      Image("MeetPRWordmark", bundle: .module)
-        .resizable()
-        .scaledToFit()
-        .frame(height: 21 * scale)
-        .accessibilityLabel("MEETPR")
-
-      Spacer(minLength: 8 * scale)
-
-      if let setOrdinal = presentation.setOrdinal {
-        HStack(alignment: .firstTextBaseline, spacing: 0) {
-          Text(ChatStrings.videoBadgeSetPrefix)
-            .font(.MeetPR.mono(size: 10 * scale))
-            .foregroundStyle(VideoBadgePalette.muted)
-          Text(setOrdinal.formatted())
-            .font(.MeetPR.display(size: 13 * scale, weight: .extraBold))
-            .foregroundStyle(VideoBadgePalette.text)
-          if !ChatStrings.videoBadgeSetSuffix.isEmpty {
-            Text(ChatStrings.videoBadgeSetSuffix)
-              .font(.MeetPR.mono(size: 10 * scale))
-              .foregroundStyle(VideoBadgePalette.muted)
-          }
-        }
-      }
-    }
-  }
-
-  private var metrics: some View {
-    HStack(alignment: .bottom, spacing: 9 * scale) {
-      if let weightText = presentation.weightText {
-        Text(weightText)
-          .font(.MeetPR.display(size: 30 * scale, weight: .extraBold))
-          .tracking(-0.6 * scale)
-          .foregroundStyle(VideoBadgePalette.text)
-          .monospacedDigit()
-        Text("kg")
-          .font(.MeetPR.mono(size: 14 * scale))
-          .foregroundStyle(VideoBadgePalette.muted)
-          .padding(.bottom, 3 * scale)
-      }
-
-      if let reps = presentation.reps {
-        Text("× \(reps.formatted())")
-          .font(.MeetPR.display(size: 20 * scale, weight: .extraBold))
-          .foregroundStyle(VideoBadgePalette.dim)
-          .monospacedDigit()
-          .padding(.bottom, 1 * scale)
-      }
-
-      Spacer(minLength: 8 * scale)
-
-      if let rpeText = presentation.rpeText {
-        HStack(alignment: .center, spacing: 5 * scale) {
-          Text("RPE")
-            .font(.MeetPR.mono(size: 9 * scale))
-            .tracking(0.9 * scale)
-            .foregroundStyle(VideoBadgePalette.gold)
-          Text(rpeText)
-            .font(.MeetPR.display(size: 15 * scale, weight: .extraBold))
-            .foregroundStyle(VideoBadgePalette.gold)
-            .monospacedDigit()
-        }
-        .padding(.horizontal, 9 * scale)
-        .frame(height: 22 * scale)
-        .background(VideoBadgePalette.gold.opacity(0.15))
-        .clipShape(.capsule)
-        .overlay {
-          Capsule().stroke(VideoBadgePalette.gold.opacity(0.42), lineWidth: max(1, scale))
-        }
-      }
-    }
+    .padding(.top, 17 * scale)
+    .padding(.horizontal, 22 * scale)
+    .padding(.bottom, 19 * scale)
+    .frame(maxWidth: 452 * scale, alignment: .leading)
+    .fixedSize()
+    .background(VideoBadgePalette.cardFill, in: .rect(cornerRadius: 22 * scale))
+    .foregroundStyle(.white)
+    .environment(\.layoutDirection, .leftToRight)
   }
 }
 
-/// Bottom darkening behind the card so white text reads on bright footage;
-/// artboard: 44% of the frame, rgba(5,5,7,.72) → transparent.
-@available(iOS 17.0, macOS 14.0, *)
-struct VideoBadgeScrim: View {
+private enum VideoBadgeWordmark {
+  static let image: Image = {
+    #if os(macOS)
+      // Command-line SwiftPM copies the catalog without running actool.
+      if let url = Bundle.module.url(
+        forResource: "meetpr-wordmark-plain-on-dark", withExtension: "svg",
+        subdirectory: "Media.xcassets/MeetPRWordmark.imageset"
+      ), let image = NSImage(contentsOf: url) {
+        return Image(nsImage: image)
+      }
+    #endif
+    return Image("MeetPRWordmark", bundle: .module)
+  }()
+}
+
+private struct VideoBadgeMetrics: View {
+  let presentation: VideoBadgePresentation
+  let scale: CGFloat
+
   var body: some View {
-    GeometryReader { proxy in
-      VStack(spacing: 0) {
-        Spacer(minLength: 0)
-        LinearGradient(
-          colors: [VideoBadgePalette.scrim.opacity(0), VideoBadgePalette.scrim.opacity(0.72)],
-          startPoint: .top,
-          endPoint: .bottom
-        )
-        .frame(height: proxy.size.height * VideoBadgeLayout.scrimHeightRatio)
+    HStack(alignment: .firstTextBaseline, spacing: 30 * scale) {
+      if presentation.hasLoad {
+        HStack(alignment: .firstTextBaseline, spacing: 7 * scale) {
+          if let weight = presentation.weightText {
+            Text(weight)
+              .font(.MeetPR.body(size: 38 * scale, weight: .semibold))
+            Text("kg")
+              .font(.MeetPR.body(size: 20 * scale, weight: .medium))
+              .foregroundStyle(.white.opacity(0.58))
+          }
+          if let reps = presentation.reps {
+            Text("× \(reps.formatted())")
+              .font(
+                .MeetPR.body(
+                  size: (presentation.weightText == nil ? 38 : 29) * scale, weight: .semibold))
+          }
+        }
+      }
+      if let rpe = presentation.rpeText {
+        HStack(alignment: .firstTextBaseline, spacing: 6 * scale) {
+          Text("RPE")
+            .font(.MeetPR.body(size: 17 * scale, weight: .medium))
+            .foregroundStyle(.white.opacity(0.58))
+          Text(rpe)
+            .font(.MeetPR.body(size: 24 * scale, weight: .semibold))
+        }
       }
     }
-    .allowsHitTesting(false)
-    .accessibilityHidden(true)
+    .monospacedDigit()
+    .lineLimit(1)
   }
 }
 

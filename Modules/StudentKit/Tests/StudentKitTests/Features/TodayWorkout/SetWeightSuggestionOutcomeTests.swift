@@ -260,9 +260,10 @@ import ViewInspector
 }
 
 @MainActor
-private struct SuggestionSheetFixture {
+struct SuggestionSheetFixture {
   let studentID: UUID
   let date: Date
+  let logs: InMemoryStudentTrainingLogRepository
   let e1rm: InMemoryE1RMRepository
   let viewModel: TodayWorkoutViewModel
   let draft: TodayWorkoutViewModel.SetRowDraft
@@ -277,7 +278,7 @@ private struct SuggestionSheetDomain {
 }
 
 @MainActor
-private func makeSuggestionSheetFixture(
+func makeSuggestionSheetFixture(
   seedHistory: Bool,
   prescribed: PrescribedSet? = nil
 ) async throws -> SuggestionSheetFixture {
@@ -288,9 +289,10 @@ private func makeSuggestionSheetFixture(
   let plans = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [domain.studentID: domain.plan])
   )
+  let logs = InMemoryStudentTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
     plans: plans,
-    logs: InMemoryStudentTrainingLogRepository(),
+    logs: logs,
     e1rm: e1rm
   )
   await viewModel.load(date: domain.date, studentID: domain.studentID)
@@ -298,7 +300,7 @@ private func makeSuggestionSheetFixture(
   return SuggestionSheetFixture(
     studentID: domain.studentID,
     date: domain.date,
-    e1rm: e1rm,
+    logs: logs, e1rm: e1rm,
     viewModel: viewModel,
     draft: draft,
     historyPoint: domain.historyPoint

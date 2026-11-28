@@ -1,3 +1,4 @@
+import ChatUI
 import DesignSystem
 import SwiftUI
 
@@ -11,12 +12,16 @@ struct AllDayVideoSheet: View {
   @State private var playback = SetEntryVideoPlayer()
   @Environment(\.dismiss) private var dismiss
 
+  private var currentBadge: VideoBadgeInfo {
+    (viewModel.currentDrafts?.first { $0.id == draft.id } ?? draft).videoBadge
+  }
+
   var body: some View {
     NavigationStack {
       VideoAttachmentSection(
         draftID: draft.id, slot: draft.pendingVideoSlot, studentID: studentID,
         trainingDate: trainingDate, videoViewModel: videoViewModel,
-        playback: playback, initialSetLogID: draft.loggedSetID,
+        badge: currentBadge, playback: playback, initialSetLogID: draft.loggedSetID,
         resolveSetLogID: {
           await viewModel.resolveVideoSetLogID(draftID: draft.id, trainingDate: trainingDate)
         }
@@ -32,7 +37,7 @@ struct AllDayVideoSheet: View {
     .interactiveDismissDisabled(playback.state.isExpanded)
     .overlay {
       if playback.state.isExpanded {
-        SetEntryVideoPlayerView(playback: playback, badge: nil) {
+        SetEntryVideoPlayerView(playback: playback, badge: currentBadge) {
           Task {
             await playback.retry { attachmentID in
               try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)

@@ -67,7 +67,7 @@ extension FeedbackVideoPlayerView {
   }
 
   func requestExport() {
-    guard !isExporting else { return }
+    guard !albumExport.isExporting else { return }
     if requiresCoachExportConfirmation,
       !UserDefaults.standard.bool(forKey: Self.coachExportConfirmationDefaultsKey)
     {
@@ -78,35 +78,7 @@ extension FeedbackVideoPlayerView {
   }
 
   func startExport() {
-    #if os(iOS)
-      guard let badge, !isExporting else { return }
-      isExporting = true
-      showingSavedToast = false
-      exportTask = Task {
-        do {
-          let outputURL = try await VideoBadgeExporter().export(
-            sourceURL: playbackURL,
-            badge: badge
-          )
-          defer { try? FileManager.default.removeItem(at: outputURL) }
-          try Task.checkCancellation()
-          try await VideoBadgePhotoLibrary.save(outputURL)
-          try Task.checkCancellation()
-          showingSavedToast = true
-          try? await Task.sleep(for: .seconds(2.5))
-          showingSavedToast = false
-        } catch is CancellationError {
-          showingSavedToast = false
-        } catch VideoBadgePhotoLibraryError.permissionDenied {
-          exportFailureMessage = ChatStrings.videoExportPhotoPermissionDenied
-          showingExportFailure = true
-        } catch {
-          exportFailureMessage = ChatStrings.videoExportFailureMessage
-          showingExportFailure = true
-        }
-        isExporting = false
-        exportTask = nil
-      }
-    #endif
+    guard let badge else { return }
+    albumExport.start(sourceURL: playbackURL, badge: badge)
   }
 }

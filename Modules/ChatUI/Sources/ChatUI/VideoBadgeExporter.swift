@@ -7,8 +7,10 @@ import SwiftUI
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-struct VideoBadgeExporter {
-  func export(sourceURL: URL, badge: VideoBadgeInfo) async throws -> URL {
+public struct VideoBadgeExporter {
+  public init() {}
+
+  public func export(sourceURL: URL, badge: VideoBadgeInfo) async throws -> URL {
     let source = AVURLAsset(url: sourceURL)
     let duration = try await source.load(.duration)
     guard duration.isNumeric, duration.seconds > 0 else {
@@ -153,21 +155,7 @@ struct VideoBadgeExporter {
     badge: VideoBadgeInfo,
     renderSize: CGSize
   ) throws -> sending CALayer {
-    let cardWidth = VideoBadgeLayout.exportCardWidth(renderWidth: renderSize.width)
-    let renderer = ImageRenderer(
-      content: ZStack(alignment: .bottom) {
-        Color.clear
-        VideoBadgeScrim()
-        VideoBadgeCard(
-          presentation: VideoBadgePresentation(info: badge),
-          width: cardWidth,
-          includesCoachAttribution: true
-        )
-        .padding(.bottom, VideoBadgeLayout.exportBottomMargin(renderHeight: renderSize.height))
-      }
-      .frame(width: renderSize.width, height: renderSize.height)
-      .environment(\.colorScheme, .dark)
-    )
+    let renderer = ImageRenderer(content: VideoBadgeExportOverlay(info: badge, size: renderSize))
     renderer.scale = 1
     renderer.proposedSize = ProposedViewSize(renderSize)
     guard let overlayImage = renderer.cgImage else {

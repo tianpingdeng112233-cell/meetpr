@@ -37,8 +37,7 @@ struct VideoFeedbackPresentationTests {
 
     let badge = CoachVideoBadgeResolver.pendingVideo(
       item,
-      setInfo: info,
-      coachName: "陈教练"
+      setInfo: info
     )
 
     #expect(badge.exerciseName == "传统硬拉")
@@ -46,7 +45,7 @@ struct VideoFeedbackPresentationTests {
     #expect(badge.reps == info.reps)
     #expect(badge.rpe == 8.5)
     #expect(badge.setOrdinal == 3)
-    #expect(badge.coachName == "陈教练")
+    #expect(badge.hasContent)
   }
 
   @MainActor

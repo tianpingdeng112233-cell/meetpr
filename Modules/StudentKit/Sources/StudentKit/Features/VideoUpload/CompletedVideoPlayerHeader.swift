@@ -1,9 +1,11 @@
+import ChatUI
 import DesignSystem
 import SwiftUI
 
 struct CompletedVideoPlayerHeader: View {
   let close: () -> Void
   let onReview: (() -> Void)?
+  let saveButton: VideoBadgeSaveButton?
 
   var body: some View {
     HStack(alignment: .top) {
@@ -16,6 +18,7 @@ struct CompletedVideoPlayerHeader: View {
       .accessibilityLabel(String(localized: "student.completedVideo.close", bundle: .module))
       .accessibilityIdentifier("completedVideo.close")
       Spacer(minLength: MeetPRSpacing.sm)
+      saveButton
       if let onReview {
         Button(action: onReview) {
           HStack(spacing: MeetPRSpacing.space1) {

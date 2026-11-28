@@ -13,40 +13,41 @@ struct SetEntryVideoPlayerView: View {
   var onClose: (() -> Void)?
   var onReview: (() -> Void)?
   let retry: () -> Void
+  @State private var albumExport = VideoBadgeAlbumExport()
+  @State private var badgeExpanded = true
+  @State private var size = CGSize.zero
 
   var body: some View {
     Group {
-      if readOnly {
+      if readOnly || (playback.state.isExpanded && !isInline) {
         SetEntryVideoStage(playback: playback, role: .expanded)
           .ignoresSafeArea()
           .overlay(alignment: .top) {
-            CompletedVideoPlayerHeader(close: { onClose?() }, onReview: onReview)
+            if readOnly {
+              CompletedVideoPlayerHeader(
+                close: { onClose?() }, onReview: onReview, saveButton: saveButton)
+            } else {
+              SetEntryVideoHeader(saveButton: saveButton, collapse: { playback.state.handleBack() })
+            }
           }
           .overlay(alignment: .bottom) {
-            VStack(spacing: MeetPRSpacing.sm) {
-              if let badge {
-                Text(
-                  [badge.exerciseName, SetEntryVideoDetails.text(badge)]
-                    .compactMap { $0 }.joined(separator: " · ")
-                )
-                .font(.MeetPR.footnote)
-                .foregroundStyle(.white.opacity(0.8))
-                .padding(.horizontal, MeetPRSpacing.sm)
+            VStack(alignment: .leading, spacing: 0) {
+              if let badge, badge.hasContent {
+                VideoBadgeOverlay(info: badge, isExpanded: $badgeExpanded, size: size)
+                  .padding(.bottom, min(size.width, size.height * 9 / 16) * 52 / 540)
               }
               SetEntryVideoControlBar(
-                playback: playback, allowsExpansion: false, showsError: showsPlaybackError,
+                playback: playback, allowsExpansion: !readOnly, showsError: showsPlaybackError,
                 retry: retry)
             }
           }
-      } else if playback.state.isExpanded && !isInline {
-        SetEntryVideoStage(playback: playback, role: .expanded)
-          .ignoresSafeArea()
-          .overlay(alignment: .top) {
-            SetEntryVideoHeader(badge: badge, collapse: { playback.state.handleBack() })
+          .onGeometryChange(for: CGSize.self) {
+            $0.size
+          } action: {
+            size = $0
           }
-          .overlay(alignment: .bottom) {
-            SetEntryVideoControlBar(playback: playback, retry: retry)
-          }
+          .modifier(VideoBadgeExportFeedback(job: albumExport))
+          .onAppear { badgeExpanded = true }
       } else {
         VStack(spacing: 0) {
           SetEntryVideoStage(
@@ -67,6 +68,15 @@ struct SetEntryVideoPlayerView: View {
       }
     #endif
   }
+  private var saveButton: VideoBadgeSaveButton? {
+    guard let badge, badge.hasContent,
+      let asset = playback.player?.currentItem?.asset as? AVURLAsset
+    else { return nil }
+    return VideoBadgeSaveButton(isExporting: albumExport.isExporting) {
+      albumExport.start(sourceURL: asset.url, badge: badge)
+    }
+  }
+
 }
 
 private struct SetEntryVideoStage: View {
@@ -195,7 +205,7 @@ private struct SetEntryVideoControls: View {
 }
 
 private struct SetEntryVideoHeader: View {
-  let badge: VideoBadgeInfo?
+  let saveButton: VideoBadgeSaveButton?
   let collapse: () -> Void
 
   var body: some View {
@@ -205,14 +215,8 @@ private struct SetEntryVideoHeader: View {
           .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
       }
       .accessibilityLabel(StudentStrings.localized(.setEntryVideoCollapse))
-      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        if let name = badge?.exerciseName { Text(name).font(.MeetPR.bodyEmphasis) }
-        if let badge {
-          Text(SetEntryVideoDetails.text(badge))
-            .font(.MeetPR.footnote)
-        }
-      }
       Spacer(minLength: 0)
+      saveButton
     }
     .padding(MeetPRSpacing.sm)
     .foregroundStyle(.white)

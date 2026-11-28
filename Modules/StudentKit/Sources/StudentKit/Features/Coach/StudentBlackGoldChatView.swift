@@ -624,8 +624,9 @@ struct StudentBlackGoldChatView: View {
     )
   }
 
-  private func feedbackVideoContent(_ selection: FeedbackVideoPlaybackItem) -> some View {
-    FeedbackVideoPlayerView(
+  private func feedbackVideoContent(_ presented: FeedbackVideoPlaybackItem) -> some View {
+    let selection = feedbackPlayback.selection ?? presented
+    return FeedbackVideoPlayerView(
       videoID: selection.id,
       url: selection.url,
       markers: selection.markers,

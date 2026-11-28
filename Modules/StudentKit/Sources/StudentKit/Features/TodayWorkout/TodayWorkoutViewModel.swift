@@ -788,6 +788,7 @@ public final class TodayWorkoutViewModel {
         mergedDraft.actualReps = currentDraft.actualReps
       }
       if editedFields.contains(.rpe) {
+        mergedDraft.isRPEPlaceholder = currentDraft.isRPEPlaceholder
         mergedDraft.actualRPE = currentDraft.actualRPE
         mergedDraft.actualRIR = currentDraft.actualRIR
       }
@@ -961,10 +962,11 @@ public final class TodayWorkoutViewModel {
     updateEffort(rowIndex: rowIndex, rpe: rpe, rir: nil)
   }
 
-  func updateEffort(rowIndex: Int, rpe: Decimal?, rir: Int?) {
+  func updateEffort(rowIndex: Int, rpe: Decimal?, rir: Int?, isPlaceholder: Bool = false) {
     guard !isPreviewingPlan, !browsingPastPlan else { return }
     mutateDraft(rowIndex: rowIndex, editedField: .rpe) {
       $0.actualRPE = rpe
+      $0.isRPEPlaceholder = isPlaceholder && rpe != nil ? true : nil
       $0.actualRIR = rir
     }
   }
@@ -1063,7 +1065,9 @@ public final class TodayWorkoutViewModel {
     {
       updateWeight(rowIndex: index, weight: original.actualWeight)
       updateReps(rowIndex: index, reps: original.actualReps)
-      updateEffort(rowIndex: index, rpe: original.actualRPE, rir: original.actualRIR)
+      updateEffort(
+        rowIndex: index, rpe: original.actualRPE, rir: original.actualRIR,
+        isPlaceholder: original.isRPEPlaceholder == true)
     }
     return result
   }
@@ -1503,6 +1507,7 @@ public final class TodayWorkoutViewModel {
     else { return }
     drafts[index].actualWeight = persisted.weightKg
     drafts[index].actualReps = persisted.reps
+    drafts[index].isRPEPlaceholder = nil
     drafts[index].actualRPE = persisted.rpe
     drafts[index].actualRIR = persisted.actualRIR
     drafts[index].completed = persisted.completed
@@ -2430,6 +2435,7 @@ extension TodayWorkoutViewModel {
         var merged = cached.exerciseName == "—" ? authoritative : cached
         merged.actualWeight = cached.actualWeight
         merged.actualReps = cached.actualReps
+        merged.isRPEPlaceholder = cached.isRPEPlaceholder
         merged.actualRPE = cached.actualRPE
         merged.actualRIR = cached.actualRIR
         merged.loggedSetID = authoritative.loggedSetID
