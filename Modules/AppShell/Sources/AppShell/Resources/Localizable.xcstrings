@@ -737,29 +737,6 @@
         }
       }
     },
-    "appShell.root.validatingSession": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verifying session…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在验证会话…"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在驗證會話…"
-          }
-        }
-      }
-    },
     "appShell.signup.eyebrow": {
       "extractionState": "manual",
       "localizations": {

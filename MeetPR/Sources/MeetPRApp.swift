@@ -538,6 +538,7 @@ struct MeetPRApp: App {
   var body: some Scene {
     WindowGroup {
       MinimumVersionGate { appContent }
+        .launchSplash()
         .environment(session)
         #if DEMO_MODE && COACH_LAUNCH_HANG_TESTING
           .onAppear {

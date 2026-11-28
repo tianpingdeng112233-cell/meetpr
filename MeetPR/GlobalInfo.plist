@@ -82,7 +82,9 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>AccentColor</string>
+		<string>LaunchScreenColor</string>
+		<key>UIImageName</key>
+		<string>LaunchScreenBackground</string>
 	</dict>
 	<key>UISupportedInterfaceOrientations~iphone</key>
 	<array>

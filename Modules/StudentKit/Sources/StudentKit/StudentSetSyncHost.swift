@@ -43,6 +43,7 @@ public struct StudentSetSyncHost<Content: View>: View {
         ContentUnavailableView(loadError, systemImage: "exclamationmark.triangle")
       } else {
         ProgressView()
+          .launchBlocking()
       }
     }
     .task {

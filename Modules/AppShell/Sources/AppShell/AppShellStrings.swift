@@ -58,7 +58,6 @@ enum AppShellStrings {
   static let consentRequired = localized("appShell.legal.required")
   static let reviewConsent = localized("appShell.legal.review")
   static let acknowledge = localized("appShell.acknowledge")
-  static let validatingSession = localized("appShell.root.validatingSession")
   static let demoCoach = localized("appShell.demo.coach")
   static let demoStudent = localized("appShell.demo.student")
 
