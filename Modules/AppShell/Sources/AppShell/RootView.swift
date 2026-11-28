@@ -241,8 +241,7 @@ public struct RootView: View {
       inbox: chat?.inbox,
       sendCoordinator: chat?.sendCoordinator,
       coachDisplayName: user.name,
-      privacyPolicyURL: LegalDocuments.privacyPolicyURL,
-      termsURL: LegalDocuments.termsURL,
+      privacyPolicyURL: AnalyticsPrivacyNotice.privacyPolicyURL,
       onLogout: { await session.logout() },
       draftStore: draftStore,
       pushRoute: pushRouteBinding

@@ -7,30 +7,6 @@ import ViewInspector
 
 @testable import AppShell
 
-@MainActor
-@Test func chinaEmailLoginUsesCanonicalPrivacyPolicyURL() throws {
-  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
-  let inspected = try GlobalLoginView(buildTrack: .china).environment(session).inspect()
-  #expect(
-    try inspected.find(link: AnalyticsPrivacyNotice.privacyPolicyURL).url()
-      == AnalyticsPrivacyNotice.privacyPolicyURL)
-}
-
-@MainActor
-@Test(arguments: [MeetPRBuildTrack.china, .global])
-func emailLoginIncludesTermsAndPreservesLocalizedPrivacyURL(track: MeetPRBuildTrack) throws {
-  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
-  let inspected = try GlobalLoginView(buildTrack: track).environment(session).inspect()
-  #expect(
-    try inspected.find(link: LegalDocuments.termsURL).url()
-      == LegalDocuments.termsURL)
-  let privacyURL = try #require(
-    URL(
-      string: track == .china
-        ? "https://meetpr.app/privacy" : "https://meetpr.app/privacy/en"))
-  #expect(try inspected.find(link: privacyURL).url() == privacyURL)
-}
-
 /// Pins the focus-to-scroll wiring; keyboard geometry still needs simulator verification.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)

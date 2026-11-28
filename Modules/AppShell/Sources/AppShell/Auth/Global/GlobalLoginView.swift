@@ -111,25 +111,18 @@ public struct GlobalLoginView: View {
 
           }
 
-          VStack(spacing: MeetPRSpacing.space1) {
+          HStack(spacing: MeetPRSpacing.space1) {
             Text(text("auth.consent"))
               .foregroundStyle(Color.MeetPR.textMuted)
-            HStack(spacing: MeetPRSpacing.space1) {
-              Link(text("appShell.legal.terms"), destination: LegalDocuments.termsURL)
-                .foregroundStyle(Color.MeetPR.goldText)
-                .underline()
-              Text(text("appShell.legal.and"))
-                .foregroundStyle(Color.MeetPR.textMuted)
-              Link(
-                text("auth.privacy"),
-                destination: buildTrack == .china
-                  ? LegalDocuments.privacyPolicyURL
-                  : URL(string: "https://meetpr.app/privacy/en")
-                    ?? LegalDocuments.privacyPolicyURL
-              )
-              .foregroundStyle(Color.MeetPR.goldText)
-              .underline()
-            }
+            Link(
+              text("auth.privacy"),
+              destination: URL(
+                string: buildTrack == .china
+                  ? "https://meetpr.app/privacy/zh" : "https://meetpr.app/privacy/en")
+                ?? AnalyticsPrivacyNotice.privacyPolicyURL
+            )
+            .foregroundStyle(Color.MeetPR.goldText)
+            .underline()
           }
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
           .frame(maxWidth: .infinity)
