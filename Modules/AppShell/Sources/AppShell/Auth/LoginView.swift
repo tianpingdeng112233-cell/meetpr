@@ -15,7 +15,7 @@ public struct LoginView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 0) {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point18) {
-            MeetPRMark(fontSize: MeetPRFontMetrics.size15)
+            MeetPRMark(height: 23)
 
             VStack(alignment: .leading, spacing: 0) {
               Text("Better than\nyesterday")

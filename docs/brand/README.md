@@ -69,3 +69,13 @@ magick /tmp/icon.png -background '#F5F6F8' -alpha remove -alpha off -colorspace 
 
 出完必查：`magick identify -format '%wx%h %[channels]'` 要是 `1024x1024 srgb 3.0`
 （**3 通道 = 无 alpha，App Store 硬要求**；tinted 那张例外，它必须带 alpha）。
+
+## 字标
+
+浅色背景使用 `meetpr-wordmark-final.svg`，深色背景使用 `meetpr-wordmark-final-on-dark.svg`。两个原稿均为 2443 × 605，展示时按高度等比缩放。
+
+| iOS 位置 | 高度 | 选图 |
+|---|---:|---|
+| 成长、我的页头 | 18 pt | 随 App 主题 |
+| 登录、注册、忘记密码页 | 23 pt | 随 App 主题 |
+| 训练视频角标（播放与导出） | 21 pt × 角标缩放系数 | 固定深色背景版 |

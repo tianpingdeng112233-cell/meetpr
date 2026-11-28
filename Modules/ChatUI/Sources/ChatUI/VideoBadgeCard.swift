@@ -92,7 +92,7 @@ struct VideoBadgeCard: View {
       Image("MeetPRWordmark", bundle: .module)
         .resizable()
         .scaledToFit()
-        .frame(height: 16 * scale)
+        .frame(height: 21 * scale)
         .accessibilityLabel("MEETPR")
 
       Spacer(minLength: 8 * scale)
