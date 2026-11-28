@@ -9,6 +9,7 @@
     let uploadsOnSave: Bool
 
     @State private var player = AVPlayer()
+    @State private var previewAudio: UploadVideoAudio?
     @State private var selection: VideoTrimSelection
     @State private var thumbnails: [VideoTrimThumbnail] = []
     @State private var isReady = false
@@ -77,6 +78,7 @@
         exportTask?.cancel()
         player.pause()
         player.replaceCurrentItem(with: nil)
+        previewAudio = nil
       }
     }
 
@@ -144,6 +146,8 @@
       {
         seek(to: selection.startSeconds)
       }
+      if previewAudio == nil { previewAudio = try? UploadVideoAudio(.preview) }
+      guard previewAudio != nil else { return }
       player.play()
       isPlaying = true
       playbackTask?.cancel()

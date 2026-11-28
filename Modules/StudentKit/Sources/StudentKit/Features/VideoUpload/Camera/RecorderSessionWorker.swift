@@ -12,19 +12,27 @@
     private let capturePipeline = RecorderCapturePipeline()
     private var isConfigured = false
 
+    private var captureAudio: UploadVideoAudio?
+
+    init() {
+      session.automaticallyConfiguresApplicationAudioSession = false
+    }
+
     static var isCameraAvailable: Bool {
       AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil
     }
 
     func configureAndStart() async throws {
       try await performOnSessionQueue {
+        guard !self.session.isRunning else { return }
+        let audio = try UploadVideoAudio(.capture)
         if !self.isConfigured {
           try self.configure()
           self.isConfigured = true
         }
-        if !self.session.isRunning {
-          self.session.startRunning()
-        }
+        self.session.startRunning()
+        guard self.session.isRunning else { throw CameraRecorderError.cameraConfigurationFailed }
+        self.captureAudio = audio
       }
     }
 
@@ -33,6 +41,7 @@
         if self.session.isRunning {
           self.session.stopRunning()
         }
+        self.captureAudio = nil
       }
     }
 
