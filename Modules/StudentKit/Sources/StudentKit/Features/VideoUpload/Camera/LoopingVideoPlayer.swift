@@ -15,7 +15,11 @@
       controller.player = context.coordinator.player
       controller.showsPlaybackControls = true
       controller.videoGravity = .resizeAspect
-      context.coordinator.player.play()
+      if context.coordinator.audio != nil {
+        context.coordinator.player.play()
+      } else {
+        controller.showsPlaybackControls = false
+      }
       return controller
     }
 
@@ -30,9 +34,11 @@
     ) {
       coordinator.player.pause()
       uiViewController.player = nil
+      coordinator.audio = nil
     }
 
     final class Coordinator {
+      var audio = try? UploadVideoAudio(.preview)
       let player: AVQueuePlayer
       private let looper: AVPlayerLooper
 

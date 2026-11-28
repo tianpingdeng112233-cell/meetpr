@@ -161,6 +161,9 @@ private struct StudentChatVideoPreview: View {
   let cancel: @MainActor () -> Void
   let chooseAgain: @MainActor () -> Void
   let send: @MainActor () -> Void
+  #if os(iOS)
+    @State private var previewAudio: UploadVideoAudio?
+  #endif
   @State private var player: AVPlayer
 
   init(
@@ -192,7 +195,12 @@ private struct StudentChatVideoPreview: View {
         }
       }
       .padding(MeetPRSpacing.md)
-      VideoPlayer(player: player)
+      #if os(iOS)
+        VideoPlayer(player: previewAudio == nil ? nil : player)
+          .onAppear { previewAudio = try? UploadVideoAudio(.preview) }
+      #else
+        VideoPlayer(player: player)
+      #endif
       HStack {
         Text(ChatVideoStrings.recipient(coachName)).font(.subheadline)
         Spacer()
@@ -207,6 +215,11 @@ private struct StudentChatVideoPreview: View {
       .padding(MeetPRSpacing.md)
     }
     .background(Color.MeetPR.bgBase)
-    .onDisappear { player.pause() }
+    .onDisappear {
+      player.pause()
+      #if os(iOS)
+        previewAudio = nil
+      #endif
+    }
   }
 }
