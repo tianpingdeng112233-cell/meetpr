@@ -1,6 +1,6 @@
 # 116 视频角标重做（带角标存相册 + 打点上进度条）
 
-状态：Approved（David 2026-11-28 定稿）。iOS 与 Android 同批，T2，P2：不进下一班，目标 iOS 1.0 (45) 与安卓 CN 再下一个包。
+状态：Approved（David 2026-11-28 定稿；同日晚改拍进下一班）。iOS 与 Android 同批，T2，P1：目标 iOS 1.0 (44) 与安卓下一个 CN 包。
 
 先读本仓 CONTEXT.md。界面依据同目录 `approved-prototype.html`（画板 540×960，配图 `approved-prototype.png`）；本文数值与它冲突时以本文为准。本规格取代 `docs/design/video-badge/badge-01.html`（iOS 仓）那一版角标。
 
