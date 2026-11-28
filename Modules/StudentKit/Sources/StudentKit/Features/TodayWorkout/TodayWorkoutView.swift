@@ -56,6 +56,7 @@ public struct TodayWorkoutView: View {
   @Environment(WorkoutKeypadSession.self) private var keypad: WorkoutKeypadSession?
   @State private var editing: EditingTarget?
   @State private var quickLogRoute: QuickLogRoute?
+  @State private var albumSaveFailed = false
   @State private var quickLogToastWeekCode: String?
   @State private var quickLogToastTask: Task<Void, Never>?
   @State private var directCameraTarget: DirectCameraTarget?
@@ -185,6 +186,9 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     workoutContent
+      .alert(StudentStrings.localized(.cameraRecorderView013), isPresented: $albumSaveFailed) {
+        Button(DesignSystemStrings.done) {}
+      }
       .onChange(of: visitContext, initial: true) { _, context in
         checkResume(context)
       }
@@ -1049,6 +1053,10 @@ public struct TodayWorkoutView: View {
         onFailure: { error in
           videoViewModel.reportVideoProcessingFailure(draftID: target.id, error: error)
         },
+        badge: {
+          viewModel.currentDrafts?.first { $0.id == target.id }?.videoBadge ?? target.badge
+        },
+        onAlbumSaveFailure: { albumSaveFailed = true },
         allDayFlow: true
       )
     }
@@ -1064,7 +1072,8 @@ public struct TodayWorkoutView: View {
 
   private func beginDirectCamera(for draft: TodayWorkoutViewModel.SetRowDraft) {
     let target = DirectCameraTarget(
-      id: draft.id, trainingDate: selectedTrainingDate, slot: draft.pendingVideoSlot)
+      id: draft.id, trainingDate: selectedTrainingDate, slot: draft.pendingVideoSlot,
+      badge: draft.videoBadge)
     if videoViewModel.hasConsented {
       directCameraTarget = target
     } else {
@@ -1469,6 +1478,7 @@ private struct DirectCameraTarget: Identifiable {
   let id: UUID
   let trainingDate: Date
   let slot: VideoAttachment.SetSlot?
+  let badge: VideoBadgeInfo
 }
 
 private struct SetRefPickerRoute: Identifiable {

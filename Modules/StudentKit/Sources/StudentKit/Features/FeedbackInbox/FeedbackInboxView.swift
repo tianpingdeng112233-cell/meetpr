@@ -27,37 +27,30 @@ public struct FeedbackInboxView: View {
     .background(Color.MeetPR.bgBase)
     #if os(iOS)
       .toolbar(.hidden, for: .navigationBar)
-      .fullScreenCover(item: $playbackItem) { playback in
-        FeedbackVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          markers: playback.markers,
-          badge: playback.badge,
-          markersFailed: playback.markersFailed,
-          onSeek: { _ in },
-          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
-          refreshURL: { try await viewModel.playbackURL(videoID: $0) }
-        )
-      }
+      .fullScreenCover(item: $playbackItem, content: player)
     #else
-      .sheet(item: $playbackItem) { playback in
-        FeedbackVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          markers: playback.markers,
-          badge: playback.badge,
-          markersFailed: playback.markersFailed,
-          onSeek: { _ in },
-          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
-          refreshURL: { try await viewModel.playbackURL(videoID: $0) }
-        )
-      }
+      .sheet(item: $playbackItem, content: player)
     #endif
     .task {
       if viewModel.state == .idle {
         await viewModel.load(studentID: studentID)
       }
     }
+  }
+
+  private func player(_ presented: FeedbackVideoPlaybackItem) -> some View {
+    // Read live marker state: the cover's item argument is the opening snapshot.
+    let playback = playbackItem ?? presented
+    return FeedbackVideoPlayerView(
+      videoID: playback.id,
+      url: playback.url,
+      markers: playback.markers,
+      badge: playback.badge,
+      markersFailed: playback.markersFailed,
+      onSeek: { _ in },
+      onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
+      refreshURL: { try await viewModel.playbackURL(videoID: $0) }
+    )
   }
 
   @ViewBuilder

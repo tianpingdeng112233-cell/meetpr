@@ -70,12 +70,8 @@ public struct FeedbackVideoPlayerView: View {
   @State private var internalAnnotationMarker: VideoMarker?
   @State private var badgeExpanded = true
   @State var playbackURL: URL
-  @State var isExporting = false
+  @State var albumExport = VideoBadgeAlbumExport()
   @State var showingCoachExportConfirmation = false
-  @State var showingExportFailure = false
-  @State var exportFailureMessage = ""
-  @State var showingSavedToast = false
-  @State var exportTask: Task<Void, Never>?
   @State var scrubState = FeedbackVideoScrubState()
   @State var scrubSeekTask: Task<Void, Never>?
   @State var pendingScrubSeconds: Double?
@@ -114,7 +110,7 @@ public struct FeedbackVideoPlayerView: View {
     self.workbenchConfiguration = workbenchConfiguration
     currentSecondsBinding = currentSeconds
     self.markers = markers
-    self.badge = badge
+    self.badge = workbenchConfiguration == nil && badge?.hasContent == false ? nil : badge
     self.requiresCoachExportConfirmation = requiresCoachExportConfirmation
     self.markersFailed = markersFailed
     self.selectedAnnotationMarker = selectedAnnotationMarker
@@ -132,21 +128,7 @@ public struct FeedbackVideoPlayerView: View {
           FeedbackVideoFailureCard(retrying: retrying, retry: retry)
         }
       }
-      .overlay(alignment: .top) {
-        if showingSavedToast {
-          Text(ChatStrings.videoExportSaved)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-            .padding(.horizontal, MeetPRSpacing.space4)
-            .padding(.vertical, MeetPRSpacing.point10)
-            .background(Color.MeetPR.bgInset.opacity(0.96), in: .capsule)
-            .overlay {
-              Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-            }
-            .padding(.top, MeetPRSpacing.point56)
-            .accessibilityIdentifier("feedback.video.exportSaved")
-        }
-      }
+      .modifier(VideoBadgeExportFeedback(job: albumExport))
       .alert(
         ChatStrings.coachExportConfirmationTitle,
         isPresented: $showingCoachExportConfirmation
@@ -161,11 +143,6 @@ public struct FeedbackVideoPlayerView: View {
         }
       } message: {
         Text(ChatStrings.coachExportConfirmationMessage)
-      }
-      .alert(ChatStrings.videoExportFailed, isPresented: $showingExportFailure) {
-        Button(ChatStrings.close, role: .cancel) {}
-      } message: {
-        Text(exportFailureMessage)
       }
       .onReceive(
         NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
@@ -205,7 +182,6 @@ public struct FeedbackVideoPlayerView: View {
       }
       .onDisappear {
         scrubSeekTask?.cancel()
-        exportTask?.cancel()
         player.pause()
       }
       .onChange(of: selectedAnnotationMarker?.wrappedValue) { oldMarker, newMarker in
@@ -238,58 +214,31 @@ public struct FeedbackVideoPlayerView: View {
       VideoPlayer(player: player)
         .ignoresSafeArea()
 
-      if badge != nil {
-        VideoBadgeScrim()
-          .ignoresSafeArea()
+      if let annotationMarker, let annotationURL = annotationMarker.annotationURL {
+        FeedbackVideoAnnotationOverlay(
+          url: annotationURL, close: closeAnnotation, loadFailed: annotationLoadFailed)
+      }
+
+      if badge != nil || markersFailed || markers?.isEmpty == false {
+        FeedbackVideoTimeline(
+          badge: badge, showsAnnotation: annotationMarker?.annotationURL != nil,
+          markers: markers ?? [], markersFailed: markersFailed,
+          seconds: scrubberPositionSeconds, duration: durationSeconds,
+          select: selectMarker, update: updateScrubberPosition, setScrubbing: setScrubbing,
+          refresh: onMarkersRefresh)
+      } else {
+        VStack(spacing: 0) {
+          Spacer()
+          FeedbackVideoScrubber(
+            positionSeconds: scrubberPositionSeconds, durationSeconds: durationSeconds,
+            layout: .fullScreen,
+            updatePosition: updateScrubberPosition, setScrubbing: setScrubbing)
+        }
       }
 
       FeedbackVideoPlayerChrome(
-        rateText: Self.rateText(rate),
-        isExporting: isExporting,
-        close: close,
-        cycleRate: cycleRate,
-        export: exportAction
-      )
-
-      VStack(spacing: 0) {
-        // The badge region is greedy (GeometryReader) and bottom-aligned, so
-        // the card always sits directly above whatever the markers panel and
-        // scrubber actually measure — no hard-coded inset to drift out of sync.
-        if let badge {
-          VideoBadgeOverlay(info: badge, isExpanded: $badgeExpanded)
-            .padding(.bottom, MeetPRSpacing.point13)
-        } else {
-          Spacer()
-        }
-
-        if markersFailed || markers?.isEmpty == false {
-          FeedbackVideoMarkerOverlay(
-            markers: markers ?? [],
-            failed: markersFailed,
-            currentSeconds: currentSeconds,
-            durationSeconds: durationSeconds,
-            seek: seek(toMilliseconds:),
-            selectMarker: selectMarker
-          )
-        }
-
-        FeedbackVideoScrubber(
-          positionSeconds: scrubberPositionSeconds,
-          durationSeconds: durationSeconds,
-          layout: .fullScreen,
-          updatePosition: updateScrubberPosition,
-          setScrubbing: setScrubbing
-        )
-      }
-
-      if let annotationMarker, let annotationURL = annotationMarker.annotationURL {
-        FeedbackVideoAnnotationOverlay(
-          url: annotationURL,
-          close: closeAnnotation,
-          loadFailed: annotationLoadFailed
-        )
-      }
-
+        rateText: Self.rateText(rate), isExporting: albumExport.isExporting, close: close,
+        cycleRate: cycleRate, export: exportAction)
     }
     .background(SwiftUI.Color.black)
   }
@@ -312,7 +261,7 @@ public struct FeedbackVideoPlayerView: View {
       addMarker: onAddMarker,
       badge: badge,
       badgeExpanded: $badgeExpanded,
-      isExporting: isExporting,
+      isExporting: albumExport.isExporting,
       export: exportAction
     )
   }
@@ -333,6 +282,7 @@ public struct FeedbackVideoPlayerView: View {
 
   private func selectMarker(_ marker: VideoMarker) {
     guard marker.annotationURL != nil else {
+      closeAnnotation()
       seek(toMilliseconds: marker.timeMilliseconds)
       return
     }
@@ -371,7 +321,7 @@ public struct FeedbackVideoPlayerView: View {
       milliseconds: milliseconds,
       durationSeconds: durationSeconds
     )
-    let tolerance = CMTime(value: 50, timescale: 1_000)
+    let tolerance = playbackBehavior == .workbench ? CMTime(value: 50, timescale: 1_000) : .zero
     player.seek(
       to: target,
       toleranceBefore: tolerance,

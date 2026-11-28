@@ -29,28 +29,7 @@ struct FeedbackVideoPlayerChrome: View {
       Spacer()
 
       if let export {
-        Button(action: export) {
-          Group {
-            if isExporting {
-              ProgressView()
-                .tint(.white)
-            } else {
-              Image(systemName: "square.and.arrow.down")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
-            }
-          }
-          .frame(width: 36, height: 36)
-          .background(.ultraThinMaterial, in: .circle)
-          .overlay {
-            Circle().stroke(Color.white.opacity(0.18), lineWidth: 1)
-          }
-        }
-        .disabled(isExporting)
-        .accessibilityLabel(
-          isExporting ? ChatStrings.videoExporting : ChatStrings.videoExport
-        )
-        .accessibilityIdentifier("feedback.video.export")
+        VideoBadgeSaveButton(isExporting: isExporting, action: export)
       }
 
       Button(action: cycleRate) {

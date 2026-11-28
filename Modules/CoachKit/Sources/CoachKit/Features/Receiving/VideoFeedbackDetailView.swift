@@ -14,7 +14,6 @@ struct VideoFeedbackDetailView: View {
   private let onSent: () -> Void
 
   @Environment(\.coachNow) private var now
-  @Environment(\.coachVideoBadgeName) private var coachName
   @Environment(\.dismiss) private var dismiss
   @State private var detailModel: VideoFeedbackDetailModel
   @State private var text = ""
@@ -287,8 +286,7 @@ extension VideoFeedbackDetailView {
   fileprivate var videoBadge: VideoBadgeInfo {
     CoachVideoBadgeResolver.pendingVideo(
       detailModel.currentItem,
-      setInfo: detailModel.setInfo,
-      coachName: coachName
+      setInfo: detailModel.setInfo
     )
   }
 

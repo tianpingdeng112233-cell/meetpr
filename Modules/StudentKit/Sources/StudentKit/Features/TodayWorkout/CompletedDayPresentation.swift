@@ -47,12 +47,7 @@ struct CompletedDayPresentation: Equatable, Sendable {
       failedAttachment = attachment.flatMap { VideoDeliveryPresentation.hasFailure($0) ? $0 : nil }
       videoFailed = failedAttachment != nil
       video = CompletedSetVideo.resolve(setLogID: draft.loggedSetID, videos: videos, local: local)
-      badge = VideoBadgeInfo(
-        exerciseName: draft.displayExerciseName,
-        weightKg: draft.actualWeight.map { NSDecimalNumber(decimal: $0).doubleValue },
-        reps: draft.actualReps,
-        rpe: draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue },
-        setOrdinal: draft.prescribed.setIndex + 1)
+      badge = draft.videoBadge
       id = draft.id
       setLogID = draft.loggedSetID
       number = draft.prescribed.setIndex + 1
@@ -111,5 +106,22 @@ struct CompletedDayPresentation: Equatable, Sendable {
             setLogIDs: rows.map(\.loggedSetID), videos: videos, local: local)))
     }
     exercises = groups
+  }
+}
+
+extension TodayWorkoutSetRowDraft {
+  var videoBadge: VideoBadgeInfo {
+    videoBadge(
+      weight: actualWeight, reps: actualReps, rpe: videoBadgeRPE,
+      setNumber: prescribed.setIndex + 1)
+  }
+
+  func videoBadge(weight: Decimal?, reps: Int?, rpe: Decimal?, setNumber: Int) -> VideoBadgeInfo {
+    let addedWeight = prescribed.isBodyweight && weight == 0 ? nil : weight
+    return VideoBadgeInfo(
+      exerciseName: displayExerciseName,
+      weightKg: addedWeight.map { NSDecimalNumber(decimal: $0).doubleValue },
+      reps: reps, rpe: rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
+      setOrdinal: setNumber)
   }
 }

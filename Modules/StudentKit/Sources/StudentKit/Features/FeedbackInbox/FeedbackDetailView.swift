@@ -88,32 +88,25 @@ public struct FeedbackDetailView: View {
     .background(Color.MeetPR.bgBase)
     .navigationTitle(StudentStrings.localized(.feedbackDetailView003))
     #if os(iOS)
-      .fullScreenCover(item: $playbackItem) { playback in
-        FeedbackVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          markers: playback.markers,
-          badge: playback.badge,
-          markersFailed: playback.markersFailed,
-          onSeek: { _ in },
-          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
-          refreshURL: { try await freshPlaybackURL(videoID: $0) }
-        )
-      }
+      .fullScreenCover(item: $playbackItem, content: player)
     #else
-      .sheet(item: $playbackItem) { playback in
-        FeedbackVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          markers: playback.markers,
-          badge: playback.badge,
-          markersFailed: playback.markersFailed,
-          onSeek: { _ in },
-          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
-          refreshURL: { try await freshPlaybackURL(videoID: $0) }
-        )
-      }
+      .sheet(item: $playbackItem, content: player)
     #endif
+  }
+
+  private func player(_ presented: FeedbackVideoPlaybackItem) -> some View {
+    // Read live marker state: the cover's item argument is the opening snapshot.
+    let playback = playbackItem ?? presented
+    return FeedbackVideoPlayerView(
+      videoID: playback.id,
+      url: playback.url,
+      markers: playback.markers,
+      badge: playback.badge,
+      markersFailed: playback.markersFailed,
+      onSeek: { _ in },
+      onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
+      refreshURL: { try await freshPlaybackURL(videoID: $0) }
+    )
   }
 
   private func play(video: CoachFeedbackVideo, videoID: UUID) {

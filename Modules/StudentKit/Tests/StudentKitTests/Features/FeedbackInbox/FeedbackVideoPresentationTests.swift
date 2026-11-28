@@ -50,7 +50,7 @@ import Testing
   #expect(badge.reps == 5)
   #expect(badge.rpe == nil)
   #expect(badge.setOrdinal == 1)
-  #expect(badge.coachName == nil)
+  #expect(badge.hasContent)
 }
 
 @Test func feedbackVideoSummaryUsesEnglishExerciseNameInEnglishLocale() {

@@ -1,4 +1,5 @@
 #if os(iOS)
+  import ChatUI
   import PhotosUI
   import SwiftUI
   import UIKit
@@ -10,6 +11,8 @@
     @Binding var isPresented: Bool
     let onPicked: (URL) -> Void
     let onFailure: (Error?) -> Void
+    let badge: () -> VideoBadgeInfo?
+    let onAlbumSaveFailure: () -> Void
     let allDayFlow: Bool
     @State private var pickedAlbumVideo: PhotosPickerItem?
     @State private var albumImportTask: Task<Void, Never>?
@@ -33,12 +36,16 @@
       isPresented: Binding<Bool>,
       onPicked: @escaping (URL) -> Void,
       onFailure: @escaping (Error?) -> Void,
+      badge: @escaping () -> VideoBadgeInfo?,
+      onAlbumSaveFailure: @escaping () -> Void,
       allDayFlow: Bool = false
     ) {
       self.maxDurationSeconds = maxDurationSeconds
       _isPresented = isPresented
       self.onPicked = onPicked
       self.onFailure = onFailure
+      self.badge = badge
+      self.onAlbumSaveFailure = onAlbumSaveFailure
       self.allDayFlow = allDayFlow
       _controller = State(
         initialValue: RecorderSessionController(maximumDuration: maxDurationSeconds)
@@ -80,13 +87,14 @@
             if let url = controller.reviewURL {
               RecorderReviewView(
                 url: url,
+                badge: badge(),
                 duration: controller.recordedDuration,
                 saveToPhotoLibrary: saveToggleBinding,
                 isBusy: isUsingRecording || isApplyingTrim,
                 showsTrimSuggestion: trimSuggestionState.shouldShow,
                 onTrim: { prepareTrim(of: url) },
                 onNeverSuggestTrim: disableTrimSuggestion,
-                onUse: { Task { await useRecording(url) } },
+                onUse: { useRecording(url) },
                 onClose: close
               )
             }
@@ -176,7 +184,10 @@
         item: $recordingToTrim,
         onDismiss: finishRecordingTrimPresentation
       ) { session in
-        VideoTrimView(session: session, uploadsOnSave: allDayFlow)
+        VideoTrimView(
+          session: session, uploadsOnSave: allDayFlow,
+          recordingBadge: controller.phase == .review ? badge() : nil,
+          albumPreference: controller.phase == .review && allDayFlow ? saveToggleBinding : nil)
       }
       .task {
         // Students frame the shot, walk to the bar, and never touch the
@@ -318,28 +329,17 @@
       Task {
         await controller.replaceReviewFile(with: editedURL)
         isApplyingTrim = false
-        if allDayFlow { await useRecording(editedURL) }
+        if allDayFlow, isPresented, controller.reviewURL == editedURL { useRecording(editedURL) }
       }
     }
 
-    private func useRecording(_ url: URL) async {
+    private func useRecording(_ url: URL) {
       guard !isUsingRecording else { return }
       isUsingRecording = true
-
-      if saveToPhotoLibrary {
-        let saved = await VideoLibrarySaver.save(url)
-        if !saved {
-          onPicked(url)
-          await controller.relinquishReviewFile()
-          showToast(StudentStrings.localized(.cameraRecorderView013))
-          try? await Task.sleep(for: .seconds(1.2))
-          isPresented = false
-          return
-        }
-      }
-
-      onPicked(url)
-      await controller.relinquishReviewFile()
+      controller.relinquishReviewFile()
+      RecordingAlbumSave.accept(
+        url, badge: badge(), saveToAlbum: saveToPhotoLibrary,
+        onPicked: onPicked, onFailure: onAlbumSaveFailure)
       isPresented = false
     }
 

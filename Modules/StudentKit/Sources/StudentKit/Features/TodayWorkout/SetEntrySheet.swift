@@ -20,7 +20,6 @@ struct SetEntrySheet: View {
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel?
   let scrollToVideo: Bool
-  let coachName: String?
   @Environment(\.dismiss) private var dismiss
 
   @State var suggestionOutcomeSnapshot: SetWeightSuggestionOutcome
@@ -56,8 +55,7 @@ struct SetEntrySheet: View {
     studentID: UUID? = nil,
     trainingDate: Date = Date(),
     videoViewModel: VideoAttachmentViewModel? = nil,
-    scrollToVideo: Bool = false,
-    coachName: String? = nil
+    scrollToVideo: Bool = false
   ) {
     self.rowIndex = rowIndex
     self.draft = draft
@@ -67,7 +65,6 @@ struct SetEntrySheet: View {
     self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
-    self.coachName = coachName
     _collarOn = State(initialValue: SetEntryPlateMath.defaultCollarOn)
 
     // Camera and picker presentations can recreate the cover. Re-seed from the
@@ -80,7 +77,8 @@ struct SetEntrySheet: View {
         && seed.prescribed.weightKg == nil
         && suggestionOutcome.percentageSource != nil
     )
-    _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
+    _showsRPEPlaceholder = State(
+      initialValue: seed.prescribed.rpe == nil && seed.videoBadgeRPE == nil)
     let weight: Decimal?
     if seed.isExtra || seed.prescribed.hasUnspecifiedLoad {
       weight = seed.actualWeight ?? (seed.prescribed.isBodyweight ? 0 : nil)
@@ -296,16 +294,14 @@ struct SetEntrySheet: View {
   }
 
   private var videoBadge: VideoBadgeInfo {
-    VideoBadgeInfo(
-      exerciseName: draft.displayExerciseName,
-      weightKg: SetEntryValue.enteredWeight(from: weightText)
-        .map { NSDecimalNumber(decimal: $0).doubleValue },
-      reps: SetEntryValue.enteredReps(from: repsText),
-      rpe: (effortMode == .rpe ? SetEntryValue.enteredRPE(from: rpeText) : nil)
-        .map { NSDecimalNumber(decimal: $0).doubleValue },
-      setOrdinal: setNumber,
-      coachName: coachName
-    )
+    draft.videoBadge(
+      weight: SetEntryValue.enteredWeight(from: weightText),
+      reps: SetEntryValue.enteredReps(from: repsText), rpe: enteredVideoRPE, setNumber: setNumber)
+  }
+
+  private var enteredVideoRPE: Decimal? {
+    guard effortMode == .rpe, !showsRPEPlaceholder else { return nil }
+    return SetEntryValue.enteredRPE(from: rpeText)
   }
 
   // MARK: - Plate guidance
@@ -669,7 +665,7 @@ extension SetEntrySheet {
         ? nil
         : draft.isAccessory || draft.isExtra || draft.prescribed.hasUnspecifiedLoad
           ? SetEntryValue.enteredRPE(from: rpeText) : rpeValue,
-      rir: effortMode == .rir ? Int(rpeText) : nil)
+      rir: effortMode == .rir ? Int(rpeText) : nil, isPlaceholder: showsRPEPlaceholder)
 
   }
 
